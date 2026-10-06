@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F6B6F">
+<title>Naija Hustle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F0;--ink:#14201F;--lagoon:#0F6B6F;--danfo:#FFC20E;--brick:#C2410C;--card:#fff;--mute:#5C6B6A;--line:#D5DCDA}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.45}
+button,input{font:inherit}
+.stripe{height:8px;background:repeating-linear-gradient(90deg,var(--danfo) 0 28px,#14201F 28px 36px)}
+.wrap{max-width:480px;margin:0 auto;padding:16px 16px 96px}
+h1{font-size:2.4rem;font-weight:800;line-height:1.05;margin:24px 0 8px;letter-spacing:-.02em}
+h2{font-size:1.3rem;font-weight:800;margin:0 0 4px}
+p{margin:0 0 12px}
+.mute{color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--danfo);outline-offset:2px}
+.btn{width:100%;padding:14px;border:0;border-radius:10px;background:var(--lagoon);color:#fff;font-weight:800;font-size:1.05rem;margin-top:16px;cursor:pointer}
+.btn:disabled{opacity:.6}
+.link{background:none;border:0;color:var(--lagoon);font-weight:600;text-decoration:underline;padding:8px 0;cursor:pointer}
+.err{background:#FDE8E0;color:#7A2A08;border-radius:10px;padding:10px 12px;margin-top:12px}
+.ok{background:#E2F3E7;color:#1C5B2E;border-radius:10px;padding:10px 12px;margin-top:12px}
+.bg{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;color:var(--ink)}
+.bg[aria-pressed=true]{border-color:var(--lagoon);box-shadow:inset 6px 0 0 var(--danfo)}
+.bg b{font-size:1.1rem}
+.bg .meta{color:var(--lagoon);font-weight:600;font-size:.9rem;margin:2px 0 4px}
+.top{background:var(--lagoon);color:#fff;position:sticky;top:0;z-index:5}
+.top .in{max-width:480px;margin:0 auto;padding:12px 16px}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cash{font-size:1.6rem;font-weight:800;color:var(--danfo)}
+.bar{height:10px;background:rgba(255,255,255,.25);border-radius:6px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--danfo)}
+.sk{margin:10px 0}
+.sk .bar{background:var(--line);margin-top:4px}
+.sk .bar i{background:var(--lagoon)}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;color:var(--mute);cursor:pointer;border-top:4px solid transparent}
+.nav button[aria-current=page]{color:var(--lagoon);border-top-color:var(--danfo)}
+.lb{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+.lb:last-child{border:0}
+.pill{display:inline-block;background:var(--danfo);color:#14201F;font-weight:800;border-radius:20px;padding:2px 10px;font-size:.85rem}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://pbqtbwiymlwksdtfsfcb.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const app = document.getElementById("app");
+const S = { user: null, ch: null, tab: "home", mode: "login", msg: null, picked: null, busy: false };
+
+const BG = [
+  { id: "street_boy", name: "Street Boy", meta: "Starts in Mushin · ₦5,000", d: "No capital, no connections, plenty of hustle. Your only collateral is gist." },
+  { id: "graduate", name: "Graduate", meta: "Starts in Yaba · ₦20,000", d: "First class degree, zero job offers. The CV is strong, the NYSC is done." },
+  { id: "nepo_baby", name: "Nepo Baby", meta: "Starts in Lekki · ₦500,000", d: "Daddy's name opens doors. Now prove the doors were worth opening." },
+  { id: "returnee", name: "Returnee", meta: "Starts in Ikeja · ₦150,000", d: "Came back from abroad with savings and a strong accent. Lagos will humble you." }
+];
+const bgName = id => (BG.find(b => b.id === id) || {}).name || id;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const naira = n => "₦" + Number(n).toLocaleString("en-NG");
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const msgHtml = () => S.msg ? `<div class="${S.msg.ok ? "ok" : "err"}" role="alert">${esc(S.msg.t)}</div>` : "";
+const setMsg = (t, ok) => { S.msg = t ? { t, ok } : null; };
+
+function viewAuth() {
+  const login = S.mode === "login";
+  app.innerHTML = `<div class="stripe"></div><div class="wrap">
+    <h1>Naija Hustle</h1>
+    <p class="mute">Start from the bottom. Own the block.</p>
+    <div class="card">
+      <h2>${login ? "Log in" : "Create account"}</h2>
+      <label for="em">Email</label><input id="em" type="email" autocomplete="email" inputmode="email">
+      <label for="pw">Password</label><input id="pw" type="password" autocomplete="${login ? "current-password" : "new-password"}" placeholder="At least 6 characters">
+      ${msgHtml()}
+      <button class="btn" id="go">${login ? "Log in" : "Sign up"}</button>
+      <button class="link" id="sw">${login ? "New here? Create an account" : "Have an account? Log in"}</button>
+    </div></div>`;
+  document.getElementById("sw").onclick = () => { S.mode = login ? "signup" : "login"; setMsg(null); viewAuth(); };
+  document.getElementById("go").onclick = async e => {
+    const email = document.getElementById("em").value.trim();
+    const password = document.getElementById("pw").value;
+    if (!email || password.length < 6) { setMsg("Enter your email and a password of at least 6 characters."); return viewAuth(); }
+    e.target.disabled = true;
+    if (login) {
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) { setMsg(error.message); viewAuth(); }
+    } else {
+      const { data, error } = await db.auth.signUp({ email, password });
+      if (error) setMsg(error.message);
+      else if (!data.session) setMsg("Account created. Check your email to confirm, then log in.", true);
+      if (error || !data.session) viewAuth();
+    }
+  };
+}
+
+function viewCreate() {
+  app.innerHTML = `<div class="stripe"></div><div class="wrap">
+    <h1>Who you be?</h1>
+    <p class="mute">Pick your starting point. It decides your cash, your skills, and which part of Lagos you wake up in.</p>
+    <label for="nm">Character name (3 to 20 characters)</label>
+    <input id="nm" maxlength="20" autocomplete="off" value="${esc(S.nameDraft || "")}">
+    <div style="height:16px"></div>
+    ${BG.map(b => `<button class="bg" data-id="${b.id}" aria-pressed="${S.picked === b.id}"><b>${b.name}</b><div class="meta">${b.meta}</div>${b.d}</button>`).join("")}
+    ${msgHtml()}
+    <button class="btn" id="mk">Start hustling</button>
+    <button class="link" id="lo">Log out</button></div>`;
+  document.querySelectorAll(".bg").forEach(el => el.onclick = () => { S.nameDraft = document.getElementById("nm").value; S.picked = el.dataset.id; viewCreate(); });
+  document.getElementById("lo").onclick = () => db.auth.signOut();
+  document.getElementById("mk").onclick = async e => {
+    const name = document.getElementById("nm").value.trim();
+    S.nameDraft = name;
+    if (name.length < 3 || name.length > 20) { setMsg("Name must be 3 to 20 characters."); return viewCreate(); }
+    if (!S.picked) { setMsg("Pick a background to continue."); return viewCreate(); }
+    e.target.disabled = true;
+    const { error } = await db.rpc("create_character", { p_name: name, p_background: S.picked });
+    if (error) { setMsg(error.message); return viewCreate(); }
+    setMsg(null); load();
+  };
+}
+
+function viewGame() {
+  const c = S.ch;
+  const pct = Math.round((c.energy / c.max_energy) * 100);
+  const tabs = [["home", "Home"], ["jobs", "Jobs"], ["business", "Business"], ["map", "Map"], ["board", "Ranks"]];
+  app.innerHTML = `<div class="top"><div class="in">
+      <div class="row"><b>${esc(c.name)}</b><span class="pill">Lvl ${c.level}</span></div>
+      <div class="cash">${naira(c.cash)}</div>
+      <div class="row" style="font-size:.9rem"><span>Energy ${c.energy}/${c.max_energy}</span><span>Rep ${c.reputation}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div><div class="stripe"></div></div>
+    <div class="wrap" id="main"></div>
+    <nav class="nav">${tabs.map(([k, l]) => `<button data-t="${k}" ${S.tab === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>`;
+  document.querySelectorAll(".nav button").forEach(b => b.onclick = () => { S.tab = b.dataset.t; viewGame(); });
+  const m = document.getElementById("main");
+  if (S.tab === "home") m.innerHTML = homeHtml(c);
+  else if (S.tab === "board") boardView(m);
+  else m.innerHTML = soon(S.tab);
+  const lo = document.getElementById("lo2"); if (lo) lo.onclick = () => db.auth.signOut();
+}
+function homeHtml(c) {
+  const sk = [["Hustle", c.skill_hustle], ["Education", c.skill_edu], ["Charm", c.skill_charm], ["Tech", c.skill_tech]];
+  return `<div class="card"><h2>Welcome to ${cap(c.district)}, ${esc(c.name)}</h2>
+    <p class="mute">${bgName(c.background)} · ${cap(c.city)}. Jobs, shops and big deals are coming. For now, your name is already on the leaderboard.</p></div>
+    <div class="card"><h2>Skills</h2>${sk.map(([n, v]) => `<div class="sk"><div class="row"><span>${n}</span><b>${v}</b></div><div class="bar"><i style="width:${Math.min(v * 10, 100)}%"></i></div></div>`).join("")}</div>
+    <button class="link" id="lo2">Log out</button>`;
+}
+function soon(t) {
+  const j = {
+    jobs: ["Job board", "NEPA took the light. HR is working by candlelight. Openings land soon."],
+    business: ["Your business", "Contractor says the shop will be ready next week. Next week is loading."],
+    map: ["Lagos map", "Go-slow has blocked the map. Traffic should clear in the next update."]
+  }[t];
+  return `<div class="card"><h2>${j[0]}</h2><p class="mute">${j[1]}</p></div>`;
+}
+async function boardView(m) {
+  m.innerHTML = `<div class="card"><h2>Richest in Lagos</h2><p class="mute">Loading ranks...</p></div>`;
+  const { data, error } = await db.from("characters").select("name,background,cash,level").order("cash", { ascending: false }).limit(20);
+  if (S.tab !== "board") return;
+  if (error) { m.innerHTML = `<div class="err">${esc(error.message)}</div>`; return; }
+  m.innerHTML = `<div class="card"><h2>Richest in Lagos</h2>${data.map((r, i) => `<div class="lb"><span>${i + 1}. ${esc(r.name)} <span class="mute">· ${bgName(r.background)}</span></span><b>${naira(r.cash)}</b></div>`).join("") || '<p class="mute">No players yet. Be the first.</p>'}</div>`;
+}
+
+async function load() {
+  if (!S.user) { S.ch = null; return viewAuth(); }
+  const { data, error } = await db.from("characters").select("*").eq("user_id", S.user.id).maybeSingle();
+  if (error) { setMsg(error.message); return viewAuth(); }
+  S.ch = data;
+  data ? viewGame() : viewCreate();
+}
+db.auth.onAuthStateChange((_ev, session) => {
+  S.user = session ? session.user : null;
+  setTimeout(load, 0);
+});
+</script>
+</body>
+</html>
