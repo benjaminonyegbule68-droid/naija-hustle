@@ -51,6 +51,20 @@ input:focus-visible,button:focus-visible{outline:3px solid var(--danfo);outline-
 .pill{display:inline-block;background:var(--danfo);color:#14201F;font-weight:800;border-radius:20px;padding:2px 10px;font-size:.85rem;white-space:nowrap}
 .lock{color:var(--brick);font-weight:600;margin-top:10px}
 .big{font-size:1.8rem;font-weight:800;color:var(--lagoon)}
+
+/* ===== MAP UPGRADES ===== */
+.map-card{padding:10px !important;overflow:hidden}
+.map-svg{width:100%;display:block;border-radius:10px}
+.map-pin{cursor:pointer;transition:transform .15s ease}
+.map-pin:hover{transform:scale(1.12)}
+.map-pin.current circle{filter:drop-shadow(0 0 6px rgba(255,194,14,.7))}
+@keyframes pulse {
+  0%{r:11} 50%{r:14} 100%{r:11}
+}
+.map-pin.current circle{animation:pulse 1.8s ease-in-out infinite}
+.district-card{transition:border-color .15s,box-shadow .15s}
+.district-card.here{border-color:var(--danfo);box-shadow:0 0 0 3px rgba(255,194,14,.25)}
+.bonus{display:inline-block;background:#E8F5F5;color:var(--lagoon);font-weight:700;font-size:.85rem;padding:3px 9px;border-radius:20px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -76,7 +90,7 @@ const bgName = id => (BG.find(b => b.id === id) || {}).name || id;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const naira = n => "₦" + Number(n).toLocaleString("en-NG");
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-const msgHtml = () => S.msg ? `<div class="${S.msg.ok ? "ok" : "err"}" role="alert" style="margin:12px 0 0">${esc(S.msg.t)}</div>` : "";
+const msgHtml = () => S.msg ? `<div class="\( {S.msg.ok ? "ok" : "err"}" role="alert" style="margin:12px 0 0"> \){esc(S.msg.t)}</div>` : "";
 const setMsg = (t, ok) => { S.msg = t ? { t, ok } : null; };
 
 function viewAuth() {
@@ -117,7 +131,7 @@ function viewCreate() {
     <label for="nm">Character name (3 to 20 characters)</label>
     <input id="nm" maxlength="20" autocomplete="off" value="${esc(S.nameDraft || "")}">
     <div style="height:16px"></div>
-    ${BG.map(b => `<button class="bg" data-id="${b.id}" aria-pressed="${S.picked === b.id}"><b>${b.name}</b><div class="meta">${b.meta}</div>${b.d}</button>`).join("")}
+    \( {BG.map(b => `<button class="bg" data-id=" \){b.id}" aria-pressed="\( {S.picked === b.id}"><b> \){b.name}</b><div class="meta">\( {b.meta}</div> \){b.d}</button>`).join("")}
     ${msgHtml()}
     <button class="btn" id="mk">Start hustling</button>
     <button class="link" id="lo">Log out</button></div>`;
@@ -152,11 +166,11 @@ function viewGame() {
   app.innerHTML = `<div class="top"><div class="in">
       <div class="row"><b>${esc(c.name)}</b><span class="pill">Lvl ${c.level} · ${xpPct}/100 XP</span></div>
       <div class="cash">${naira(c.cash)}</div>
-      <div class="row" style="font-size:.9rem"><span>Energy ${c.energy}/${c.max_energy}</span><span>Rep ${c.reputation}</span></div>
+      <div class="row" style="font-size:.9rem"><span>Energy \( {c.energy}/ \){c.max_energy}</span><span>Rep ${c.reputation}</span></div>
       <div class="bar"><i style="width:${pct}%"></i></div>
     </div><div class="stripe"></div></div>
     <div class="wrap" id="main"></div>
-    <nav class="nav">${tabs.map(([k, l]) => `<button data-t="${k}" ${S.tab === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>`;
+    <nav class="nav">\( {tabs.map(([k, l]) => `<button data-t=" \){k}" \( {S.tab === k ? 'aria-current="page"' : ""}> \){l}</button>`).join("")}</nav>`;
   document.querySelectorAll(".nav button").forEach(b => b.onclick = () => go(b.dataset.t));
   const m = document.getElementById("main");
   if (S.tab === "home") m.innerHTML = homeHtml(c);
@@ -172,7 +186,7 @@ function homeHtml(c) {
   const sk = [["hustle", c.skill_hustle], ["edu", c.skill_edu], ["charm", c.skill_charm], ["tech", c.skill_tech]];
   return `<div class="card"><h2>Welcome to ${cap(c.district)}, ${esc(c.name)}</h2>
     <p class="mute">${bgName(c.background)} · ${cap(c.city)}. Work jobs to earn, then buy a shop in Business. Energy refills 1 point every minute.</p></div>
-    <div class="card"><h2>Skills</h2>${sk.map(([k, v]) => `<div class="sk"><div class="row"><span>${SK[k]}</span><b>${v}</b></div><div class="bar"><i style="width:${Math.min(v * 10, 100)}%"></i></div></div>`).join("")}</div>
+    <div class="card"><h2>Skills</h2>\( {sk.map(([k, v]) => `<div class="sk"><div class="row"><span> \){SK[k]}</span><b>\( {v}</b></div><div class="bar"><i style="width: \){Math.min(v * 10, 100)}%"></i></div></div>`).join("")}</div>
     <button class="link" id="lo2">Log out</button>`;
 }
 
@@ -180,7 +194,7 @@ function soon(t) {
   const j = {
     map: ["Lagos map", "Go-slow has blocked the map. Traffic should clear in the next update."]
   }[t];
-  return `<div class="card"><h2>${j[0]}</h2><p class="mute">${j[1]}</p></div>`;
+  return `<div class="card"><h2>\( {j[0]}</h2><p class="mute"> \){j[1]}</p></div>`;
 }
 
 function jobCard(j, c) {
@@ -190,15 +204,15 @@ function jobCard(j, c) {
   if (c.level < j.min_level) need.push("level " + j.min_level);
   if (j.req_skill && c["skill_" + j.req_skill] < j.req_skill_level) need.push(SK[j.req_skill] + " " + j.req_skill_level);
   return `<div class="card">
-    <div class="row"><h2>${esc(j.title)}</h2><span class="pill">${j.energy_cost} energy</span></div>
+    <div class="row"><h2>\( {esc(j.title)}</h2><span class="pill"> \){j.energy_cost} energy</span></div>
     <p class="mute">${esc(j.description)}</p>
-    <div class="row" style="font-size:.95rem"><span>${naira(j.pay_min)} to ${naira(j.pay_max)}${bonus ? ` · +${bonus}% here` : ""}</span><span>+${j.xp} XP · trains ${SK[j.trains]}</span></div>
-    ${need.length ? `<div class="lock">Locked: needs ${need.join(" and ")}</div>` : `<button class="btn" data-job="${esc(j.id)}">Work this job</button>`}
+    <div class="row" style="font-size:.95rem"><span>${naira(j.pay_min)} to \( {naira(j.pay_max)} \){bonus ? ` · +\( {bonus}% here` : ""}</span><span>+ \){j.xp} XP · trains ${SK[j.trains]}</span></div>
+    ${need.length ? `<div class="lock">Locked: needs \( {need.join(" and ")}</div>` : `<button class="btn" data-job=" \){esc(j.id)}">Work this job</button>`}
   </div>`;
 }
 
 async function jobsView(m) {
-  const head = S.jobMsg ? `<div class="${S.jobMsg.ok ? "ok" : "err"}" role="alert">${esc(S.jobMsg.t)}</div>` : "";
+  const head = S.jobMsg ? `<div class="\( {S.jobMsg.ok ? "ok" : "err"}" role="alert"> \){esc(S.jobMsg.t)}</div>` : "";
   if (!S.jobs) {
     m.innerHTML = `<div class="card"><h2>Job board</h2><p class="mute">Loading jobs...</p></div>`;
     const { data, error } = await db.from("jobs").select("*").order("min_level").order("pay_min");
@@ -221,7 +235,7 @@ async function doJob(id) {
   if (error) { S.jobMsg = { t: error.message, ok: false }; return viewGame(); }
   const j = S.jobs.find(x => x.id === id);
   const diff = Number(data.cash) - Number(before.cash);
-  let t = `${j.title} done. Cash ${diff >= 0 ? "+" : "-"}${naira(Math.abs(diff))}, +${j.xp} XP.`;
+  let t = `${j.title} done. Cash \( {diff >= 0 ? "+" : "-"} \){naira(Math.abs(diff))}, +${j.xp} XP.`;
   if (data.last_event) t += " " + data.last_event;
   if (data.level > before.level) t += ` Level up! You're now level ${data.level}.`;
   Object.keys(SK).forEach(k => { if (data["skill_" + k] > before["skill_" + k]) t += ` ${SK[k]} went up to ${data["skill_" + k]}.`; });
@@ -234,15 +248,15 @@ function buyCard(t, c) {
   const perHr = t.base_rate * (t.unit_price - t.unit_cost);
   const locked = c.level < t.min_level;
   return `<div class="card">
-    <div class="row"><h2>${esc(t.name)}</h2><span class="pill">${naira(t.buy_cost)}</span></div>
+    <div class="row"><h2>\( {esc(t.name)}</h2><span class="pill"> \){naira(t.buy_cost)}</span></div>
     <p class="mute">${esc(t.description)}</p>
     <div class="row" style="font-size:.95rem"><span>Up to ${naira(perHr)} profit per hour</span><span>Holds ${t.base_capacity} units</span></div>
-    ${locked ? `<div class="lock">Locked: needs level ${t.min_level}</div>` : `<button class="btn" data-buy="${esc(t.id)}">Buy for ${naira(t.buy_cost)}</button>`}
+    ${locked ? `<div class="lock">Locked: needs level \( {t.min_level}</div>` : `<button class="btn" data-buy=" \){esc(t.id)}">Buy for ${naira(t.buy_cost)}</button>`}
   </div>`;
 }
 
 async function bizView(m) {
-  const head = S.bizMsg ? `<div class="${S.bizMsg.ok ? "ok" : "err"}" role="alert">${esc(S.bizMsg.t)}</div>` : "";
+  const head = S.bizMsg ? `<div class="\( {S.bizMsg.ok ? "ok" : "err"}" role="alert"> \){esc(S.bizMsg.t)}</div>` : "";
   if (!S.bizTypes || !S.bizLoaded) {
     m.innerHTML = `<div class="card"><h2>Your business</h2><p class="mute">Opening the shop...</p></div>`;
     if (!S.bizTypes) {
@@ -277,7 +291,7 @@ async function bizView(m) {
   m.innerHTML = head + `<div class="card">
       <div class="row"><h2>${esc(t.name)}</h2><span class="pill">Level ${b.level}</span></div>
       <p class="mute">Sells ${rate} units per hour at ${naira(t.unit_price)} each. Profit up to ${naira(perHr)} per hour while stocked.</p>
-      <div class="sk"><div class="row"><span>Stock</span><b>${b.stock}/${capU}</b></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+      <div class="sk"><div class="row"><span>Stock</span><b>\( {b.stock}/ \){capU}</b></div><div class="bar"><i style="width:${pct}%"></i></div></div>
       ${b.stock === 0 ? `<div class="lock">Shelves are empty. Restock to keep earning.</div>` : ""}
     </div>
     <div class="card">
@@ -291,13 +305,13 @@ async function bizView(m) {
       ${fill > 0 ? `<div class="grid3">
         <button class="btn alt" data-stock="10">+10<small>${naira(10 * t.unit_cost)}</small></button>
         <button class="btn alt" data-stock="50">+50<small>${naira(50 * t.unit_cost)}</small></button>
-        <button class="btn alt" data-stock="${fill}">Fill<small>${naira(fill * t.unit_cost)}</small></button>
+        <button class="btn alt" data-stock="\( {fill}">Fill<small> \){naira(fill * t.unit_cost)}</small></button>
       </div>` : `<p>Your shop is full.</p>`}
     </div>
     <div class="card">
       <h2>Upgrade</h2>
       <p class="mute">More level means more sales per hour and more shelf space.</p>
-      ${b.level < 5 ? `<button class="btn alt" id="upgrade" style="width:100%">Upgrade to level ${b.level + 1}<small>${naira(upCost)}</small></button>` : `<p>Max level reached.</p>`}
+      ${b.level < 5 ? `<button class="btn alt" id="upgrade" style="width:100%">Upgrade to level \( {b.level + 1}<small> \){naira(upCost)}</small></button>` : `<p>Max level reached.</p>`}
     </div>`;
   document.getElementById("collect").onclick = () => bizAct("collect_earnings", {}, d => `Collected ${naira(b.uncollected)}.` + (d.character.last_event ? " " + d.character.last_event : ""));
   m.querySelectorAll("[data-stock]").forEach(el => el.onclick = () => {
@@ -329,32 +343,101 @@ async function loadDistricts() {
 }
 
 function mapSvg(cur) {
-  const P = { ikeja: [70, 40], mushin: [125, 85], yaba: [215, 90], victoria_island: [190, 180], lekki: [275, 190] };
-  const L = { ikeja: "Ikeja", mushin: "Mushin", yaba: "Yaba", victoria_island: "Victoria Island", lekki: "Lekki" };
-  const links = [["ikeja", "mushin"], ["mushin", "yaba"], ["yaba", "victoria_island"], ["victoria_island", "lekki"]];
-  const lines = links.map(([a, b]) => `<line x1="${P[a][0]}" y1="${P[a][1]}" x2="${P[b][0]}" y2="${P[b][1]}" stroke="#5C6B6A" stroke-width="2" stroke-dasharray="5 4"/>`).join("");
+  const P = {
+    ikeja: [68, 42],
+    mushin: [128, 88],
+    yaba: [218, 92],
+    victoria_island: [195, 175],
+    lekki: [278, 188]
+  };
+  const L = {
+    ikeja: "Ikeja",
+    mushin: "Mushin",
+    yaba: "Yaba",
+    victoria_island: "VI",
+    lekki: "Lekki"
+  };
+  const links = [
+    ["ikeja", "mushin"],
+    ["mushin", "yaba"],
+    ["yaba", "victoria_island"],
+    ["victoria_island", "lekki"]
+  ];
+
+  const lines = links.map(([a, b]) =>
+    `<line x1="\( {P[a][0]}" y1=" \){P[a][1]}" x2="\( {P[b][0]}" y2=" \){P[b][1]}"
+      stroke="#94A3A2" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round"/>`
+  ).join("");
+
   const dots = Object.keys(P).map(k => {
-    const [x, y] = P[k], on = k === cur;
-    return `<circle cx="${x}" cy="${y}" r="${on ? 12 : 8}" fill="${on ? "#FFC20E" : "#fff"}" stroke="${on ? "#14201F" : "#0F6B6F"}" stroke-width="3"/><text x="${x}" y="${y + (on ? 27 : 23)}" text-anchor="middle" font-size="12" font-weight="600" fill="#14201F">${L[k]}</text>`;
+    const [x, y] = P[k];
+    const on = k === cur;
+    return `
+      <g class="map-pin \( {on ? "current" : ""}" data-id=" \){k}">
+        <circle cx="\( {x}" cy=" \){y}" r="${on ? 13 : 9}"
+          fill="${on ? "#FFC20E" : "#fff"}"
+          stroke="${on ? "#14201F" : "#0F6B6F"}"
+          stroke-width="3"/>
+        <text x="\( {x}" y=" \){y + (on ? 28 : 24)}" text-anchor="middle"
+          font-size="12" font-weight="700" fill="#14201F">${L[k]}</text>
+      </g>`;
   }).join("");
-  return `<div class="card" style="padding:8px"><svg viewBox="0 0 320 230" width="100%" role="img" aria-label="Map of Lagos districts"><rect width="320" height="230" rx="10" fill="#F4F1E6"/><path d="M0 125 C60 110 120 150 200 130 S300 120 320 135 L320 160 C260 150 200 175 120 160 S40 150 0 150 Z" fill="#BFE0E0"/><text x="30" y="148" font-size="11" fill="#0F6B6F">Lagos Lagoon</text>${lines}${dots}</svg></div>`;
+
+  return `
+    <div class="card map-card">
+      <svg class="map-svg" viewBox="0 0 320 230" role="img" aria-label="Map of Lagos districts">
+        <rect width="320" height="230" rx="12" fill="#F7F4EC"/>
+        <path d="M0 128 C55 112 125 155 205 132 S305 122 320 138 L320 162 C265 152 200 178 115 162 S35 152 0 155 Z"
+          fill="#A8D5D5" opacity="0.85"/>
+        <text x="28" y="152" font-size="11" fill="#0F6B6F" font-weight="600">Lagos Lagoon</text>
+        ${lines}
+        ${dots}
+      </svg>
+    </div>`;
 }
 
 async function mapView(m) {
-  const head = S.mapMsg ? `<div class="${S.mapMsg.ok ? "ok" : "err"}" role="alert">${esc(S.mapMsg.t)}</div>` : "";
+  const head = S.mapMsg ? `<div class="\( {S.mapMsg.ok ? "ok" : "err"}" role="alert"> \){esc(S.mapMsg.t)}</div>` : "";
   if (!S.districts) {
     m.innerHTML = `<div class="card"><h2>Lagos map</h2><p class="mute">Checking traffic...</p></div>`;
     await loadDistricts();
     if (S.tab !== "map") return;
     if (!S.districts) { m.innerHTML = `<div class="err">Could not load the map.</div>`; return; }
   }
+
   const cur = S.ch.district;
-  m.innerHTML = head + mapSvg(cur) + S.districts.map(d => `<div class="card">
-      <div class="row"><h2>${esc(d.name)}</h2>${d.id === cur ? '<span class="pill">You are here</span>' : `<span class="pill">${naira(d.travel_cost)} · ${d.travel_energy} energy</span>`}</div>
-      <p class="mute">${esc(d.description)}</p>
-      <div style="font-size:.95rem">+${d.bonus_pct}% pay on ${SK[d.bonus_skill]} jobs</div>
-      ${d.id === cur ? "" : `<button class="btn" data-travel="${esc(d.id)}">Travel to ${esc(d.name)}</button>`}
-    </div>`).join("");
+
+  m.innerHTML = head + `
+    <div class="card" style="margin-bottom:14px">
+      <h2 style="margin:0">Lagos Map</h2>
+      <p class="mute" style="margin:4px 0 0">Tap a district on the map or use the buttons below. Travel costs energy + cash.</p>
+    </div>
+    ${mapSvg(cur)}
+    ${S.districts.map(d => {
+      const here = d.id === cur;
+      return `
+        <div class="card district-card ${here ? "here" : ""}">
+          <div class="row">
+            <h2 style="margin:0">${esc(d.name)}</h2>
+            ${here
+              ? `<span class="pill">You are here</span>`
+              : `<span class="pill">${naira(d.travel_cost)} · ${d.travel_energy} energy</span>`}
+          </div>
+          <p class="mute" style="margin:8px 0 4px">${esc(d.description)}</p>
+          <div class="bonus">+${d.bonus_pct}% pay on ${SK[d.bonus_skill]} jobs</div>
+          \( {here ? "" : `<button class="btn" data-travel=" \){esc(d.id)}" style="margin-top:14px">Travel to ${esc(d.name)}</button>`}
+        </div>`;
+    }).join("")}
+  `;
+
+  // Make map pins clickable
+  m.querySelectorAll(".map-pin").forEach(pin => {
+    pin.onclick = () => {
+      const id = pin.dataset.id;
+      if (id && id !== cur) travel(id);
+    };
+  });
+
   m.querySelectorAll("[data-travel]").forEach(b => b.onclick = () => travel(b.dataset.travel));
 }
 
@@ -375,7 +458,7 @@ async function boardView(m) {
   const { data, error } = await db.from("characters").select("name,background,cash,level").order("cash", { ascending: false }).limit(20);
   if (S.tab !== "board") return;
   if (error) { m.innerHTML = `<div class="err">${esc(error.message)}</div>`; return; }
-  m.innerHTML = `<div class="card"><h2>Richest in Lagos</h2>${data.map((r, i) => `<div class="lb"><span>${i + 1}. ${esc(r.name)} <span class="mute">· ${bgName(r.background)} · Lvl ${r.level}</span></span><b>${naira(r.cash)}</b></div>`).join("") || '<p class="mute">No players yet. Be the first.</p>'}</div>`;
+  m.innerHTML = `<div class="card"><h2>Richest in Lagos</h2>\( {data.map((r, i) => `<div class="lb"><span> \){i + 1}. ${esc(r.name)} <span class="mute">· ${bgName(r.background)} · Lvl \( {r.level}</span></span><b> \){naira(r.cash)}</b></div>`).join("") || '<p class="mute">No players yet. Be the first.</p>'}</div>`;
 }
 
 async function load() {
