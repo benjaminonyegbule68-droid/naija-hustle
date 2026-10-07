@@ -52,15 +52,13 @@ input:focus-visible,button:focus-visible{outline:3px solid var(--danfo);outline-
 .lock{color:var(--brick);font-weight:600;margin-top:10px}
 .big{font-size:1.8rem;font-weight:800;color:var(--lagoon)}
 
-/* ===== MAP UPGRADES ===== */
-.map-card{padding:10px !important;overflow:hidden}
+/* Map upgrades */
+.map-card{padding:10px!important;overflow:hidden}
 .map-svg{width:100%;display:block;border-radius:10px}
 .map-pin{cursor:pointer;transition:transform .15s ease}
 .map-pin:hover{transform:scale(1.12)}
 .map-pin.current circle{filter:drop-shadow(0 0 6px rgba(255,194,14,.7))}
-@keyframes pulse {
-  0%{r:11} 50%{r:14} 100%{r:11}
-}
+@keyframes pulse{0%{r:11}50%{r:14}100%{r:11}}
 .map-pin.current circle{animation:pulse 1.8s ease-in-out infinite}
 .district-card{transition:border-color .15s,box-shadow .15s}
 .district-card.here{border-color:var(--danfo);box-shadow:0 0 0 3px rgba(255,194,14,.25)}
@@ -430,7 +428,6 @@ async function mapView(m) {
     }).join("")}
   `;
 
-  // Make map pins clickable
   m.querySelectorAll(".map-pin").forEach(pin => {
     pin.onclick = () => {
       const id = pin.dataset.id;
