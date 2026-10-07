@@ -63,7 +63,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const app = document.getElementById("app");
-const S = { user: null, ch: null, tab: "home", mode: "login", msg: null, picked: null, busy: false, jobs: null, jobMsg: null, bizTypes: null, biz: null, bizLoaded: false, bizMsg: null };
+const S = { user: null, ch: null, tab: "home", mode: "login", msg: null, picked: null, busy: false, jobs: null, jobMsg: null, bizTypes: null, biz: null, bizLoaded: false, bizMsg: null, districts: null, mapMsg: null };
 
 const BG = [
   { id: "street_boy", name: "Street Boy", meta: "Starts in Mushin · ₦5,000", d: "No capital, no connections, plenty of hustle. Your only collateral is gist." },
@@ -136,7 +136,7 @@ function viewCreate() {
 }
 
 async function go(t) {
-  S.tab = t; S.jobMsg = null; S.bizMsg = null;
+  S.tab = t; S.jobMsg = null; S.bizMsg = null; S.mapMsg = null;
   if (t === "business") S.bizLoaded = false;
   viewGame();
   if (t === "business") return;
@@ -162,6 +162,7 @@ function viewGame() {
   if (S.tab === "home") m.innerHTML = homeHtml(c);
   else if (S.tab === "jobs") jobsView(m);
   else if (S.tab === "business") bizView(m);
+  else if (S.tab === "map") mapView(m);
   else if (S.tab === "board") boardView(m);
   else m.innerHTML = soon(S.tab);
   const lo = document.getElementById("lo2"); if (lo) lo.onclick = () => db.auth.signOut();
@@ -184,12 +185,14 @@ function soon(t) {
 
 function jobCard(j, c) {
   const need = [];
+  const dd = (S.districts || []).find(x => x.id === c.district);
+  const bonus = dd && dd.bonus_skill === j.trains ? dd.bonus_pct : 0;
   if (c.level < j.min_level) need.push("level " + j.min_level);
   if (j.req_skill && c["skill_" + j.req_skill] < j.req_skill_level) need.push(SK[j.req_skill] + " " + j.req_skill_level);
   return `<div class="card">
     <div class="row"><h2>${esc(j.title)}</h2><span class="pill">${j.energy_cost} energy</span></div>
     <p class="mute">${esc(j.description)}</p>
-    <div class="row" style="font-size:.95rem"><span>${naira(j.pay_min)} to ${naira(j.pay_max)}</span><span>+${j.xp} XP · trains ${SK[j.trains]}</span></div>
+    <div class="row" style="font-size:.95rem"><span>${naira(j.pay_min)} to ${naira(j.pay_max)}${bonus ? ` · +${bonus}% here` : ""}</span><span>+${j.xp} XP · trains ${SK[j.trains]}</span></div>
     ${need.length ? `<div class="lock">Locked: needs ${need.join(" and ")}</div>` : `<button class="btn" data-job="${esc(j.id)}">Work this job</button>`}
   </div>`;
 }
@@ -203,6 +206,8 @@ async function jobsView(m) {
     S.jobs = data;
     if (S.tab !== "jobs") return;
   }
+  await loadDistricts();
+  if (S.tab !== "jobs") return;
   m.innerHTML = head + S.jobs.map(j => jobCard(j, S.ch)).join("");
   m.querySelectorAll("[data-job]").forEach(b => b.onclick = () => doJob(b.dataset.job));
 }
@@ -314,6 +319,54 @@ async function bizAct(fn, args, okText) {
   S.biz = data.business;
   S.bizLoaded = true;
   S.bizMsg = { t: text, ok: true };
+  viewGame();
+}
+
+async function loadDistricts() {
+  if (S.districts) return;
+  const r = await db.from("districts").select("*").order("travel_cost");
+  if (!r.error) S.districts = r.data;
+}
+
+function mapSvg(cur) {
+  const P = { ikeja: [70, 40], mushin: [125, 85], yaba: [215, 90], victoria_island: [190, 180], lekki: [275, 190] };
+  const L = { ikeja: "Ikeja", mushin: "Mushin", yaba: "Yaba", victoria_island: "Victoria Island", lekki: "Lekki" };
+  const links = [["ikeja", "mushin"], ["mushin", "yaba"], ["yaba", "victoria_island"], ["victoria_island", "lekki"]];
+  const lines = links.map(([a, b]) => `<line x1="${P[a][0]}" y1="${P[a][1]}" x2="${P[b][0]}" y2="${P[b][1]}" stroke="#5C6B6A" stroke-width="2" stroke-dasharray="5 4"/>`).join("");
+  const dots = Object.keys(P).map(k => {
+    const [x, y] = P[k], on = k === cur;
+    return `<circle cx="${x}" cy="${y}" r="${on ? 12 : 8}" fill="${on ? "#FFC20E" : "#fff"}" stroke="${on ? "#14201F" : "#0F6B6F"}" stroke-width="3"/><text x="${x}" y="${y + (on ? 27 : 23)}" text-anchor="middle" font-size="12" font-weight="600" fill="#14201F">${L[k]}</text>`;
+  }).join("");
+  return `<div class="card" style="padding:8px"><svg viewBox="0 0 320 230" width="100%" role="img" aria-label="Map of Lagos districts"><rect width="320" height="230" rx="10" fill="#F4F1E6"/><path d="M0 125 C60 110 120 150 200 130 S300 120 320 135 L320 160 C260 150 200 175 120 160 S40 150 0 150 Z" fill="#BFE0E0"/><text x="30" y="148" font-size="11" fill="#0F6B6F">Lagos Lagoon</text>${lines}${dots}</svg></div>`;
+}
+
+async function mapView(m) {
+  const head = S.mapMsg ? `<div class="${S.mapMsg.ok ? "ok" : "err"}" role="alert">${esc(S.mapMsg.t)}</div>` : "";
+  if (!S.districts) {
+    m.innerHTML = `<div class="card"><h2>Lagos map</h2><p class="mute">Checking traffic...</p></div>`;
+    await loadDistricts();
+    if (S.tab !== "map") return;
+    if (!S.districts) { m.innerHTML = `<div class="err">Could not load the map.</div>`; return; }
+  }
+  const cur = S.ch.district;
+  m.innerHTML = head + mapSvg(cur) + S.districts.map(d => `<div class="card">
+      <div class="row"><h2>${esc(d.name)}</h2>${d.id === cur ? '<span class="pill">You are here</span>' : `<span class="pill">${naira(d.travel_cost)} · ${d.travel_energy} energy</span>`}</div>
+      <p class="mute">${esc(d.description)}</p>
+      <div style="font-size:.95rem">+${d.bonus_pct}% pay on ${SK[d.bonus_skill]} jobs</div>
+      ${d.id === cur ? "" : `<button class="btn" data-travel="${esc(d.id)}">Travel to ${esc(d.name)}</button>`}
+    </div>`).join("");
+  m.querySelectorAll("[data-travel]").forEach(b => b.onclick = () => travel(b.dataset.travel));
+}
+
+async function travel(id) {
+  if (S.busy) return;
+  S.busy = true;
+  const d = S.districts.find(x => x.id === id);
+  const { data, error } = await db.rpc("travel", { p_district: id });
+  S.busy = false;
+  if (error) { S.mapMsg = { t: error.message, ok: false }; return viewGame(); }
+  S.ch = data;
+  S.mapMsg = { t: `You reached ${d.name} after the go-slow. It cost ${naira(d.travel_cost)} and ${d.travel_energy} energy.`, ok: true };
   viewGame();
 }
 
