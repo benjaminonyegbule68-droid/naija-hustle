@@ -1742,12 +1742,19 @@
         main.innerHTML =
           homeHtml(c);
 
-        /*
-         * IMPORTANT FIX:
-         * homeHtml() creates the activity buttons.
-         * The handlers must be attached AFTER the HTML
-         * has been inserted into #main.
-         */
+        /* =====================================================
+           ACTIVITY BUTTON FIX
+           =====================================================
+
+           homeHtml() creates the activity buttons.
+
+           They do not exist until homeHtml() has been
+           inserted into #main.
+
+           Therefore the click handlers MUST be attached here,
+           after the HTML is rendered.
+        */
+
         main
           .querySelectorAll("[data-activity]")
           .forEach(button => {
