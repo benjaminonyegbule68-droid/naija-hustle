@@ -362,6 +362,73 @@
       border-radius: 20px;
       margin-top: 6px;
     }
+
+    /* =========================================================
+       NEEDS
+       ========================================================= */
+
+    .needs-card {
+      position: relative;
+    }
+
+    .need-row {
+      margin: 14px 0;
+    }
+
+    .need-row:last-child {
+      margin-bottom: 2px;
+    }
+
+    .need-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .need-name {
+      font-weight: 700;
+    }
+
+    .need-value {
+      font-weight: 800;
+    }
+
+    .need-bar {
+      height: 10px;
+      background: var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .need-bar i {
+      display: block;
+      height: 100%;
+      border-radius: 8px;
+      transition: width 0.25s ease;
+    }
+
+    .need-good {
+      background: var(--lagoon);
+    }
+
+    .need-mid {
+      background: var(--danfo);
+    }
+
+    .need-low {
+      background: var(--brick);
+    }
+
+    .needs-note {
+      background: #F7F4EC;
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--mute);
+      font-size: 0.9rem;
+      margin-top: 12px;
+    }
   </style>
 </head>
 
@@ -385,10 +452,6 @@
     const SUPABASE_ANON_KEY =
       "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
-    /*
-     * Prevent a completely blank page when the
-     * Supabase library fails to load.
-     */
     if (
       !window.supabase ||
       typeof window.supabase.createClient !== "function"
@@ -551,10 +614,108 @@
 
 
     /* =========================================================
+       NEEDS HELPERS
+       ========================================================= */
+
+    const needPct = value =>
+      Math.max(
+        0,
+        Math.min(
+          100,
+          Number(value) || 0
+        )
+      );
+
+    const needClass = value => {
+
+      const pct =
+        needPct(value);
+
+      if (pct <= 20) {
+        return "need-low";
+      }
+
+      if (pct <= 50) {
+        return "need-mid";
+      }
+
+      return "need-good";
+    };
+
+
+    const needsHtml = c => {
+
+      const needs = [
+        ["🍗", "Hunger", c.hunger],
+        ["🎮", "Fun", c.fun],
+        ["🤝", "Social", c.social],
+        ["🧼", "Hygiene", c.hygiene]
+      ];
+
+      return `
+        <div class="card needs-card">
+
+          <h2>
+            Needs
+          </h2>
+
+          <p class="mute">
+            Keep yourself in good shape while you hustle.
+          </p>
+
+          ${needs.map(
+            ([icon, name, value]) => {
+
+              const pct =
+                needPct(value);
+
+              return `
+                <div class="need-row">
+
+                  <div class="need-label">
+
+                    <span class="need-name">
+                      ${icon}
+                      ${name}
+                    </span>
+
+                    <span class="need-value">
+                      ${pct}/100
+                    </span>
+
+                  </div>
+
+                  <div class="need-bar">
+
+                    <i
+                      class="${needClass(pct)}"
+                      style="width:${pct}%"
+                    ></i>
+
+                  </div>
+
+                </div>
+              `;
+
+            }
+          ).join("")}
+
+          <div class="needs-note">
+            Low needs will matter more as activities,
+            time, and daily life are added to the game.
+          </div>
+
+        </div>
+      `;
+    };
+
+
+    /* =========================================================
        AUTH
        ========================================================= */
 
     function viewAuth() {
+
       const login =
         S.mode === "login";
 
@@ -629,6 +790,7 @@
       document
         .getElementById("sw")
         .onclick = () => {
+
           S.mode =
             login
               ? "signup"
@@ -658,6 +820,7 @@
             !email ||
             password.length < 6
           ) {
+
             setMsg(
               "Enter your email and a password of at least 6 characters."
             );
@@ -681,7 +844,11 @@
                   });
 
               if (error) {
-                setMsg(error.message);
+
+                setMsg(
+                  error.message
+                );
+
                 viewAuth();
               }
 
@@ -698,11 +865,16 @@
               });
 
             if (error) {
-              setMsg(error.message);
+
+              setMsg(
+                error.message
+              );
+
               return viewAuth();
             }
 
             if (!data.session) {
+
               setMsg(
                 "Account created. Check your email to confirm, then log in.",
                 true
@@ -763,6 +935,7 @@
               data-id="${bg.id}"
               aria-pressed="${S.picked === bg.id}"
             >
+
               <b>
                 ${esc(bg.name)}
               </b>
@@ -835,6 +1008,7 @@
             name.length < 3 ||
             name.length > 20
           ) {
+
             setMsg(
               "Name must be 3 to 20 characters."
             );
@@ -843,6 +1017,7 @@
           }
 
           if (!S.picked) {
+
             setMsg(
               "Pick a background to continue."
             );
@@ -866,7 +1041,11 @@
               );
 
             if (error) {
-              setMsg(error.message);
+
+              setMsg(
+                error.message
+              );
+
               return viewCreate();
             }
 
@@ -918,13 +1097,31 @@
             "get_my_character"
           );
 
+        /*
+         * Refresh the displayed character whenever
+         * any server-controlled stat changed.
+         *
+         * This now includes the four Needs values.
+         */
         if (
           data &&
           data.id &&
           S.tab === tab &&
           S.ch &&
-          data.energy !== S.ch.energy
+          (
+            data.energy !== S.ch.energy ||
+            data.hunger !== S.ch.hunger ||
+            data.fun !== S.ch.fun ||
+            data.social !== S.ch.social ||
+            data.hygiene !== S.ch.hygiene ||
+            data.cash !== S.ch.cash ||
+            data.level !== S.ch.level ||
+            data.xp !== S.ch.xp ||
+            data.reputation !== S.ch.reputation ||
+            data.district !== S.ch.district
+          )
         ) {
+
           S.ch = data;
 
           viewGame();
@@ -1020,9 +1217,11 @@
             </div>
 
             <div class="bar">
+
               <i
                 style="width:${pct}%"
               ></i>
+
             </div>
 
           </div>
@@ -1038,18 +1237,20 @@
 
         <nav class="nav">
 
-          ${tabs.map(([key, label]) => `
-            <button
-              data-t="${key}"
-              ${
-                S.tab === key
-                  ? 'aria-current="page"'
-                  : ""
-              }
-            >
-              ${label}
-            </button>
-          `).join("")}
+          ${tabs.map(
+            ([key, label]) => `
+              <button
+                data-t="${key}"
+                ${
+                  S.tab === key
+                    ? 'aria-current="page"'
+                    : ""
+                }
+              >
+                ${label}
+              </button>
+            `
+          ).join("")}
 
         </nav>
       `;
@@ -1093,8 +1294,10 @@
         document.getElementById("lo2");
 
       if (logout) {
+
         logout.onclick = () =>
           db.auth.signOut();
+
       }
     }
 
@@ -1113,6 +1316,7 @@
       ];
 
       return `
+
         <div class="card">
 
           <h2>
@@ -1136,50 +1340,54 @@
 
         </div>
 
+        ${needsHtml(c)}
+
         <div class="card">
 
           <h2>
             Skills
           </h2>
 
-          ${skills.map(([key, value]) => {
+          ${skills.map(
+            ([key, value]) => {
 
-            const skillValue =
-              Number(value) || 0;
+              const skillValue =
+                Number(value) || 0;
 
-            const width =
-              Math.min(
-                skillValue * 10,
-                100
-              );
+              const width =
+                Math.min(
+                  skillValue * 10,
+                  100
+                );
 
-            return `
-              <div class="sk">
+              return `
+                <div class="sk">
 
-                <div class="row">
+                  <div class="row">
 
-                  <span>
-                    ${SK[key]}
-                  </span>
+                    <span>
+                      ${SK[key]}
+                    </span>
 
-                  <b>
-                    ${skillValue}
-                  </b>
+                    <b>
+                      ${skillValue}
+                    </b>
+
+                  </div>
+
+                  <div class="bar">
+
+                    <i
+                      style="width:${width}%"
+                    ></i>
+
+                  </div>
 
                 </div>
+              `;
 
-                <div class="bar">
-
-                  <i
-                    style="width:${width}%"
-                  ></i>
-
-                </div>
-
-              </div>
-            `;
-
-          }).join("")}
+            }
+          ).join("")}
 
         </div>
 
@@ -1221,6 +1429,7 @@
         Number(character.level) <
         Number(job.min_level)
       ) {
+
         needs.push(
           "level " +
           job.min_level
@@ -1237,6 +1446,7 @@
         ) <
         Number(job.req_skill_level)
       ) {
+
         needs.push(
           SK[job.req_skill] +
           " " +
@@ -1298,10 +1508,12 @@
             needs.length
               ? `
                 <div class="lock">
+
                   Locked: needs
                   ${esc(
                     needs.join(" and ")
                   )}
+
                 </div>
               `
               : `
@@ -1397,11 +1609,12 @@
         (
           S.jobs.length
             ? S.jobs
-                .map(job =>
-                  jobCard(
-                    job,
-                    S.ch
-                  )
+                .map(
+                  job =>
+                    jobCard(
+                      job,
+                      S.ch
+                    )
                 )
                 .join("")
             : `
@@ -1509,6 +1722,7 @@
           `+${job.xp} XP.`;
 
         if (data.last_event) {
+
           message +=
             " " +
             data.last_event;
@@ -1518,6 +1732,7 @@
           Number(data.level) >
           Number(before.level)
         ) {
+
           message +=
             ` Level up! You're now level ${data.level}.`;
         }
@@ -1629,8 +1844,10 @@
             locked
               ? `
                 <div class="lock">
+
                   Locked: needs level
                   ${type.min_level}
+
                 </div>
               `
               : `
@@ -1739,6 +1956,7 @@
           result.data &&
           result.data.character
         ) {
+
           S.ch =
             result.data.character;
         }
@@ -1777,11 +1995,12 @@
             </div>
           ` +
           S.bizTypes
-            .map(type =>
-              buyCard(
-                type,
-                S.ch
-              )
+            .map(
+              type =>
+                buyCard(
+                  type,
+                  S.ch
+                )
             )
             .join("");
 
@@ -2253,6 +2472,7 @@
           successText(data);
 
         if (data.character) {
+
           S.ch =
             data.character;
         }
@@ -2265,6 +2485,7 @@
               "business"
             )
         ) {
+
           S.biz =
             data.business;
         }
@@ -2683,7 +2904,9 @@
               id &&
               id !== current
             ) {
+
               travel(id);
+
             }
           };
 
@@ -3000,6 +3223,7 @@
          * INITIAL_SESSION is handled by init()
          * below so we don't load the app twice.
          */
+
         if (
           event ===
           "INITIAL_SESSION"
