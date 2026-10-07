@@ -215,7 +215,9 @@ async function doJob(id) {
   S.busy = false;
   if (error) { S.jobMsg = { t: error.message, ok: false }; return viewGame(); }
   const j = S.jobs.find(x => x.id === id);
-  let t = `${j.title}: you earned ${naira(Number(data.cash) - Number(before.cash))} and ${j.xp} XP.`;
+  const diff = Number(data.cash) - Number(before.cash);
+  let t = `${j.title} done. Cash ${diff >= 0 ? "+" : "-"}${naira(Math.abs(diff))}, +${j.xp} XP.`;
+  if (data.last_event) t += " " + data.last_event;
   if (data.level > before.level) t += ` Level up! You're now level ${data.level}.`;
   Object.keys(SK).forEach(k => { if (data["skill_" + k] > before["skill_" + k]) t += ` ${SK[k]} went up to ${data["skill_" + k]}.`; });
   S.ch = data;
@@ -292,7 +294,7 @@ async function bizView(m) {
       <p class="mute">More level means more sales per hour and more shelf space.</p>
       ${b.level < 5 ? `<button class="btn alt" id="upgrade" style="width:100%">Upgrade to level ${b.level + 1}<small>${naira(upCost)}</small></button>` : `<p>Max level reached.</p>`}
     </div>`;
-  document.getElementById("collect").onclick = () => bizAct("collect_earnings", {}, () => `Collected ${naira(b.uncollected)}.`);
+  document.getElementById("collect").onclick = () => bizAct("collect_earnings", {}, d => `Collected ${naira(b.uncollected)}.` + (d.character.last_event ? " " + d.character.last_event : ""));
   m.querySelectorAll("[data-stock]").forEach(el => el.onclick = () => {
     const n = Number(el.dataset.stock);
     bizAct("restock_business", { p_units: n }, () => `Restocked ${n} units for ${naira(n * t.unit_cost)}.`);
@@ -307,7 +309,7 @@ async function bizAct(fn, args, okText) {
   const { data, error } = await db.rpc(fn, args);
   S.busy = false;
   if (error) { S.bizMsg = { t: error.message, ok: false }; return viewGame(); }
-  const text = okText();
+  const text = okText(data);
   S.ch = data.character;
   S.biz = data.business;
   S.bizLoaded = true;
