@@ -54,6 +54,10 @@
       font: inherit;
     }
 
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     .stripe {
       height: 8px;
       background: repeating-linear-gradient(
@@ -428,7 +432,7 @@
       margin-top: 12px;
     }
 
-    /* GAME CLOCK */
+    /* REAL NIGERIAN CLOCK */
 
     .clock-card {
       background: var(--ink);
@@ -466,6 +470,48 @@
       font-size: 1.35rem;
       margin-right: 5px;
     }
+
+    .activity-action {
+      width: auto;
+      margin-top: 0;
+      padding: 10px 14px;
+      white-space: nowrap;
+    }
+
+    /* LOADING */
+
+    .loading {
+      text-align: center;
+      padding: 24px 12px;
+      color: var(--mute);
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 380px) {
+      .wrap {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .top .in {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .grid3 {
+        grid-template-columns: 1fr;
+      }
+
+      .activity-card .row {
+        align-items: flex-start;
+      }
+
+      .activity-action {
+        padding: 9px 10px;
+        font-size: .9rem;
+      }
+    }
   </style>
 </head>
 
@@ -496,6 +542,7 @@
         <div class="stripe"></div>
         <div class="wrap">
           <h1>Naija Hustle</h1>
+
           <div class="err">
             <b>Naija Hustle could not start.</b>
             <br><br>
@@ -648,53 +695,67 @@
 
 
     /* =========================================================
-       GAME CLOCK
+       REAL NIGERIAN CLOCK
        ========================================================= */
 
-    function gameTimeInfo(minutes) {
+    function realTimeInfo() {
 
-      const total =
-        Math.max(
-          0,
-          Math.min(
-            1439,
-            Number(minutes) || 0
-          )
+      const now = new Date();
+
+      const timeFormatter =
+        new Intl.DateTimeFormat(
+          "en-NG",
+          {
+            timeZone: "Africa/Lagos",
+            hour: "numeric",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+          }
         );
 
-      const hour24 =
-        Math.floor(total / 60);
+      const dateFormatter =
+        new Intl.DateTimeFormat(
+          "en-NG",
+          {
+            timeZone: "Africa/Lagos",
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          }
+        );
 
-      const mins =
-        total % 60;
+      const hourFormatter =
+        new Intl.DateTimeFormat(
+          "en-NG",
+          {
+            timeZone: "Africa/Lagos",
+            hour: "numeric",
+            hour12: false
+          }
+        );
 
-      const period =
-        hour24 >= 12
-          ? "PM"
-          : "AM";
-
-      let hour12 =
-        hour24 % 12;
-
-      if (hour12 === 0) {
-        hour12 = 12;
-      }
+      const hour =
+        Number(
+          hourFormatter.format(now)
+        );
 
       let phase = "Morning";
 
       if (
-        hour24 >= 12 &&
-        hour24 < 17
+        hour >= 12 &&
+        hour < 17
       ) {
         phase = "Afternoon";
       } else if (
-        hour24 >= 17 &&
-        hour24 < 21
+        hour >= 17 &&
+        hour < 21
       ) {
         phase = "Evening";
       } else if (
-        hour24 >= 21 ||
-        hour24 < 5
+        hour >= 21 ||
+        hour < 5
       ) {
         phase = "Night";
       }
@@ -710,19 +771,21 @@
 
       return {
         time:
-          `${hour12}:${String(mins).padStart(2, "0")} ${period}`,
+          timeFormatter.format(now),
+
+        date:
+          dateFormatter.format(now),
+
         phase,
         icon
       };
     }
 
 
-    function gameClockHtml(c) {
+    function gameClockHtml() {
 
       const info =
-        gameTimeInfo(
-          c.game_minutes
-        );
+        realTimeInfo();
 
       return `
         <div class="card clock-card">
@@ -731,8 +794,11 @@
 
             <div>
 
-              <div class="clock-day">
-                DAY ${Number(c.game_day) || 1}
+              <div
+                class="clock-day"
+                data-real-date
+              >
+                ${info.date}
               </div>
 
               <div
@@ -764,6 +830,16 @@
 
           </div>
 
+          <div
+            style="
+              margin-top:8px;
+              font-size:.78rem;
+              color:rgba(255,255,255,.6);
+            "
+          >
+            🇳🇬 Nigeria · Live time
+          </div>
+
         </div>
       `;
     }
@@ -779,115 +855,67 @@
         );
       }
 
-      if (
-        !S.ch ||
-        !S.ch.game_time_updated_at
-      ) {
-        return;
-      }
+      const updateClock = () => {
 
-      const baseMinutes =
-        Number(
-          S.ch.game_minutes
-        ) || 0;
+        if (
+          !document.querySelector(
+            "[data-game-clock]"
+          )
+        ) {
+          return;
+        }
 
-      const baseTime =
-        new Date(
-          S.ch.game_time_updated_at
-        ).getTime();
+        const info =
+          realTimeInfo();
+
+        const clock =
+          document.querySelector(
+            "[data-game-clock]"
+          );
+
+        const date =
+          document.querySelector(
+            "[data-real-date]"
+          );
+
+        const phase =
+          document.querySelector(
+            "[data-game-phase]"
+          );
+
+        const icon =
+          document.querySelector(
+            "[data-game-phase-icon]"
+          );
+
+        if (clock) {
+          clock.textContent =
+            info.time;
+        }
+
+        if (date) {
+          date.textContent =
+            info.date;
+        }
+
+        if (phase) {
+          phase.textContent =
+            info.phase;
+        }
+
+        if (icon) {
+          icon.textContent =
+            info.icon;
+        }
+      };
+
+      updateClock();
 
       window.naijaClockTimer =
-        setInterval(() => {
-
-          if (
-            !S.ch ||
-            !document.querySelector(
-              "[data-game-clock]"
-            )
-          ) {
-            return;
-          }
-
-          const elapsedSeconds =
-            Math.max(
-              0,
-              (
-                Date.now() -
-                baseTime
-              ) / 1000
-            );
-
-          /*
-           * 1 real second = 1/6 game minute.
-           * Therefore 6 real seconds = 1 game minute.
-           */
-
-          const passedMinutes =
-            Math.floor(
-              elapsedSeconds / 6
-            );
-
-          const total =
-            baseMinutes +
-            passedMinutes;
-
-          const dayOffset =
-            Math.floor(
-              total / 1440
-            );
-
-          const minutes =
-            total % 1440;
-
-          const info =
-            gameTimeInfo(
-              minutes
-            );
-
-          const clock =
-            document.querySelector(
-              "[data-game-clock]"
-            );
-
-          const phase =
-            document.querySelector(
-              "[data-game-phase]"
-            );
-
-          const icon =
-            document.querySelector(
-              "[data-game-phase-icon]"
-            );
-
-          if (clock) {
-            clock.textContent =
-              info.time;
-          }
-
-          if (phase) {
-            phase.textContent =
-              info.phase;
-          }
-
-          if (icon) {
-            icon.textContent =
-              info.icon;
-          }
-
-          const day =
-            document.querySelector(
-              ".clock-day"
-            );
-
-          if (day) {
-            day.textContent =
-              `DAY ${
-                (Number(S.ch.game_day) || 1) +
-                dayOffset
-              }`;
-          }
-
-        }, 1000);
+        setInterval(
+          updateClock,
+          1000
+        );
     }
 
 
@@ -1072,7 +1100,7 @@
 
                 <div class="row">
 
-                  <div>
+                  <div style="flex:1">
 
                     <h2 style="margin:0">
 
@@ -1097,14 +1125,9 @@
                   </div>
 
                   <button
-                    class="btn"
+                    class="btn activity-action"
+                    type="button"
                     data-activity="${activity.id}"
-                    style="
-                      width:auto;
-                      margin-top:0;
-                      padding:10px 14px;
-                      white-space:nowrap;
-                    "
                   >
                     Do it
                   </button>
@@ -1195,6 +1218,7 @@
             <button
               class="btn"
               id="go"
+              type="button"
             >
               ${login ? "Log in" : "Sign up"}
             </button>
@@ -1202,6 +1226,7 @@
             <button
               class="link"
               id="sw"
+              type="button"
             >
               ${
                 login
@@ -1366,6 +1391,7 @@
           ${BG.map(bg => `
             <button
               class="bg"
+              type="button"
               data-id="${bg.id}"
               aria-pressed="${S.picked === bg.id}"
             >
@@ -1388,6 +1414,7 @@
           <button
             class="btn"
             id="mk"
+            type="button"
           >
             Start hustling
           </button>
@@ -1395,6 +1422,7 @@
           <button
             class="link"
             id="lo"
+            type="button"
           >
             Log out
           </button>
@@ -1547,9 +1575,7 @@
             data.level !== S.ch.level ||
             data.xp !== S.ch.xp ||
             data.reputation !== S.ch.reputation ||
-            data.district !== S.ch.district ||
-            data.game_day !== S.ch.game_day ||
-            data.game_minutes !== S.ch.game_minutes
+            data.district !== S.ch.district
           )
         ) {
 
@@ -1677,6 +1703,7 @@
           ${tabs.map(
             ([key, label]) => `
               <button
+                type="button"
                 data-t="${key}"
                 ${
                   S.tab === key
@@ -1708,6 +1735,24 @@
 
         main.innerHTML =
           homeHtml(c);
+
+        /*
+          FIX:
+          Activity buttons are rendered inside homeHtml(),
+          so their click handlers must be attached AFTER
+          homeHtml() has been inserted into the DOM.
+        */
+
+        main
+          .querySelectorAll("[data-activity]")
+          .forEach(button => {
+
+            button.onclick = () =>
+              doActivity(
+                button.dataset.activity
+              );
+
+          });
 
       } else if (S.tab === "jobs") {
 
@@ -1756,7 +1801,7 @@
 
       return `
 
-        ${gameClockHtml(c)}
+        ${gameClockHtml()}
 
         <div class="card">
 
@@ -1837,6 +1882,7 @@
         <button
           class="link"
           id="lo2"
+          type="button"
         >
           Log out
         </button>
@@ -2054,6 +2100,7 @@
               : `
                 <button
                   class="btn"
+                  type="button"
                   data-job="${esc(job.id)}"
                 >
                   Work this job
@@ -2388,6 +2435,7 @@
               : `
                 <button
                   class="btn"
+                  type="button"
                   data-buy="${esc(type.id)}"
                 >
                   Buy for
@@ -2725,6 +2773,7 @@
             <button
               class="btn"
               id="collect"
+              type="button"
               style="margin-top:12px"
             >
               Collect earnings
@@ -2752,6 +2801,7 @@
 
                     <button
                       class="btn alt"
+                      type="button"
                       data-stock="${Math.min(
                         10,
                         fill
@@ -2775,6 +2825,7 @@
 
                     <button
                       class="btn alt"
+                      type="button"
                       data-stock="${Math.min(
                         50,
                         fill
@@ -2798,6 +2849,7 @@
 
                     <button
                       class="btn alt"
+                      type="button"
                       data-stock="${fill}"
                     >
                       Fill
@@ -2843,6 +2895,7 @@
                   <button
                     class="btn alt"
                     id="upgrade"
+                    type="button"
                     style="width:100%"
                   >
 
@@ -3405,6 +3458,7 @@
                       : `
                         <button
                           class="btn"
+                          type="button"
                           data-travel="${esc(
                             district.id
                           )}"
