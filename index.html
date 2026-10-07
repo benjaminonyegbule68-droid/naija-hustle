@@ -51,16 +51,9 @@ input:focus-visible,button:focus-visible{outline:3px solid var(--danfo);outline-
 .pill{display:inline-block;background:var(--danfo);color:#14201F;font-weight:800;border-radius:20px;padding:2px 10px;font-size:.85rem;white-space:nowrap}
 .lock{color:var(--brick);font-weight:600;margin-top:10px}
 .big{font-size:1.8rem;font-weight:800;color:var(--lagoon)}
-
-/* Map upgrades */
 .map-card{padding:10px!important;overflow:hidden}
 .map-svg{width:100%;display:block;border-radius:10px}
-.map-pin{cursor:pointer;transition:transform .15s ease}
-.map-pin:hover{transform:scale(1.12)}
-.map-pin.current circle{filter:drop-shadow(0 0 6px rgba(255,194,14,.7))}
-@keyframes pulse{0%{r:11}50%{r:14}100%{r:11}}
-.map-pin.current circle{animation:pulse 1.8s ease-in-out infinite}
-.district-card{transition:border-color .15s,box-shadow .15s}
+.map-pin{cursor:pointer}
 .district-card.here{border-color:var(--danfo);box-shadow:0 0 0 3px rgba(255,194,14,.25)}
 .bonus{display:inline-block;background:#E8F5F5;color:var(--lagoon);font-weight:700;font-size:.85rem;padding:3px 9px;border-radius:20px;margin-top:6px}
 </style>
@@ -176,7 +169,6 @@ function viewGame() {
   else if (S.tab === "business") bizView(m);
   else if (S.tab === "map") mapView(m);
   else if (S.tab === "board") boardView(m);
-  else m.innerHTML = soon(S.tab);
   const lo = document.getElementById("lo2"); if (lo) lo.onclick = () => db.auth.signOut();
 }
 
@@ -186,13 +178,6 @@ function homeHtml(c) {
     <p class="mute">${bgName(c.background)} · ${cap(c.city)}. Work jobs to earn, then buy a shop in Business. Energy refills 1 point every minute.</p></div>
     <div class="card"><h2>Skills</h2>\( {sk.map(([k, v]) => `<div class="sk"><div class="row"><span> \){SK[k]}</span><b>\( {v}</b></div><div class="bar"><i style="width: \){Math.min(v * 10, 100)}%"></i></div></div>`).join("")}</div>
     <button class="link" id="lo2">Log out</button>`;
-}
-
-function soon(t) {
-  const j = {
-    map: ["Lagos map", "Go-slow has blocked the map. Traffic should clear in the next update."]
-  }[t];
-  return `<div class="card"><h2>\( {j[0]}</h2><p class="mute"> \){j[1]}</p></div>`;
 }
 
 function jobCard(j, c) {
@@ -341,57 +326,16 @@ async function loadDistricts() {
 }
 
 function mapSvg(cur) {
-  const P = {
-    ikeja: [68, 42],
-    mushin: [128, 88],
-    yaba: [218, 92],
-    victoria_island: [195, 175],
-    lekki: [278, 188]
-  };
-  const L = {
-    ikeja: "Ikeja",
-    mushin: "Mushin",
-    yaba: "Yaba",
-    victoria_island: "VI",
-    lekki: "Lekki"
-  };
-  const links = [
-    ["ikeja", "mushin"],
-    ["mushin", "yaba"],
-    ["yaba", "victoria_island"],
-    ["victoria_island", "lekki"]
-  ];
-
-  const lines = links.map(([a, b]) =>
-    `<line x1="\( {P[a][0]}" y1=" \){P[a][1]}" x2="\( {P[b][0]}" y2=" \){P[b][1]}"
-      stroke="#94A3A2" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round"/>`
-  ).join("");
-
+  const P = { ikeja: [68, 42], mushin: [128, 88], yaba: [218, 92], victoria_island: [195, 175], lekki: [278, 188] };
+  const L = { ikeja: "Ikeja", mushin: "Mushin", yaba: "Yaba", victoria_island: "VI", lekki: "Lekki" };
+  const links = [["ikeja", "mushin"], ["mushin", "yaba"], ["yaba", "victoria_island"], ["victoria_island", "lekki"]];
+  const lines = links.map(([a, b]) => `<line x1="\( {P[a][0]}" y1=" \){P[a][1]}" x2="\( {P[b][0]}" y2=" \){P[b][1]}" stroke="#94A3A2" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round"/>`).join("");
   const dots = Object.keys(P).map(k => {
     const [x, y] = P[k];
     const on = k === cur;
-    return `
-      <g class="map-pin \( {on ? "current" : ""}" data-id=" \){k}">
-        <circle cx="\( {x}" cy=" \){y}" r="${on ? 13 : 9}"
-          fill="${on ? "#FFC20E" : "#fff"}"
-          stroke="${on ? "#14201F" : "#0F6B6F"}"
-          stroke-width="3"/>
-        <text x="\( {x}" y=" \){y + (on ? 28 : 24)}" text-anchor="middle"
-          font-size="12" font-weight="700" fill="#14201F">${L[k]}</text>
-      </g>`;
+    return `<g class="map-pin\( {on ? " current" : ""}" data-id=" \){k}"><circle cx="\( {x}" cy=" \){y}" r="\( {on ? 13 : 9}" fill=" \){on ? "#FFC20E" : "#fff"}" stroke="\( {on ? "#14201F" : "#0F6B6F"}" stroke-width="3"/><text x=" \){x}" y="\( {y + (on ? 28 : 24)}" text-anchor="middle" font-size="12" font-weight="700" fill="#14201F"> \){L[k]}</text></g>`;
   }).join("");
-
-  return `
-    <div class="card map-card">
-      <svg class="map-svg" viewBox="0 0 320 230" role="img" aria-label="Map of Lagos districts">
-        <rect width="320" height="230" rx="12" fill="#F7F4EC"/>
-        <path d="M0 128 C55 112 125 155 205 132 S305 122 320 138 L320 162 C265 152 200 178 115 162 S35 152 0 155 Z"
-          fill="#A8D5D5" opacity="0.85"/>
-        <text x="28" y="152" font-size="11" fill="#0F6B6F" font-weight="600">Lagos Lagoon</text>
-        ${lines}
-        ${dots}
-      </svg>
-    </div>`;
+  return `<div class="card map-card"><svg class="map-svg" viewBox="0 0 320 230" role="img" aria-label="Map of Lagos districts"><rect width="320" height="230" rx="12" fill="#F7F4EC"/><path d="M0 128 C55 112 125 155 205 132 S305 122 320 138 L320 162 C265 152 200 178 115 162 S35 152 0 155 Z" fill="#A8D5D5" opacity="0.85"/><text x="28" y="152" font-size="11" fill="#0F6B6F" font-weight="600">Lagos Lagoon</text>\( {lines} \){dots}</svg></div>`;
 }
 
 async function mapView(m) {
@@ -402,39 +346,14 @@ async function mapView(m) {
     if (S.tab !== "map") return;
     if (!S.districts) { m.innerHTML = `<div class="err">Could not load the map.</div>`; return; }
   }
-
   const cur = S.ch.district;
-
-  m.innerHTML = head + `
-    <div class="card" style="margin-bottom:14px">
-      <h2 style="margin:0">Lagos Map</h2>
-      <p class="mute" style="margin:4px 0 0">Tap a district on the map or use the buttons below. Travel costs energy + cash.</p>
-    </div>
-    ${mapSvg(cur)}
-    ${S.districts.map(d => {
-      const here = d.id === cur;
-      return `
-        <div class="card district-card ${here ? "here" : ""}">
-          <div class="row">
-            <h2 style="margin:0">${esc(d.name)}</h2>
-            ${here
-              ? `<span class="pill">You are here</span>`
-              : `<span class="pill">${naira(d.travel_cost)} · ${d.travel_energy} energy</span>`}
-          </div>
-          <p class="mute" style="margin:8px 0 4px">${esc(d.description)}</p>
-          <div class="bonus">+${d.bonus_pct}% pay on ${SK[d.bonus_skill]} jobs</div>
-          \( {here ? "" : `<button class="btn" data-travel=" \){esc(d.id)}" style="margin-top:14px">Travel to ${esc(d.name)}</button>`}
-        </div>`;
-    }).join("")}
-  `;
-
+  m.innerHTML = head + `<div class="card" style="margin-bottom:14px"><h2 style="margin:0">Lagos Map</h2><p class="mute" style="margin:4px 0 0">Tap a district on the map or use the buttons below.</p></div>\( {mapSvg(cur)} \){S.districts.map(d => {
+    const here = d.id === cur;
+    return `<div class="card district-card\( {here ? " here" : ""}"><div class="row"><h2 style="margin:0"> \){esc(d.name)}</h2>\( {here ? `<span class="pill">You are here</span>` : `<span class="pill"> \){naira(d.travel_cost)} · \( {d.travel_energy} energy</span>`}</div><p class="mute" style="margin:8px 0 4px"> \){esc(d.description)}</p><div class="bonus">+${d.bonus_pct}% pay on \( {SK[d.bonus_skill]} jobs</div> \){here ? "" : `<button class="btn" data-travel="${esc(d.id)}" style="margin-top:14px">Travel to ${esc(d.name)}</button>`}</div>`;
+  }).join("")}`;
   m.querySelectorAll(".map-pin").forEach(pin => {
-    pin.onclick = () => {
-      const id = pin.dataset.id;
-      if (id && id !== cur) travel(id);
-    };
+    pin.onclick = () => { const id = pin.dataset.id; if (id && id !== cur) travel(id); };
   });
-
   m.querySelectorAll("[data-travel]").forEach(b => b.onclick = () => travel(b.dataset.travel));
 }
 
