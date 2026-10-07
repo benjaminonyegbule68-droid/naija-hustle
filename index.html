@@ -1,17 +1,31 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
-  <meta name="theme-color" content="#0F6B6F">  <title>Naija Hustle</title>  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <meta
+    name="theme-color"
+    content="#0F6B6F"
+  >
+
+  <title>Naija Hustle</title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
   <link
     href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap"
     rel="stylesheet"
-  >  <style>
+  >
+
+  <style>
     :root {
       --bg: #EEF1F0;
       --ink: #14201F;
@@ -348,11 +362,22 @@
       border-radius: 20px;
       margin-top: 6px;
     }
-  </style></head><body>
-  <div id="app"></div>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script>
+  </style>
+</head>
+
+<body>
+
+  <div id="app"></div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
     /* =========================================================
        SUPABASE
        ========================================================= */
+
+    const app = document.getElementById("app");
 
     const SUPABASE_URL =
       "https://pbqtbwiymlwksdtfsfcb.supabase.co";
@@ -360,12 +385,41 @@
     const SUPABASE_ANON_KEY =
       "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
-    const db = supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
+    /*
+     * Prevent a completely blank page when the
+     * Supabase library fails to load.
+     */
+    if (
+      !window.supabase ||
+      typeof window.supabase.createClient !== "function"
+    ) {
+      app.innerHTML = `
+        <div class="stripe"></div>
 
-    const app = document.getElementById("app");
+        <div class="wrap">
+          <h1>Naija Hustle</h1>
+
+          <div class="err">
+            <b>Naija Hustle could not start.</b>
+
+            <br><br>
+
+            The Supabase connection library failed to load.
+            Check your internet connection and reload the page.
+          </div>
+        </div>
+      `;
+
+      throw new Error(
+        "Supabase JavaScript library failed to load."
+      );
+    }
+
+    const db =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
 
 
     /* =========================================================
@@ -456,17 +510,21 @@
       );
 
     const naira = value =>
-      "₦" + Number(value || 0).toLocaleString("en-NG");
+      "₦" +
+      Number(value || 0).toLocaleString("en-NG");
 
     const cap = value => {
       const str = String(value || "");
+
       return str
         ? str.charAt(0).toUpperCase() + str.slice(1)
         : "";
     };
 
     const msgHtml = () => {
-      if (!S.msg) return "";
+      if (!S.msg) {
+        return "";
+      }
 
       return `
         <div
@@ -479,9 +537,15 @@
       `;
     };
 
-    const setMsg = (text, ok = false) => {
+    const setMsg = (
+      text,
+      ok = false
+    ) => {
       S.msg = text
-        ? { t: text, ok }
+        ? {
+            t: text,
+            ok
+          }
         : null;
     };
 
@@ -491,12 +555,14 @@
        ========================================================= */
 
     function viewAuth() {
-      const login = S.mode === "login";
+      const login =
+        S.mode === "login";
 
       app.innerHTML = `
         <div class="stripe"></div>
 
         <div class="wrap">
+
           <h1>Naija Hustle</h1>
 
           <p class="mute">
@@ -504,9 +570,14 @@
           </p>
 
           <div class="card">
-            <h2>${login ? "Log in" : "Create account"}</h2>
 
-            <label for="em">Email</label>
+            <h2>
+              ${login ? "Log in" : "Create account"}
+            </h2>
+
+            <label for="em">
+              Email
+            </label>
 
             <input
               id="em"
@@ -515,88 +586,141 @@
               inputmode="email"
             >
 
-            <label for="pw">Password</label>
+            <label for="pw">
+              Password
+            </label>
 
             <input
               id="pw"
               type="password"
-              autocomplete="${login ? "current-password" : "new-password"}"
+              autocomplete="${
+                login
+                  ? "current-password"
+                  : "new-password"
+              }"
               placeholder="At least 6 characters"
             >
 
             ${msgHtml()}
 
-            <button class="btn" id="go">
+            <button
+              class="btn"
+              id="go"
+            >
               ${login ? "Log in" : "Sign up"}
             </button>
 
-            <button class="link" id="sw">
-              ${login
-                ? "New here? Create an account"
-                : "Have an account? Log in"}
+            <button
+              class="link"
+              id="sw"
+            >
+              ${
+                login
+                  ? "New here? Create an account"
+                  : "Have an account? Log in"
+              }
             </button>
+
           </div>
+
         </div>
       `;
 
-      document.getElementById("sw").onclick = () => {
-        S.mode = login ? "signup" : "login";
-        setMsg(null);
-        viewAuth();
-      };
+      document
+        .getElementById("sw")
+        .onclick = () => {
+          S.mode =
+            login
+              ? "signup"
+              : "login";
 
-      document.getElementById("go").onclick = async event => {
-        const email =
-          document.getElementById("em").value.trim();
+          setMsg(null);
 
-        const password =
-          document.getElementById("pw").value;
+          viewAuth();
+        };
 
-        if (!email || password.length < 6) {
-          setMsg(
-            "Enter your email and a password of at least 6 characters."
-          );
+      document
+        .getElementById("go")
+        .onclick = async event => {
 
-          return viewAuth();
-        }
+          const email =
+            document
+              .getElementById("em")
+              .value
+              .trim();
 
-        event.target.disabled = true;
+          const password =
+            document
+              .getElementById("pw")
+              .value;
 
-        if (login) {
-          const { error } =
-            await db.auth.signInWithPassword({
-              email,
-              password
-            });
+          if (
+            !email ||
+            password.length < 6
+          ) {
+            setMsg(
+              "Enter your email and a password of at least 6 characters."
+            );
 
-          if (error) {
-            setMsg(error.message);
-            viewAuth();
+            return viewAuth();
           }
 
-          return;
-        }
+          event.target.disabled = true;
 
-        const { data, error } =
-          await db.auth.signUp({
-            email,
-            password
-          });
+          try {
 
-        if (error) {
-          setMsg(error.message);
-          return viewAuth();
-        }
+            if (login) {
 
-        if (!data.session) {
-          setMsg(
-            "Account created. Check your email to confirm, then log in.",
-            true
-          );
+              const {
+                error
+              } =
+                await db.auth
+                  .signInWithPassword({
+                    email,
+                    password
+                  });
 
-          return viewAuth();
-        }
-      };
+              if (error) {
+                setMsg(error.message);
+                viewAuth();
+              }
+
+              return;
+            }
+
+            const {
+              data,
+              error
+            } =
+              await db.auth.signUp({
+                email,
+                password
+              });
+
+            if (error) {
+              setMsg(error.message);
+              return viewAuth();
+            }
+
+            if (!data.session) {
+              setMsg(
+                "Account created. Check your email to confirm, then log in.",
+                true
+              );
+
+              return viewAuth();
+            }
+
+          } catch (error) {
+
+            setMsg(
+              error?.message ||
+              "Authentication failed."
+            );
+
+            viewAuth();
+          }
+        };
     }
 
 
@@ -605,11 +729,15 @@
        ========================================================= */
 
     function viewCreate() {
+
       app.innerHTML = `
         <div class="stripe"></div>
 
         <div class="wrap">
-          <h1>Who you be?</h1>
+
+          <h1>
+            Who you be?
+          </h1>
 
           <p class="mute">
             Pick your starting point. It decides your cash,
@@ -635,50 +763,78 @@
               data-id="${bg.id}"
               aria-pressed="${S.picked === bg.id}"
             >
-              <b>${esc(bg.name)}</b>
+              <b>
+                ${esc(bg.name)}
+              </b>
 
               <div class="meta">
                 ${esc(bg.meta)}
               </div>
 
               ${esc(bg.d)}
+
             </button>
           `).join("")}
 
           ${msgHtml()}
 
-          <button class="btn" id="mk">
+          <button
+            class="btn"
+            id="mk"
+          >
             Start hustling
           </button>
 
-          <button class="link" id="lo">
+          <button
+            class="link"
+            id="lo"
+          >
             Log out
           </button>
+
         </div>
       `;
 
-      document.querySelectorAll(".bg").forEach(button => {
-        button.onclick = () => {
-          S.nameDraft =
-            document.getElementById("nm").value;
+      document
+        .querySelectorAll(".bg")
+        .forEach(button => {
 
-          S.picked = button.dataset.id;
+          button.onclick = () => {
 
-          viewCreate();
-        };
-      });
+            S.nameDraft =
+              document
+                .getElementById("nm")
+                .value;
 
-      document.getElementById("lo").onclick = () =>
-        db.auth.signOut();
+            S.picked =
+              button.dataset.id;
 
-      document.getElementById("mk").onclick =
-        async event => {
+            viewCreate();
+          };
+
+        });
+
+      document
+        .getElementById("lo")
+        .onclick = () =>
+          db.auth.signOut();
+
+      document
+        .getElementById("mk")
+        .onclick = async event => {
+
           const name =
-            document.getElementById("nm").value.trim();
+            document
+              .getElementById("nm")
+              .value
+              .trim();
 
           S.nameDraft = name;
 
-          if (name.length < 3 || name.length > 20) {
+          if (
+            name.length < 3 ||
+            name.length > 20
+          ) {
             setMsg(
               "Name must be 3 to 20 characters."
             );
@@ -696,19 +852,37 @@
 
           event.target.disabled = true;
 
-          const { error } =
-            await db.rpc("create_character", {
-              p_name: name,
-              p_background: S.picked
-            });
+          try {
 
-          if (error) {
-            setMsg(error.message);
-            return viewCreate();
+            const {
+              error
+            } =
+              await db.rpc(
+                "create_character",
+                {
+                  p_name: name,
+                  p_background: S.picked
+                }
+              );
+
+            if (error) {
+              setMsg(error.message);
+              return viewCreate();
+            }
+
+            setMsg(null);
+
+            await load();
+
+          } catch (error) {
+
+            setMsg(
+              error?.message ||
+              "Character creation failed."
+            );
+
+            viewCreate();
           }
-
-          setMsg(null);
-          await load();
         };
     }
 
@@ -718,6 +892,7 @@
        ========================================================= */
 
     async function go(tab) {
+
       S.tab = tab;
 
       S.jobMsg = null;
@@ -734,18 +909,33 @@
         return;
       }
 
-      const { data } =
-        await db.rpc("get_my_character");
+      try {
 
-      if (
-        data &&
-        data.id &&
-        S.tab === tab &&
-        S.ch &&
-        data.energy !== S.ch.energy
-      ) {
-        S.ch = data;
-        viewGame();
+        const {
+          data
+        } =
+          await db.rpc(
+            "get_my_character"
+          );
+
+        if (
+          data &&
+          data.id &&
+          S.tab === tab &&
+          S.ch &&
+          data.energy !== S.ch.energy
+        ) {
+          S.ch = data;
+
+          viewGame();
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Navigation refresh failed:",
+          error
+        );
       }
     }
 
@@ -755,6 +945,7 @@
        ========================================================= */
 
     function viewGame() {
+
       const c = S.ch;
 
       if (!c) {
@@ -772,7 +963,9 @@
           0,
           Math.min(
             100,
-            Math.round((energy / maxEnergy) * 100)
+            Math.round(
+              (energy / maxEnergy) * 100
+            )
           )
         );
 
@@ -789,15 +982,20 @@
 
       app.innerHTML = `
         <div class="top">
+
           <div class="in">
 
             <div class="row">
-              <b>${esc(c.name)}</b>
+
+              <b>
+                ${esc(c.name)}
+              </b>
 
               <span class="pill">
                 Lvl ${Number(c.level) || 1}
                 · ${xpPct}/100 XP
               </span>
+
             </div>
 
             <div class="cash">
@@ -808,60 +1006,87 @@
               class="row"
               style="font-size:.9rem"
             >
+
               <span>
-                Energy ${energy}/${maxEnergy}
+                Energy
+                ${energy}/${maxEnergy}
               </span>
 
               <span>
-                Rep ${Number(c.reputation) || 0}
+                Rep
+                ${Number(c.reputation) || 0}
               </span>
+
             </div>
 
             <div class="bar">
-              <i style="width:${pct}%"></i>
+              <i
+                style="width:${pct}%"
+              ></i>
             </div>
 
           </div>
 
           <div class="stripe"></div>
+
         </div>
 
-        <div class="wrap" id="main"></div>
+        <div
+          class="wrap"
+          id="main"
+        ></div>
 
         <nav class="nav">
+
           ${tabs.map(([key, label]) => `
             <button
               data-t="${key}"
-              ${S.tab === key
-                ? 'aria-current="page"'
-                : ""}
+              ${
+                S.tab === key
+                  ? 'aria-current="page"'
+                  : ""
+              }
             >
               ${label}
             </button>
           `).join("")}
+
         </nav>
       `;
 
       document
         .querySelectorAll(".nav button")
         .forEach(button => {
+
           button.onclick = () =>
             go(button.dataset.t);
+
         });
 
       const main =
         document.getElementById("main");
 
       if (S.tab === "home") {
-        main.innerHTML = homeHtml(c);
+
+        main.innerHTML =
+          homeHtml(c);
+
       } else if (S.tab === "jobs") {
+
         jobsView(main);
+
       } else if (S.tab === "business") {
+
         bizView(main);
+
       } else if (S.tab === "map") {
+
         mapView(main);
+
       } else if (S.tab === "board") {
+
         boardView(main);
+
       }
 
       const logout =
@@ -879,6 +1104,7 @@
        ========================================================= */
 
     function homeHtml(c) {
+
       const skills = [
         ["hustle", c.skill_hustle],
         ["edu", c.skill_edu],
@@ -888,48 +1114,79 @@
 
       return `
         <div class="card">
+
           <h2>
-            Welcome to ${cap(c.district)},
+            Welcome to
+            ${cap(c.district)},
             ${esc(c.name)}
           </h2>
 
           <p class="mute">
+
             ${esc(bgName(c.background))}
-            · ${cap(c.city)}.
+            ·
+            ${cap(c.city)}.
 
             Work jobs to earn, then buy a shop
             in Business.
 
             Energy refills 1 point every minute.
+
           </p>
+
         </div>
 
         <div class="card">
-          <h2>Skills</h2>
+
+          <h2>
+            Skills
+          </h2>
 
           ${skills.map(([key, value]) => {
+
             const skillValue =
               Number(value) || 0;
 
             const width =
-              Math.min(skillValue * 10, 100);
+              Math.min(
+                skillValue * 10,
+                100
+              );
 
             return `
               <div class="sk">
+
                 <div class="row">
-                  <span>${SK[key]}</span>
-                  <b>${skillValue}</b>
+
+                  <span>
+                    ${SK[key]}
+                  </span>
+
+                  <b>
+                    ${skillValue}
+                  </b>
+
                 </div>
 
                 <div class="bar">
-                  <i style="width:${width}%"></i>
+
+                  <i
+                    style="width:${width}%"
+                  ></i>
+
                 </div>
+
               </div>
             `;
+
           }).join("")}
+
         </div>
 
-        <button class="link" id="lo2">
+        <button
+          class="link"
+          id="lo2"
+        >
           Log out
         </button>
       `;
@@ -940,12 +1197,18 @@
        JOBS
        ========================================================= */
 
-    function jobCard(job, character) {
+    function jobCard(
+      job,
+      character
+    ) {
+
       const needs = [];
 
       const district =
         (S.districts || []).find(
-          item => item.id === character.district
+          item =>
+            item.id ===
+            character.district
         );
 
       const bonus =
@@ -959,13 +1222,19 @@
         Number(job.min_level)
       ) {
         needs.push(
-          "level " + job.min_level
+          "level " +
+          job.min_level
         );
       }
 
       if (
         job.req_skill &&
-        Number(character["skill_" + job.req_skill]) <
+        Number(
+          character[
+            "skill_" +
+            job.req_skill
+          ]
+        ) <
         Number(job.req_skill_level)
       ) {
         needs.push(
@@ -979,11 +1248,16 @@
         <div class="card">
 
           <div class="row">
-            <h2>${esc(job.title)}</h2>
+
+            <h2>
+              ${esc(job.title)}
+            </h2>
 
             <span class="pill">
-              ${job.energy_cost} energy
+              ${job.energy_cost}
+              energy
             </span>
+
           </div>
 
           <p class="mute">
@@ -994,17 +1268,30 @@
             class="row"
             style="font-size:.95rem"
           >
+
             <span>
+
               ${naira(job.pay_min)}
               to
               ${naira(job.pay_max)}
-              ${bonus ? ` · +${bonus}% here` : ""}
+
+              ${
+                bonus
+                  ? ` · +${bonus}% here`
+                  : ""
+              }
+
             </span>
 
             <span>
+
               +${job.xp} XP
-              · trains ${SK[job.trains] || job.trains}
+
+              · trains
+              ${SK[job.trains] || job.trains}
+
             </span>
+
           </div>
 
           ${
@@ -1012,7 +1299,9 @@
               ? `
                 <div class="lock">
                   Locked: needs
-                  ${esc(needs.join(" and "))}
+                  ${esc(
+                    needs.join(" and ")
+                  )}
                 </div>
               `
               : `
@@ -1031,37 +1320,51 @@
 
 
     async function jobsView(main) {
-      const head = S.jobMsg
-        ? `
-          <div
-            class="${S.jobMsg.ok ? "ok" : "err"}"
-            role="alert"
-          >
-            ${esc(S.jobMsg.t)}
-          </div>
-        `
-        : "";
+
+      const head =
+        S.jobMsg
+          ? `
+            <div
+              class="${
+                S.jobMsg.ok
+                  ? "ok"
+                  : "err"
+              }"
+              role="alert"
+            >
+              ${esc(S.jobMsg.t)}
+            </div>
+          `
+          : "";
 
       if (!S.jobs) {
+
         main.innerHTML = `
           <div class="card">
-            <h2>Job board</h2>
+
+            <h2>
+              Job board
+            </h2>
+
             <p class="mute">
               Loading jobs...
             </p>
+
           </div>
         `;
 
         const {
           data,
           error
-        } = await db
-          .from("jobs")
-          .select("*")
-          .order("min_level")
-          .order("pay_min");
+        } =
+          await db
+            .from("jobs")
+            .select("*")
+            .order("min_level")
+            .order("pay_min");
 
         if (error) {
+
           main.innerHTML = `
             <div class="err">
               ${esc(error.message)}
@@ -1071,16 +1374,21 @@
           return;
         }
 
-        S.jobs = data || [];
+        S.jobs =
+          data || [];
 
-        if (S.tab !== "jobs") {
+        if (
+          S.tab !== "jobs"
+        ) {
           return;
         }
       }
 
       await loadDistricts();
 
-      if (S.tab !== "jobs") {
+      if (
+        S.tab !== "jobs"
+      ) {
         return;
       }
 
@@ -1090,15 +1398,23 @@
           S.jobs.length
             ? S.jobs
                 .map(job =>
-                  jobCard(job, S.ch)
+                  jobCard(
+                    job,
+                    S.ch
+                  )
                 )
                 .join("")
             : `
               <div class="card">
-                <h2>Job board</h2>
+
+                <h2>
+                  Job board
+                </h2>
+
                 <p class="mute">
                   No jobs available yet.
                 </p>
+
               </div>
             `
         );
@@ -1106,99 +1422,148 @@
       main
         .querySelectorAll("[data-job]")
         .forEach(button => {
+
           button.onclick = () =>
-            doJob(button.dataset.job);
+            doJob(
+              button.dataset.job
+            );
+
         });
     }
 
 
     async function doJob(id) {
-      if (S.busy) return;
+
+      if (S.busy) {
+        return;
+      }
 
       S.busy = true;
 
       const before = S.ch;
 
-      const {
-        data,
-        error
-      } = await db.rpc("do_job", {
-        p_job_id: id
-      });
+      try {
 
-      S.busy = false;
+        const {
+          data,
+          error
+        } =
+          await db.rpc(
+            "do_job",
+            {
+              p_job_id: id
+            }
+          );
 
-      if (error) {
+        S.busy = false;
+
+        if (error) {
+
+          S.jobMsg = {
+            t: error.message,
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        if (!data) {
+
+          S.jobMsg = {
+            t:
+              "The job completed but returned no character data.",
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        const job =
+          S.jobs.find(
+            item =>
+              item.id === id
+          );
+
+        if (!job) {
+
+          S.jobMsg = {
+            t:
+              "Job completed.",
+            ok: true
+          };
+
+          S.ch = data;
+
+          return viewGame();
+        }
+
+        const diff =
+          Number(data.cash) -
+          Number(before.cash);
+
+        let message =
+          `${job.title} done. Cash ` +
+          `${diff >= 0 ? "+" : "-"}${naira(
+            Math.abs(diff)
+          )}, ` +
+          `+${job.xp} XP.`;
+
+        if (data.last_event) {
+          message +=
+            " " +
+            data.last_event;
+        }
+
+        if (
+          Number(data.level) >
+          Number(before.level)
+        ) {
+          message +=
+            ` Level up! You're now level ${data.level}.`;
+        }
+
+        Object.keys(SK)
+          .forEach(key => {
+
+            if (
+              Number(
+                data["skill_" + key]
+              ) >
+              Number(
+                before["skill_" + key]
+              )
+            ) {
+
+              message +=
+                ` ${SK[key]} went up to ` +
+                `${data["skill_" + key]}.`;
+
+            }
+
+          });
+
+        S.ch = data;
+
         S.jobMsg = {
-          t: error.message,
-          ok: false
-        };
-
-        return viewGame();
-      }
-
-      if (!data) {
-        S.jobMsg = {
-          t: "The job completed but returned no character data.",
-          ok: false
-        };
-
-        return viewGame();
-      }
-
-      const job =
-        S.jobs.find(item => item.id === id);
-
-      if (!job) {
-        S.jobMsg = {
-          t: "Job completed.",
+          t: message,
           ok: true
         };
 
-        S.ch = data;
-        return viewGame();
+        viewGame();
+
+      } catch (error) {
+
+        S.busy = false;
+
+        S.jobMsg = {
+          t:
+            error?.message ||
+            "The job could not be completed.",
+          ok: false
+        };
+
+        viewGame();
       }
-
-      const diff =
-        Number(data.cash) -
-        Number(before.cash);
-
-      let message =
-        `${job.title} done. Cash ` +
-        `${diff >= 0 ? "+" : "-"}${naira(Math.abs(diff))}, ` +
-        `+${job.xp} XP.`;
-
-      if (data.last_event) {
-        message += " " + data.last_event;
-      }
-
-      if (
-        Number(data.level) >
-        Number(before.level)
-      ) {
-        message +=
-          ` Level up! You're now level ${data.level}.`;
-      }
-
-      Object.keys(SK).forEach(key => {
-        if (
-          Number(data["skill_" + key]) >
-          Number(before["skill_" + key])
-        ) {
-          message +=
-            ` ${SK[key]} went up to ` +
-            `${data["skill_" + key]}.`;
-        }
-      });
-
-      S.ch = data;
-
-      S.jobMsg = {
-        t: message,
-        ok: true
-      };
-
-      viewGame();
     }
 
 
@@ -1206,7 +1571,11 @@
        BUSINESS
        ========================================================= */
 
-    function buyCard(type, character) {
+    function buyCard(
+      type,
+      character
+    ) {
+
       const perHour =
         Number(type.base_rate) *
         (
@@ -1222,11 +1591,15 @@
         <div class="card">
 
           <div class="row">
-            <h2>${esc(type.name)}</h2>
+
+            <h2>
+              ${esc(type.name)}
+            </h2>
 
             <span class="pill">
               ${naira(type.buy_cost)}
             </span>
+
           </div>
 
           <p class="mute">
@@ -1237,14 +1610,19 @@
             class="row"
             style="font-size:.95rem"
           >
+
             <span>
-              Up to ${naira(perHour)}
+              Up to
+              ${naira(perHour)}
               profit per hour
             </span>
 
             <span>
-              Holds ${type.base_capacity} units
+              Holds
+              ${type.base_capacity}
+              units
             </span>
+
           </div>
 
           ${
@@ -1260,7 +1638,8 @@
                   class="btn"
                   data-buy="${esc(type.id)}"
                 >
-                  Buy for ${naira(type.buy_cost)}
+                  Buy for
+                  ${naira(type.buy_cost)}
                 </button>
               `
           }
@@ -1271,28 +1650,44 @@
 
 
     async function bizView(main) {
-      const head = S.bizMsg
-        ? `
-          <div
-            class="${S.bizMsg.ok ? "ok" : "err"}"
-            role="alert"
-          >
-            ${esc(S.bizMsg.t)}
-          </div>
-        `
-        : "";
 
-      if (!S.bizTypes || !S.bizLoaded) {
+      const head =
+        S.bizMsg
+          ? `
+            <div
+              class="${
+                S.bizMsg.ok
+                  ? "ok"
+                  : "err"
+              }"
+              role="alert"
+            >
+              ${esc(S.bizMsg.t)}
+            </div>
+          `
+          : "";
+
+      if (
+        !S.bizTypes ||
+        !S.bizLoaded
+      ) {
+
         main.innerHTML = `
           <div class="card">
-            <h2>Your business</h2>
+
+            <h2>
+              Your business
+            </h2>
+
             <p class="mute">
               Opening the shop...
             </p>
+
           </div>
         `;
 
         if (!S.bizTypes) {
+
           const result =
             await db
               .from("business_types")
@@ -1300,25 +1695,34 @@
               .order("buy_cost");
 
           if (result.error) {
+
             main.innerHTML = `
               <div class="err">
-                ${esc(result.error.message)}
+                ${esc(
+                  result.error.message
+                )}
               </div>
             `;
 
             return;
           }
 
-          S.bizTypes = result.data || [];
+          S.bizTypes =
+            result.data || [];
         }
 
         const result =
-          await db.rpc("get_my_business");
+          await db.rpc(
+            "get_my_business"
+          );
 
         if (result.error) {
+
           main.innerHTML = `
             <div class="err">
-              ${esc(result.error.message)}
+              ${esc(
+                result.error.message
+              )}
             </div>
           `;
 
@@ -1335,12 +1739,15 @@
           result.data &&
           result.data.character
         ) {
-          S.ch = result.data.character;
+          S.ch =
+            result.data.character;
         }
 
         S.bizLoaded = true;
 
-        if (S.tab !== "business") {
+        if (
+          S.tab !== "business"
+        ) {
           return;
         }
 
@@ -1348,29 +1755,44 @@
       }
 
       if (!S.biz) {
+
         main.innerHTML =
           head +
           `
             <div class="card">
-              <h2>Start a business</h2>
+
+              <h2>
+                Start a business
+              </h2>
 
               <p class="mute">
+
                 Buy a shop, stock it, and earn
                 while you work other jobs.
+
                 You can own one business for now.
+
               </p>
+
             </div>
           ` +
           S.bizTypes
             .map(type =>
-              buyCard(type, S.ch)
+              buyCard(
+                type,
+                S.ch
+              )
             )
             .join("");
 
         main
-          .querySelectorAll("[data-buy]")
+          .querySelectorAll(
+            "[data-buy]"
+          )
           .forEach(button => {
+
             button.onclick = () => {
+
               const type =
                 S.bizTypes.find(
                   item =>
@@ -1378,29 +1800,38 @@
                     button.dataset.buy
                 );
 
-              if (!type) return;
+              if (!type) {
+                return;
+              }
 
               bizAct(
                 "buy_business",
-                { p_type: type.id },
+                {
+                  p_type: type.id
+                },
                 () =>
                   `You bought a ${type.name}. ` +
                   `Restock it so customers have something to buy.`
               );
             };
+
           });
 
         return;
       }
 
-      const business = S.biz;
+      const business =
+        S.biz;
 
       const type =
         S.bizTypes.find(
-          item => item.id === business.type_id
+          item =>
+            item.id ===
+            business.type_id
         );
 
       if (!type) {
+
         main.innerHTML = `
           ${head}
 
@@ -1431,7 +1862,10 @@
         Number(business.stock) || 0;
 
       const fill =
-        Math.max(0, capacity - stock);
+        Math.max(
+          0,
+          capacity - stock
+        );
 
       const upgradeCost =
         Math.floor(
@@ -1442,8 +1876,14 @@
 
       const stockPercent =
         capacity > 0
-          ? Math.round(
-              (stock / capacity) * 100
+          ? Math.max(
+              0,
+              Math.min(
+                100,
+                Math.round(
+                  (stock / capacity) * 100
+                )
+              )
             )
           : 0;
 
@@ -1453,32 +1893,54 @@
           <div class="card">
 
             <div class="row">
-              <h2>${esc(type.name)}</h2>
+
+              <h2>
+                ${esc(type.name)}
+              </h2>
 
               <span class="pill">
                 Level ${business.level}
               </span>
+
             </div>
 
             <p class="mute">
-              Sells ${rate} units per hour
-              at ${naira(type.unit_price)}
+
+              Sells
+              ${rate}
+              units per hour
+              at
+              ${naira(type.unit_price)}
               each.
 
               Profit up to
               ${naira(perHour)}
               per hour while stocked.
+
             </p>
 
             <div class="sk">
+
               <div class="row">
-                <span>Stock</span>
-                <b>${stock}/${capacity}</b>
+
+                <span>
+                  Stock
+                </span>
+
+                <b>
+                  ${stock}/${capacity}
+                </b>
+
               </div>
 
               <div class="bar">
-                <i style="width:${stockPercent}%"></i>
+
+                <i
+                  style="width:${stockPercent}%"
+                ></i>
+
               </div>
+
             </div>
 
             ${
@@ -1495,12 +1957,15 @@
           </div>
 
           <div class="card">
+
             <div class="mute">
               Ready to collect
             </div>
 
             <div class="big">
-              ${naira(business.uncollected)}
+              ${naira(
+                business.uncollected
+              )}
             </div>
 
             <button
@@ -1510,15 +1975,20 @@
             >
               Collect earnings
             </button>
+
           </div>
 
           <div class="card">
 
-            <h2>Restock</h2>
+            <h2>
+              Restock
+            </h2>
 
             <p class="mute">
               Each unit costs
-              ${naira(type.unit_cost)}.
+              ${naira(
+                type.unit_cost
+              )}.
             </p>
 
             ${
@@ -1528,28 +1998,48 @@
 
                     <button
                       class="btn alt"
-                      data-stock="10"
+                      data-stock="${Math.min(
+                        10,
+                        fill
+                      )}"
                     >
                       +10
+
                       <small>
                         ${naira(
-                          10 *
-                          Number(type.unit_cost)
+                          Math.min(
+                            10,
+                            fill
+                          ) *
+                          Number(
+                            type.unit_cost
+                          )
                         )}
                       </small>
+
                     </button>
 
                     <button
                       class="btn alt"
-                      data-stock="50"
+                      data-stock="${Math.min(
+                        50,
+                        fill
+                      )}"
                     >
                       +50
+
                       <small>
                         ${naira(
-                          50 *
-                          Number(type.unit_cost)
+                          Math.min(
+                            50,
+                            fill
+                          ) *
+                          Number(
+                            type.unit_cost
+                          )
                         )}
                       </small>
+
                     </button>
 
                     <button
@@ -1557,12 +2047,16 @@
                       data-stock="${fill}"
                     >
                       Fill
+
                       <small>
                         ${naira(
                           fill *
-                          Number(type.unit_cost)
+                          Number(
+                            type.unit_cost
+                          )
                         )}
                       </small>
+
                     </button>
 
                   </div>
@@ -1578,11 +2072,15 @@
 
           <div class="card">
 
-            <h2>Upgrade</h2>
+            <h2>
+              Upgrade
+            </h2>
 
             <p class="mute">
+
               More level means more sales
               per hour and more shelf space.
+
             </p>
 
             ${
@@ -1593,12 +2091,20 @@
                     id="upgrade"
                     style="width:100%"
                   >
+
                     Upgrade to level
-                    ${Number(business.level) + 1}
+                    ${
+                      Number(
+                        business.level
+                      ) + 1
+                    }
 
                     <small>
-                      ${naira(upgradeCost)}
+                      ${naira(
+                        upgradeCost
+                      )}
                     </small>
+
                   </button>
                 `
                 : `
@@ -1612,12 +2118,18 @@
         `;
 
       const collect =
-        document.getElementById("collect");
+        document.getElementById(
+          "collect"
+        );
 
       if (collect) {
+
         collect.onclick = () => {
+
           const amount =
-            Number(business.uncollected) || 0;
+            Number(
+              business.uncollected
+            ) || 0;
 
           bizAct(
             "collect_earnings",
@@ -1637,36 +2149,53 @@
       }
 
       main
-        .querySelectorAll("[data-stock]")
+        .querySelectorAll(
+          "[data-stock]"
+        )
         .forEach(button => {
+
           button.onclick = () => {
+
             const units =
-              Number(button.dataset.stock);
+              Number(
+                button.dataset.stock
+              );
 
             bizAct(
               "restock_business",
-              { p_units: units },
+              {
+                p_units: units
+              },
               () =>
                 `Restocked ${units} units for ` +
                 `${naira(
                   units *
-                  Number(type.unit_cost)
+                  Number(
+                    type.unit_cost
+                  )
                 )}.`
             );
           };
+
         });
 
       const upgrade =
-        document.getElementById("upgrade");
+        document.getElementById(
+          "upgrade"
+        );
 
       if (upgrade) {
+
         upgrade.onclick = () => {
+
           bizAct(
             "upgrade_business",
             {},
             () =>
               `Upgraded to level ${
-                Number(business.level) + 1
+                Number(
+                  business.level
+                ) + 1
               }.`
           );
         };
@@ -1679,62 +2208,89 @@
       args,
       successText
     ) {
-      if (S.busy) return;
+
+      if (S.busy) {
+        return;
+      }
 
       S.busy = true;
 
-      const {
-        data,
-        error
-      } = await db.rpc(
-        functionName,
-        args
-      );
+      try {
 
-      S.busy = false;
-
-      if (error) {
-        S.bizMsg = {
-          t: error.message,
-          ok: false
-        };
-
-        return viewGame();
-      }
-
-      if (!data) {
-        S.bizMsg = {
-          t: "The action completed but returned no data.",
-          ok: false
-        };
-
-        return viewGame();
-      }
-
-      const message =
-        successText(data);
-
-      if (data.character) {
-        S.ch = data.character;
-      }
-
-      if (
-        Object.prototype.hasOwnProperty.call(
+        const {
           data,
-          "business"
-        )
-      ) {
-        S.biz = data.business;
+          error
+        } =
+          await db.rpc(
+            functionName,
+            args
+          );
+
+        S.busy = false;
+
+        if (error) {
+
+          S.bizMsg = {
+            t: error.message,
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        if (!data) {
+
+          S.bizMsg = {
+            t:
+              "The action completed but returned no data.",
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        const message =
+          successText(data);
+
+        if (data.character) {
+          S.ch =
+            data.character;
+        }
+
+        if (
+          Object.prototype
+            .hasOwnProperty
+            .call(
+              data,
+              "business"
+            )
+        ) {
+          S.biz =
+            data.business;
+        }
+
+        S.bizLoaded = true;
+
+        S.bizMsg = {
+          t: message,
+          ok: true
+        };
+
+        viewGame();
+
+      } catch (error) {
+
+        S.busy = false;
+
+        S.bizMsg = {
+          t:
+            error?.message ||
+            "Business action failed.",
+          ok: false
+        };
+
+        viewGame();
       }
-
-      S.bizLoaded = true;
-
-      S.bizMsg = {
-        t: message,
-        ok: true
-      };
-
-      viewGame();
     }
 
 
@@ -1743,6 +2299,7 @@
        ========================================================= */
 
     async function loadDistricts() {
+
       if (S.districts) {
         return S.districts;
       }
@@ -1768,7 +2325,10 @@
        MAP
        ========================================================= */
 
-    function mapSvg(currentDistrict) {
+    function mapSvg(
+      currentDistrict
+    ) {
+
       const positions = {
         ikeja: [68, 42],
         mushin: [128, 88],
@@ -1794,23 +2354,28 @@
 
       const lines =
         links
-          .map(([from, to]) => `
-            <line
-              x1="${positions[from][0]}"
-              y1="${positions[from][1]}"
-              x2="${positions[to][0]}"
-              y2="${positions[to][1]}"
-              stroke="#94A3A2"
-              stroke-width="2.5"
-              stroke-dasharray="6 5"
-              stroke-linecap="round"
-            />
-          `)
+          .map(
+            ([from, to]) => `
+              <line
+                x1="${positions[from][0]}"
+                y1="${positions[from][1]}"
+                x2="${positions[to][0]}"
+                y2="${positions[to][1]}"
+                stroke="#94A3A2"
+                stroke-width="2.5"
+                stroke-dasharray="6 5"
+                stroke-linecap="round"
+              />
+            `
+          )
           .join("");
 
       const dots =
-        Object.keys(positions)
+        Object.keys(
+          positions
+        )
           .map(id => {
+
             const [x, y] =
               positions[id];
 
@@ -1819,21 +2384,45 @@
 
             return `
               <g
-                class="map-pin${current ? " current" : ""}"
+                class="map-pin${
+                  current
+                    ? " current"
+                    : ""
+                }"
                 data-id="${id}"
               >
+
                 <circle
                   cx="${x}"
                   cy="${y}"
-                  r="${current ? 13 : 9}"
-                  fill="${current ? "#FFC20E" : "#fff"}"
-                  stroke="${current ? "#14201F" : "#0F6B6F"}"
+                  r="${
+                    current
+                      ? 13
+                      : 9
+                  }"
+                  fill="${
+                    current
+                      ? "#FFC20E"
+                      : "#fff"
+                  }"
+                  stroke="${
+                    current
+                      ? "#14201F"
+                      : "#0F6B6F"
+                  }"
                   stroke-width="3"
                 />
 
                 <text
                   x="${x}"
-                  y="${y + (current ? 28 : 24)}"
+                  y="${
+                    y +
+                    (
+                      current
+                        ? 28
+                        : 24
+                    )
+                  }"
                   text-anchor="middle"
                   font-size="12"
                   font-weight="700"
@@ -1841,6 +2430,7 @@
                 >
                   ${labels[id]}
                 </text>
+
               </g>
             `;
           })
@@ -1894,35 +2484,49 @@
 
 
     async function mapView(main) {
-      const head = S.mapMsg
-        ? `
-          <div
-            class="${S.mapMsg.ok ? "ok" : "err"}"
-            role="alert"
-          >
-            ${esc(S.mapMsg.t)}
-          </div>
-        `
-        : "";
+
+      const head =
+        S.mapMsg
+          ? `
+            <div
+              class="${
+                S.mapMsg.ok
+                  ? "ok"
+                  : "err"
+              }"
+              role="alert"
+            >
+              ${esc(S.mapMsg.t)}
+            </div>
+          `
+          : "";
 
       if (!S.districts) {
+
         main.innerHTML = `
           <div class="card">
-            <h2>Lagos map</h2>
+
+            <h2>
+              Lagos map
+            </h2>
 
             <p class="mute">
               Checking traffic...
             </p>
+
           </div>
         `;
 
         await loadDistricts();
 
-        if (S.tab !== "map") {
+        if (
+          S.tab !== "map"
+        ) {
           return;
         }
 
         if (!S.districts) {
+
           main.innerHTML = `
             <div class="err">
               Could not load the map.
@@ -1943,6 +2547,7 @@
             class="card"
             style="margin-bottom:14px"
           >
+
             <h2 style="margin:0">
               Lagos Map
             </h2>
@@ -1954,83 +2559,123 @@
               Tap a district on the map
               or use the buttons below.
             </p>
+
           </div>
 
           ${mapSvg(current)}
 
-          ${S.districts.map(district => {
-            const here =
-              district.id === current;
+          ${S.districts
+            .map(district => {
 
-            return `
-              <div
-                class="card district-card${here ? " here" : ""}"
-              >
+              const here =
+                district.id ===
+                current;
 
-                <div class="row">
+              return `
+                <div
+                  class="card district-card${
+                    here
+                      ? " here"
+                      : ""
+                  }"
+                >
 
-                  <h2 style="margin:0">
-                    ${esc(district.name)}
-                  </h2>
+                  <div class="row">
+
+                    <h2 style="margin:0">
+                      ${esc(
+                        district.name
+                      )}
+                    </h2>
+
+                    ${
+                      here
+                        ? `
+                          <span class="pill">
+                            You are here
+                          </span>
+                        `
+                        : `
+                          <span class="pill">
+
+                            ${naira(
+                              district.travel_cost
+                            )}
+
+                            ·
+
+                            ${
+                              district.travel_energy
+                            }
+
+                            energy
+
+                          </span>
+                        `
+                    }
+
+                  </div>
+
+                  <p
+                    class="mute"
+                    style="margin:8px 0 4px"
+                  >
+                    ${esc(
+                      district.description
+                    )}
+                  </p>
+
+                  <div class="bonus">
+
+                    +${district.bonus_pct}%
+
+                    pay on
+
+                    ${
+                      SK[
+                        district
+                          .bonus_skill
+                      ] ||
+                      district.bonus_skill
+                    }
+
+                    jobs
+
+                  </div>
 
                   ${
                     here
-                      ? `
-                        <span class="pill">
-                          You are here
-                        </span>
-                      `
+                      ? ""
                       : `
-                        <span class="pill">
-                          ${naira(district.travel_cost)}
-                          ·
-                          ${district.travel_energy}
-                          energy
-                        </span>
+                        <button
+                          class="btn"
+                          data-travel="${esc(
+                            district.id
+                          )}"
+                          style="margin-top:14px"
+                        >
+                          Travel to
+                          ${esc(
+                            district.name
+                          )}
+                        </button>
                       `
                   }
 
                 </div>
-
-                <p
-                  class="mute"
-                  style="margin:8px 0 4px"
-                >
-                  ${esc(district.description)}
-                </p>
-
-                <div class="bonus">
-                  +${district.bonus_pct}%
-                  pay on
-                  ${SK[district.bonus_skill] ||
-                    district.bonus_skill}
-                  jobs
-                </div>
-
-                ${
-                  here
-                    ? ""
-                    : `
-                      <button
-                        class="btn"
-                        data-travel="${esc(district.id)}"
-                        style="margin-top:14px"
-                      >
-                        Travel to
-                        ${esc(district.name)}
-                      </button>
-                    `
-                }
-
-              </div>
-            `;
-          }).join("")}
+              `;
+            })
+            .join("")}
         `;
 
       main
-        .querySelectorAll(".map-pin")
+        .querySelectorAll(
+          ".map-pin"
+        )
         .forEach(pin => {
+
           pin.onclick = () => {
+
             const id =
               pin.dataset.id;
 
@@ -2041,28 +2686,41 @@
               travel(id);
             }
           };
+
         });
 
       main
-        .querySelectorAll("[data-travel]")
+        .querySelectorAll(
+          "[data-travel]"
+        )
         .forEach(button => {
+
           button.onclick = () =>
-            travel(button.dataset.travel);
+            travel(
+              button.dataset.travel
+            );
+
         });
     }
 
 
     async function travel(id) {
-      if (S.busy) return;
+
+      if (S.busy) {
+        return;
+      }
 
       const district =
         S.districts.find(
-          item => item.id === id
+          item =>
+            item.id === id
         );
 
       if (!district) {
+
         S.mapMsg = {
-          t: "That district could not be found.",
+          t:
+            "That district could not be found.",
           ok: false
         };
 
@@ -2071,44 +2729,69 @@
 
       S.busy = true;
 
-      const {
-        data,
-        error
-      } = await db.rpc("travel", {
-        p_district: id
-      });
+      try {
 
-      S.busy = false;
+        const {
+          data,
+          error
+        } =
+          await db.rpc(
+            "travel",
+            {
+              p_district: id
+            }
+          );
 
-      if (error) {
+        S.busy = false;
+
+        if (error) {
+
+          S.mapMsg = {
+            t: error.message,
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        if (!data) {
+
+          S.mapMsg = {
+            t:
+              "Travel completed but no character data was returned.",
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        S.ch = data;
+
         S.mapMsg = {
-          t: error.message,
+          t:
+            `You reached ${district.name} after the go-slow. ` +
+            `It cost ${naira(
+              district.travel_cost
+            )} ` +
+            `and ${district.travel_energy} energy.`,
+          ok: true
+        };
+
+        viewGame();
+
+      } catch (error) {
+
+        S.busy = false;
+
+        S.mapMsg = {
+          t:
+            error?.message ||
+            "Travel failed.",
           ok: false
         };
 
-        return viewGame();
+        viewGame();
       }
-
-      if (!data) {
-        S.mapMsg = {
-          t: "Travel completed but no character data was returned.",
-          ok: false
-        };
-
-        return viewGame();
-      }
-
-      S.ch = data;
-
-      S.mapMsg = {
-        t:
-          `You reached ${district.name} after the go-slow. ` +
-          `It cost ${naira(district.travel_cost)} ` +
-          `and ${district.travel_energy} energy.`,
-        ok: true
-      };
-
-      viewGame();
     }
 
 
@@ -2117,34 +2800,46 @@
        ========================================================= */
 
     async function boardView(main) {
+
       main.innerHTML = `
         <div class="card">
-          <h2>Richest in Lagos</h2>
+
+          <h2>
+            Richest in Lagos
+          </h2>
 
           <p class="mute">
             Loading ranks...
           </p>
+
         </div>
       `;
 
       const {
         data,
         error
-      } = await db
-        .from("characters")
-        .select(
-          "name,background,cash,level"
-        )
-        .order("cash", {
-          ascending: false
-        })
-        .limit(20);
+      } =
+        await db
+          .from("characters")
+          .select(
+            "name,background,cash,level"
+          )
+          .order(
+            "cash",
+            {
+              ascending: false
+            }
+          )
+          .limit(20);
 
-      if (S.tab !== "board") {
+      if (
+        S.tab !== "board"
+      ) {
         return;
       }
 
       if (error) {
+
         main.innerHTML = `
           <div class="err">
             ${esc(error.message)}
@@ -2154,7 +2849,8 @@
         return;
       }
 
-      const players = data || [];
+      const players =
+        data || [];
 
       main.innerHTML = `
         <div class="card">
@@ -2166,31 +2862,49 @@
           ${
             players.length
               ? players
-                  .map((player, index) => `
-                    <div class="lb">
+                  .map(
+                    (
+                      player,
+                      index
+                    ) => `
+                      <div class="lb">
 
-                      <span>
-                        ${index + 1}.
-                        ${esc(player.name)}
+                        <span>
 
-                        <span class="mute">
-                          ·
+                          ${
+                            index + 1
+                          }.
+
                           ${esc(
-                            bgName(
-                              player.background
-                            )
+                            player.name
                           )}
-                          · Lvl
-                          ${player.level}
+
+                          <span class="mute">
+
+                            ·
+
+                            ${esc(
+                              bgName(
+                                player.background
+                              )
+                            )}
+
+                            · Lvl
+                            ${player.level}
+
+                          </span>
+
                         </span>
-                      </span>
 
-                      <b>
-                        ${naira(player.cash)}
-                      </b>
+                        <b>
+                          ${naira(
+                            player.cash
+                          )}
+                        </b>
 
-                    </div>
-                  `)
+                      </div>
+                    `
+                  )
                   .join("")
               : `
                 <p class="mute">
@@ -2210,32 +2924,62 @@
        ========================================================= */
 
     async function load() {
+
       if (!S.user) {
+
         S.ch = null;
+
         return viewAuth();
       }
 
-      const {
-        data,
-        error
-      } = await db.rpc(
-        "get_my_character"
-      );
+      try {
 
-      if (error) {
-        setMsg(error.message);
-        return viewAuth();
-      }
+        const {
+          data,
+          error
+        } =
+          await db.rpc(
+            "get_my_character"
+          );
 
-      S.ch =
-        data && data.id
-          ? data
-          : null;
+        if (error) {
 
-      if (S.ch) {
-        viewGame();
-      } else {
-        viewCreate();
+          setMsg(
+            error.message
+          );
+
+          return viewAuth();
+        }
+
+        S.ch =
+          data &&
+          data.id
+            ? data
+            : null;
+
+        if (S.ch) {
+
+          viewGame();
+
+        } else {
+
+          viewCreate();
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Load failed:",
+          error
+        );
+
+        setMsg(
+          error?.message ||
+          "Could not load the game."
+        );
+
+        viewAuth();
       }
     }
 
@@ -2245,11 +2989,23 @@
        ========================================================= */
 
     db.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+
         S.user =
           session
             ? session.user
             : null;
+
+        /*
+         * INITIAL_SESSION is handled by init()
+         * below so we don't load the app twice.
+         */
+        if (
+          event ===
+          "INITIAL_SESSION"
+        ) {
+          return;
+        }
 
         setTimeout(
           () => load(),
@@ -2260,9 +3016,68 @@
 
 
     /* =========================================================
-       INITIAL LOAD
+       INITIAL STARTUP
        ========================================================= */
 
-    load();
-  </script></body>
+    (async function init() {
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await db.auth.getSession();
+
+        if (error) {
+          throw error;
+        }
+
+        S.user =
+          data &&
+          data.session
+            ? data.session.user
+            : null;
+
+        await load();
+
+      } catch (error) {
+
+        console.error(
+          "Naija Hustle startup error:",
+          error
+        );
+
+        app.innerHTML = `
+          <div class="stripe"></div>
+
+          <div class="wrap">
+
+            <h1>
+              Naija Hustle
+            </h1>
+
+            <div class="err">
+
+              <b>
+                Something went wrong while starting the game.
+              </b>
+
+              <br><br>
+
+              ${esc(
+                error?.message ||
+                "Unknown startup error."
+              )}
+
+            </div>
+
+          </div>
+        `;
+      }
+
+    })();
+  </script>
+
+</body>
   </html>
