@@ -1,393 +1,2268 @@
 <!doctype html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0F6B6F">
-<title>Naija Hustle</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#EEF1F0;--ink:#14201F;--lagoon:#0F6B6F;--danfo:#FFC20E;--brick:#C2410C;--card:#fff;--mute:#5C6B6A;--line:#D5DCDA}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.45}
-button,input{font:inherit}
-.stripe{height:8px;background:repeating-linear-gradient(90deg,var(--danfo) 0 28px,#14201F 28px 36px)}
-.wrap{max-width:480px;margin:0 auto;padding:16px 16px 96px}
-h1{font-size:2.4rem;font-weight:800;line-height:1.05;margin:24px 0 8px;letter-spacing:-.02em}
-h2{font-size:1.3rem;font-weight:800;margin:0 0 4px}
-p{margin:0 0 12px}
-.mute{color:var(--mute)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
-label{display:block;font-weight:600;margin:12px 0 4px}
-input{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
-input:focus-visible,button:focus-visible{outline:3px solid var(--danfo);outline-offset:2px}
-.btn{width:100%;padding:14px;border:0;border-radius:10px;background:var(--lagoon);color:#fff;font-weight:800;font-size:1.05rem;margin-top:16px;cursor:pointer}
-.btn:disabled{opacity:.6}
-.btn.alt{background:#fff;color:var(--lagoon);border:2px solid var(--lagoon);margin-top:0;padding:10px 4px;font-size:.95rem}
-.btn.alt small{display:block;font-weight:600;color:var(--mute)}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.link{background:none;border:0;color:var(--lagoon);font-weight:600;text-decoration:underline;padding:8px 0;cursor:pointer}
-.err{background:#FDE8E0;color:#7A2A08;border-radius:10px;padding:10px 12px;margin:0 0 12px}
-.ok{background:#E2F3E7;color:#1C5B2E;border-radius:10px;padding:10px 12px;margin:0 0 12px}
-.bg{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;color:var(--ink)}
-.bg[aria-pressed=true]{border-color:var(--lagoon);box-shadow:inset 6px 0 0 var(--danfo)}
-.bg b{font-size:1.1rem}
-.bg .meta{color:var(--lagoon);font-weight:600;font-size:.9rem;margin:2px 0 4px}
-.top{background:var(--lagoon);color:#fff;position:sticky;top:0;z-index:5}
-.top .in{max-width:480px;margin:0 auto;padding:12px 16px}
-.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.cash{font-size:1.6rem;font-weight:800;color:var(--danfo)}
-.bar{height:10px;background:rgba(255,255,255,.25);border-radius:6px;overflow:hidden;margin-top:8px}
-.bar i{display:block;height:100%;background:var(--danfo)}
-.sk{margin:10px 0}
-.sk .bar{background:var(--line);margin-top:4px}
-.sk .bar i{background:var(--lagoon)}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
-.nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;color:var(--mute);cursor:pointer;border-top:4px solid transparent}
-.nav button[aria-current=page]{color:var(--lagoon);border-top-color:var(--danfo)}
-.lb{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
-.lb:last-child{border:0}
-.pill{display:inline-block;background:var(--danfo);color:#14201F;font-weight:800;border-radius:20px;padding:2px 10px;font-size:.85rem;white-space:nowrap}
-.lock{color:var(--brick);font-weight:600;margin-top:10px}
-.big{font-size:1.8rem;font-weight:800;color:var(--lagoon)}
-.map-card{padding:10px!important;overflow:hidden}
-.map-svg{width:100%;display:block;border-radius:10px}
-.map-pin{cursor:pointer}
-.district-card.here{border-color:var(--danfo);box-shadow:0 0 0 3px rgba(255,194,14,.25)}
-.bonus{display:inline-block;background:#E8F5F5;color:var(--lagoon);font-weight:700;font-size:.85rem;padding:3px 9px;border-radius:20px;margin-top:6px}
-</style>
-</head>
-<body>
-<div id="app"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://pbqtbwiymlwksdtfsfcb.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
-
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const app = document.getElementById("app");
-const S = { user: null, ch: null, tab: "home", mode: "login", msg: null, picked: null, busy: false, jobs: null, jobMsg: null, bizTypes: null, biz: null, bizLoaded: false, bizMsg: null, districts: null, mapMsg: null };
-
-const BG = [
-  { id: "street_boy", name: "Street Boy", meta: "Starts in Mushin · ₦5,000", d: "No capital, no connections, plenty of hustle. Your only collateral is gist." },
-  { id: "graduate", name: "Graduate", meta: "Starts in Yaba · ₦20,000", d: "First class degree, zero job offers. The CV is strong, the NYSC is done." },
-  { id: "nepo_baby", name: "Nepo Baby", meta: "Starts in Lekki · ₦500,000", d: "Daddy's name opens doors. Now prove the doors were worth opening." },
-  { id: "returnee", name: "Returnee", meta: "Starts in Ikeja · ₦150,000", d: "Came back from abroad with savings and a strong accent. Lagos will humble you." }
-];
-const SK = { hustle: "Hustle", edu: "Education", charm: "Charm", tech: "Tech" };
-const bgName = id => (BG.find(b => b.id === id) || {}).name || id;
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const naira = n => "₦" + Number(n).toLocaleString("en-NG");
-const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-const msgHtml = () => S.msg ? `<div class="\( {S.msg.ok ? "ok" : "err"}" role="alert" style="margin:12px 0 0"> \){esc(S.msg.t)}</div>` : "";
-const setMsg = (t, ok) => { S.msg = t ? { t, ok } : null; };
-
-function viewAuth() {
-  const login = S.mode === "login";
-  app.innerHTML = `<div class="stripe"></div><div class="wrap">
-    <h1>Naija Hustle</h1>
-    <p class="mute">Start from the bottom. Own the block.</p>
-    <div class="card">
-      <h2>${login ? "Log in" : "Create account"}</h2>
-      <label for="em">Email</label><input id="em" type="email" autocomplete="email" inputmode="email">
-      <label for="pw">Password</label><input id="pw" type="password" autocomplete="${login ? "current-password" : "new-password"}" placeholder="At least 6 characters">
-      ${msgHtml()}
-      <button class="btn" id="go">${login ? "Log in" : "Sign up"}</button>
-      <button class="link" id="sw">${login ? "New here? Create an account" : "Have an account? Log in"}</button>
-    </div></div>`;
-  document.getElementById("sw").onclick = () => { S.mode = login ? "signup" : "login"; setMsg(null); viewAuth(); };
-  document.getElementById("go").onclick = async e => {
-    const email = document.getElementById("em").value.trim();
-    const password = document.getElementById("pw").value;
-    if (!email || password.length < 6) { setMsg("Enter your email and a password of at least 6 characters."); return viewAuth(); }
-    e.target.disabled = true;
-    if (login) {
-      const { error } = await db.auth.signInWithPassword({ email, password });
-      if (error) { setMsg(error.message); viewAuth(); }
-    } else {
-      const { data, error } = await db.auth.signUp({ email, password });
-      if (error) setMsg(error.message);
-      else if (!data.session) setMsg("Account created. Check your email to confirm, then log in.", true);
-      if (error || !data.session) viewAuth();
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+  <meta name="theme-color" content="#0F6B6F">  <title>Naija Hustle</title>  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap"
+    rel="stylesheet"
+  >  <style>
+    :root {
+      --bg: #EEF1F0;
+      --ink: #14201F;
+      --lagoon: #0F6B6F;
+      --danfo: #FFC20E;
+      --brick: #C2410C;
+      --card: #fff;
+      --mute: #5C6B6A;
+      --line: #D5DCDA;
     }
-  };
-}
 
-function viewCreate() {
-  app.innerHTML = `<div class="stripe"></div><div class="wrap">
-    <h1>Who you be?</h1>
-    <p class="mute">Pick your starting point. It decides your cash, your skills, and which part of Lagos you wake up in.</p>
-    <label for="nm">Character name (3 to 20 characters)</label>
-    <input id="nm" maxlength="20" autocomplete="off" value="${esc(S.nameDraft || "")}">
-    <div style="height:16px"></div>
-    \( {BG.map(b => `<button class="bg" data-id=" \){b.id}" aria-pressed="\( {S.picked === b.id}"><b> \){b.name}</b><div class="meta">\( {b.meta}</div> \){b.d}</button>`).join("")}
-    ${msgHtml()}
-    <button class="btn" id="mk">Start hustling</button>
-    <button class="link" id="lo">Log out</button></div>`;
-  document.querySelectorAll(".bg").forEach(el => el.onclick = () => { S.nameDraft = document.getElementById("nm").value; S.picked = el.dataset.id; viewCreate(); });
-  document.getElementById("lo").onclick = () => db.auth.signOut();
-  document.getElementById("mk").onclick = async e => {
-    const name = document.getElementById("nm").value.trim();
-    S.nameDraft = name;
-    if (name.length < 3 || name.length > 20) { setMsg("Name must be 3 to 20 characters."); return viewCreate(); }
-    if (!S.picked) { setMsg("Pick a background to continue."); return viewCreate(); }
-    e.target.disabled = true;
-    const { error } = await db.rpc("create_character", { p_name: name, p_background: S.picked });
-    if (error) { setMsg(error.message); return viewCreate(); }
-    setMsg(null); load();
-  };
-}
-
-async function go(t) {
-  S.tab = t; S.jobMsg = null; S.bizMsg = null; S.mapMsg = null;
-  if (t === "business") S.bizLoaded = false;
-  viewGame();
-  if (t === "business") return;
-  const { data } = await db.rpc("get_my_character");
-  if (data && data.id && S.tab === t && S.ch && data.energy !== S.ch.energy) { S.ch = data; viewGame(); }
-}
-
-function viewGame() {
-  const c = S.ch;
-  const pct = Math.round((c.energy / c.max_energy) * 100);
-  const xpPct = c.xp % 100;
-  const tabs = [["home", "Home"], ["jobs", "Jobs"], ["business", "Business"], ["map", "Map"], ["board", "Ranks"]];
-  app.innerHTML = `<div class="top"><div class="in">
-      <div class="row"><b>${esc(c.name)}</b><span class="pill">Lvl ${c.level} · ${xpPct}/100 XP</span></div>
-      <div class="cash">${naira(c.cash)}</div>
-      <div class="row" style="font-size:.9rem"><span>Energy \( {c.energy}/ \){c.max_energy}</span><span>Rep ${c.reputation}</span></div>
-      <div class="bar"><i style="width:${pct}%"></i></div>
-    </div><div class="stripe"></div></div>
-    <div class="wrap" id="main"></div>
-    <nav class="nav">\( {tabs.map(([k, l]) => `<button data-t=" \){k}" \( {S.tab === k ? 'aria-current="page"' : ""}> \){l}</button>`).join("")}</nav>`;
-  document.querySelectorAll(".nav button").forEach(b => b.onclick = () => go(b.dataset.t));
-  const m = document.getElementById("main");
-  if (S.tab === "home") m.innerHTML = homeHtml(c);
-  else if (S.tab === "jobs") jobsView(m);
-  else if (S.tab === "business") bizView(m);
-  else if (S.tab === "map") mapView(m);
-  else if (S.tab === "board") boardView(m);
-  const lo = document.getElementById("lo2"); if (lo) lo.onclick = () => db.auth.signOut();
-}
-
-function homeHtml(c) {
-  const sk = [["hustle", c.skill_hustle], ["edu", c.skill_edu], ["charm", c.skill_charm], ["tech", c.skill_tech]];
-  return `<div class="card"><h2>Welcome to ${cap(c.district)}, ${esc(c.name)}</h2>
-    <p class="mute">${bgName(c.background)} · ${cap(c.city)}. Work jobs to earn, then buy a shop in Business. Energy refills 1 point every minute.</p></div>
-    <div class="card"><h2>Skills</h2>\( {sk.map(([k, v]) => `<div class="sk"><div class="row"><span> \){SK[k]}</span><b>\( {v}</b></div><div class="bar"><i style="width: \){Math.min(v * 10, 100)}%"></i></div></div>`).join("")}</div>
-    <button class="link" id="lo2">Log out</button>`;
-}
-
-function jobCard(j, c) {
-  const need = [];
-  const dd = (S.districts || []).find(x => x.id === c.district);
-  const bonus = dd && dd.bonus_skill === j.trains ? dd.bonus_pct : 0;
-  if (c.level < j.min_level) need.push("level " + j.min_level);
-  if (j.req_skill && c["skill_" + j.req_skill] < j.req_skill_level) need.push(SK[j.req_skill] + " " + j.req_skill_level);
-  return `<div class="card">
-    <div class="row"><h2>\( {esc(j.title)}</h2><span class="pill"> \){j.energy_cost} energy</span></div>
-    <p class="mute">${esc(j.description)}</p>
-    <div class="row" style="font-size:.95rem"><span>${naira(j.pay_min)} to \( {naira(j.pay_max)} \){bonus ? ` · +\( {bonus}% here` : ""}</span><span>+ \){j.xp} XP · trains ${SK[j.trains]}</span></div>
-    ${need.length ? `<div class="lock">Locked: needs \( {need.join(" and ")}</div>` : `<button class="btn" data-job=" \){esc(j.id)}">Work this job</button>`}
-  </div>`;
-}
-
-async function jobsView(m) {
-  const head = S.jobMsg ? `<div class="\( {S.jobMsg.ok ? "ok" : "err"}" role="alert"> \){esc(S.jobMsg.t)}</div>` : "";
-  if (!S.jobs) {
-    m.innerHTML = `<div class="card"><h2>Job board</h2><p class="mute">Loading jobs...</p></div>`;
-    const { data, error } = await db.from("jobs").select("*").order("min_level").order("pay_min");
-    if (error) { m.innerHTML = `<div class="err">${esc(error.message)}</div>`; return; }
-    S.jobs = data;
-    if (S.tab !== "jobs") return;
-  }
-  await loadDistricts();
-  if (S.tab !== "jobs") return;
-  m.innerHTML = head + S.jobs.map(j => jobCard(j, S.ch)).join("");
-  m.querySelectorAll("[data-job]").forEach(b => b.onclick = () => doJob(b.dataset.job));
-}
-
-async function doJob(id) {
-  if (S.busy) return;
-  S.busy = true;
-  const before = S.ch;
-  const { data, error } = await db.rpc("do_job", { p_job_id: id });
-  S.busy = false;
-  if (error) { S.jobMsg = { t: error.message, ok: false }; return viewGame(); }
-  const j = S.jobs.find(x => x.id === id);
-  const diff = Number(data.cash) - Number(before.cash);
-  let t = `${j.title} done. Cash \( {diff >= 0 ? "+" : "-"} \){naira(Math.abs(diff))}, +${j.xp} XP.`;
-  if (data.last_event) t += " " + data.last_event;
-  if (data.level > before.level) t += ` Level up! You're now level ${data.level}.`;
-  Object.keys(SK).forEach(k => { if (data["skill_" + k] > before["skill_" + k]) t += ` ${SK[k]} went up to ${data["skill_" + k]}.`; });
-  S.ch = data;
-  S.jobMsg = { t, ok: true };
-  viewGame();
-}
-
-function buyCard(t, c) {
-  const perHr = t.base_rate * (t.unit_price - t.unit_cost);
-  const locked = c.level < t.min_level;
-  return `<div class="card">
-    <div class="row"><h2>\( {esc(t.name)}</h2><span class="pill"> \){naira(t.buy_cost)}</span></div>
-    <p class="mute">${esc(t.description)}</p>
-    <div class="row" style="font-size:.95rem"><span>Up to ${naira(perHr)} profit per hour</span><span>Holds ${t.base_capacity} units</span></div>
-    ${locked ? `<div class="lock">Locked: needs level \( {t.min_level}</div>` : `<button class="btn" data-buy=" \){esc(t.id)}">Buy for ${naira(t.buy_cost)}</button>`}
-  </div>`;
-}
-
-async function bizView(m) {
-  const head = S.bizMsg ? `<div class="\( {S.bizMsg.ok ? "ok" : "err"}" role="alert"> \){esc(S.bizMsg.t)}</div>` : "";
-  if (!S.bizTypes || !S.bizLoaded) {
-    m.innerHTML = `<div class="card"><h2>Your business</h2><p class="mute">Opening the shop...</p></div>`;
-    if (!S.bizTypes) {
-      const r = await db.from("business_types").select("*").order("buy_cost");
-      if (r.error) { m.innerHTML = `<div class="err">${esc(r.error.message)}</div>`; return; }
-      S.bizTypes = r.data;
+    * {
+      box-sizing: border-box;
     }
-    const s = await db.rpc("get_my_business");
-    if (s.error) { m.innerHTML = `<div class="err">${esc(s.error.message)}</div>`; return; }
-    S.biz = s.data.business;
-    if (s.data.character) S.ch = s.data.character;
-    S.bizLoaded = true;
-    if (S.tab !== "business") return;
-    return viewGame();
-  }
 
-  if (!S.biz) {
-    m.innerHTML = head + `<div class="card"><h2>Start a business</h2><p class="mute">Buy a shop, stock it, and earn while you work other jobs. You can own one business for now.</p></div>` + S.bizTypes.map(t => buyCard(t, S.ch)).join("");
-    m.querySelectorAll("[data-buy]").forEach(b => b.onclick = () => {
-      const t = S.bizTypes.find(x => x.id === b.dataset.buy);
-      bizAct("buy_business", { p_type: t.id }, () => `You bought a ${t.name}. Restock it so customers have something to buy.`);
-    });
-    return;
-  }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Bricolage Grotesque", system-ui, sans-serif;
+      line-height: 1.45;
+    }
 
-  const b = S.biz, t = S.bizTypes.find(x => x.id === b.type_id);
-  const rate = t.base_rate * b.level, capU = t.base_capacity * b.level;
-  const perHr = rate * (t.unit_price - t.unit_cost);
-  const fill = capU - b.stock;
-  const upCost = Math.floor(t.buy_cost * b.level / 2);
-  const pct = Math.round((b.stock / capU) * 100);
-  m.innerHTML = head + `<div class="card">
-      <div class="row"><h2>${esc(t.name)}</h2><span class="pill">Level ${b.level}</span></div>
-      <p class="mute">Sells ${rate} units per hour at ${naira(t.unit_price)} each. Profit up to ${naira(perHr)} per hour while stocked.</p>
-      <div class="sk"><div class="row"><span>Stock</span><b>\( {b.stock}/ \){capU}</b></div><div class="bar"><i style="width:${pct}%"></i></div></div>
-      ${b.stock === 0 ? `<div class="lock">Shelves are empty. Restock to keep earning.</div>` : ""}
-    </div>
-    <div class="card">
-      <div class="mute">Ready to collect</div>
-      <div class="big">${naira(b.uncollected)}</div>
-      <button class="btn" id="collect" style="margin-top:12px">Collect earnings</button>
-    </div>
-    <div class="card">
-      <h2>Restock</h2>
-      <p class="mute">Each unit costs ${naira(t.unit_cost)}.</p>
-      ${fill > 0 ? `<div class="grid3">
-        <button class="btn alt" data-stock="10">+10<small>${naira(10 * t.unit_cost)}</small></button>
-        <button class="btn alt" data-stock="50">+50<small>${naira(50 * t.unit_cost)}</small></button>
-        <button class="btn alt" data-stock="\( {fill}">Fill<small> \){naira(fill * t.unit_cost)}</small></button>
-      </div>` : `<p>Your shop is full.</p>`}
-    </div>
-    <div class="card">
-      <h2>Upgrade</h2>
-      <p class="mute">More level means more sales per hour and more shelf space.</p>
-      ${b.level < 5 ? `<button class="btn alt" id="upgrade" style="width:100%">Upgrade to level \( {b.level + 1}<small> \){naira(upCost)}</small></button>` : `<p>Max level reached.</p>`}
-    </div>`;
-  document.getElementById("collect").onclick = () => bizAct("collect_earnings", {}, d => `Collected ${naira(b.uncollected)}.` + (d.character.last_event ? " " + d.character.last_event : ""));
-  m.querySelectorAll("[data-stock]").forEach(el => el.onclick = () => {
-    const n = Number(el.dataset.stock);
-    bizAct("restock_business", { p_units: n }, () => `Restocked ${n} units for ${naira(n * t.unit_cost)}.`);
-  });
-  const up = document.getElementById("upgrade");
-  if (up) up.onclick = () => bizAct("upgrade_business", {}, () => `Upgraded to level ${b.level + 1}.`);
-}
+    button,
+    input {
+      font: inherit;
+    }
 
-async function bizAct(fn, args, okText) {
-  if (S.busy) return;
-  S.busy = true;
-  const { data, error } = await db.rpc(fn, args);
-  S.busy = false;
-  if (error) { S.bizMsg = { t: error.message, ok: false }; return viewGame(); }
-  const text = okText(data);
-  S.ch = data.character;
-  S.biz = data.business;
-  S.bizLoaded = true;
-  S.bizMsg = { t: text, ok: true };
-  viewGame();
-}
+    .stripe {
+      height: 8px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--danfo) 0 28px,
+        #14201F 28px 36px
+      );
+    }
 
-async function loadDistricts() {
-  if (S.districts) return;
-  const r = await db.from("districts").select("*").order("travel_cost");
-  if (!r.error) S.districts = r.data;
-}
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px 16px 96px;
+    }
 
-function mapSvg(cur) {
-  const P = { ikeja: [68, 42], mushin: [128, 88], yaba: [218, 92], victoria_island: [195, 175], lekki: [278, 188] };
-  const L = { ikeja: "Ikeja", mushin: "Mushin", yaba: "Yaba", victoria_island: "VI", lekki: "Lekki" };
-  const links = [["ikeja", "mushin"], ["mushin", "yaba"], ["yaba", "victoria_island"], ["victoria_island", "lekki"]];
-  const lines = links.map(([a, b]) => `<line x1="\( {P[a][0]}" y1=" \){P[a][1]}" x2="\( {P[b][0]}" y2=" \){P[b][1]}" stroke="#94A3A2" stroke-width="2.5" stroke-dasharray="6 5" stroke-linecap="round"/>`).join("");
-  const dots = Object.keys(P).map(k => {
-    const [x, y] = P[k];
-    const on = k === cur;
-    return `<g class="map-pin\( {on ? " current" : ""}" data-id=" \){k}"><circle cx="\( {x}" cy=" \){y}" r="\( {on ? 13 : 9}" fill=" \){on ? "#FFC20E" : "#fff"}" stroke="\( {on ? "#14201F" : "#0F6B6F"}" stroke-width="3"/><text x=" \){x}" y="\( {y + (on ? 28 : 24)}" text-anchor="middle" font-size="12" font-weight="700" fill="#14201F"> \){L[k]}</text></g>`;
-  }).join("");
-  return `<div class="card map-card"><svg class="map-svg" viewBox="0 0 320 230" role="img" aria-label="Map of Lagos districts"><rect width="320" height="230" rx="12" fill="#F7F4EC"/><path d="M0 128 C55 112 125 155 205 132 S305 122 320 138 L320 162 C265 152 200 178 115 162 S35 152 0 155 Z" fill="#A8D5D5" opacity="0.85"/><text x="28" y="152" font-size="11" fill="#0F6B6F" font-weight="600">Lagos Lagoon</text>\( {lines} \){dots}</svg></div>`;
-}
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1.05;
+      margin: 24px 0 8px;
+      letter-spacing: -0.02em;
+    }
 
-async function mapView(m) {
-  const head = S.mapMsg ? `<div class="\( {S.mapMsg.ok ? "ok" : "err"}" role="alert"> \){esc(S.mapMsg.t)}</div>` : "";
-  if (!S.districts) {
-    m.innerHTML = `<div class="card"><h2>Lagos map</h2><p class="mute">Checking traffic...</p></div>`;
-    await loadDistricts();
-    if (S.tab !== "map") return;
-    if (!S.districts) { m.innerHTML = `<div class="err">Could not load the map.</div>`; return; }
-  }
-  const cur = S.ch.district;
-  m.innerHTML = head + `<div class="card" style="margin-bottom:14px"><h2 style="margin:0">Lagos Map</h2><p class="mute" style="margin:4px 0 0">Tap a district on the map or use the buttons below.</p></div>\( {mapSvg(cur)} \){S.districts.map(d => {
-    const here = d.id === cur;
-    return `<div class="card district-card\( {here ? " here" : ""}"><div class="row"><h2 style="margin:0"> \){esc(d.name)}</h2>\( {here ? `<span class="pill">You are here</span>` : `<span class="pill"> \){naira(d.travel_cost)} · \( {d.travel_energy} energy</span>`}</div><p class="mute" style="margin:8px 0 4px"> \){esc(d.description)}</p><div class="bonus">+${d.bonus_pct}% pay on \( {SK[d.bonus_skill]} jobs</div> \){here ? "" : `<button class="btn" data-travel="${esc(d.id)}" style="margin-top:14px">Travel to ${esc(d.name)}</button>`}</div>`;
-  }).join("")}`;
-  m.querySelectorAll(".map-pin").forEach(pin => {
-    pin.onclick = () => { const id = pin.dataset.id; if (id && id !== cur) travel(id); };
-  });
-  m.querySelectorAll("[data-travel]").forEach(b => b.onclick = () => travel(b.dataset.travel));
-}
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 0 0 4px;
+    }
 
-async function travel(id) {
-  if (S.busy) return;
-  S.busy = true;
-  const d = S.districts.find(x => x.id === id);
-  const { data, error } = await db.rpc("travel", { p_district: id });
-  S.busy = false;
-  if (error) { S.mapMsg = { t: error.message, ok: false }; return viewGame(); }
-  S.ch = data;
-  S.mapMsg = { t: `You reached ${d.name} after the go-slow. It cost ${naira(d.travel_cost)} and ${d.travel_energy} energy.`, ok: true };
-  viewGame();
-}
+    p {
+      margin: 0 0 12px;
+    }
 
-async function boardView(m) {
-  m.innerHTML = `<div class="card"><h2>Richest in Lagos</h2><p class="mute">Loading ranks...</p></div>`;
-  const { data, error } = await db.from("characters").select("name,background,cash,level").order("cash", { ascending: false }).limit(20);
-  if (S.tab !== "board") return;
-  if (error) { m.innerHTML = `<div class="err">${esc(error.message)}</div>`; return; }
-  m.innerHTML = `<div class="card"><h2>Richest in Lagos</h2>\( {data.map((r, i) => `<div class="lb"><span> \){i + 1}. ${esc(r.name)} <span class="mute">· ${bgName(r.background)} · Lvl \( {r.level}</span></span><b> \){naira(r.cash)}</b></div>`).join("") || '<p class="mute">No players yet. Be the first.</p>'}</div>`;
-}
+    .mute {
+      color: var(--mute);
+    }
 
-async function load() {
-  if (!S.user) { S.ch = null; return viewAuth(); }
-  const { data, error } = await db.rpc("get_my_character");
-  if (error) { setMsg(error.message); return viewAuth(); }
-  S.ch = data && data.id ? data : null;
-  S.ch ? viewGame() : viewCreate();
-}
-db.auth.onAuthStateChange((_ev, session) => {
-  S.user = session ? session.user : null;
-  setTimeout(load, 0);
-});
-</script>
-</body>
-</html>
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 12px 0 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    input:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--danfo);
+      outline-offset: 2px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--lagoon);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn.alt {
+      background: #fff;
+      color: var(--lagoon);
+      border: 2px solid var(--lagoon);
+      margin-top: 0;
+      padding: 10px 4px;
+      font-size: 0.95rem;
+    }
+
+    .btn.alt small {
+      display: block;
+      font-weight: 600;
+      color: var(--mute);
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .link {
+      background: none;
+      border: 0;
+      color: var(--lagoon);
+      font-weight: 600;
+      text-decoration: underline;
+      padding: 8px 0;
+      cursor: pointer;
+    }
+
+    .err {
+      background: #FDE8E0;
+      color: #7A2A08;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 0 0 12px;
+    }
+
+    .ok {
+      background: #E2F3E7;
+      color: #1C5B2E;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 0 0 12px;
+    }
+
+    .bg {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .bg[aria-pressed="true"] {
+      border-color: var(--lagoon);
+      box-shadow: inset 6px 0 0 var(--danfo);
+    }
+
+    .bg b {
+      font-size: 1.1rem;
+    }
+
+    .bg .meta {
+      color: var(--lagoon);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin: 2px 0 4px;
+    }
+
+    .top {
+      background: var(--lagoon);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .top .in {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 16px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .cash {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--danfo);
+    }
+
+    .bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: var(--danfo);
+    }
+
+    .sk {
+      margin: 10px 0;
+    }
+
+    .sk .bar {
+      background: var(--line);
+      margin-top: 4px;
+    }
+
+    .sk .bar i {
+      background: var(--lagoon);
+    }
+
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid var(--line);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 20;
+    }
+
+    .nav button {
+      flex: 1;
+      padding: 14px 4px;
+      border: 0;
+      background: none;
+      font-weight: 600;
+      color: var(--mute);
+      cursor: pointer;
+      border-top: 4px solid transparent;
+    }
+
+    .nav button[aria-current="page"] {
+      color: var(--lagoon);
+      border-top-color: var(--danfo);
+    }
+
+    .lb {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      gap: 10px;
+    }
+
+    .lb:last-child {
+      border: 0;
+    }
+
+    .pill {
+      display: inline-block;
+      background: var(--danfo);
+      color: #14201F;
+      font-weight: 800;
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .lock {
+      color: var(--brick);
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .big {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--lagoon);
+    }
+
+    .map-card {
+      padding: 10px !important;
+      overflow: hidden;
+    }
+
+    .map-svg {
+      width: 100%;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .map-pin {
+      cursor: pointer;
+    }
+
+    .district-card.here {
+      border-color: var(--danfo);
+      box-shadow: 0 0 0 3px rgba(255, 194, 14, 0.25);
+    }
+
+    .bonus {
+      display: inline-block;
+      background: #E8F5F5;
+      color: var(--lagoon);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      margin-top: 6px;
+    }
+  </style></head><body>
+  <div id="app"></div>  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>  <script>
+    /* =========================================================
+       SUPABASE
+       ========================================================= */
+
+    const SUPABASE_URL =
+      "https://pbqtbwiymlwksdtfsfcb.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
+
+    const db = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const app = document.getElementById("app");
+
+
+    /* =========================================================
+       APP STATE
+       ========================================================= */
+
+    const S = {
+      user: null,
+      ch: null,
+      tab: "home",
+      mode: "login",
+      msg: null,
+      picked: null,
+      nameDraft: "",
+      busy: false,
+
+      jobs: null,
+      jobMsg: null,
+
+      bizTypes: null,
+      biz: null,
+      bizLoaded: false,
+      bizMsg: null,
+
+      districts: null,
+      mapMsg: null
+    };
+
+
+    /* =========================================================
+       GAME DATA
+       ========================================================= */
+
+    const BG = [
+      {
+        id: "street_boy",
+        name: "Street Boy",
+        meta: "Starts in Mushin · ₦5,000",
+        d: "No capital, no connections, plenty of hustle. Your only collateral is gist."
+      },
+      {
+        id: "graduate",
+        name: "Graduate",
+        meta: "Starts in Yaba · ₦20,000",
+        d: "First class degree, zero job offers. The CV is strong, the NYSC is done."
+      },
+      {
+        id: "nepo_baby",
+        name: "Nepo Baby",
+        meta: "Starts in Lekki · ₦500,000",
+        d: "Daddy's name opens doors. Now prove the doors were worth opening."
+      },
+      {
+        id: "returnee",
+        name: "Returnee",
+        meta: "Starts in Ikeja · ₦150,000",
+        d: "Came back from abroad with savings and a strong accent. Lagos will humble you."
+      }
+    ];
+
+    const SK = {
+      hustle: "Hustle",
+      edu: "Education",
+      charm: "Charm",
+      tech: "Tech"
+    };
+
+
+    /* =========================================================
+       HELPERS
+       ========================================================= */
+
+    const bgName = id => {
+      const bg = BG.find(item => item.id === id);
+      return bg ? bg.name : id;
+    };
+
+    const esc = value =>
+      String(value ?? "").replace(
+        /[&<>"']/g,
+        char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char])
+      );
+
+    const naira = value =>
+      "₦" + Number(value || 0).toLocaleString("en-NG");
+
+    const cap = value => {
+      const str = String(value || "");
+      return str
+        ? str.charAt(0).toUpperCase() + str.slice(1)
+        : "";
+    };
+
+    const msgHtml = () => {
+      if (!S.msg) return "";
+
+      return `
+        <div
+          class="${S.msg.ok ? "ok" : "err"}"
+          role="alert"
+          style="margin:12px 0 0"
+        >
+          ${esc(S.msg.t)}
+        </div>
+      `;
+    };
+
+    const setMsg = (text, ok = false) => {
+      S.msg = text
+        ? { t: text, ok }
+        : null;
+    };
+
+
+    /* =========================================================
+       AUTH
+       ========================================================= */
+
+    function viewAuth() {
+      const login = S.mode === "login";
+
+      app.innerHTML = `
+        <div class="stripe"></div>
+
+        <div class="wrap">
+          <h1>Naija Hustle</h1>
+
+          <p class="mute">
+            Start from the bottom. Own the block.
+          </p>
+
+          <div class="card">
+            <h2>${login ? "Log in" : "Create account"}</h2>
+
+            <label for="em">Email</label>
+
+            <input
+              id="em"
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+            >
+
+            <label for="pw">Password</label>
+
+            <input
+              id="pw"
+              type="password"
+              autocomplete="${login ? "current-password" : "new-password"}"
+              placeholder="At least 6 characters"
+            >
+
+            ${msgHtml()}
+
+            <button class="btn" id="go">
+              ${login ? "Log in" : "Sign up"}
+            </button>
+
+            <button class="link" id="sw">
+              ${login
+                ? "New here? Create an account"
+                : "Have an account? Log in"}
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("sw").onclick = () => {
+        S.mode = login ? "signup" : "login";
+        setMsg(null);
+        viewAuth();
+      };
+
+      document.getElementById("go").onclick = async event => {
+        const email =
+          document.getElementById("em").value.trim();
+
+        const password =
+          document.getElementById("pw").value;
+
+        if (!email || password.length < 6) {
+          setMsg(
+            "Enter your email and a password of at least 6 characters."
+          );
+
+          return viewAuth();
+        }
+
+        event.target.disabled = true;
+
+        if (login) {
+          const { error } =
+            await db.auth.signInWithPassword({
+              email,
+              password
+            });
+
+          if (error) {
+            setMsg(error.message);
+            viewAuth();
+          }
+
+          return;
+        }
+
+        const { data, error } =
+          await db.auth.signUp({
+            email,
+            password
+          });
+
+        if (error) {
+          setMsg(error.message);
+          return viewAuth();
+        }
+
+        if (!data.session) {
+          setMsg(
+            "Account created. Check your email to confirm, then log in.",
+            true
+          );
+
+          return viewAuth();
+        }
+      };
+    }
+
+
+    /* =========================================================
+       CHARACTER CREATION
+       ========================================================= */
+
+    function viewCreate() {
+      app.innerHTML = `
+        <div class="stripe"></div>
+
+        <div class="wrap">
+          <h1>Who you be?</h1>
+
+          <p class="mute">
+            Pick your starting point. It decides your cash,
+            your skills, and which part of Lagos you wake up in.
+          </p>
+
+          <label for="nm">
+            Character name (3 to 20 characters)
+          </label>
+
+          <input
+            id="nm"
+            maxlength="20"
+            autocomplete="off"
+            value="${esc(S.nameDraft)}"
+          >
+
+          <div style="height:16px"></div>
+
+          ${BG.map(bg => `
+            <button
+              class="bg"
+              data-id="${bg.id}"
+              aria-pressed="${S.picked === bg.id}"
+            >
+              <b>${esc(bg.name)}</b>
+
+              <div class="meta">
+                ${esc(bg.meta)}
+              </div>
+
+              ${esc(bg.d)}
+            </button>
+          `).join("")}
+
+          ${msgHtml()}
+
+          <button class="btn" id="mk">
+            Start hustling
+          </button>
+
+          <button class="link" id="lo">
+            Log out
+          </button>
+        </div>
+      `;
+
+      document.querySelectorAll(".bg").forEach(button => {
+        button.onclick = () => {
+          S.nameDraft =
+            document.getElementById("nm").value;
+
+          S.picked = button.dataset.id;
+
+          viewCreate();
+        };
+      });
+
+      document.getElementById("lo").onclick = () =>
+        db.auth.signOut();
+
+      document.getElementById("mk").onclick =
+        async event => {
+          const name =
+            document.getElementById("nm").value.trim();
+
+          S.nameDraft = name;
+
+          if (name.length < 3 || name.length > 20) {
+            setMsg(
+              "Name must be 3 to 20 characters."
+            );
+
+            return viewCreate();
+          }
+
+          if (!S.picked) {
+            setMsg(
+              "Pick a background to continue."
+            );
+
+            return viewCreate();
+          }
+
+          event.target.disabled = true;
+
+          const { error } =
+            await db.rpc("create_character", {
+              p_name: name,
+              p_background: S.picked
+            });
+
+          if (error) {
+            setMsg(error.message);
+            return viewCreate();
+          }
+
+          setMsg(null);
+          await load();
+        };
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+       ========================================================= */
+
+    async function go(tab) {
+      S.tab = tab;
+
+      S.jobMsg = null;
+      S.bizMsg = null;
+      S.mapMsg = null;
+
+      if (tab === "business") {
+        S.bizLoaded = false;
+      }
+
+      viewGame();
+
+      if (tab === "business") {
+        return;
+      }
+
+      const { data } =
+        await db.rpc("get_my_character");
+
+      if (
+        data &&
+        data.id &&
+        S.tab === tab &&
+        S.ch &&
+        data.energy !== S.ch.energy
+      ) {
+        S.ch = data;
+        viewGame();
+      }
+    }
+
+
+    /* =========================================================
+       MAIN GAME VIEW
+       ========================================================= */
+
+    function viewGame() {
+      const c = S.ch;
+
+      if (!c) {
+        return viewAuth();
+      }
+
+      const maxEnergy =
+        Number(c.max_energy) || 1;
+
+      const energy =
+        Number(c.energy) || 0;
+
+      const pct =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            Math.round((energy / maxEnergy) * 100)
+          )
+        );
+
+      const xpPct =
+        Number(c.xp || 0) % 100;
+
+      const tabs = [
+        ["home", "Home"],
+        ["jobs", "Jobs"],
+        ["business", "Business"],
+        ["map", "Map"],
+        ["board", "Ranks"]
+      ];
+
+      app.innerHTML = `
+        <div class="top">
+          <div class="in">
+
+            <div class="row">
+              <b>${esc(c.name)}</b>
+
+              <span class="pill">
+                Lvl ${Number(c.level) || 1}
+                · ${xpPct}/100 XP
+              </span>
+            </div>
+
+            <div class="cash">
+              ${naira(c.cash)}
+            </div>
+
+            <div
+              class="row"
+              style="font-size:.9rem"
+            >
+              <span>
+                Energy ${energy}/${maxEnergy}
+              </span>
+
+              <span>
+                Rep ${Number(c.reputation) || 0}
+              </span>
+            </div>
+
+            <div class="bar">
+              <i style="width:${pct}%"></i>
+            </div>
+
+          </div>
+
+          <div class="stripe"></div>
+        </div>
+
+        <div class="wrap" id="main"></div>
+
+        <nav class="nav">
+          ${tabs.map(([key, label]) => `
+            <button
+              data-t="${key}"
+              ${S.tab === key
+                ? 'aria-current="page"'
+                : ""}
+            >
+              ${label}
+            </button>
+          `).join("")}
+        </nav>
+      `;
+
+      document
+        .querySelectorAll(".nav button")
+        .forEach(button => {
+          button.onclick = () =>
+            go(button.dataset.t);
+        });
+
+      const main =
+        document.getElementById("main");
+
+      if (S.tab === "home") {
+        main.innerHTML = homeHtml(c);
+      } else if (S.tab === "jobs") {
+        jobsView(main);
+      } else if (S.tab === "business") {
+        bizView(main);
+      } else if (S.tab === "map") {
+        mapView(main);
+      } else if (S.tab === "board") {
+        boardView(main);
+      }
+
+      const logout =
+        document.getElementById("lo2");
+
+      if (logout) {
+        logout.onclick = () =>
+          db.auth.signOut();
+      }
+    }
+
+
+    /* =========================================================
+       HOME
+       ========================================================= */
+
+    function homeHtml(c) {
+      const skills = [
+        ["hustle", c.skill_hustle],
+        ["edu", c.skill_edu],
+        ["charm", c.skill_charm],
+        ["tech", c.skill_tech]
+      ];
+
+      return `
+        <div class="card">
+          <h2>
+            Welcome to ${cap(c.district)},
+            ${esc(c.name)}
+          </h2>
+
+          <p class="mute">
+            ${esc(bgName(c.background))}
+            · ${cap(c.city)}.
+
+            Work jobs to earn, then buy a shop
+            in Business.
+
+            Energy refills 1 point every minute.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>Skills</h2>
+
+          ${skills.map(([key, value]) => {
+            const skillValue =
+              Number(value) || 0;
+
+            const width =
+              Math.min(skillValue * 10, 100);
+
+            return `
+              <div class="sk">
+                <div class="row">
+                  <span>${SK[key]}</span>
+                  <b>${skillValue}</b>
+                </div>
+
+                <div class="bar">
+                  <i style="width:${width}%"></i>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+
+        <button class="link" id="lo2">
+          Log out
+        </button>
+      `;
+    }
+
+
+    /* =========================================================
+       JOBS
+       ========================================================= */
+
+    function jobCard(job, character) {
+      const needs = [];
+
+      const district =
+        (S.districts || []).find(
+          item => item.id === character.district
+        );
+
+      const bonus =
+        district &&
+        district.bonus_skill === job.trains
+          ? Number(district.bonus_pct) || 0
+          : 0;
+
+      if (
+        Number(character.level) <
+        Number(job.min_level)
+      ) {
+        needs.push(
+          "level " + job.min_level
+        );
+      }
+
+      if (
+        job.req_skill &&
+        Number(character["skill_" + job.req_skill]) <
+        Number(job.req_skill_level)
+      ) {
+        needs.push(
+          SK[job.req_skill] +
+          " " +
+          job.req_skill_level
+        );
+      }
+
+      return `
+        <div class="card">
+
+          <div class="row">
+            <h2>${esc(job.title)}</h2>
+
+            <span class="pill">
+              ${job.energy_cost} energy
+            </span>
+          </div>
+
+          <p class="mute">
+            ${esc(job.description)}
+          </p>
+
+          <div
+            class="row"
+            style="font-size:.95rem"
+          >
+            <span>
+              ${naira(job.pay_min)}
+              to
+              ${naira(job.pay_max)}
+              ${bonus ? ` · +${bonus}% here` : ""}
+            </span>
+
+            <span>
+              +${job.xp} XP
+              · trains ${SK[job.trains] || job.trains}
+            </span>
+          </div>
+
+          ${
+            needs.length
+              ? `
+                <div class="lock">
+                  Locked: needs
+                  ${esc(needs.join(" and "))}
+                </div>
+              `
+              : `
+                <button
+                  class="btn"
+                  data-job="${esc(job.id)}"
+                >
+                  Work this job
+                </button>
+              `
+          }
+
+        </div>
+      `;
+    }
+
+
+    async function jobsView(main) {
+      const head = S.jobMsg
+        ? `
+          <div
+            class="${S.jobMsg.ok ? "ok" : "err"}"
+            role="alert"
+          >
+            ${esc(S.jobMsg.t)}
+          </div>
+        `
+        : "";
+
+      if (!S.jobs) {
+        main.innerHTML = `
+          <div class="card">
+            <h2>Job board</h2>
+            <p class="mute">
+              Loading jobs...
+            </p>
+          </div>
+        `;
+
+        const {
+          data,
+          error
+        } = await db
+          .from("jobs")
+          .select("*")
+          .order("min_level")
+          .order("pay_min");
+
+        if (error) {
+          main.innerHTML = `
+            <div class="err">
+              ${esc(error.message)}
+            </div>
+          `;
+
+          return;
+        }
+
+        S.jobs = data || [];
+
+        if (S.tab !== "jobs") {
+          return;
+        }
+      }
+
+      await loadDistricts();
+
+      if (S.tab !== "jobs") {
+        return;
+      }
+
+      main.innerHTML =
+        head +
+        (
+          S.jobs.length
+            ? S.jobs
+                .map(job =>
+                  jobCard(job, S.ch)
+                )
+                .join("")
+            : `
+              <div class="card">
+                <h2>Job board</h2>
+                <p class="mute">
+                  No jobs available yet.
+                </p>
+              </div>
+            `
+        );
+
+      main
+        .querySelectorAll("[data-job]")
+        .forEach(button => {
+          button.onclick = () =>
+            doJob(button.dataset.job);
+        });
+    }
+
+
+    async function doJob(id) {
+      if (S.busy) return;
+
+      S.busy = true;
+
+      const before = S.ch;
+
+      const {
+        data,
+        error
+      } = await db.rpc("do_job", {
+        p_job_id: id
+      });
+
+      S.busy = false;
+
+      if (error) {
+        S.jobMsg = {
+          t: error.message,
+          ok: false
+        };
+
+        return viewGame();
+      }
+
+      if (!data) {
+        S.jobMsg = {
+          t: "The job completed but returned no character data.",
+          ok: false
+        };
+
+        return viewGame();
+      }
+
+      const job =
+        S.jobs.find(item => item.id === id);
+
+      if (!job) {
+        S.jobMsg = {
+          t: "Job completed.",
+          ok: true
+        };
+
+        S.ch = data;
+        return viewGame();
+      }
+
+      const diff =
+        Number(data.cash) -
+        Number(before.cash);
+
+      let message =
+        `${job.title} done. Cash ` +
+        `${diff >= 0 ? "+" : "-"}${naira(Math.abs(diff))}, ` +
+        `+${job.xp} XP.`;
+
+      if (data.last_event) {
+        message += " " + data.last_event;
+      }
+
+      if (
+        Number(data.level) >
+        Number(before.level)
+      ) {
+        message +=
+          ` Level up! You're now level ${data.level}.`;
+      }
+
+      Object.keys(SK).forEach(key => {
+        if (
+          Number(data["skill_" + key]) >
+          Number(before["skill_" + key])
+        ) {
+          message +=
+            ` ${SK[key]} went up to ` +
+            `${data["skill_" + key]}.`;
+        }
+      });
+
+      S.ch = data;
+
+      S.jobMsg = {
+        t: message,
+        ok: true
+      };
+
+      viewGame();
+    }
+
+
+    /* =========================================================
+       BUSINESS
+       ========================================================= */
+
+    function buyCard(type, character) {
+      const perHour =
+        Number(type.base_rate) *
+        (
+          Number(type.unit_price) -
+          Number(type.unit_cost)
+        );
+
+      const locked =
+        Number(character.level) <
+        Number(type.min_level);
+
+      return `
+        <div class="card">
+
+          <div class="row">
+            <h2>${esc(type.name)}</h2>
+
+            <span class="pill">
+              ${naira(type.buy_cost)}
+            </span>
+          </div>
+
+          <p class="mute">
+            ${esc(type.description)}
+          </p>
+
+          <div
+            class="row"
+            style="font-size:.95rem"
+          >
+            <span>
+              Up to ${naira(perHour)}
+              profit per hour
+            </span>
+
+            <span>
+              Holds ${type.base_capacity} units
+            </span>
+          </div>
+
+          ${
+            locked
+              ? `
+                <div class="lock">
+                  Locked: needs level
+                  ${type.min_level}
+                </div>
+              `
+              : `
+                <button
+                  class="btn"
+                  data-buy="${esc(type.id)}"
+                >
+                  Buy for ${naira(type.buy_cost)}
+                </button>
+              `
+          }
+
+        </div>
+      `;
+    }
+
+
+    async function bizView(main) {
+      const head = S.bizMsg
+        ? `
+          <div
+            class="${S.bizMsg.ok ? "ok" : "err"}"
+            role="alert"
+          >
+            ${esc(S.bizMsg.t)}
+          </div>
+        `
+        : "";
+
+      if (!S.bizTypes || !S.bizLoaded) {
+        main.innerHTML = `
+          <div class="card">
+            <h2>Your business</h2>
+            <p class="mute">
+              Opening the shop...
+            </p>
+          </div>
+        `;
+
+        if (!S.bizTypes) {
+          const result =
+            await db
+              .from("business_types")
+              .select("*")
+              .order("buy_cost");
+
+          if (result.error) {
+            main.innerHTML = `
+              <div class="err">
+                ${esc(result.error.message)}
+              </div>
+            `;
+
+            return;
+          }
+
+          S.bizTypes = result.data || [];
+        }
+
+        const result =
+          await db.rpc("get_my_business");
+
+        if (result.error) {
+          main.innerHTML = `
+            <div class="err">
+              ${esc(result.error.message)}
+            </div>
+          `;
+
+          return;
+        }
+
+        S.biz =
+          result.data &&
+          result.data.business
+            ? result.data.business
+            : null;
+
+        if (
+          result.data &&
+          result.data.character
+        ) {
+          S.ch = result.data.character;
+        }
+
+        S.bizLoaded = true;
+
+        if (S.tab !== "business") {
+          return;
+        }
+
+        return viewGame();
+      }
+
+      if (!S.biz) {
+        main.innerHTML =
+          head +
+          `
+            <div class="card">
+              <h2>Start a business</h2>
+
+              <p class="mute">
+                Buy a shop, stock it, and earn
+                while you work other jobs.
+                You can own one business for now.
+              </p>
+            </div>
+          ` +
+          S.bizTypes
+            .map(type =>
+              buyCard(type, S.ch)
+            )
+            .join("");
+
+        main
+          .querySelectorAll("[data-buy]")
+          .forEach(button => {
+            button.onclick = () => {
+              const type =
+                S.bizTypes.find(
+                  item =>
+                    item.id ===
+                    button.dataset.buy
+                );
+
+              if (!type) return;
+
+              bizAct(
+                "buy_business",
+                { p_type: type.id },
+                () =>
+                  `You bought a ${type.name}. ` +
+                  `Restock it so customers have something to buy.`
+              );
+            };
+          });
+
+        return;
+      }
+
+      const business = S.biz;
+
+      const type =
+        S.bizTypes.find(
+          item => item.id === business.type_id
+        );
+
+      if (!type) {
+        main.innerHTML = `
+          ${head}
+
+          <div class="err">
+            Your business type could not be found.
+          </div>
+        `;
+
+        return;
+      }
+
+      const rate =
+        Number(type.base_rate) *
+        Number(business.level);
+
+      const capacity =
+        Number(type.base_capacity) *
+        Number(business.level);
+
+      const perHour =
+        rate *
+        (
+          Number(type.unit_price) -
+          Number(type.unit_cost)
+        );
+
+      const stock =
+        Number(business.stock) || 0;
+
+      const fill =
+        Math.max(0, capacity - stock);
+
+      const upgradeCost =
+        Math.floor(
+          Number(type.buy_cost) *
+          Number(business.level) /
+          2
+        );
+
+      const stockPercent =
+        capacity > 0
+          ? Math.round(
+              (stock / capacity) * 100
+            )
+          : 0;
+
+      main.innerHTML =
+        head +
+        `
+          <div class="card">
+
+            <div class="row">
+              <h2>${esc(type.name)}</h2>
+
+              <span class="pill">
+                Level ${business.level}
+              </span>
+            </div>
+
+            <p class="mute">
+              Sells ${rate} units per hour
+              at ${naira(type.unit_price)}
+              each.
+
+              Profit up to
+              ${naira(perHour)}
+              per hour while stocked.
+            </p>
+
+            <div class="sk">
+              <div class="row">
+                <span>Stock</span>
+                <b>${stock}/${capacity}</b>
+              </div>
+
+              <div class="bar">
+                <i style="width:${stockPercent}%"></i>
+              </div>
+            </div>
+
+            ${
+              stock === 0
+                ? `
+                  <div class="lock">
+                    Shelves are empty.
+                    Restock to keep earning.
+                  </div>
+                `
+                : ""
+            }
+
+          </div>
+
+          <div class="card">
+            <div class="mute">
+              Ready to collect
+            </div>
+
+            <div class="big">
+              ${naira(business.uncollected)}
+            </div>
+
+            <button
+              class="btn"
+              id="collect"
+              style="margin-top:12px"
+            >
+              Collect earnings
+            </button>
+          </div>
+
+          <div class="card">
+
+            <h2>Restock</h2>
+
+            <p class="mute">
+              Each unit costs
+              ${naira(type.unit_cost)}.
+            </p>
+
+            ${
+              fill > 0
+                ? `
+                  <div class="grid3">
+
+                    <button
+                      class="btn alt"
+                      data-stock="10"
+                    >
+                      +10
+                      <small>
+                        ${naira(
+                          10 *
+                          Number(type.unit_cost)
+                        )}
+                      </small>
+                    </button>
+
+                    <button
+                      class="btn alt"
+                      data-stock="50"
+                    >
+                      +50
+                      <small>
+                        ${naira(
+                          50 *
+                          Number(type.unit_cost)
+                        )}
+                      </small>
+                    </button>
+
+                    <button
+                      class="btn alt"
+                      data-stock="${fill}"
+                    >
+                      Fill
+                      <small>
+                        ${naira(
+                          fill *
+                          Number(type.unit_cost)
+                        )}
+                      </small>
+                    </button>
+
+                  </div>
+                `
+                : `
+                  <p>
+                    Your shop is full.
+                  </p>
+                `
+            }
+
+          </div>
+
+          <div class="card">
+
+            <h2>Upgrade</h2>
+
+            <p class="mute">
+              More level means more sales
+              per hour and more shelf space.
+            </p>
+
+            ${
+              Number(business.level) < 5
+                ? `
+                  <button
+                    class="btn alt"
+                    id="upgrade"
+                    style="width:100%"
+                  >
+                    Upgrade to level
+                    ${Number(business.level) + 1}
+
+                    <small>
+                      ${naira(upgradeCost)}
+                    </small>
+                  </button>
+                `
+                : `
+                  <p>
+                    Max level reached.
+                  </p>
+                `
+            }
+
+          </div>
+        `;
+
+      const collect =
+        document.getElementById("collect");
+
+      if (collect) {
+        collect.onclick = () => {
+          const amount =
+            Number(business.uncollected) || 0;
+
+          bizAct(
+            "collect_earnings",
+            {},
+            data =>
+              `Collected ${naira(amount)}.` +
+              (
+                data &&
+                data.character &&
+                data.character.last_event
+                  ? " " +
+                    data.character.last_event
+                  : ""
+              )
+          );
+        };
+      }
+
+      main
+        .querySelectorAll("[data-stock]")
+        .forEach(button => {
+          button.onclick = () => {
+            const units =
+              Number(button.dataset.stock);
+
+            bizAct(
+              "restock_business",
+              { p_units: units },
+              () =>
+                `Restocked ${units} units for ` +
+                `${naira(
+                  units *
+                  Number(type.unit_cost)
+                )}.`
+            );
+          };
+        });
+
+      const upgrade =
+        document.getElementById("upgrade");
+
+      if (upgrade) {
+        upgrade.onclick = () => {
+          bizAct(
+            "upgrade_business",
+            {},
+            () =>
+              `Upgraded to level ${
+                Number(business.level) + 1
+              }.`
+          );
+        };
+      }
+    }
+
+
+    async function bizAct(
+      functionName,
+      args,
+      successText
+    ) {
+      if (S.busy) return;
+
+      S.busy = true;
+
+      const {
+        data,
+        error
+      } = await db.rpc(
+        functionName,
+        args
+      );
+
+      S.busy = false;
+
+      if (error) {
+        S.bizMsg = {
+          t: error.message,
+          ok: false
+        };
+
+        return viewGame();
+      }
+
+      if (!data) {
+        S.bizMsg = {
+          t: "The action completed but returned no data.",
+          ok: false
+        };
+
+        return viewGame();
+      }
+
+      const message =
+        successText(data);
+
+      if (data.character) {
+        S.ch = data.character;
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          data,
+          "business"
+        )
+      ) {
+        S.biz = data.business;
+      }
+
+      S.bizLoaded = true;
+
+      S.bizMsg = {
+        t: message,
+        ok: true
+      };
+
+      viewGame();
+    }
+
+
+    /* =========================================================
+       DISTRICTS
+       ========================================================= */
+
+    async function loadDistricts() {
+      if (S.districts) {
+        return S.districts;
+      }
+
+      const result =
+        await db
+          .from("districts")
+          .select("*")
+          .order("travel_cost");
+
+      if (result.error) {
+        return null;
+      }
+
+      S.districts =
+        result.data || [];
+
+      return S.districts;
+    }
+
+
+    /* =========================================================
+       MAP
+       ========================================================= */
+
+    function mapSvg(currentDistrict) {
+      const positions = {
+        ikeja: [68, 42],
+        mushin: [128, 88],
+        yaba: [218, 92],
+        victoria_island: [195, 175],
+        lekki: [278, 188]
+      };
+
+      const labels = {
+        ikeja: "Ikeja",
+        mushin: "Mushin",
+        yaba: "Yaba",
+        victoria_island: "VI",
+        lekki: "Lekki"
+      };
+
+      const links = [
+        ["ikeja", "mushin"],
+        ["mushin", "yaba"],
+        ["yaba", "victoria_island"],
+        ["victoria_island", "lekki"]
+      ];
+
+      const lines =
+        links
+          .map(([from, to]) => `
+            <line
+              x1="${positions[from][0]}"
+              y1="${positions[from][1]}"
+              x2="${positions[to][0]}"
+              y2="${positions[to][1]}"
+              stroke="#94A3A2"
+              stroke-width="2.5"
+              stroke-dasharray="6 5"
+              stroke-linecap="round"
+            />
+          `)
+          .join("");
+
+      const dots =
+        Object.keys(positions)
+          .map(id => {
+            const [x, y] =
+              positions[id];
+
+            const current =
+              id === currentDistrict;
+
+            return `
+              <g
+                class="map-pin${current ? " current" : ""}"
+                data-id="${id}"
+              >
+                <circle
+                  cx="${x}"
+                  cy="${y}"
+                  r="${current ? 13 : 9}"
+                  fill="${current ? "#FFC20E" : "#fff"}"
+                  stroke="${current ? "#14201F" : "#0F6B6F"}"
+                  stroke-width="3"
+                />
+
+                <text
+                  x="${x}"
+                  y="${y + (current ? 28 : 24)}"
+                  text-anchor="middle"
+                  font-size="12"
+                  font-weight="700"
+                  fill="#14201F"
+                >
+                  ${labels[id]}
+                </text>
+              </g>
+            `;
+          })
+          .join("");
+
+      return `
+        <div class="card map-card">
+
+          <svg
+            class="map-svg"
+            viewBox="0 0 320 230"
+            role="img"
+            aria-label="Map of Lagos districts"
+          >
+
+            <rect
+              width="320"
+              height="230"
+              rx="12"
+              fill="#F7F4EC"
+            />
+
+            <path
+              d="M0 128 C55 112 125 155 205 132
+                 S305 122 320 138
+                 L320 162
+                 C265 152 200 178 115 162
+                 S35 152 0 155 Z"
+              fill="#A8D5D5"
+              opacity="0.85"
+            />
+
+            <text
+              x="28"
+              y="152"
+              font-size="11"
+              fill="#0F6B6F"
+              font-weight="600"
+            >
+              Lagos Lagoon
+            </text>
+
+            ${lines}
+            ${dots}
+
+          </svg>
+
+        </div>
+      `;
+    }
+
+
+    async function mapView(main) {
+      const head = S.mapMsg
+        ? `
+          <div
+            class="${S.mapMsg.ok ? "ok" : "err"}"
+            role="alert"
+          >
+            ${esc(S.mapMsg.t)}
+          </div>
+        `
+        : "";
+
+      if (!S.districts) {
+        main.innerHTML = `
+          <div class="card">
+            <h2>Lagos map</h2>
+
+            <p class="mute">
+              Checking traffic...
+            </p>
+          </div>
+        `;
+
+        await loadDistricts();
+
+        if (S.tab !== "map") {
+          return;
+        }
+
+        if (!S.districts) {
+          main.innerHTML = `
+            <div class="err">
+              Could not load the map.
+            </div>
+          `;
+
+          return;
+        }
+      }
+
+      const current =
+        S.ch.district;
+
+      main.innerHTML =
+        head +
+        `
+          <div
+            class="card"
+            style="margin-bottom:14px"
+          >
+            <h2 style="margin:0">
+              Lagos Map
+            </h2>
+
+            <p
+              class="mute"
+              style="margin:4px 0 0"
+            >
+              Tap a district on the map
+              or use the buttons below.
+            </p>
+          </div>
+
+          ${mapSvg(current)}
+
+          ${S.districts.map(district => {
+            const here =
+              district.id === current;
+
+            return `
+              <div
+                class="card district-card${here ? " here" : ""}"
+              >
+
+                <div class="row">
+
+                  <h2 style="margin:0">
+                    ${esc(district.name)}
+                  </h2>
+
+                  ${
+                    here
+                      ? `
+                        <span class="pill">
+                          You are here
+                        </span>
+                      `
+                      : `
+                        <span class="pill">
+                          ${naira(district.travel_cost)}
+                          ·
+                          ${district.travel_energy}
+                          energy
+                        </span>
+                      `
+                  }
+
+                </div>
+
+                <p
+                  class="mute"
+                  style="margin:8px 0 4px"
+                >
+                  ${esc(district.description)}
+                </p>
+
+                <div class="bonus">
+                  +${district.bonus_pct}%
+                  pay on
+                  ${SK[district.bonus_skill] ||
+                    district.bonus_skill}
+                  jobs
+                </div>
+
+                ${
+                  here
+                    ? ""
+                    : `
+                      <button
+                        class="btn"
+                        data-travel="${esc(district.id)}"
+                        style="margin-top:14px"
+                      >
+                        Travel to
+                        ${esc(district.name)}
+                      </button>
+                    `
+                }
+
+              </div>
+            `;
+          }).join("")}
+        `;
+
+      main
+        .querySelectorAll(".map-pin")
+        .forEach(pin => {
+          pin.onclick = () => {
+            const id =
+              pin.dataset.id;
+
+            if (
+              id &&
+              id !== current
+            ) {
+              travel(id);
+            }
+          };
+        });
+
+      main
+        .querySelectorAll("[data-travel]")
+        .forEach(button => {
+          button.onclick = () =>
+            travel(button.dataset.travel);
+        });
+    }
+
+
+    async function travel(id) {
+      if (S.busy) return;
+
+      const district =
+        S.districts.find(
+          item => item.id === id
+        );
+
+      if (!district) {
+        S.mapMsg = {
+          t: "That district could not be found.",
+          ok: false
+        };
+
+        return viewGame();
+      }
+
+      S.busy = true;
+
+      const {
+        data,
+        error
+      } = await db.rpc("travel", {
+        p_district: id
+      });
+
+      S.busy = false;
+
+      if (error) {
+        S.mapMsg = {
+          t: error.message,
+          ok: false
+        };
+
+        return viewGame();
+      }
+
+      if (!data) {
+        S.mapMsg = {
+          t: "Travel completed but no character data was returned.",
+          ok: false
+        };
+
+        return viewGame();
+      }
+
+      S.ch = data;
+
+      S.mapMsg = {
+        t:
+          `You reached ${district.name} after the go-slow. ` +
+          `It cost ${naira(district.travel_cost)} ` +
+          `and ${district.travel_energy} energy.`,
+        ok: true
+      };
+
+      viewGame();
+    }
+
+
+    /* =========================================================
+       LEADERBOARD
+       ========================================================= */
+
+    async function boardView(main) {
+      main.innerHTML = `
+        <div class="card">
+          <h2>Richest in Lagos</h2>
+
+          <p class="mute">
+            Loading ranks...
+          </p>
+        </div>
+      `;
+
+      const {
+        data,
+        error
+      } = await db
+        .from("characters")
+        .select(
+          "name,background,cash,level"
+        )
+        .order("cash", {
+          ascending: false
+        })
+        .limit(20);
+
+      if (S.tab !== "board") {
+        return;
+      }
+
+      if (error) {
+        main.innerHTML = `
+          <div class="err">
+            ${esc(error.message)}
+          </div>
+        `;
+
+        return;
+      }
+
+      const players = data || [];
+
+      main.innerHTML = `
+        <div class="card">
+
+          <h2>
+            Richest in Lagos
+          </h2>
+
+          ${
+            players.length
+              ? players
+                  .map((player, index) => `
+                    <div class="lb">
+
+                      <span>
+                        ${index + 1}.
+                        ${esc(player.name)}
+
+                        <span class="mute">
+                          ·
+                          ${esc(
+                            bgName(
+                              player.background
+                            )
+                          )}
+                          · Lvl
+                          ${player.level}
+                        </span>
+                      </span>
+
+                      <b>
+                        ${naira(player.cash)}
+                      </b>
+
+                    </div>
+                  `)
+                  .join("")
+              : `
+                <p class="mute">
+                  No players yet.
+                  Be the first.
+                </p>
+              `
+          }
+
+        </div>
+      `;
+    }
+
+
+    /* =========================================================
+       LOAD CURRENT USER / CHARACTER
+       ========================================================= */
+
+    async function load() {
+      if (!S.user) {
+        S.ch = null;
+        return viewAuth();
+      }
+
+      const {
+        data,
+        error
+      } = await db.rpc(
+        "get_my_character"
+      );
+
+      if (error) {
+        setMsg(error.message);
+        return viewAuth();
+      }
+
+      S.ch =
+        data && data.id
+          ? data
+          : null;
+
+      if (S.ch) {
+        viewGame();
+      } else {
+        viewCreate();
+      }
+    }
+
+
+    /* =========================================================
+       AUTH STATE
+       ========================================================= */
+
+    db.auth.onAuthStateChange(
+      (_event, session) => {
+        S.user =
+          session
+            ? session.user
+            : null;
+
+        setTimeout(
+          () => load(),
+          0
+        );
+      }
+    );
+
+
+    /* =========================================================
+       INITIAL LOAD
+       ========================================================= */
+
+    load();
+  </script></body>
+  </html>
