@@ -363,9 +363,7 @@
       margin-top: 6px;
     }
 
-    /* =========================================================
-       NEEDS
-       ========================================================= */
+    /* NEEDS */
 
     .needs-card {
       position: relative;
@@ -430,45 +428,43 @@
       margin-top: 12px;
     }
 
-    /* =========================================================
-       ACTIVITIES
-       ========================================================= */
+    /* GAME CLOCK */
+
+    .clock-card {
+      background: var(--ink);
+      color: #fff;
+      border: 0;
+    }
+
+    .clock-day {
+      color: var(--danfo);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .clock-time {
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+
+    .clock-phase {
+      color: rgba(255,255,255,.75);
+      font-size: .85rem;
+    }
+
+    /* ACTIVITIES */
 
     .activity-card {
+      margin: 10px 0 0;
       background: #F7F9F8;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 10px;
     }
 
     .activity-icon {
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       margin-right: 5px;
-    }
-
-    .activity-title {
-      font-weight: 800;
-      font-size: 1.05rem;
-    }
-
-    .activity-description {
-      color: var(--mute);
-      margin: 4px 0 0;
-      font-size: 0.9rem;
-    }
-
-    .activity-meta {
-      color: var(--mute);
-      margin: 10px 0 0;
-      font-size: 0.9rem;
-    }
-
-    .activity-btn {
-      width: auto;
-      margin-top: 0;
-      padding: 10px 14px;
-      white-space: nowrap;
     }
   </style>
 </head>
@@ -477,7 +473,6 @@
 
   <div id="app"></div>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -499,15 +494,11 @@
     ) {
       app.innerHTML = `
         <div class="stripe"></div>
-
         <div class="wrap">
           <h1>Naija Hustle</h1>
-
           <div class="err">
             <b>Naija Hustle could not start.</b>
-
             <br><br>
-
             The Supabase connection library failed to load.
             Check your internet connection and reload the page.
           </div>
@@ -657,7 +648,251 @@
 
 
     /* =========================================================
-       NEEDS HELPERS
+       GAME CLOCK
+       ========================================================= */
+
+    function gameTimeInfo(minutes) {
+
+      const total =
+        Math.max(
+          0,
+          Math.min(
+            1439,
+            Number(minutes) || 0
+          )
+        );
+
+      const hour24 =
+        Math.floor(total / 60);
+
+      const mins =
+        total % 60;
+
+      const period =
+        hour24 >= 12
+          ? "PM"
+          : "AM";
+
+      let hour12 =
+        hour24 % 12;
+
+      if (hour12 === 0) {
+        hour12 = 12;
+      }
+
+      let phase = "Morning";
+
+      if (
+        hour24 >= 12 &&
+        hour24 < 17
+      ) {
+        phase = "Afternoon";
+      } else if (
+        hour24 >= 17 &&
+        hour24 < 21
+      ) {
+        phase = "Evening";
+      } else if (
+        hour24 >= 21 ||
+        hour24 < 5
+      ) {
+        phase = "Night";
+      }
+
+      const icon =
+        phase === "Morning"
+          ? "🌅"
+          : phase === "Afternoon"
+            ? "☀️"
+            : phase === "Evening"
+              ? "🌆"
+              : "🌙";
+
+      return {
+        time:
+          `${hour12}:${String(mins).padStart(2, "0")} ${period}`,
+        phase,
+        icon
+      };
+    }
+
+
+    function gameClockHtml(c) {
+
+      const info =
+        gameTimeInfo(
+          c.game_minutes
+        );
+
+      return `
+        <div class="card clock-card">
+
+          <div class="row">
+
+            <div>
+
+              <div class="clock-day">
+                DAY ${Number(c.game_day) || 1}
+              </div>
+
+              <div
+                class="clock-time"
+                data-game-clock
+              >
+                ${info.time}
+              </div>
+
+            </div>
+
+            <div style="text-align:right">
+
+              <div
+                style="font-size:1.5rem"
+                data-game-phase-icon
+              >
+                ${info.icon}
+              </div>
+
+              <div
+                class="clock-phase"
+                data-game-phase
+              >
+                ${info.phase}
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+
+    function startGameClock() {
+
+      if (
+        window.naijaClockTimer
+      ) {
+        clearInterval(
+          window.naijaClockTimer
+        );
+      }
+
+      if (
+        !S.ch ||
+        !S.ch.game_time_updated_at
+      ) {
+        return;
+      }
+
+      const baseMinutes =
+        Number(
+          S.ch.game_minutes
+        ) || 0;
+
+      const baseTime =
+        new Date(
+          S.ch.game_time_updated_at
+        ).getTime();
+
+      window.naijaClockTimer =
+        setInterval(() => {
+
+          if (
+            !S.ch ||
+            !document.querySelector(
+              "[data-game-clock]"
+            )
+          ) {
+            return;
+          }
+
+          const elapsedSeconds =
+            Math.max(
+              0,
+              (
+                Date.now() -
+                baseTime
+              ) / 1000
+            );
+
+          /*
+           * 1 real second = 1/6 game minute.
+           * Therefore 6 real seconds = 1 game minute.
+           */
+
+          const passedMinutes =
+            Math.floor(
+              elapsedSeconds / 6
+            );
+
+          const total =
+            baseMinutes +
+            passedMinutes;
+
+          const dayOffset =
+            Math.floor(
+              total / 1440
+            );
+
+          const minutes =
+            total % 1440;
+
+          const info =
+            gameTimeInfo(
+              minutes
+            );
+
+          const clock =
+            document.querySelector(
+              "[data-game-clock]"
+            );
+
+          const phase =
+            document.querySelector(
+              "[data-game-phase]"
+            );
+
+          const icon =
+            document.querySelector(
+              "[data-game-phase-icon]"
+            );
+
+          if (clock) {
+            clock.textContent =
+              info.time;
+          }
+
+          if (phase) {
+            phase.textContent =
+              info.phase;
+          }
+
+          if (icon) {
+            icon.textContent =
+              info.icon;
+          }
+
+          const day =
+            document.querySelector(
+              ".clock-day"
+            );
+
+          if (day) {
+            day.textContent =
+              `DAY ${
+                (Number(S.ch.game_day) || 1) +
+                dayOffset
+              }`;
+          }
+
+        }, 1000);
+    }
+
+
+    /* =========================================================
+       NEEDS
        ========================================================= */
 
     const needPct = value =>
@@ -831,44 +1066,66 @@
 
           ${message}
 
-          ${activities.map(activity => `
-            <div class="activity-card">
+          ${activities.map(
+            activity => `
+              <div class="card activity-card">
 
-              <div class="row">
+                <div class="row">
 
-                <div>
+                  <div>
 
-                  <div class="activity-title">
-                    <span class="activity-icon">
-                      ${activity.icon}
-                    </span>
+                    <h2 style="margin:0">
 
-                    ${activity.name}
+                      <span class="activity-icon">
+                        ${activity.icon}
+                      </span>
+
+                      ${activity.name}
+
+                    </h2>
+
+                    <p
+                      class="mute"
+                      style="
+                        margin:4px 0 0;
+                        font-size:.9rem;
+                      "
+                    >
+                      ${activity.description}
+                    </p>
+
                   </div>
 
-                  <p class="activity-description">
-                    ${activity.description}
-                  </p>
+                  <button
+                    class="btn"
+                    data-activity="${activity.id}"
+                    style="
+                      width:auto;
+                      margin-top:0;
+                      padding:10px 14px;
+                      white-space:nowrap;
+                    "
+                  >
+                    Do it
+                  </button>
 
                 </div>
 
-                <button
-                  class="btn activity-btn"
-                  data-activity="${activity.id}"
+                <p
+                  class="mute"
+                  style="
+                    margin:10px 0 0;
+                    font-size:.9rem;
+                  "
                 >
-                  Do it
-                </button>
+                  ${naira(activity.cost)}
+                  · ${activity.energy} energy
+                  · ${activity.restore}
+                </p>
 
               </div>
-
-              <p class="activity-meta">
-                ${naira(activity.cost)}
-                · ${activity.energy} energy
-                · ${activity.restore}
-              </p>
-
-            </div>
-          `).join("")}
+            `
+          ).join("")}
 
         </div>
       `;
@@ -880,6 +1137,12 @@
        ========================================================= */
 
     function viewAuth() {
+
+      if (window.naijaClockTimer) {
+        clearInterval(
+          window.naijaClockTimer
+        );
+      }
 
       const login =
         S.mode === "login";
@@ -1066,6 +1329,12 @@
        ========================================================= */
 
     function viewCreate() {
+
+      if (window.naijaClockTimer) {
+        clearInterval(
+          window.naijaClockTimer
+        );
+      }
 
       app.innerHTML = `
         <div class="stripe"></div>
@@ -1278,7 +1547,9 @@
             data.level !== S.ch.level ||
             data.xp !== S.ch.xp ||
             data.reputation !== S.ch.reputation ||
-            data.district !== S.ch.district
+            data.district !== S.ch.district ||
+            data.game_day !== S.ch.game_day ||
+            data.game_minutes !== S.ch.game_minutes
           )
         ) {
 
@@ -1307,6 +1578,12 @@
 
       if (!c) {
         return viewAuth();
+      }
+
+      if (window.naijaClockTimer) {
+        clearInterval(
+          window.naijaClockTimer
+        );
       }
 
       const maxEnergy =
@@ -1432,17 +1709,6 @@
         main.innerHTML =
           homeHtml(c);
 
-        main
-          .querySelectorAll("[data-activity]")
-          .forEach(button => {
-
-            button.onclick = () =>
-              doActivity(
-                button.dataset.activity
-              );
-
-          });
-
       } else if (S.tab === "jobs") {
 
         jobsView(main);
@@ -1470,6 +1736,8 @@
           db.auth.signOut();
 
       }
+
+      startGameClock();
     }
 
 
@@ -1487,6 +1755,8 @@
       ];
 
       return `
+
+        ${gameClockHtml(c)}
 
         <div class="card">
 
@@ -1578,7 +1848,9 @@
        ACTIVITIES ACTION
        ========================================================= */
 
-    async function doActivity(activity) {
+    async function doActivity(
+      activity
+    ) {
 
       if (S.busy) {
         return;
@@ -3481,11 +3753,6 @@
           session
             ? session.user
             : null;
-
-        /*
-         * INITIAL_SESSION is handled by init()
-         * below so we don't load the app twice.
-         */
 
         if (
           event ===
