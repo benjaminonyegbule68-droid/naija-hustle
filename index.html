@@ -429,6 +429,47 @@
       font-size: 0.9rem;
       margin-top: 12px;
     }
+
+    /* =========================================================
+       ACTIVITIES
+       ========================================================= */
+
+    .activity-card {
+      background: #F7F9F8;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .activity-icon {
+      font-size: 1.5rem;
+      margin-right: 5px;
+    }
+
+    .activity-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .activity-description {
+      color: var(--mute);
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+    }
+
+    .activity-meta {
+      color: var(--mute);
+      margin: 10px 0 0;
+      font-size: 0.9rem;
+    }
+
+    .activity-btn {
+      width: auto;
+      margin-top: 0;
+      padding: 10px 14px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 
@@ -501,6 +542,8 @@
 
       jobs: null,
       jobMsg: null,
+
+      activityMsg: null,
 
       bizTypes: null,
       biz: null,
@@ -704,6 +747,128 @@
             Low needs will matter more as activities,
             time, and daily life are added to the game.
           </div>
+
+        </div>
+      `;
+    };
+
+
+    /* =========================================================
+       ACTIVITIES
+       ========================================================= */
+
+    const activitiesHtml = () => {
+
+      const message =
+        S.activityMsg
+          ? `
+            <div
+              class="${
+                S.activityMsg.ok
+                  ? "ok"
+                  : "err"
+              }"
+              role="alert"
+            >
+              ${esc(S.activityMsg.t)}
+            </div>
+          `
+          : "";
+
+      const activities = [
+        {
+          id: "eat",
+          icon: "🍲",
+          name: "Eat",
+          description:
+            "Grab a proper meal and restore your hunger.",
+          cost: 500,
+          energy: 1,
+          restore: "+30 Hunger"
+        },
+        {
+          id: "entertainment",
+          icon: "🎮",
+          name: "Entertainment",
+          description:
+            "Take a break and clear your head.",
+          cost: 300,
+          energy: 2,
+          restore: "+30 Fun"
+        },
+        {
+          id: "socialize",
+          icon: "🤝",
+          name: "Socialize",
+          description:
+            "Link up and strengthen your social game.",
+          cost: 200,
+          energy: 1,
+          restore: "+30 Social"
+        },
+        {
+          id: "freshen_up",
+          icon: "🧼",
+          name: "Freshen Up",
+          description:
+            "Clean up and get yourself ready to hustle.",
+          cost: 100,
+          energy: 1,
+          restore: "+30 Hygiene"
+        }
+      ];
+
+      return `
+        <div class="card">
+
+          <h2>
+            Activities
+          </h2>
+
+          <p class="mute">
+            Look after yourself so you can keep chasing the bag.
+          </p>
+
+          ${message}
+
+          ${activities.map(activity => `
+            <div class="activity-card">
+
+              <div class="row">
+
+                <div>
+
+                  <div class="activity-title">
+                    <span class="activity-icon">
+                      ${activity.icon}
+                    </span>
+
+                    ${activity.name}
+                  </div>
+
+                  <p class="activity-description">
+                    ${activity.description}
+                  </p>
+
+                </div>
+
+                <button
+                  class="btn activity-btn"
+                  data-activity="${activity.id}"
+                >
+                  Do it
+                </button>
+
+              </div>
+
+              <p class="activity-meta">
+                ${naira(activity.cost)}
+                · ${activity.energy} energy
+                · ${activity.restore}
+              </p>
+
+            </div>
+          `).join("")}
 
         </div>
       `;
@@ -1075,6 +1240,7 @@
       S.tab = tab;
 
       S.jobMsg = null;
+      S.activityMsg = null;
       S.bizMsg = null;
       S.mapMsg = null;
 
@@ -1097,12 +1263,6 @@
             "get_my_character"
           );
 
-        /*
-         * Refresh the displayed character whenever
-         * any server-controlled stat changed.
-         *
-         * This now includes the four Needs values.
-         */
         if (
           data &&
           data.id &&
@@ -1272,6 +1432,17 @@
         main.innerHTML =
           homeHtml(c);
 
+        main
+          .querySelectorAll("[data-activity]")
+          .forEach(button => {
+
+            button.onclick = () =>
+              doActivity(
+                button.dataset.activity
+              );
+
+          });
+
       } else if (S.tab === "jobs") {
 
         jobsView(main);
@@ -1342,6 +1513,8 @@
 
         ${needsHtml(c)}
 
+        ${activitiesHtml()}
+
         <div class="card">
 
           <h2>
@@ -1398,6 +1571,96 @@
           Log out
         </button>
       `;
+    }
+
+
+    /* =========================================================
+       ACTIVITIES ACTION
+       ========================================================= */
+
+    async function doActivity(activity) {
+
+      if (S.busy) {
+        return;
+      }
+
+      S.busy = true;
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await db.rpc(
+            "do_activity",
+            {
+              p_activity: activity
+            }
+          );
+
+        S.busy = false;
+
+        if (error) {
+
+          S.activityMsg = {
+            t: error.message,
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        if (!data) {
+
+          S.activityMsg = {
+            t:
+              "The activity completed but returned no character data.",
+            ok: false
+          };
+
+          return viewGame();
+        }
+
+        S.ch = data;
+
+        const activityNames = {
+          eat: "Meal",
+          entertainment: "Entertainment",
+          socialize: "Socializing",
+          freshen_up: "Freshening up"
+        };
+
+        const name =
+          activityNames[activity] ||
+          "Activity";
+
+        S.activityMsg = {
+          t:
+            `${name} completed.` +
+            (
+              data.last_event
+                ? ` ${data.last_event}`
+                : ""
+            ),
+          ok: true
+        };
+
+        viewGame();
+
+      } catch (error) {
+
+        S.busy = false;
+
+        S.activityMsg = {
+          t:
+            error?.message ||
+            "Activity failed.",
+          ok: false
+        };
+
+        viewGame();
+      }
     }
 
 
