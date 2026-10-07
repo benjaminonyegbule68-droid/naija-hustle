@@ -8,17 +8,11 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <meta
-    name="theme-color"
-    content="#0F6B6F"
-  >
+  <meta name="theme-color" content="#0F6B6F">
 
   <title>Naija Hustle</title>
 
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
 
   <link
     href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap"
@@ -50,7 +44,8 @@
     }
 
     button,
-    input {
+    input,
+    select {
       font: inherit;
     }
 
@@ -109,7 +104,8 @@
       margin: 12px 0 4px;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       padding: 13px 14px;
       border: 2px solid var(--line);
@@ -119,6 +115,7 @@
     }
 
     input:focus-visible,
+    select:focus-visible,
     button:focus-visible {
       outline: 3px solid var(--danfo);
       outline-offset: 2px;
@@ -138,7 +135,7 @@
     }
 
     .btn:disabled {
-      opacity: 0.6;
+      opacity: .6;
       cursor: not-allowed;
     }
 
@@ -148,7 +145,7 @@
       border: 2px solid var(--lagoon);
       margin-top: 0;
       padding: 10px 4px;
-      font-size: 0.95rem;
+      font-size: .95rem;
     }
 
     .btn.alt small {
@@ -190,6 +187,8 @@
       margin: 0 0 12px;
     }
 
+    /* BACKGROUND CARDS */
+
     .bg {
       display: block;
       width: 100%;
@@ -215,9 +214,164 @@
     .bg .meta {
       color: var(--lagoon);
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: .9rem;
       margin: 2px 0 4px;
     }
+
+    /* PERSONALITY */
+
+    .section-head {
+      margin: 22px 0 8px;
+    }
+
+    .section-head h2 {
+      margin-bottom: 3px;
+    }
+
+    .counter {
+      display: inline-block;
+      background: var(--ink);
+      color: #fff;
+      padding: 4px 9px;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .trait-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 10px;
+    }
+
+    .trait {
+      min-height: 125px;
+      text-align: left;
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 13px;
+      padding: 12px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .trait[aria-pressed="true"] {
+      border-color: var(--lagoon);
+      box-shadow: inset 0 -5px 0 var(--danfo);
+      background: #F4FAF9;
+    }
+
+    .trait b {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .trait small {
+      display: block;
+      color: var(--mute);
+      line-height: 1.35;
+    }
+
+    .trait-number {
+      float: right;
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--line);
+      font-size: .72rem;
+      font-weight: 800;
+    }
+
+    .trait[aria-pressed="true"] .trait-number {
+      background: var(--danfo);
+    }
+
+    /* CHARACTER DESIGN */
+
+    .look-preview {
+      background:
+        linear-gradient(
+          135deg,
+          #14201F,
+          #0F6B6F
+        );
+      color: #fff;
+      border-radius: 16px;
+      padding: 18px;
+      margin: 10px 0 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .look-preview::after {
+      content: "NAIJA HUSTLE";
+      position: absolute;
+      right: -4px;
+      bottom: -7px;
+      font-size: 2rem;
+      font-weight: 800;
+      opacity: .08;
+    }
+
+    .avatar {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: var(--danfo);
+      display: grid;
+      place-items: center;
+      font-size: 2.7rem;
+      margin-bottom: 10px;
+      border: 4px solid rgba(255,255,255,.8);
+    }
+
+    .look-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .look-meta {
+      color: rgba(255,255,255,.78);
+      font-size: .85rem;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .choice {
+      border: 2px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 11px 9px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .choice.selected {
+      border-color: var(--lagoon);
+      background: #EAF7F6;
+    }
+
+    .choice b {
+      display: block;
+      font-size: .9rem;
+    }
+
+    .choice small {
+      color: var(--mute);
+    }
+
+    /* GAME */
 
     .top {
       background: var(--lagoon);
@@ -248,7 +402,7 @@
 
     .bar {
       height: 10px;
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255,255,255,.25);
       border-radius: 6px;
       overflow: hidden;
       margin-top: 8px;
@@ -320,7 +474,7 @@
       font-weight: 800;
       border-radius: 20px;
       padding: 2px 10px;
-      font-size: 0.85rem;
+      font-size: .85rem;
       white-space: nowrap;
     }
 
@@ -353,7 +507,7 @@
 
     .district-card.here {
       border-color: var(--danfo);
-      box-shadow: 0 0 0 3px rgba(255, 194, 14, 0.25);
+      box-shadow: 0 0 0 3px rgba(255,194,14,.25);
     }
 
     .bonus {
@@ -361,7 +515,7 @@
       background: #E8F5F5;
       color: var(--lagoon);
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: .85rem;
       padding: 3px 9px;
       border-radius: 20px;
       margin-top: 6px;
@@ -408,7 +562,6 @@
       display: block;
       height: 100%;
       border-radius: 8px;
-      transition: width 0.25s ease;
     }
 
     .need-good {
@@ -428,11 +581,11 @@
       border-radius: 10px;
       padding: 10px 12px;
       color: var(--mute);
-      font-size: 0.9rem;
+      font-size: .9rem;
       margin-top: 12px;
     }
 
-    /* REAL NIGERIAN CLOCK */
+    /* CLOCK */
 
     .clock-card {
       background: var(--ink);
@@ -442,9 +595,9 @@
 
     .clock-day {
       color: var(--danfo);
-      font-size: 0.8rem;
+      font-size: .8rem;
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: .08em;
     }
 
     .clock-time {
@@ -478,15 +631,11 @@
       white-space: nowrap;
     }
 
-    /* LOADING */
-
     .loading {
       text-align: center;
       padding: 24px 12px;
       color: var(--mute);
     }
-
-    /* MOBILE */
 
     @media (max-width: 380px) {
       .wrap {
@@ -497,6 +646,11 @@
       .top .in {
         padding-left: 12px;
         padding-right: 12px;
+      }
+
+      .trait-grid,
+      .choice-grid {
+        grid-template-columns: 1fr;
       }
 
       .grid3 {
@@ -517,2193 +671,2290 @@
 
 <body>
 
-  <div id="app"></div>
+<div id="app"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    /* =========================================================
-       SUPABASE
-       ========================================================= */
+<script>
+/* =========================================================
+   SUPABASE
+   ========================================================= */
 
-    const app = document.getElementById("app");
+const app = document.getElementById("app");
 
-    const SUPABASE_URL =
-      "https://pbqtbwiymlwksdtfsfcb.supabase.co";
+const SUPABASE_URL =
+  "https://pbqtbwiymlwksdtfsfcb.supabase.co";
 
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
+const SUPABASE_ANON_KEY =
+  "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
-    if (
-      !window.supabase ||
-      typeof window.supabase.createClient !== "function"
-    ) {
-      app.innerHTML = `
-        <div class="stripe"></div>
-        <div class="wrap">
-          <h1>Naija Hustle</h1>
+if (
+  !window.supabase ||
+  typeof window.supabase.createClient !== "function"
+) {
+  app.innerHTML = `
+    <div class="stripe"></div>
+    <div class="wrap">
+      <h1>Naija Hustle</h1>
+      <div class="err">
+        <b>Naija Hustle could not start.</b><br><br>
+        The Supabase connection library failed to load.
+      </div>
+    </div>
+  `;
 
-          <div class="err">
-            <b>Naija Hustle could not start.</b>
-            <br><br>
-            The Supabase connection library failed to load.
-            Check your internet connection and reload the page.
-          </div>
-        </div>
-      `;
+  throw new Error(
+    "Supabase JavaScript library failed to load."
+  );
+}
 
-      throw new Error(
-        "Supabase JavaScript library failed to load."
-      );
-    }
-
-    const db =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
+const db =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
 
-    /* =========================================================
-       APP STATE
-       ========================================================= */
+/* =========================================================
+   STATE
+   ========================================================= */
 
-    const S = {
-      user: null,
-      ch: null,
-      tab: "home",
-      mode: "login",
-      msg: null,
-      picked: null,
-      nameDraft: "",
-      busy: false,
+const S = {
+  user: null,
+  ch: null,
 
-      jobs: null,
-      jobMsg: null,
+  tab: "home",
+  mode: "login",
 
-      activityMsg: null,
+  msg: null,
+  busy: false,
 
-      bizTypes: null,
-      biz: null,
-      bizLoaded: false,
-      bizMsg: null,
+  picked: null,
+  nameDraft: "",
 
-      districts: null,
-      mapMsg: null
-    };
+  personalityTraits: null,
+  personality1: null,
+  personality2: null,
+
+  skinTone: "medium",
+  hairstyle: "short",
+  hairColor: "black",
+  outfit: "casual",
+  accessory: "none",
+
+  jobs: null,
+  jobMsg: null,
+
+  activityMsg: null,
+
+  bizTypes: null,
+  biz: null,
+  bizLoaded: false,
+  bizMsg: null,
+
+  districts: null,
+  mapMsg: null
+};
 
 
-    /* =========================================================
-       GAME DATA
-       ========================================================= */
+/* =========================================================
+   GAME DATA
+   ========================================================= */
 
-    const BG = [
-      {
-        id: "street_boy",
-        name: "Street Boy",
-        meta: "Starts in Mushin · ₦5,000",
-        d: "No capital, no connections, plenty of hustle. Your only collateral is gist."
-      },
-      {
-        id: "graduate",
-        name: "Graduate",
-        meta: "Starts in Yaba · ₦20,000",
-        d: "First class degree, zero job offers. The CV is strong, the NYSC is done."
-      },
-      {
-        id: "nepo_baby",
-        name: "Nepo Baby",
-        meta: "Starts in Lekki · ₦500,000",
-        d: "Daddy's name opens doors. Now prove the doors were worth opening."
-      },
-      {
-        id: "returnee",
-        name: "Returnee",
-        meta: "Starts in Ikeja · ₦150,000",
-        d: "Came back from abroad with savings and a strong accent. Lagos will humble you."
+const BG = [
+  {
+    id: "street_boy",
+    name: "Street Boy",
+    meta: "Starts in Mushin · ₦5,000",
+    d: "No capital, no connections, plenty of hustle. Your only collateral is gist."
+  },
+  {
+    id: "graduate",
+    name: "Graduate",
+    meta: "Starts in Yaba · ₦20,000",
+    d: "First class degree, zero job offers. The CV is strong, the NYSC is done."
+  },
+  {
+    id: "nepo_baby",
+    name: "Nepo Baby",
+    meta: "Starts in Lekki · ₦500,000",
+    d: "Daddy's name opens doors. Now prove the doors were worth opening."
+  },
+  {
+    id: "returnee",
+    name: "Returnee",
+    meta: "Starts in Ikeja · ₦150,000",
+    d: "Came back from abroad with savings and a strong accent. Lagos will humble you."
+  }
+];
+
+const SK = {
+  hustle: "Hustle",
+  edu: "Education",
+  charm: "Charm",
+  tech: "Tech"
+};
+
+const SKIN_TONES = [
+  ["light", "Light"],
+  ["medium", "Medium"],
+  ["deep", "Deep"]
+];
+
+const HAIRSTYLES = [
+  ["short", "Short"],
+  ["low_cut", "Low Cut"],
+  ["fade", "Fade"],
+  ["afro", "Afro"],
+  ["braids", "Braids"],
+  ["dreads", "Dreads"],
+  ["natural", "Natural"],
+  ["long", "Long"]
+];
+
+const HAIR_COLORS = [
+  ["black", "Black"],
+  ["brown", "Brown"],
+  ["blonde", "Blonde"],
+  ["red", "Red"]
+];
+
+const OUTFITS = [
+  ["casual", "Casual"],
+  ["streetwear", "Streetwear"],
+  ["formal", "Formal"],
+  ["traditional", "Traditional"],
+  ["sport", "Sport"],
+  ["business", "Business"]
+];
+
+const ACCESSORIES = [
+  ["none", "None"],
+  ["cap", "Cap"],
+  ["glasses", "Glasses"],
+  ["chain", "Chain"],
+  ["watch", "Watch"],
+  ["earrings", "Earrings"],
+  ["headphones", "Headphones"]
+];
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+const esc = value =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
+    char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char])
+  );
+
+const naira = value =>
+  "₦" +
+  Number(value || 0).toLocaleString("en-NG");
+
+const cap = value => {
+  const str = String(value || "");
+
+  return str
+    ? str.charAt(0).toUpperCase() + str.slice(1)
+    : "";
+};
+
+const bgName = id => {
+  const bg = BG.find(item => item.id === id);
+  return bg ? bg.name : id;
+};
+
+const setMsg = (
+  text,
+  ok = false
+) => {
+  S.msg = text
+    ? {
+        t: text,
+        ok
       }
-    ];
+    : null;
+};
 
-    const SK = {
-      hustle: "Hustle",
-      edu: "Education",
-      charm: "Charm",
-      tech: "Tech"
-    };
+const msgHtml = () => {
+  if (!S.msg) {
+    return "";
+  }
+
+  return `
+    <div
+      class="${S.msg.ok ? "ok" : "err"}"
+      role="alert"
+      style="margin:12px 0 0"
+    >
+      ${esc(S.msg.t)}
+    </div>
+  `;
+};
+
+function optionLabel(list, value) {
+  const found = list.find(
+    item => item[0] === value
+  );
+
+  return found
+    ? found[1]
+    : cap(value);
+}
 
 
-    /* =========================================================
-       HELPERS
-       ========================================================= */
+/* =========================================================
+   CHARACTER PREVIEW
+   ========================================================= */
 
-    const bgName = id => {
-      const bg = BG.find(item => item.id === id);
-      return bg ? bg.name : id;
-    };
+function avatarEmoji() {
+  if (S.accessory === "headphones") return "🎧";
+  if (S.accessory === "glasses") return "🤓";
+  if (S.accessory === "cap") return "🧢";
+  if (S.accessory === "chain") return "😎";
 
-    const esc = value =>
-      String(value ?? "").replace(
-        /[&<>"']/g,
-        char => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        }[char])
-      );
+  return "🧑🏿";
+}
 
-    const naira = value =>
-      "₦" +
-      Number(value || 0).toLocaleString("en-NG");
+function characterPreviewHtml() {
+  const trait1 =
+    S.personalityTraits?.find(
+      item => item.id === S.personality1
+    );
 
-    const cap = value => {
-      const str = String(value || "");
+  const trait2 =
+    S.personalityTraits?.find(
+      item => item.id === S.personality2
+    );
 
-      return str
-        ? str.charAt(0).toUpperCase() + str.slice(1)
-        : "";
-    };
+  return `
+    <div class="look-preview">
 
-    const msgHtml = () => {
-      if (!S.msg) {
-        return "";
+      <div class="avatar">
+        ${avatarEmoji()}
+      </div>
+
+      <div class="look-name">
+        ${esc(
+          S.nameDraft ||
+          "Your Hustler"
+        )}
+      </div>
+
+      <div class="look-meta">
+        ${optionLabel(SKIN_TONES, S.skinTone)}
+        ·
+        ${optionLabel(HAIRSTYLES, S.hairstyle)}
+        ·
+        ${optionLabel(OUTFITS, S.outfit)}
+      </div>
+
+      <div
+        style="
+          margin-top:10px;
+          display:flex;
+          gap:6px;
+          flex-wrap:wrap;
+        "
+      >
+        ${
+          trait1
+            ? `<span class="pill">${esc(trait1.name)}</span>`
+            : ""
+        }
+
+        ${
+          trait2
+            ? `<span class="pill">${esc(trait2.name)}</span>`
+            : ""
+        }
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* =========================================================
+   REAL NIGERIAN CLOCK
+   ========================================================= */
+
+function realTimeInfo() {
+
+  const now = new Date();
+
+  const timeFormatter =
+    new Intl.DateTimeFormat(
+      "en-NG",
+      {
+        timeZone: "Africa/Lagos",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
       }
+    );
 
-      return `
-        <div
-          class="${S.msg.ok ? "ok" : "err"}"
-          role="alert"
-          style="margin:12px 0 0"
-        >
-          ${esc(S.msg.t)}
-        </div>
-      `;
-    };
-
-    const setMsg = (
-      text,
-      ok = false
-    ) => {
-      S.msg = text
-        ? {
-            t: text,
-            ok
-          }
-        : null;
-    };
-
-
-    /* =========================================================
-       REAL NIGERIAN CLOCK
-       ========================================================= */
-
-    function realTimeInfo() {
-
-      const now = new Date();
-
-      const timeFormatter =
-        new Intl.DateTimeFormat(
-          "en-NG",
-          {
-            timeZone: "Africa/Lagos",
-            hour: "numeric",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: true
-          }
-        );
-
-      const dateFormatter =
-        new Intl.DateTimeFormat(
-          "en-NG",
-          {
-            timeZone: "Africa/Lagos",
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-          }
-        );
-
-      const hourFormatter =
-        new Intl.DateTimeFormat(
-          "en-NG",
-          {
-            timeZone: "Africa/Lagos",
-            hour: "numeric",
-            hour12: false
-          }
-        );
-
-      const hour =
-        Number(
-          hourFormatter.format(now)
-        );
-
-      let phase = "Morning";
-
-      if (
-        hour >= 12 &&
-        hour < 17
-      ) {
-        phase = "Afternoon";
-      } else if (
-        hour >= 17 &&
-        hour < 21
-      ) {
-        phase = "Evening";
-      } else if (
-        hour >= 21 ||
-        hour < 5
-      ) {
-        phase = "Night";
+  const dateFormatter =
+    new Intl.DateTimeFormat(
+      "en-NG",
+      {
+        timeZone: "Africa/Lagos",
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
       }
+    );
 
-      const icon =
-        phase === "Morning"
-          ? "🌅"
-          : phase === "Afternoon"
-            ? "☀️"
-            : phase === "Evening"
-              ? "🌆"
-              : "🌙";
+  const hourFormatter =
+    new Intl.DateTimeFormat(
+      "en-NG",
+      {
+        timeZone: "Africa/Lagos",
+        hour: "numeric",
+        hour12: false
+      }
+    );
 
-      return {
-        time:
-          timeFormatter.format(now),
+  const hour =
+    Number(hourFormatter.format(now));
 
-        date:
-          dateFormatter.format(now),
+  let phase = "Morning";
 
-        phase,
-        icon
-      };
-    }
+  if (hour >= 12 && hour < 17) {
+    phase = "Afternoon";
+  } else if (hour >= 17 && hour < 21) {
+    phase = "Evening";
+  } else if (hour >= 21 || hour < 5) {
+    phase = "Night";
+  }
 
+  const icon =
+    phase === "Morning"
+      ? "🌅"
+      : phase === "Afternoon"
+        ? "☀️"
+        : phase === "Evening"
+          ? "🌆"
+          : "🌙";
 
-    function gameClockHtml() {
+  return {
+    time: timeFormatter.format(now),
+    date: dateFormatter.format(now),
+    phase,
+    icon
+  };
+}
 
-      const info =
-        realTimeInfo();
+function gameClockHtml() {
 
-      return `
-        <div class="card clock-card">
+  const info = realTimeInfo();
 
-          <div class="row">
+  return `
+    <div class="card clock-card">
 
-            <div>
+      <div class="row">
 
-              <div
-                class="clock-day"
-                data-real-date
-              >
-                ${info.date}
-              </div>
+        <div>
 
-              <div
-                class="clock-time"
-                data-game-clock
-              >
-                ${info.time}
-              </div>
-
-            </div>
-
-            <div style="text-align:right">
-
-              <div
-                style="font-size:1.5rem"
-                data-game-phase-icon
-              >
-                ${info.icon}
-              </div>
-
-              <div
-                class="clock-phase"
-                data-game-phase
-              >
-                ${info.phase}
-              </div>
-
-            </div>
-
+          <div
+            class="clock-day"
+            data-real-date
+          >
+            ${info.date}
           </div>
 
           <div
-            style="
-              margin-top:8px;
-              font-size:.78rem;
-              color:rgba(255,255,255,.6);
-            "
+            class="clock-time"
+            data-game-clock
           >
-            🇳🇬 Nigeria · Live time
+            ${info.time}
           </div>
 
         </div>
-      `;
-    }
 
+        <div style="text-align:right">
 
-    function startGameClock() {
+          <div
+            style="font-size:1.5rem"
+            data-game-phase-icon
+          >
+            ${info.icon}
+          </div>
 
-      if (window.naijaClockTimer) {
-        clearInterval(
-          window.naijaClockTimer
-        );
+          <div
+            class="clock-phase"
+            data-game-phase
+          >
+            ${info.phase}
+          </div>
 
-        window.naijaClockTimer = null;
-      }
+        </div>
 
-      const updateClock = () => {
+      </div>
 
-        const clock =
-          document.querySelector(
-            "[data-game-clock]"
-          );
+      <div
+        style="
+          margin-top:8px;
+          font-size:.78rem;
+          color:rgba(255,255,255,.6);
+        "
+      >
+        🇳🇬 Nigeria · Live time
+      </div>
 
-        if (!clock) {
-          return;
-        }
+    </div>
+  `;
+}
 
-        const info =
-          realTimeInfo();
+function startGameClock() {
 
-        const date =
-          document.querySelector(
-            "[data-real-date]"
-          );
+  if (window.naijaClockTimer) {
+    clearInterval(window.naijaClockTimer);
+  }
 
-        const phase =
-          document.querySelector(
-            "[data-game-phase]"
-          );
+  const updateClock = () => {
 
-        const icon =
-          document.querySelector(
-            "[data-game-phase-icon]"
-          );
-
-        clock.textContent =
-          info.time;
-
-        if (date) {
-          date.textContent =
-            info.date;
-        }
-
-        if (phase) {
-          phase.textContent =
-            info.phase;
-        }
-
-        if (icon) {
-          icon.textContent =
-            info.icon;
-        }
-      };
-
-      updateClock();
-
-      if (
-        document.querySelector(
-          "[data-game-clock]"
-        )
-      ) {
-        window.naijaClockTimer =
-          setInterval(
-            updateClock,
-            1000
-          );
-      }
-    }
-
-
-    /* =========================================================
-       NEEDS
-       ========================================================= */
-
-    const needPct = value =>
-      Math.max(
-        0,
-        Math.min(
-          100,
-          Number(value) || 0
-        )
+    const clock =
+      document.querySelector(
+        "[data-game-clock]"
       );
 
-    const needClass = value => {
+    if (!clock) return;
 
-      const pct =
-        needPct(value);
+    const info = realTimeInfo();
 
-      if (pct <= 20) {
-        return "need-low";
-      }
+    const date =
+      document.querySelector(
+        "[data-real-date]"
+      );
 
-      if (pct <= 50) {
-        return "need-mid";
-      }
+    const phase =
+      document.querySelector(
+        "[data-game-phase]"
+      );
 
-      return "need-good";
-    };
+    const icon =
+      document.querySelector(
+        "[data-game-phase-icon]"
+      );
 
+    clock.textContent = info.time;
 
-    const needsHtml = c => {
+    if (date) date.textContent = info.date;
+    if (phase) phase.textContent = info.phase;
+    if (icon) icon.textContent = info.icon;
+  };
 
-      const needs = [
-        ["🍗", "Hunger", c.hunger],
-        ["🎮", "Fun", c.fun],
-        ["🤝", "Social", c.social],
-        ["🧼", "Hygiene", c.hygiene]
-      ];
+  updateClock();
 
-      return `
-        <div class="card needs-card">
-
-          <h2>
-            Needs
-          </h2>
-
-          <p class="mute">
-            Keep yourself in good shape while you hustle.
-          </p>
-
-          ${needs.map(
-            ([icon, name, value]) => {
-
-              const pct =
-                needPct(value);
-
-              return `
-                <div class="need-row">
-
-                  <div class="need-label">
-
-                    <span class="need-name">
-                      ${icon}
-                      ${name}
-                    </span>
-
-                    <span class="need-value">
-                      ${pct}/100
-                    </span>
-
-                  </div>
-
-                  <div class="need-bar">
-
-                    <i
-                      class="${needClass(pct)}"
-                      style="width:${pct}%"
-                    ></i>
-
-                  </div>
-
-                </div>
-              `;
-
-            }
-          ).join("")}
-
-          <div class="needs-note">
-            Low needs will matter more as activities,
-            time, and daily life are added to the game.
-          </div>
-
-        </div>
-      `;
-    };
+  if (
+    document.querySelector(
+      "[data-game-clock]"
+    )
+  ) {
+    window.naijaClockTimer =
+      setInterval(updateClock, 1000);
+  }
+}
 
 
-    /* =========================================================
-       ACTIVITIES
-       ========================================================= */
+/* =========================================================
+   NEEDS
+   ========================================================= */
 
-    const activitiesHtml = () => {
+const needPct = value =>
+  Math.max(
+    0,
+    Math.min(
+      100,
+      Number(value) || 0
+    )
+  );
 
-      const message =
-        S.activityMsg
-          ? `
-            <div
-              class="${
-                S.activityMsg.ok
-                  ? "ok"
-                  : "err"
-              }"
-              role="alert"
-            >
-              ${esc(S.activityMsg.t)}
+const needClass = value => {
+  const pct = needPct(value);
+
+  if (pct <= 20) return "need-low";
+  if (pct <= 50) return "need-mid";
+
+  return "need-good";
+};
+
+function needsHtml(c) {
+
+  const needs = [
+    ["🍗", "Hunger", c.hunger],
+    ["🎮", "Fun", c.fun],
+    ["🤝", "Social", c.social],
+    ["🧼", "Hygiene", c.hygiene]
+  ];
+
+  return `
+    <div class="card needs-card">
+
+      <h2>Needs</h2>
+
+      <p class="mute">
+        Keep yourself in good shape while you hustle.
+      </p>
+
+      ${needs.map(
+        ([icon, name, value]) => {
+
+          const pct = needPct(value);
+
+          return `
+            <div class="need-row">
+
+              <div class="need-label">
+
+                <span class="need-name">
+                  ${icon} ${name}
+                </span>
+
+                <span class="need-value">
+                  ${pct}/100
+                </span>
+
+              </div>
+
+              <div class="need-bar">
+                <i
+                  class="${needClass(pct)}"
+                  style="width:${pct}%"
+                ></i>
+              </div>
+
             </div>
-          `
-          : "";
-
-      const activities = [
-        {
-          id: "eat",
-          icon: "🍲",
-          name: "Eat",
-          description:
-            "Grab a proper meal and restore your hunger.",
-          cost: 500,
-          energy: 1,
-          restore: "+30 Hunger"
-        },
-        {
-          id: "entertainment",
-          icon: "🎮",
-          name: "Entertainment",
-          description:
-            "Take a break and clear your head.",
-          cost: 300,
-          energy: 2,
-          restore: "+30 Fun"
-        },
-        {
-          id: "socialize",
-          icon: "🤝",
-          name: "Socialize",
-          description:
-            "Link up and strengthen your social game.",
-          cost: 200,
-          energy: 1,
-          restore: "+30 Social"
-        },
-        {
-          id: "freshen_up",
-          icon: "🧼",
-          name: "Freshen Up",
-          description:
-            "Clean up and get yourself ready to hustle.",
-          cost: 100,
-          energy: 1,
-          restore: "+30 Hygiene"
+          `;
         }
-      ];
+      ).join("")}
 
-      return `
-        <div class="card">
+      <div class="needs-note">
+        Low needs will matter more as daily life expands.
+      </div>
 
-          <h2>
-            Activities
-          </h2>
+    </div>
+  `;
+}
 
-          <p class="mute">
-            Look after yourself so you can keep chasing the bag.
-          </p>
 
-          ${message}
+/* =========================================================
+   ACTIVITIES
+   ========================================================= */
 
-          ${activities.map(
-            activity => `
-              <div class="card activity-card">
+function activitiesHtml() {
 
-                <div class="row">
+  const message =
+    S.activityMsg
+      ? `
+        <div
+          class="${S.activityMsg.ok ? "ok" : "err"}"
+          role="alert"
+        >
+          ${esc(S.activityMsg.t)}
+        </div>
+      `
+      : "";
 
-                  <div style="flex:1">
+  const activities = [
+    {
+      id: "eat",
+      icon: "🍲",
+      name: "Eat",
+      description:
+        "Grab a proper meal and restore your hunger.",
+      cost: 500,
+      energy: 1,
+      restore: "+30 Hunger"
+    },
+    {
+      id: "entertainment",
+      icon: "🎮",
+      name: "Entertainment",
+      description:
+        "Take a break and clear your head.",
+      cost: 300,
+      energy: 2,
+      restore: "+30 Fun"
+    },
+    {
+      id: "socialize",
+      icon: "🤝",
+      name: "Socialize",
+      description:
+        "Link up and strengthen your social game.",
+      cost: 200,
+      energy: 1,
+      restore: "+30 Social"
+    },
+    {
+      id: "freshen_up",
+      icon: "🧼",
+      name: "Freshen Up",
+      description:
+        "Clean up and get yourself ready.",
+      cost: 100,
+      energy: 1,
+      restore: "+30 Hygiene"
+    }
+  ];
 
-                    <h2 style="margin:0">
+  return `
+    <div class="card">
 
-                      <span class="activity-icon">
-                        ${activity.icon}
-                      </span>
+      <h2>Activities</h2>
 
-                      ${activity.name}
+      <p class="mute">
+        Look after yourself so you can keep chasing the bag.
+      </p>
 
-                    </h2>
+      ${message}
 
-                    <p
-                      class="mute"
-                      style="
-                        margin:4px 0 0;
-                        font-size:.9rem;
-                      "
-                    >
-                      ${activity.description}
-                    </p>
+      ${activities.map(
+        activity => `
+          <div class="card activity-card">
 
-                  </div>
+            <div class="row">
 
-                  <button
-                    class="btn activity-action"
-                    type="button"
-                    data-activity="${activity.id}"
-                  >
-                    Do it
-                  </button>
+              <div style="flex:1">
 
-                </div>
+                <h2 style="margin:0">
+
+                  <span class="activity-icon">
+                    ${activity.icon}
+                  </span>
+
+                  ${activity.name}
+
+                </h2>
 
                 <p
                   class="mute"
                   style="
-                    margin:10px 0 0;
+                    margin:4px 0 0;
                     font-size:.9rem;
                   "
                 >
-                  ${naira(activity.cost)}
-                  · ${activity.energy} energy
-                  · ${activity.restore}
+                  ${activity.description}
                 </p>
 
               </div>
-            `
-          ).join("")}
 
-        </div>
-      `;
-    };
-
-
-    /* =========================================================
-       AUTH
-       ========================================================= */
-
-    function viewAuth() {
-
-      if (window.naijaClockTimer) {
-        clearInterval(
-          window.naijaClockTimer
-        );
-
-        window.naijaClockTimer = null;
-      }
-
-      const login =
-        S.mode === "login";
-
-      app.innerHTML = `
-        <div class="stripe"></div>
-
-        <div class="wrap">
-
-          <h1>Naija Hustle</h1>
-
-          <p class="mute">
-            Start from the bottom. Own the block.
-          </p>
-
-          <div class="card">
-
-            <h2>
-              ${login ? "Log in" : "Create account"}
-            </h2>
-
-            <label for="em">
-              Email
-            </label>
-
-            <input
-              id="em"
-              type="email"
-              autocomplete="email"
-              inputmode="email"
-            >
-
-            <label for="pw">
-              Password
-            </label>
-
-            <input
-              id="pw"
-              type="password"
-              autocomplete="${
-                login
-                  ? "current-password"
-                  : "new-password"
-              }"
-              placeholder="At least 6 characters"
-            >
-
-            ${msgHtml()}
-
-            <button
-              class="btn"
-              id="go"
-              type="button"
-            >
-              ${login ? "Log in" : "Sign up"}
-            </button>
-
-            <button
-              class="link"
-              id="sw"
-              type="button"
-            >
-              ${
-                login
-                  ? "New here? Create an account"
-                  : "Have an account? Log in"
-              }
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-      document
-        .getElementById("sw")
-        .onclick = () => {
-
-          S.mode =
-            login
-              ? "signup"
-              : "login";
-
-          setMsg(null);
-
-          viewAuth();
-        };
-
-      document
-        .getElementById("go")
-        .onclick = async event => {
-
-          const email =
-            document
-              .getElementById("em")
-              .value
-              .trim();
-
-          const password =
-            document
-              .getElementById("pw")
-              .value;
-
-          if (
-            !email ||
-            password.length < 6
-          ) {
-
-            setMsg(
-              "Enter your email and a password of at least 6 characters."
-            );
-
-            return viewAuth();
-          }
-
-          event.target.disabled = true;
-
-          try {
-
-            if (login) {
-
-              const {
-                error
-              } =
-                await db.auth
-                  .signInWithPassword({
-                    email,
-                    password
-                  });
-
-              if (error) {
-
-                setMsg(
-                  error.message
-                );
-
-                viewAuth();
-              }
-
-              return;
-            }
-
-            const {
-              data,
-              error
-            } =
-              await db.auth.signUp({
-                email,
-                password
-              });
-
-            if (error) {
-
-              setMsg(
-                error.message
-              );
-
-              return viewAuth();
-            }
-
-            if (!data.session) {
-
-              setMsg(
-                "Account created. Check your email to confirm, then log in.",
-                true
-              );
-
-              return viewAuth();
-            }
-
-          } catch (error) {
-
-            setMsg(
-              error?.message ||
-              "Authentication failed."
-            );
-
-            viewAuth();
-          }
-        };
-    }
-
-
-    /* =========================================================
-       CHARACTER CREATION
-       ========================================================= */
-
-    function viewCreate() {
-
-      if (window.naijaClockTimer) {
-        clearInterval(
-          window.naijaClockTimer
-        );
-
-        window.naijaClockTimer = null;
-      }
-
-      app.innerHTML = `
-        <div class="stripe"></div>
-
-        <div class="wrap">
-
-          <h1>
-            Who you be?
-          </h1>
-
-          <p class="mute">
-            Pick your starting point. It decides your cash,
-            your skills, and which part of Lagos you wake up in.
-          </p>
-
-          <label for="nm">
-            Character name (3 to 20 characters)
-          </label>
-
-          <input
-            id="nm"
-            maxlength="20"
-            autocomplete="off"
-            value="${esc(S.nameDraft)}"
-          >
-
-          <div style="height:16px"></div>
-
-          ${BG.map(bg => `
-            <button
-              class="bg"
-              type="button"
-              data-id="${bg.id}"
-              aria-pressed="${S.picked === bg.id}"
-            >
-
-              <b>
-                ${esc(bg.name)}
-              </b>
-
-              <div class="meta">
-                ${esc(bg.meta)}
-              </div>
-
-              ${esc(bg.d)}
-
-            </button>
-          `).join("")}
-
-          ${msgHtml()}
-
-          <button
-            class="btn"
-            id="mk"
-            type="button"
-          >
-            Start hustling
-          </button>
-
-          <button
-            class="link"
-            id="lo"
-            type="button"
-          >
-            Log out
-          </button>
-
-        </div>
-      `;
-
-      document
-        .querySelectorAll(".bg")
-        .forEach(button => {
-
-          button.onclick = () => {
-
-            S.nameDraft =
-              document
-                .getElementById("nm")
-                .value;
-
-            S.picked =
-              button.dataset.id;
-
-            viewCreate();
-          };
-
-        });
-
-      document
-        .getElementById("lo")
-        .onclick = () =>
-          db.auth.signOut();
-
-      document
-        .getElementById("mk")
-        .onclick = async event => {
-
-          const name =
-            document
-              .getElementById("nm")
-              .value
-              .trim();
-
-          S.nameDraft = name;
-
-          if (
-            name.length < 3 ||
-            name.length > 20
-          ) {
-
-            setMsg(
-              "Name must be 3 to 20 characters."
-            );
-
-            return viewCreate();
-          }
-
-          if (!S.picked) {
-
-            setMsg(
-              "Pick a background to continue."
-            );
-
-            return viewCreate();
-          }
-
-          event.target.disabled = true;
-
-          try {
-
-            const {
-              error
-            } =
-              await db.rpc(
-                "create_character",
-                {
-                  p_name: name,
-                  p_background: S.picked
-                }
-              );
-
-            if (error) {
-
-              setMsg(
-                error.message
-              );
-
-              return viewCreate();
-            }
-
-            setMsg(null);
-
-            await load();
-
-          } catch (error) {
-
-            setMsg(
-              error?.message ||
-              "Character creation failed."
-            );
-
-            viewCreate();
-          }
-        };
-    }
-
-
-    /* =========================================================
-       NAVIGATION
-       ========================================================= */
-
-    async function go(tab) {
-
-      S.tab = tab;
-
-      S.jobMsg = null;
-      S.activityMsg = null;
-      S.bizMsg = null;
-      S.mapMsg = null;
-
-      if (tab === "business") {
-        S.bizLoaded = false;
-      }
-
-      viewGame();
-
-      if (tab === "business") {
-        return;
-      }
-
-      try {
-
-        const {
-          data
-        } =
-          await db.rpc(
-            "get_my_character"
-          );
-
-        if (
-          data &&
-          data.id &&
-          S.tab === tab &&
-          S.ch &&
-          (
-            data.energy !== S.ch.energy ||
-            data.hunger !== S.ch.hunger ||
-            data.fun !== S.ch.fun ||
-            data.social !== S.ch.social ||
-            data.hygiene !== S.ch.hygiene ||
-            data.cash !== S.ch.cash ||
-            data.level !== S.ch.level ||
-            data.xp !== S.ch.xp ||
-            data.reputation !== S.ch.reputation ||
-            data.district !== S.ch.district
-          )
-        ) {
-
-          S.ch = data;
-
-          viewGame();
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Navigation refresh failed:",
-          error
-        );
-      }
-    }
-
-
-    /* =========================================================
-       MAIN GAME VIEW
-       ========================================================= */
-
-    function viewGame() {
-
-      const c = S.ch;
-
-      if (!c) {
-        return viewAuth();
-      }
-
-      if (window.naijaClockTimer) {
-        clearInterval(
-          window.naijaClockTimer
-        );
-
-        window.naijaClockTimer = null;
-      }
-
-      const maxEnergy =
-        Number(c.max_energy) || 1;
-
-      const energy =
-        Number(c.energy) || 0;
-
-      const pct =
-        Math.max(
-          0,
-          Math.min(
-            100,
-            Math.round(
-              (energy / maxEnergy) * 100
-            )
-          )
-        );
-
-      const xpPct =
-        Number(c.xp || 0) % 100;
-
-      const tabs = [
-        ["home", "Home"],
-        ["jobs", "Jobs"],
-        ["business", "Business"],
-        ["map", "Map"],
-        ["board", "Ranks"]
-      ];
-
-      app.innerHTML = `
-        <div class="top">
-
-          <div class="in">
-
-            <div class="row">
-
-              <b>
-                ${esc(c.name)}
-              </b>
-
-              <span class="pill">
-                Lvl ${Number(c.level) || 1}
-                · ${xpPct}/100 XP
-              </span>
-
-            </div>
-
-            <div class="cash">
-              ${naira(c.cash)}
-            </div>
-
-            <div
-              class="row"
-              style="font-size:.9rem"
-            >
-
-              <span>
-                Energy
-                ${energy}/${maxEnergy}
-              </span>
-
-              <span>
-                Rep
-                ${Number(c.reputation) || 0}
-              </span>
-
-            </div>
-
-            <div class="bar">
-
-              <i
-                style="width:${pct}%"
-              ></i>
-
-            </div>
-
-          </div>
-
-          <div class="stripe"></div>
-
-        </div>
-
-        <div
-          class="wrap"
-          id="main"
-        ></div>
-
-        <nav class="nav">
-
-          ${tabs.map(
-            ([key, label]) => `
               <button
+                class="btn activity-action"
                 type="button"
-                data-t="${key}"
-                ${
-                  S.tab === key
-                    ? 'aria-current="page"'
-                    : ""
-                }
+                data-activity="${activity.id}"
               >
-                ${label}
+                Do it
               </button>
-            `
-          ).join("")}
 
-        </nav>
-      `;
+            </div>
 
-      document
-        .querySelectorAll(".nav button")
-        .forEach(button => {
+            <p
+              class="mute"
+              style="
+                margin:10px 0 0;
+                font-size:.9rem;
+              "
+            >
+              ${naira(activity.cost)}
+              · ${activity.energy} energy
+              · ${activity.restore}
+            </p>
 
-          button.onclick = () =>
-            go(button.dataset.t);
+          </div>
+        `
+      ).join("")}
 
-        });
-
-      const main =
-        document.getElementById("main");
-
-      if (S.tab === "home") {
-
-        main.innerHTML =
-          homeHtml(c);
-
-        /* =====================================================
-           ACTIVITY BUTTON FIX
-           =====================================================
-
-           homeHtml() creates the activity buttons.
-
-           They do not exist until homeHtml() has been
-           inserted into #main.
-
-           Therefore the click handlers MUST be attached here,
-           after the HTML is rendered.
-        */
-
-        main
-          .querySelectorAll("[data-activity]")
-          .forEach(button => {
-
-            button.onclick = () =>
-              doActivity(
-                button.dataset.activity
-              );
-
-          });
-
-      } else if (S.tab === "jobs") {
-
-        jobsView(main);
-
-      } else if (S.tab === "business") {
-
-        bizView(main);
-
-      } else if (S.tab === "map") {
-
-        mapView(main);
-
-      } else if (S.tab === "board") {
-
-        boardView(main);
-
-      }
-
-      const logout =
-        document.getElementById("lo2");
-
-      if (logout) {
-
-        logout.onclick = () =>
-          db.auth.signOut();
-
-      }
-
-      startGameClock();
-    }
+    </div>
+  `;
+}
 
 
-    /* =========================================================
-       HOME
-       ========================================================= */
+/* =========================================================
+   AUTH
+   ========================================================= */
 
-    function homeHtml(c) {
+function viewAuth() {
 
-      const skills = [
-        ["hustle", c.skill_hustle],
-        ["edu", c.skill_edu],
-        ["charm", c.skill_charm],
-        ["tech", c.skill_tech]
-      ];
+  if (window.naijaClockTimer) {
+    clearInterval(window.naijaClockTimer);
+    window.naijaClockTimer = null;
+  }
 
-      return `
+  const login = S.mode === "login";
 
-        ${gameClockHtml()}
+  app.innerHTML = `
+    <div class="stripe"></div>
 
-        <div class="card">
+    <div class="wrap">
 
-          <h2>
-            Welcome to
-            ${cap(c.district)},
-            ${esc(c.name)}
-          </h2>
+      <h1>Naija Hustle</h1>
 
-          <p class="mute">
+      <p class="mute">
+        Start from the bottom. Own the block.
+      </p>
 
-            ${esc(bgName(c.background))}
-            ·
-            ${cap(c.city)}.
+      <div class="card">
 
-            Work jobs to earn, then buy a shop
-            in Business.
+        <h2>
+          ${login ? "Log in" : "Create account"}
+        </h2>
 
-            Energy refills 1 point every minute.
+        <label for="em">
+          Email
+        </label>
 
-          </p>
+        <input
+          id="em"
+          type="email"
+          autocomplete="email"
+        >
 
-        </div>
+        <label for="pw">
+          Password
+        </label>
 
-        ${needsHtml(c)}
+        <input
+          id="pw"
+          type="password"
+          autocomplete="${login ? "current-password" : "new-password"}"
+          placeholder="At least 6 characters"
+        >
 
-        ${activitiesHtml()}
+        ${msgHtml()}
 
-        <div class="card">
-
-          <h2>
-            Skills
-          </h2>
-
-          ${skills.map(
-            ([key, value]) => {
-
-              const skillValue =
-                Number(value) || 0;
-
-              const width =
-                Math.min(
-                  skillValue * 10,
-                  100
-                );
-
-              return `
-                <div class="sk">
-
-                  <div class="row">
-
-                    <span>
-                      ${SK[key]}
-                    </span>
-
-                    <b>
-                      ${skillValue}
-                    </b>
-
-                  </div>
-
-                  <div class="bar">
-
-                    <i
-                      style="width:${width}%"
-                    ></i>
-
-                  </div>
-
-                </div>
-              `;
-
-            }
-          ).join("")}
-
-        </div>
+        <button
+          class="btn"
+          id="go"
+          type="button"
+        >
+          ${login ? "Log in" : "Sign up"}
+        </button>
 
         <button
           class="link"
-          id="lo2"
+          id="sw"
           type="button"
         >
-          Log out
+          ${
+            login
+              ? "New here? Create an account"
+              : "Have an account? Log in"
+          }
         </button>
-      `;
-    }
 
+      </div>
 
-    /* =========================================================
-       ACTIVITIES ACTION
-       ========================================================= */
+    </div>
+  `;
 
-    async function doActivity(
-      activity
-    ) {
+  document.getElementById("sw").onclick = () => {
 
-      if (S.busy) {
-        return;
+    S.mode =
+      login
+        ? "signup"
+        : "login";
+
+    setMsg(null);
+
+    viewAuth();
+  };
+
+  document.getElementById("go").onclick =
+    async event => {
+
+      const email =
+        document
+          .getElementById("em")
+          .value
+          .trim();
+
+      const password =
+        document.getElementById("pw").value;
+
+      if (
+        !email ||
+        password.length < 6
+      ) {
+        setMsg(
+          "Enter your email and a password of at least 6 characters."
+        );
+
+        return viewAuth();
       }
 
-      S.busy = true;
+      event.target.disabled = true;
 
       try {
 
-        const {
-          data,
-          error
-        } =
-          await db.rpc(
-            "do_activity",
-            {
-              p_activity: activity
-            }
-          );
+        if (login) {
 
-        S.busy = false;
+          const { error } =
+            await db.auth.signInWithPassword({
+              email,
+              password
+            });
+
+          if (error) {
+            setMsg(error.message);
+            viewAuth();
+          }
+
+          return;
+        }
+
+        const { data, error } =
+          await db.auth.signUp({
+            email,
+            password
+          });
 
         if (error) {
-
-          S.activityMsg = {
-            t: error.message,
-            ok: false
-          };
-
-          return viewGame();
+          setMsg(error.message);
+          return viewAuth();
         }
 
-        if (!data) {
+        if (!data.session) {
 
-          S.activityMsg = {
-            t:
-              "The activity completed but returned no character data.",
-            ok: false
-          };
+          setMsg(
+            "Account created. Check your email to confirm, then log in.",
+            true
+          );
 
-          return viewGame();
+          return viewAuth();
         }
-
-        S.ch = data;
-
-        const activityNames = {
-          eat: "Meal",
-          entertainment: "Entertainment",
-          socialize: "Socializing",
-          freshen_up: "Freshening up"
-        };
-
-        const name =
-          activityNames[activity] ||
-          "Activity";
-
-        S.activityMsg = {
-          t:
-            `${name} completed.` +
-            (
-              data.last_event
-                ? ` ${data.last_event}`
-                : ""
-            ),
-          ok: true
-        };
-
-        viewGame();
 
       } catch (error) {
 
-        S.busy = false;
-
-        S.activityMsg = {
-          t:
-            error?.message ||
-            "Activity failed.",
-          ok: false
-        };
-
-        viewGame();
-      }
-    }
-
-
-    /* =========================================================
-       JOBS
-       ========================================================= */
-
-    function jobCard(
-      job,
-      character
-    ) {
-
-      const needs = [];
-
-      const district =
-        (S.districts || []).find(
-          item =>
-            item.id ===
-            character.district
+        setMsg(
+          error?.message ||
+          "Authentication failed."
         );
 
-      const bonus =
-        district &&
-        district.bonus_skill === job.trains
-          ? Number(district.bonus_pct) || 0
-          : 0;
-
-      if (
-        Number(character.level) <
-        Number(job.min_level)
-      ) {
-
-        needs.push(
-          "level " +
-          job.min_level
-        );
+        viewAuth();
       }
+    };
+}
 
-      if (
-        job.req_skill &&
-        Number(
-          character[
-            "skill_" +
-            job.req_skill
-          ]
-        ) <
-        Number(job.req_skill_level)
-      ) {
 
-        needs.push(
-          SK[job.req_skill] +
-          " " +
-          job.req_skill_level
-        );
-      }
+/* =========================================================
+   PERSONALITY DATA
+   ========================================================= */
 
-      return `
-        <div class="card">
+async function loadPersonalityTraits() {
 
-          <div class="row">
+  if (S.personalityTraits) {
+    return S.personalityTraits;
+  }
 
-            <h2>
-              ${esc(job.title)}
-            </h2>
+  const { data, error } =
+    await db
+      .from("personality_traits")
+      .select(
+        "id,name,description,skill_bonus,skill_bonus_amount,effect_key,effect_amount"
+      )
+      .order("name");
 
-            <span class="pill">
-              ${job.energy_cost}
-              energy
-            </span>
+  if (error) {
+    throw error;
+  }
 
+  S.personalityTraits =
+    data || [];
+
+  return S.personalityTraits;
+}
+
+
+/* =========================================================
+   CHARACTER CREATION
+   ========================================================= */
+
+async function viewCreate() {
+
+  if (window.naijaClockTimer) {
+    clearInterval(window.naijaClockTimer);
+    window.naijaClockTimer = null;
+  }
+
+  app.innerHTML = `
+    <div class="stripe"></div>
+
+    <div class="wrap">
+
+      <h1>
+        Build your hustler.
+      </h1>
+
+      <p class="mute">
+        Your background gives you a starting point.
+        Your personality and look make the character yours.
+      </p>
+
+      <label for="nm">
+        Character name (3 to 20 characters)
+      </label>
+
+      <input
+        id="nm"
+        maxlength="20"
+        autocomplete="off"
+        value="${esc(S.nameDraft)}"
+      >
+
+      <div style="height:14px"></div>
+
+      ${BG.map(bg => `
+        <button
+          class="bg"
+          type="button"
+          data-bg="${bg.id}"
+          aria-pressed="${S.picked === bg.id}"
+        >
+
+          <b>
+            ${esc(bg.name)}
+          </b>
+
+          <div class="meta">
+            ${esc(bg.meta)}
           </div>
 
-          <p class="mute">
-            ${esc(job.description)}
-          </p>
+          ${esc(bg.d)}
 
-          <div
-            class="row"
-            style="font-size:.95rem"
+        </button>
+      `).join("")}
+
+      <div class="section-head">
+        <h2>
+          Personality
+        </h2>
+
+        <p class="mute">
+          Pick exactly two traits. They will shape how your character plays.
+        </p>
+
+        <span class="counter">
+          ${
+            [S.personality1, S.personality2]
+              .filter(Boolean)
+              .length
+          } / 2 selected
+        </span>
+      </div>
+
+      <div id="traitsArea">
+        <div class="loading">
+          Loading personality traits...
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2>
+          Character design
+        </h2>
+
+        <p class="mute">
+          Choose how your hustler looks.
+        </p>
+      </div>
+
+      ${characterPreviewHtml()}
+
+      <div class="card">
+
+        <h2>Skin tone</h2>
+
+        <div class="choice-grid">
+          ${SKIN_TONES.map(
+            ([id, label]) => `
+              <button
+                class="choice ${
+                  S.skinTone === id
+                    ? "selected"
+                    : ""
+                }"
+                type="button"
+                data-choice-type="skinTone"
+                data-choice="${id}"
+              >
+                <b>${label}</b>
+              </button>
+            `
+          ).join("")}
+        </div>
+
+        <h2 style="margin-top:18px">
+          Hairstyle
+        </h2>
+
+        <div class="choice-grid">
+          ${HAIRSTYLES.map(
+            ([id, label]) => `
+              <button
+                class="choice ${
+                  S.hairstyle === id
+                    ? "selected"
+                    : ""
+                }"
+                type="button"
+                data-choice-type="hairstyle"
+                data-choice="${id}"
+              >
+                <b>${label}</b>
+              </button>
+            `
+          ).join("")}
+        </div>
+
+        <h2 style="margin-top:18px">
+          Hair colour
+        </h2>
+
+        <div class="choice-grid">
+          ${HAIR_COLORS.map(
+            ([id, label]) => `
+              <button
+                class="choice ${
+                  S.hairColor === id
+                    ? "selected"
+                    : ""
+                }"
+                type="button"
+                data-choice-type="hairColor"
+                data-choice="${id}"
+              >
+                <b>${label}</b>
+              </button>
+            `
+          ).join("")}
+        </div>
+
+        <h2 style="margin-top:18px">
+          Outfit
+        </h2>
+
+        <div class="choice-grid">
+          ${OUTFITS.map(
+            ([id, label]) => `
+              <button
+                class="choice ${
+                  S.outfit === id
+                    ? "selected"
+                    : ""
+                }"
+                type="button"
+                data-choice-type="outfit"
+                data-choice="${id}"
+              >
+                <b>${label}</b>
+              </button>
+            `
+          ).join("")}
+        </div>
+
+        <h2 style="margin-top:18px">
+          Accessory
+        </h2>
+
+        <div class="choice-grid">
+          ${ACCESSORIES.map(
+            ([id, label]) => `
+              <button
+                class="choice ${
+                  S.accessory === id
+                    ? "selected"
+                    : ""
+                }"
+                type="button"
+                data-choice-type="accessory"
+                data-choice="${id}"
+              >
+                <b>${label}</b>
+              </button>
+            `
+          ).join("")}
+        </div>
+
+      </div>
+
+      ${msgHtml()}
+
+      <button
+        class="btn"
+        id="mk"
+        type="button"
+      >
+        Start hustling
+      </button>
+
+      <button
+        class="link"
+        id="lo"
+        type="button"
+      >
+        Log out
+      </button>
+
+    </div>
+  `;
+
+  const nameInput =
+    document.getElementById("nm");
+
+  nameInput.oninput = () => {
+    S.nameDraft =
+      nameInput.value;
+
+    const name =
+      document.querySelector(
+        ".look-name"
+      );
+
+    if (name) {
+      name.textContent =
+        S.nameDraft ||
+        "Your Hustler";
+    }
+  };
+
+  document
+    .querySelectorAll("[data-bg]")
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        S.nameDraft =
+          nameInput.value;
+
+        S.picked =
+          button.dataset.bg;
+
+        viewCreate();
+      };
+    });
+
+  document
+    .querySelectorAll("[data-choice-type]")
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        const type =
+          button.dataset.choiceType;
+
+        const value =
+          button.dataset.choice;
+
+        S[type] = value;
+
+        viewCreate();
+      };
+    });
+
+  document
+    .getElementById("lo")
+    .onclick = () =>
+      db.auth.signOut();
+
+  document
+    .getElementById("mk")
+    .onclick = createCharacter;
+
+  try {
+
+    const traits =
+      await loadPersonalityTraits();
+
+    if (!document.getElementById("traitsArea")) {
+      return;
+    }
+
+    document.getElementById("traitsArea").innerHTML = `
+      <div class="trait-grid">
+
+        ${traits.map(
+          trait => {
+
+            const selected =
+              trait.id === S.personality1 ||
+              trait.id === S.personality2;
+
+            const number =
+              trait.id === S.personality1
+                ? "1"
+                : trait.id === S.personality2
+                  ? "2"
+                  : "";
+
+            return `
+              <button
+                class="trait"
+                type="button"
+                data-trait="${esc(trait.id)}"
+                aria-pressed="${selected}"
+              >
+
+                <span class="trait-number">
+                  ${number}
+                </span>
+
+                <b>
+                  ${esc(trait.name)}
+                </b>
+
+                <small>
+                  ${esc(trait.description)}
+                </small>
+
+              </button>
+            `;
+          }
+        ).join("")}
+
+      </div>
+    `;
+
+    document
+      .querySelectorAll("[data-trait]")
+      .forEach(button => {
+
+        button.onclick = () => {
+
+          const id =
+            button.dataset.trait;
+
+          if (S.personality1 === id) {
+
+            S.personality1 = null;
+
+          } else if (
+            S.personality2 === id
+          ) {
+
+            S.personality2 = null;
+
+          } else if (!S.personality1) {
+
+            S.personality1 = id;
+
+          } else if (!S.personality2) {
+
+            S.personality2 = id;
+
+          } else {
+
+            S.personality2 = id;
+
+          }
+
+          viewCreate();
+        };
+      });
+
+  } catch (error) {
+
+    const area =
+      document.getElementById(
+        "traitsArea"
+      );
+
+    if (area) {
+
+      area.innerHTML = `
+        <div class="err">
+          Could not load personality traits.
+          ${esc(error.message)}
+        </div>
+      `;
+    }
+  }
+}
+
+
+/* =========================================================
+   CREATE CHARACTER
+   ========================================================= */
+
+async function createCharacter(event) {
+
+  if (S.busy) {
+    return;
+  }
+
+  const name =
+    document
+      .getElementById("nm")
+      .value
+      .trim();
+
+  S.nameDraft = name;
+
+  if (
+    name.length < 3 ||
+    name.length > 20
+  ) {
+
+    setMsg(
+      "Name must be 3 to 20 characters."
+    );
+
+    return viewCreate();
+  }
+
+  if (!S.picked) {
+
+    setMsg(
+      "Pick a background to continue."
+    );
+
+    return viewCreate();
+  }
+
+  if (!S.personality1 ||
+      !S.personality2) {
+
+    setMsg(
+      "Pick exactly two personality traits."
+    );
+
+    return viewCreate();
+  }
+
+  if (
+    S.personality1 ===
+    S.personality2
+  ) {
+
+    setMsg(
+      "Choose two different personality traits."
+    );
+
+    return viewCreate();
+  }
+
+  S.busy = true;
+
+  event.target.disabled = true;
+
+  try {
+
+    /*
+     * STEP 1
+     * Existing character creation.
+     *
+     * This preserves your current starting
+     * money, background, skills, district,
+     * energy, etc.
+     */
+
+    const {
+      error
+    } =
+      await db.rpc(
+        "create_character",
+        {
+          p_name: name,
+          p_background: S.picked
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+
+    /*
+     * STEP 2
+     * Securely save personality and appearance.
+     *
+     * This requires:
+     *
+     * public.customize_character(...)
+     *
+     * The RPC must identify the user with
+     * auth.uid() on the server.
+     */
+
+    const {
+      error: customizeError
+    } =
+      await db.rpc(
+        "customize_character",
+        {
+          p_personality_1:
+            S.personality1,
+
+          p_personality_2:
+            S.personality2,
+
+          p_skin_tone:
+            S.skinTone,
+
+          p_hairstyle:
+            S.hairstyle,
+
+          p_hair_color:
+            S.hairColor,
+
+          p_outfit:
+            S.outfit,
+
+          p_accessory:
+            S.accessory
+        }
+      );
+
+    if (customizeError) {
+      throw customizeError;
+    }
+
+    S.busy = false;
+
+    setMsg(null);
+
+    await load();
+
+  } catch (error) {
+
+    S.busy = false;
+
+    setMsg(
+      error?.message ||
+      "Character creation failed."
+    );
+
+    viewCreate();
+  }
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+async function go(tab) {
+
+  S.tab = tab;
+
+  S.jobMsg = null;
+  S.activityMsg = null;
+  S.bizMsg = null;
+  S.mapMsg = null;
+
+  if (tab === "business") {
+    S.bizLoaded = false;
+  }
+
+  viewGame();
+
+  if (tab === "business") {
+    return;
+  }
+
+  try {
+
+    const { data } =
+      await db.rpc(
+        "get_my_character"
+      );
+
+    if (
+      data &&
+      data.id &&
+      S.tab === tab
+    ) {
+      S.ch = data;
+      viewGame();
+    }
+
+  } catch (error) {
+    console.error(
+      "Navigation refresh failed:",
+      error
+    );
+  }
+}
+
+
+/* =========================================================
+   MAIN GAME VIEW
+   ========================================================= */
+
+function viewGame() {
+
+  const c = S.ch;
+
+  if (!c) {
+    return viewAuth();
+  }
+
+  if (window.naijaClockTimer) {
+    clearInterval(
+      window.naijaClockTimer
+    );
+  }
+
+  const maxEnergy =
+    Number(c.max_energy) || 1;
+
+  const energy =
+    Number(c.energy) || 0;
+
+  const pct =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(
+          (energy / maxEnergy) * 100
+        )
+      )
+    );
+
+  const xpPct =
+    Number(c.xp || 0) % 100;
+
+  const tabs = [
+    ["home", "Home"],
+    ["jobs", "Jobs"],
+    ["business", "Business"],
+    ["map", "Map"],
+    ["board", "Ranks"]
+  ];
+
+  app.innerHTML = `
+    <div class="top">
+
+      <div class="in">
+
+        <div class="row">
+
+          <b>
+            ${esc(c.name)}
+          </b>
+
+          <span class="pill">
+            Lvl ${Number(c.level) || 1}
+            · ${xpPct}/100 XP
+          </span>
+
+        </div>
+
+        <div class="cash">
+          ${naira(c.cash)}
+        </div>
+
+        <div
+          class="row"
+          style="font-size:.9rem"
+        >
+
+          <span>
+            Energy
+            ${energy}/${maxEnergy}
+          </span>
+
+          <span>
+            Rep
+            ${Number(c.reputation) || 0}
+          </span>
+
+        </div>
+
+        <div class="bar">
+          <i style="width:${pct}%"></i>
+        </div>
+
+      </div>
+
+      <div class="stripe"></div>
+
+    </div>
+
+    <div
+      class="wrap"
+      id="main"
+    ></div>
+
+    <nav class="nav">
+
+      ${tabs.map(
+        ([key, label]) => `
+          <button
+            type="button"
+            data-t="${key}"
+            ${
+              S.tab === key
+                ? 'aria-current="page"'
+                : ""
+            }
           >
+            ${label}
+          </button>
+        `
+      ).join("")}
 
-            <span>
+    </nav>
+  `;
 
-              ${naira(job.pay_min)}
-              to
-              ${naira(job.pay_max)}
+  document
+    .querySelectorAll(".nav button")
+    .forEach(button => {
+
+      button.onclick = () =>
+        go(button.dataset.t);
+
+    });
+
+  const main =
+    document.getElementById("main");
+
+  if (S.tab === "home") {
+
+    main.innerHTML =
+      homeHtml(c);
+
+    main
+      .querySelectorAll(
+        "[data-activity]"
+      )
+      .forEach(button => {
+
+        button.onclick = () =>
+          doActivity(
+            button.dataset.activity
+          );
+
+      });
+
+  } else if (S.tab === "jobs") {
+
+    jobsView(main);
+
+  } else if (S.tab === "business") {
+
+    bizView(main);
+
+  } else if (S.tab === "map") {
+
+    mapView(main);
+
+  } else if (S.tab === "board") {
+
+    boardView(main);
+  }
+
+  const logout =
+    document.getElementById("lo2");
+
+  if (logout) {
+    logout.onclick = () =>
+      db.auth.signOut();
+  }
+
+  startGameClock();
+}
+
+
+/* =========================================================
+   HOME
+   ========================================================= */
+
+function homeHtml(c) {
+
+  const skills = [
+    ["hustle", c.skill_hustle],
+    ["edu", c.skill_edu],
+    ["charm", c.skill_charm],
+    ["tech", c.skill_tech]
+  ];
+
+  const personality1 =
+    S.personalityTraits?.find(
+      trait =>
+        trait.id === c.personality_1
+    );
+
+  const personality2 =
+    S.personalityTraits?.find(
+      trait =>
+        trait.id === c.personality_2
+    );
+
+  return `
+
+    ${gameClockHtml()}
+
+    <div class="card">
+
+      <h2>
+        Welcome to
+        ${cap(c.district)},
+        ${esc(c.name)}
+      </h2>
+
+      <p class="mute">
+
+        ${esc(bgName(c.background))}
+        ·
+        ${cap(c.city)}.
+
+        Work jobs to earn, then build your empire.
+
+      </p>
+
+      ${
+        personality1 ||
+        personality2
+          ? `
+            <div
+              style="
+                display:flex;
+                gap:6px;
+                flex-wrap:wrap;
+                margin-top:8px;
+              "
+            >
 
               ${
-                bonus
-                  ? ` · +${bonus}% here`
+                personality1
+                  ? `<span class="pill">
+                      ${esc(personality1.name)}
+                    </span>`
                   : ""
               }
 
-            </span>
+              ${
+                personality2
+                  ? `<span class="pill">
+                      ${esc(personality2.name)}
+                    </span>`
+                  : ""
+              }
 
-            <span>
-
-              +${job.xp} XP
-
-              · trains
-              ${SK[job.trains] || job.trains}
-
-            </span>
-
-          </div>
-
-          ${
-            needs.length
-              ? `
-                <div class="lock">
-
-                  Locked: needs
-                  ${esc(
-                    needs.join(" and ")
-                  )}
-
-                </div>
-              `
-              : `
-                <button
-                  class="btn"
-                  type="button"
-                  data-job="${esc(job.id)}"
-                >
-                  Work this job
-                </button>
-              `
-          }
-
-        </div>
-      `;
-    }
-
-
-    async function jobsView(main) {
-
-      const head =
-        S.jobMsg
-          ? `
-            <div
-              class="${
-                S.jobMsg.ok
-                  ? "ok"
-                  : "err"
-              }"
-              role="alert"
-            >
-              ${esc(S.jobMsg.t)}
             </div>
           `
-          : "";
-
-      if (!S.jobs) {
-
-        main.innerHTML = `
-          <div class="card">
-
-            <h2>
-              Job board
-            </h2>
-
-            <p class="mute">
-              Loading jobs...
-            </p>
-
-          </div>
-        `;
-
-        const {
-          data,
-          error
-        } =
-          await db
-            .from("jobs")
-            .select("*")
-            .order("min_level")
-            .order("pay_min");
-
-        if (error) {
-
-          main.innerHTML = `
-            <div class="err">
-              ${esc(error.message)}
-            </div>
-          `;
-
-          return;
-        }
-
-        S.jobs =
-          data || [];
-
-        if (
-          S.tab !== "jobs"
-        ) {
-          return;
-        }
+          : ""
       }
 
-      await loadDistricts();
+    </div>
 
-      if (
-        S.tab !== "jobs"
-      ) {
-        return;
-      }
+    ${needsHtml(c)}
 
-      main.innerHTML =
-        head +
-        (
-          S.jobs.length
-            ? S.jobs
-                .map(
-                  job =>
-                    jobCard(
-                      job,
-                      S.ch
-                    )
-                )
-                .join("")
-            : `
-              <div class="card">
+    ${activitiesHtml()}
 
-                <h2>
-                  Job board
-                </h2>
+    <div class="card">
 
-                <p class="mute">
-                  No jobs available yet.
-                </p>
+      <h2>
+        Skills
+      </h2>
 
-              </div>
-            `
-        );
+      ${skills.map(
+        ([key, value]) => {
 
-      main
-        .querySelectorAll("[data-job]")
-        .forEach(button => {
+          const skillValue =
+            Number(value) || 0;
 
-          button.onclick = () =>
-            doJob(
-              button.dataset.job
+          const width =
+            Math.min(
+              skillValue * 10,
+              100
             );
 
-        });
-    }
+          return `
+            <div class="sk">
 
+              <div class="row">
 
-    async function doJob(id) {
+                <span>
+                  ${SK[key]}
+                </span>
 
-      if (S.busy) {
-        return;
-      }
+                <b>
+                  ${skillValue}
+                </b>
 
-      S.busy = true;
-
-      const before = S.ch;
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await db.rpc(
-            "do_job",
-            {
-              p_job_id: id
-            }
-          );
-
-        S.busy = false;
-
-        if (error) {
-
-          S.jobMsg = {
-            t: error.message,
-            ok: false
-          };
-
-          return viewGame();
-        }
-
-        if (!data) {
-
-          S.jobMsg = {
-            t:
-              "The job completed but returned no character data.",
-            ok: false
-          };
-
-          return viewGame();
-        }
-
-        const job =
-          S.jobs.find(
-            item =>
-              item.id === id
-          );
-
-        if (!job) {
-
-          S.jobMsg = {
-            t:
-              "Job completed.",
-            ok: true
-          };
-
-          S.ch = data;
-
-          return viewGame();
-        }
-
-        const diff =
-          Number(data.cash) -
-          Number(before.cash);
-
-        let message =
-          `${job.title} done. Cash ` +
-          `${diff >= 0 ? "+" : "-"}${naira(
-            Math.abs(diff)
-          )}, ` +
-          `+${job.xp} XP.`;
-
-        if (data.last_event) {
-
-          message +=
-            " " +
-            data.last_event;
-        }
-
-        if (
-          Number(data.level) >
-          Number(before.level)
-        ) {
-
-          message +=
-            ` Level up! You're now level ${data.level}.`;
-        }
-
-        Object.keys(SK)
-          .forEach(key => {
-
-            if (
-              Number(
-                data["skill_" + key]
-              ) >
-              Number(
-                before["skill_" + key]
-              )
-            ) {
-
-              message +=
-                ` ${SK[key]} went up to ` +
-                `${data["skill_" + key]}.`;
-
-            }
-
-          });
-
-        S.ch = data;
-
-        S.jobMsg = {
-          t: message,
-          ok: true
-        };
-
-        viewGame();
-
-      } catch (error) {
-
-        S.busy = false;
-
-        S.jobMsg = {
-          t:
-            error?.message ||
-            "The job could not be completed.",
-          ok: false
-        };
-
-        viewGame();
-      }
-    }
-
-
-    /* =========================================================
-       BUSINESS
-       ========================================================= */
-
-    function buyCard(
-      type,
-      character
-    ) {
-
-      const perHour =
-        Number(type.base_rate) *
-        (
-          Number(type.unit_price) -
-          Number(type.unit_cost)
-        );
-
-      const locked =
-        Number(character.level) <
-        Number(type.min_level);
-
-      return `
-        <div class="card">
-
-          <div class="row">
-
-            <h2>
-              ${esc(type.name)}
-            </h2>
-
-            <span class="pill">
-              ${naira(type.buy_cost)}
-            </span>
-
-          </div>
-
-          <p class="mute">
-            ${esc(type.description)}
-          </p>
-
-          <div
-            class="row"
-            style="font-size:.95rem"
-          >
-
-            <span>
-              Up to
-              ${naira(perHour)}
-              profit per hour
-            </span>
-
-            <span>
-              Holds
-              ${type.base_capacity}
-              units
-            </span>
-
-          </div>
-
-          ${
-            locked
-              ? `
-                <div class="lock">
-
-                  Locked: needs level
-                  ${type.min_level}
-
-                </div>
-              `
-              : `
-                <button
-                  class="btn"
-                  type="button"
-                  data-buy="${esc(type.id)}"
-                >
-                  Buy for
-                  ${naira(type.buy_cost)}
-                </button>
-              `
-          }
-
-        </div>
-      `;
-    }
-
-
-    async function bizView(main) {
-
-      const head =
-        S.bizMsg
-          ? `
-            <div
-              class="${
-                S.bizMsg.ok
-                  ? "ok"
-                  : "err"
-              }"
-              role="alert"
-            >
-              ${esc(S.bizMsg.t)}
-            </div>
-          `
-          : "";
-
-      if (
-        !S.bizTypes ||
-        !S.bizLoaded
-      ) {
-
-        main.innerHTML = `
-          <div class="card">
-
-            <h2>
-              Your business
-            </h2>
-
-            <p class="mute">
-              Opening the shop...
-            </p>
-
-          </div>
-        `;
-
-        if (!S.bizTypes) {
-
-          const result =
-            await db
-              .from("business_types")
-              .select("*")
-              .order("buy_cost");
-
-          if (result.error) {
-
-            main.innerHTML = `
-              <div class="err">
-                ${esc(
-                  result.error.message
-                )}
               </div>
-            `;
 
-            return;
-          }
+              <div class="bar">
 
-          S.bizTypes =
-            result.data || [];
-        }
+                <i
+                  style="width:${width}%"
+                ></i>
 
-        const result =
-          await db.rpc(
-            "get_my_business"
-          );
+              </div>
 
-        if (result.error) {
-
-          main.innerHTML = `
-            <div class="err">
-              ${esc(
-                result.error.message
-              )}
             </div>
           `;
-
-          return;
         }
+      ).join("")}
 
-        S.biz =
-          result.data &&
-          result.data.business
-            ? result.data.business
-            : null;
+    </div>
 
-        if (
-          result.data &&
-          result.data.character
-        ) {
+    <button
+      class="link"
+      id="lo2"
+      type="button"
+    >
+      Log out
+    </button>
+  `;
+}
 
-          S.ch =
-            result.data.character;
+
+/* =========================================================
+   ACTIVITIES ACTION
+   ========================================================= */
+
+async function doActivity(activity) {
+
+  if (S.busy) return;
+
+  S.busy = true;
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await db.rpc(
+        "do_activity",
+        {
+          p_activity: activity
         }
+      );
 
-        S.bizLoaded = true;
+    S.busy = false;
 
-        if (
-          S.tab !== "business"
-        ) {
-          return;
-        }
+    if (error) {
 
-        return viewGame();
+      S.activityMsg = {
+        t: error.message,
+        ok: false
+      };
+
+      return viewGame();
+    }
+
+    S.ch = data;
+
+    const names = {
+      eat: "Meal",
+      entertainment: "Entertainment",
+      socialize: "Socializing",
+      freshen_up: "Freshening up"
+    };
+
+    S.activityMsg = {
+      t:
+        `${names[activity] || "Activity"} completed.` +
+        (
+          data.last_event
+            ? ` ${data.last_event}`
+            : ""
+        ),
+      ok: true
+    };
+
+    viewGame();
+
+  } catch (error) {
+
+    S.busy = false;
+
+    S.activityMsg = {
+      t:
+        error?.message ||
+        "Activity failed.",
+      ok: false
+    };
+
+    viewGame();
+  }
+}
+
+
+/* =========================================================
+   JOBS
+   ========================================================= */
+
+function jobCard(job, character) {
+
+  const needs = [];
+
+  if (
+    Number(character.level) <
+    Number(job.min_level)
+  ) {
+    needs.push(
+      "level " +
+      job.min_level
+    );
+  }
+
+  if (
+    job.req_skill &&
+    Number(
+      character[
+        "skill_" +
+        job.req_skill
+      ]
+    ) <
+    Number(job.req_skill_level)
+  ) {
+    needs.push(
+      SK[job.req_skill] +
+      " " +
+      job.req_skill_level
+    );
+  }
+
+  return `
+    <div class="card">
+
+      <div class="row">
+
+        <h2>
+          ${esc(job.title)}
+        </h2>
+
+        <span class="pill">
+          ${job.energy_cost} energy
+        </span>
+
+      </div>
+
+      <p class="mute">
+        ${esc(job.description)}
+      </p>
+
+      <div
+        class="row"
+        style="font-size:.95rem"
+      >
+
+        <span>
+          ${naira(job.pay_min)}
+          to
+          ${naira(job.pay_max)}
+        </span>
+
+        <span>
+          +${job.xp} XP
+        </span>
+
+      </div>
+
+      ${
+        needs.length
+          ? `
+            <div class="lock">
+              Locked: needs
+              ${esc(needs.join(" and "))}
+            </div>
+          `
+          : `
+            <button
+              class="btn"
+              type="button"
+              data-job="${esc(job.id)}"
+            >
+              Work this job
+            </button>
+          `
       }
 
-      if (!S.biz) {
+    </div>
+  `;
+}
 
-        main.innerHTML =
-          head +
-          `
-            <div class="card">
+async function jobsView(main) {
 
-              <h2>
-                Start a business
-              </h2>
+  if (!S.jobs) {
 
-              <p class="mute">
+    main.innerHTML = `
+      <div class="card">
+        <h2>Job board</h2>
+        <p class="mute">Loading jobs...</p>
+      </div>
+    `;
 
-                Buy a shop, stock it, and earn
-                while you work other jobs.
+    const {
+      data,
+      error
+    } =
+      await db
+        .from("jobs")
+        .select("*")
+        .order("min_level")
+        .order("pay_min");
 
-                You can own one business for now.
+    if (error) {
 
-              </p>
+      main.innerHTML = `
+        <div class="err">
+          ${esc(error.message)}
+        </div>
+      `;
 
-            </div>
-          ` +
-          S.bizTypes
+      return;
+    }
+
+    S.jobs = data || [];
+  }
+
+  main.innerHTML = `
+    ${
+      S.jobMsg
+        ? `
+          <div
+            class="${S.jobMsg.ok ? "ok" : "err"}"
+          >
+            ${esc(S.jobMsg.t)}
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      S.jobs.length
+        ? S.jobs
             .map(
-              type =>
-                buyCard(
-                  type,
+              job =>
+                jobCard(
+                  job,
                   S.ch
                 )
             )
-            .join("");
+            .join("")
+        : `
+          <div class="card">
+            <h2>Job board</h2>
+            <p class="mute">
+              No jobs available yet.
+            </p>
+          </div>
+        `
+    }
+  `;
 
-        main
-          .querySelectorAll(
-            "[data-buy]"
-          )
-          .forEach(button => {
+  main
+    .querySelectorAll("[data-job]")
+    .forEach(button => {
 
-            button.onclick = () => {
+      button.onclick = () =>
+        doJob(button.dataset.job);
 
-              const type =
-                S.bizTypes.find(
-                  item =>
-                    item.id ===
-                    button.dataset.buy
-                );
+    });
+}
 
-              if (!type) {
-                return;
-              }
+async function doJob(id) {
 
-              bizAct(
-                "buy_business",
-                {
-                  p_type: type.id
-                },
-                () =>
-                  `You bought a ${type.name}. ` +
-                  `Restock it so customers have something to buy.`
-              );
-            };
+  if (S.busy) return;
 
-          });
+  S.busy = true;
 
-        return;
-      }
+  const before = S.ch;
 
-      const business =
-        S.biz;
+  try {
 
-      const type =
-        S.bizTypes.find(
-          item =>
-            item.id ===
-            business.type_id
-        );
+    const {
+      data,
+      error
+    } =
+      await db.rpc(
+        "do_job",
+        {
+          p_job_id: id
+        }
+      );
 
-      if (!type) {
+    S.busy = false;
+
+    if (error) {
+
+      S.jobMsg = {
+        t: error.message,
+        ok: false
+      };
+
+      return viewGame();
+    }
+
+    const job =
+      S.jobs.find(
+        item =>
+          item.id === id
+      );
+
+    S.ch = data;
+
+    let message =
+      job
+        ? `${job.title} completed.`
+        : "Job completed.";
+
+    const diff =
+      Number(data.cash) -
+      Number(before.cash);
+
+    message +=
+      ` Cash ${diff >= 0 ? "+" : "-"}${naira(Math.abs(diff))}.`;
+
+    if (
+      Number(data.level) >
+      Number(before.level)
+    ) {
+      message +=
+        ` Level up! You're now level ${data.level}.`;
+    }
+
+    if (data.last_event) {
+      message +=
+        " " +
+        data.last_event;
+    }
+
+    S.jobMsg = {
+      t: message,
+      ok: true
+    };
+
+    viewGame();
+
+  } catch (error) {
+
+    S.busy = false;
+
+    S.jobMsg = {
+      t:
+        error?.message ||
+        "The job could not be completed.",
+      ok: false
+    };
+
+    viewGame();
+  }
+}
+
+
+/* =========================================================
+   BUSINESS
+   ========================================================= */
+
+async function bizView(main) {
+
+  if (
+    !S.bizTypes ||
+    !S.bizLoaded
+  ) {
+
+    main.innerHTML = `
+      <div class="card">
+        <h2>Your business</h2>
+        <p class="mute">
+          Opening the shop...
+        </p>
+      </div>
+    `;
+
+    if (!S.bizTypes) {
+
+      const result =
+        await db
+          .from("business_types")
+          .select("*")
+          .order("buy_cost");
+
+      if (result.error) {
 
         main.innerHTML = `
-          ${head}
-
           <div class="err">
-            Your business type could not be found.
+            ${esc(result.error.message)}
           </div>
         `;
 
         return;
       }
 
-      const rate =
-        Number(type.base_rate) *
-        Number(business.level);
+      S.bizTypes =
+        result.data || [];
+    }
 
-      const capacity =
-        Number(type.base_capacity) *
-        Number(business.level);
+    const result =
+      await db.rpc(
+        "get_my_business"
+      );
 
-      const perHour =
-        rate *
-        (
-          Number(type.unit_price) -
-          Number(type.unit_cost)
-        );
+    if (result.error) {
 
-      const stock =
-        Number(business.stock) || 0;
+      main.innerHTML = `
+        <div class="err">
+          ${esc(result.error.message)}
+        </div>
+      `;
 
-      const fill =
-        Math.max(
-          0,
-          capacity - stock
-        );
+      return;
+    }
 
-      const upgradeCost =
-        Math.floor(
-          Number(type.buy_cost) *
-          Number(business.level) /
-          2
-        );
+    S.biz =
+      result.data?.business ||
+      null;
 
-      const stockPercent =
-        capacity > 0
-          ? Math.max(
-              0,
-              Math.min(
-                100,
-                Math.round(
-                  (stock / capacity) * 100
-                )
-              )
-            )
-          : 0;
+    if (result.data?.character) {
+      S.ch =
+        result.data.character;
+    }
 
-      main.innerHTML =
-        head +
-        `
+    S.bizLoaded = true;
+
+    return viewGame();
+  }
+
+  const head =
+    S.bizMsg
+      ? `
+        <div
+          class="${S.bizMsg.ok ? "ok" : "err"}"
+        >
+          ${esc(S.bizMsg.t)}
+        </div>
+      `
+      : "";
+
+  if (!S.biz) {
+
+    main.innerHTML =
+      head +
+      `
+        <div class="card">
+
+          <h2>
+            Start a business
+          </h2>
+
+          <p class="mute">
+            Buy a shop, stock it, and earn
+            while you work other jobs.
+          </p>
+
+        </div>
+      ` +
+      S.bizTypes
+        .map(type => `
           <div class="card">
 
             <div class="row">
@@ -2713,1191 +2964,1004 @@
               </h2>
 
               <span class="pill">
-                Level ${business.level}
+                ${naira(type.buy_cost)}
               </span>
 
             </div>
 
             <p class="mute">
-
-              Sells
-              ${rate}
-              units per hour
-              at
-              ${naira(type.unit_price)}
-              each.
-
-              Profit up to
-              ${naira(perHour)}
-              per hour while stocked.
-
+              ${esc(type.description)}
             </p>
-
-            <div class="sk">
-
-              <div class="row">
-
-                <span>
-                  Stock
-                </span>
-
-                <b>
-                  ${stock}/${capacity}
-                </b>
-
-              </div>
-
-              <div class="bar">
-
-                <i
-                  style="width:${stockPercent}%"
-                ></i>
-
-              </div>
-
-            </div>
-
-            ${
-              stock === 0
-                ? `
-                  <div class="lock">
-                    Shelves are empty.
-                    Restock to keep earning.
-                  </div>
-                `
-                : ""
-            }
-
-          </div>
-
-          <div class="card">
-
-            <div class="mute">
-              Ready to collect
-            </div>
-
-            <div class="big">
-              ${naira(
-                business.uncollected
-              )}
-            </div>
 
             <button
               class="btn"
-              id="collect"
               type="button"
-              style="margin-top:12px"
+              data-buy="${esc(type.id)}"
             >
-              Collect earnings
+              Buy for ${naira(type.buy_cost)}
             </button>
 
           </div>
+        `)
+        .join("");
 
-          <div class="card">
+    main
+      .querySelectorAll("[data-buy]")
+      .forEach(button => {
 
-            <h2>
-              Restock
-            </h2>
-
-            <p class="mute">
-              Each unit costs
-              ${naira(
-                type.unit_cost
-              )}.
-            </p>
-
-            ${
-              fill > 0
-                ? `
-                  <div class="grid3">
-
-                    <button
-                      class="btn alt"
-                      type="button"
-                      data-stock="${Math.min(
-                        10,
-                        fill
-                      )}"
-                    >
-                      +10
-
-                      <small>
-                        ${naira(
-                          Math.min(
-                            10,
-                            fill
-                          ) *
-                          Number(
-                            type.unit_cost
-                          )
-                        )}
-                      </small>
-
-                    </button>
-
-                    <button
-                      class="btn alt"
-                      type="button"
-                      data-stock="${Math.min(
-                        50,
-                        fill
-                      )}"
-                    >
-                      +50
-
-                      <small>
-                        ${naira(
-                          Math.min(
-                            50,
-                            fill
-                          ) *
-                          Number(
-                            type.unit_cost
-                          )
-                        )}
-                      </small>
-
-                    </button>
-
-                    <button
-                      class="btn alt"
-                      type="button"
-                      data-stock="${fill}"
-                    >
-                      Fill
-
-                      <small>
-                        ${naira(
-                          fill *
-                          Number(
-                            type.unit_cost
-                          )
-                        )}
-                      </small>
-
-                    </button>
-
-                  </div>
-                `
-                : `
-                  <p>
-                    Your shop is full.
-                  </p>
-                `
-            }
-
-          </div>
-
-          <div class="card">
-
-            <h2>
-              Upgrade
-            </h2>
-
-            <p class="mute">
-
-              More level means more sales
-              per hour and more shelf space.
-
-            </p>
-
-            ${
-              Number(business.level) < 5
-                ? `
-                  <button
-                    class="btn alt"
-                    id="upgrade"
-                    type="button"
-                    style="width:100%"
-                  >
-
-                    Upgrade to level
-                    ${
-                      Number(
-                        business.level
-                      ) + 1
-                    }
-
-                    <small>
-                      ${naira(
-                        upgradeCost
-                      )}
-                    </small>
-
-                  </button>
-                `
-                : `
-                  <p>
-                    Max level reached.
-                  </p>
-                `
-            }
-
-          </div>
-        `;
-
-      const collect =
-        document.getElementById(
-          "collect"
-        );
-
-      if (collect) {
-
-        collect.onclick = () => {
-
-          const amount =
-            Number(
-              business.uncollected
-            ) || 0;
-
+        button.onclick = () =>
           bizAct(
-            "collect_earnings",
-            {},
-            data =>
-              `Collected ${naira(amount)}.` +
-              (
-                data &&
-                data.character &&
-                data.character.last_event
-                  ? " " +
-                    data.character.last_event
-                  : ""
-              )
+            "buy_business",
+            {
+              p_type:
+                button.dataset.buy
+            },
+            () =>
+              "Business purchased. Restock it and start earning."
           );
-        };
-      }
+      });
 
-      main
-        .querySelectorAll(
-          "[data-stock]"
-        )
-        .forEach(button => {
+    return;
+  }
 
-          button.onclick = () => {
+  const business = S.biz;
 
-            const units =
+  const type =
+    S.bizTypes.find(
+      item =>
+        item.id ===
+        business.type_id
+    );
+
+  if (!type) {
+
+    main.innerHTML = `
+      ${head}
+
+      <div class="err">
+        Your business type could not be found.
+      </div>
+    `;
+
+    return;
+  }
+
+  const rate =
+    Number(type.base_rate) *
+    Number(business.level);
+
+  const capacity =
+    Number(type.base_capacity) *
+    Number(business.level);
+
+  const perHour =
+    rate *
+    (
+      Number(type.unit_price) -
+      Number(type.unit_cost)
+    );
+
+  const stock =
+    Number(business.stock) || 0;
+
+  const fill =
+    Math.max(
+      0,
+      capacity - stock
+    );
+
+  const upgradeCost =
+    Math.floor(
+      Number(type.buy_cost) *
+      Number(business.level) /
+      2
+    );
+
+  main.innerHTML =
+    head +
+    `
+      <div class="card">
+
+        <div class="row">
+
+          <h2>
+            ${esc(type.name)}
+          </h2>
+
+          <span class="pill">
+            Level ${business.level}
+          </span>
+
+        </div>
+
+        <p class="mute">
+          ${rate} units per hour.
+          Potential profit:
+          ${naira(perHour)}
+          per hour while stocked.
+        </p>
+
+        <div class="sk">
+
+          <div class="row">
+            <span>Stock</span>
+            <b>
+              ${stock}/${capacity}
+            </b>
+          </div>
+
+          <div class="bar">
+            <i
+              style="
+                width:${
+                  capacity
+                    ? Math.min(
+                        100,
+                        (stock / capacity) * 100
+                      )
+                    : 0
+                }%
+              "
+            ></i>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="mute">
+          Ready to collect
+        </div>
+
+        <div class="big">
+          ${naira(business.uncollected)}
+        </div>
+
+        <button
+          class="btn"
+          id="collect"
+          type="button"
+        >
+          Collect earnings
+        </button>
+
+      </div>
+
+      <div class="card">
+
+        <h2>Restock</h2>
+
+        <p class="mute">
+          Each unit costs
+          ${naira(type.unit_cost)}.
+        </p>
+
+        ${
+          fill > 0
+            ? `
+              <div class="grid3">
+
+                <button
+                  class="btn alt"
+                  data-stock="${Math.min(10, fill)}"
+                >
+                  +10
+                </button>
+
+                <button
+                  class="btn alt"
+                  data-stock="${Math.min(50, fill)}"
+                >
+                  +50
+                </button>
+
+                <button
+                  class="btn alt"
+                  data-stock="${fill}"
+                >
+                  Fill
+                </button>
+
+              </div>
+            `
+            : `
+              <p>
+                Your shop is full.
+              </p>
+            `
+        }
+
+      </div>
+
+      <div class="card">
+
+        <h2>Upgrade</h2>
+
+        ${
+          Number(business.level) < 5
+            ? `
+              <button
+                class="btn alt"
+                id="upgrade"
+                type="button"
+                style="width:100%"
+              >
+                Upgrade to level
+                ${Number(business.level) + 1}
+                <small>
+                  ${naira(upgradeCost)}
+                </small>
+              </button>
+            `
+            : `
+              <p>
+                Max level reached.
+              </p>
+            `
+        }
+
+      </div>
+    `;
+
+  const collect =
+    document.getElementById("collect");
+
+  if (collect) {
+
+    collect.onclick = () =>
+      bizAct(
+        "collect_earnings",
+        {},
+        () =>
+          "Earnings collected."
+      );
+  }
+
+  main
+    .querySelectorAll("[data-stock]")
+    .forEach(button => {
+
+      button.onclick = () =>
+        bizAct(
+          "restock_business",
+          {
+            p_units:
               Number(
                 button.dataset.stock
-              );
-
-            bizAct(
-              "restock_business",
-              {
-                p_units: units
-              },
-              () =>
-                `Restocked ${units} units for ` +
-                `${naira(
-                  units *
-                  Number(
-                    type.unit_cost
-                  )
-                )}.`
-            );
-          };
-
-        });
-
-      const upgrade =
-        document.getElementById(
-          "upgrade"
+              )
+          },
+          () =>
+            "Business restocked."
         );
+    });
 
-      if (upgrade) {
+  const upgrade =
+    document.getElementById("upgrade");
 
-        upgrade.onclick = () => {
+  if (upgrade) {
 
-          bizAct(
-            "upgrade_business",
-            {},
-            () =>
-              `Upgraded to level ${
-                Number(
-                  business.level
-                ) + 1
-              }.`
-          );
-        };
-      }
-    }
+    upgrade.onclick = () =>
+      bizAct(
+        "upgrade_business",
+        {},
+        () =>
+          "Business upgraded."
+      );
+  }
+}
 
+async function bizAct(
+  functionName,
+  args,
+  successText
+) {
 
-    async function bizAct(
-      functionName,
-      args,
-      successText
-    ) {
+  if (S.busy) return;
 
-      if (S.busy) {
-        return;
-      }
+  S.busy = true;
 
-      S.busy = true;
+  try {
 
-      try {
+    const {
+      data,
+      error
+    } =
+      await db.rpc(
+        functionName,
+        args
+      );
 
-        const {
-          data,
-          error
-        } =
-          await db.rpc(
-            functionName,
-            args
-          );
+    S.busy = false;
 
-        S.busy = false;
+    if (error) {
 
-        if (error) {
-
-          S.bizMsg = {
-            t: error.message,
-            ok: false
-          };
-
-          return viewGame();
-        }
-
-        if (!data) {
-
-          S.bizMsg = {
-            t:
-              "The action completed but returned no data.",
-            ok: false
-          };
-
-          return viewGame();
-        }
-
-        const message =
-          successText(data);
-
-        if (data.character) {
-
-          S.ch =
-            data.character;
-        }
-
-        if (
-          Object.prototype
-            .hasOwnProperty
-            .call(
-              data,
-              "business"
-            )
-        ) {
-
-          S.biz =
-            data.business;
-        }
-
-        S.bizLoaded = true;
-
-        S.bizMsg = {
-          t: message,
-          ok: true
-        };
-
-        viewGame();
-
-      } catch (error) {
-
-        S.busy = false;
-
-        S.bizMsg = {
-          t:
-            error?.message ||
-            "Business action failed.",
-          ok: false
-        };
-
-        viewGame();
-      }
-    }
-
-
-    /* =========================================================
-       DISTRICTS
-       ========================================================= */
-
-    async function loadDistricts() {
-
-      if (S.districts) {
-        return S.districts;
-      }
-
-      const result =
-        await db
-          .from("districts")
-          .select("*")
-          .order("travel_cost");
-
-      if (result.error) {
-        return null;
-      }
-
-      S.districts =
-        result.data || [];
-
-      return S.districts;
-    }
-
-
-    /* =========================================================
-       MAP
-       ========================================================= */
-
-    function mapSvg(
-      currentDistrict
-    ) {
-
-      const positions = {
-        ikeja: [68, 42],
-        mushin: [128, 88],
-        yaba: [218, 92],
-        victoria_island: [195, 175],
-        lekki: [278, 188]
+      S.bizMsg = {
+        t: error.message,
+        ok: false
       };
 
-      const labels = {
-        ikeja: "Ikeja",
-        mushin: "Mushin",
-        yaba: "Yaba",
-        victoria_island: "VI",
-        lekki: "Lekki"
-      };
+      return viewGame();
+    }
 
-      const links = [
-        ["ikeja", "mushin"],
-        ["mushin", "yaba"],
-        ["yaba", "victoria_island"],
-        ["victoria_island", "lekki"]
-      ];
+    if (data?.character) {
+      S.ch = data.character;
+    }
 
-      const lines =
-        links
-          .map(
-            ([from, to]) => `
-              <line
-                x1="${positions[from][0]}"
-                y1="${positions[from][1]}"
-                x2="${positions[to][0]}"
-                y2="${positions[to][1]}"
-                stroke="#94A3A2"
-                stroke-width="2.5"
-                stroke-dasharray="6 5"
-                stroke-linecap="round"
-              />
-            `
-          )
-          .join("");
+    if (
+      Object.prototype
+        .hasOwnProperty
+        .call(data || {}, "business")
+    ) {
+      S.biz = data.business;
+    }
 
-      const dots =
-        Object.keys(
-          positions
-        )
-          .map(id => {
+    S.bizLoaded = true;
 
-            const [x, y] =
-              positions[id];
+    S.bizMsg = {
+      t: successText(data),
+      ok: true
+    };
 
-            const current =
-              id === currentDistrict;
+    viewGame();
 
-            return `
-              <g
-                class="map-pin${
-                  current
-                    ? " current"
-                    : ""
-                }"
-                data-id="${id}"
-              >
+  } catch (error) {
 
-                <circle
-                  cx="${x}"
-                  cy="${y}"
-                  r="${
-                    current
-                      ? 13
-                      : 9
-                  }"
-                  fill="${
-                    current
-                      ? "#FFC20E"
-                      : "#fff"
-                  }"
-                  stroke="${
-                    current
-                      ? "#14201F"
-                      : "#0F6B6F"
-                  }"
-                  stroke-width="3"
-                />
+    S.busy = false;
 
-                <text
-                  x="${x}"
-                  y="${
-                    y +
-                    (
-                      current
-                        ? 28
-                        : 24
-                    )
-                  }"
-                  text-anchor="middle"
-                  font-size="12"
-                  font-weight="700"
-                  fill="#14201F"
-                >
-                  ${labels[id]}
-                </text>
+    S.bizMsg = {
+      t:
+        error?.message ||
+        "Business action failed.",
+      ok: false
+    };
 
-              </g>
-            `;
-          })
-          .join("");
+    viewGame();
+  }
+}
 
-      return `
-        <div class="card map-card">
 
-          <svg
-            class="map-svg"
-            viewBox="0 0 320 230"
-            role="img"
-            aria-label="Map of Lagos districts"
+/* =========================================================
+   DISTRICTS
+   ========================================================= */
+
+async function loadDistricts() {
+
+  if (S.districts) {
+    return S.districts;
+  }
+
+  const result =
+    await db
+      .from("districts")
+      .select("*")
+      .order("travel_cost");
+
+  if (result.error) {
+    return null;
+  }
+
+  S.districts =
+    result.data || [];
+
+  return S.districts;
+}
+
+
+/* =========================================================
+   MAP
+   ========================================================= */
+
+function mapSvg(currentDistrict) {
+
+  const positions = {
+    ikeja: [68, 42],
+    mushin: [128, 88],
+    yaba: [218, 92],
+    victoria_island: [195, 175],
+    lekki: [278, 188]
+  };
+
+  const labels = {
+    ikeja: "Ikeja",
+    mushin: "Mushin",
+    yaba: "Yaba",
+    victoria_island: "VI",
+    lekki: "Lekki"
+  };
+
+  const links = [
+    ["ikeja", "mushin"],
+    ["mushin", "yaba"],
+    ["yaba", "victoria_island"],
+    ["victoria_island", "lekki"]
+  ];
+
+  const lines =
+    links.map(
+      ([from, to]) => `
+        <line
+          x1="${positions[from][0]}"
+          y1="${positions[from][1]}"
+          x2="${positions[to][0]}"
+          y2="${positions[to][1]}"
+          stroke="#94A3A2"
+          stroke-width="2.5"
+          stroke-dasharray="6 5"
+          stroke-linecap="round"
+        />
+      `
+    ).join("");
+
+  const dots =
+    Object.keys(positions)
+      .map(id => {
+
+        const [x, y] =
+          positions[id];
+
+        const current =
+          id === currentDistrict;
+
+        return `
+          <g
+            class="map-pin"
+            data-id="${id}"
           >
 
-            <rect
-              width="320"
-              height="230"
-              rx="12"
-              fill="#F7F4EC"
-            />
-
-            <path
-              d="M0 128 C55 112 125 155 205 132
-                 S305 122 320 138
-                 L320 162
-                 C265 152 200 178 115 162
-                 S35 152 0 155 Z"
-              fill="#A8D5D5"
-              opacity="0.85"
+            <circle
+              cx="${x}"
+              cy="${y}"
+              r="${current ? 13 : 9}"
+              fill="${current ? "#FFC20E" : "#fff"}"
+              stroke="${current ? "#14201F" : "#0F6B6F"}"
+              stroke-width="3"
             />
 
             <text
-              x="28"
-              y="152"
-              font-size="11"
-              fill="#0F6B6F"
-              font-weight="600"
+              x="${x}"
+              y="${y + 28}"
+              text-anchor="middle"
+              font-size="12"
+              font-weight="700"
+              fill="#14201F"
             >
-              Lagos Lagoon
+              ${labels[id]}
             </text>
 
-            ${lines}
-            ${dots}
+          </g>
+        `;
+      }).join("");
 
-          </svg>
+  return `
+    <div class="card map-card">
 
-        </div>
-      `;
-    }
+      <svg
+        class="map-svg"
+        viewBox="0 0 320 230"
+      >
 
+        <rect
+          width="320"
+          height="230"
+          rx="12"
+          fill="#F7F4EC"
+        />
 
-    async function mapView(main) {
+        <path
+          d="M0 128 C55 112 125 155 205 132
+             S305 122 320 138
+             L320 162
+             C265 152 200 178 115 162
+             S35 152 0 155 Z"
+          fill="#A8D5D5"
+        />
 
-      const head =
+        <text
+          x="28"
+          y="152"
+          font-size="11"
+          fill="#0F6B6F"
+          font-weight="600"
+        >
+          Lagos Lagoon
+        </text>
+
+        ${lines}
+        ${dots}
+
+      </svg>
+
+    </div>
+  `;
+}
+
+async function mapView(main) {
+
+  if (!S.districts) {
+
+    main.innerHTML = `
+      <div class="card">
+        <h2>Lagos map</h2>
+        <p class="mute">
+          Checking traffic...
+        </p>
+      </div>
+    `;
+
+    await loadDistricts();
+  }
+
+  if (!S.districts) {
+
+    main.innerHTML = `
+      <div class="err">
+        Could not load the map.
+      </div>
+    `;
+
+    return;
+  }
+
+  const current =
+    S.ch.district;
+
+  main.innerHTML =
+    `
+      ${
         S.mapMsg
           ? `
             <div
-              class="${
-                S.mapMsg.ok
-                  ? "ok"
-                  : "err"
-              }"
-              role="alert"
+              class="${S.mapMsg.ok ? "ok" : "err"}"
             >
               ${esc(S.mapMsg.t)}
             </div>
           `
-          : "";
+          : ""
+      }
 
-      if (!S.districts) {
+      <div class="card">
 
-        main.innerHTML = `
-          <div class="card">
+        <h2>
+          Lagos Map
+        </h2>
 
-            <h2>
-              Lagos map
-            </h2>
+        <p class="mute">
+          Move between districts.
+        </p>
 
-            <p class="mute">
-              Checking traffic...
-            </p>
+      </div>
 
-          </div>
-        `;
+      ${mapSvg(current)}
 
-        await loadDistricts();
+      ${S.districts.map(
+        district => {
 
-        if (
-          S.tab !== "map"
-        ) {
-          return;
-        }
+          const here =
+            district.id === current;
 
-        if (!S.districts) {
+          return `
+            <div
+              class="card district-card${
+                here ? " here" : ""
+              }"
+            >
 
-          main.innerHTML = `
-            <div class="err">
-              Could not load the map.
+              <div class="row">
+
+                <h2>
+                  ${esc(district.name)}
+                </h2>
+
+                ${
+                  here
+                    ? `
+                      <span class="pill">
+                        You are here
+                      </span>
+                    `
+                    : `
+                      <span class="pill">
+                        ${naira(district.travel_cost)}
+                      </span>
+                    `
+                }
+
+              </div>
+
+              <p class="mute">
+                ${esc(district.description)}
+              </p>
+
+              <div class="bonus">
+                +${district.bonus_pct}% pay on
+                ${
+                  SK[district.bonus_skill] ||
+                  district.bonus_skill
+                }
+                jobs
+              </div>
+
+              ${
+                here
+                  ? ""
+                  : `
+                    <button
+                      class="btn"
+                      data-travel="${esc(district.id)}"
+                    >
+                      Travel to
+                      ${esc(district.name)}
+                    </button>
+                  `
+              }
+
             </div>
           `;
-
-          return;
         }
-      }
+      ).join("")}
+    `;
 
-      const current =
-        S.ch.district;
+  main
+    .querySelectorAll(".map-pin")
+    .forEach(pin => {
 
-      main.innerHTML =
-        head +
-        `
-          <div
-            class="card"
-            style="margin-bottom:14px"
-          >
-
-            <h2 style="margin:0">
-              Lagos Map
-            </h2>
-
-            <p
-              class="mute"
-              style="margin:4px 0 0"
-            >
-              Tap a district on the map
-              or use the buttons below.
-            </p>
-
-          </div>
-
-          ${mapSvg(current)}
-
-          ${S.districts
-            .map(district => {
-
-              const here =
-                district.id ===
-                current;
-
-              return `
-                <div
-                  class="card district-card${
-                    here
-                      ? " here"
-                      : ""
-                  }"
-                >
-
-                  <div class="row">
-
-                    <h2 style="margin:0">
-                      ${esc(
-                        district.name
-                      )}
-                    </h2>
-
-                    ${
-                      here
-                        ? `
-                          <span class="pill">
-                            You are here
-                          </span>
-                        `
-                        : `
-                          <span class="pill">
-
-                            ${naira(
-                              district.travel_cost
-                            )}
-
-                            ·
-
-                            ${
-                              district.travel_energy
-                            }
-
-                            energy
-
-                          </span>
-                        `
-                    }
-
-                  </div>
-
-                  <p
-                    class="mute"
-                    style="margin:8px 0 4px"
-                  >
-                    ${esc(
-                      district.description
-                    )}
-                  </p>
-
-                  <div class="bonus">
-
-                    +${district.bonus_pct}%
-
-                    pay on
-
-                    ${
-                      SK[
-                        district
-                          .bonus_skill
-                      ] ||
-                      district.bonus_skill
-                    }
-
-                    jobs
-
-                  </div>
-
-                  ${
-                    here
-                      ? ""
-                      : `
-                        <button
-                          class="btn"
-                          type="button"
-                          data-travel="${esc(
-                            district.id
-                          )}"
-                          style="margin-top:14px"
-                        >
-                          Travel to
-                          ${esc(
-                            district.name
-                          )}
-                        </button>
-                      `
-                  }
-
-                </div>
-              `;
-            })
-            .join("")}
-        `;
-
-      main
-        .querySelectorAll(
-          ".map-pin"
-        )
-        .forEach(pin => {
-
-          pin.onclick = () => {
-
-            const id =
-              pin.dataset.id;
-
-            if (
-              id &&
-              id !== current
-            ) {
-
-              travel(id);
-
-            }
-          };
-
-        });
-
-      main
-        .querySelectorAll(
-          "[data-travel]"
-        )
-        .forEach(button => {
-
-          button.onclick = () =>
-            travel(
-              button.dataset.travel
-            );
-
-        });
-    }
-
-
-    async function travel(id) {
-
-      if (S.busy) {
-        return;
-      }
-
-      const district =
-        S.districts.find(
-          item =>
-            item.id === id
-        );
-
-      if (!district) {
-
-        S.mapMsg = {
-          t:
-            "That district could not be found.",
-          ok: false
-        };
-
-        return viewGame();
-      }
-
-      S.busy = true;
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await db.rpc(
-            "travel",
-            {
-              p_district: id
-            }
-          );
-
-        S.busy = false;
-
-        if (error) {
-
-          S.mapMsg = {
-            t: error.message,
-            ok: false
-          };
-
-          return viewGame();
-        }
-
-        if (!data) {
-
-          S.mapMsg = {
-            t:
-              "Travel completed but no character data was returned.",
-            ok: false
-          };
-
-          return viewGame();
-        }
-
-        S.ch = data;
-
-        S.mapMsg = {
-          t:
-            `You reached ${district.name} after the go-slow. ` +
-            `It cost ${naira(
-              district.travel_cost
-            )} ` +
-            `and ${district.travel_energy} energy.`,
-          ok: true
-        };
-
-        viewGame();
-
-      } catch (error) {
-
-        S.busy = false;
-
-        S.mapMsg = {
-          t:
-            error?.message ||
-            "Travel failed.",
-          ok: false
-        };
-
-        viewGame();
-      }
-    }
-
-
-    /* =========================================================
-       LEADERBOARD
-       ========================================================= */
-
-    async function boardView(main) {
-
-      main.innerHTML = `
-        <div class="card">
-
-          <h2>
-            Richest in Lagos
-          </h2>
-
-          <p class="mute">
-            Loading ranks...
-          </p>
-
-        </div>
-      `;
-
-      const {
-        data,
-        error
-      } =
-        await db
-          .from("characters")
-          .select(
-            "name,background,cash,level"
-          )
-          .order(
-            "cash",
-            {
-              ascending: false
-            }
-          )
-          .limit(20);
-
-      if (
-        S.tab !== "board"
-      ) {
-        return;
-      }
-
-      if (error) {
-
-        main.innerHTML = `
-          <div class="err">
-            ${esc(error.message)}
-          </div>
-        `;
-
-        return;
-      }
-
-      const players =
-        data || [];
-
-      main.innerHTML = `
-        <div class="card">
-
-          <h2>
-            Richest in Lagos
-          </h2>
-
-          ${
-            players.length
-              ? players
-                  .map(
-                    (
-                      player,
-                      index
-                    ) => `
-                      <div class="lb">
-
-                        <span>
-
-                          ${
-                            index + 1
-                          }.
-
-                          ${esc(
-                            player.name
-                          )}
-
-                          <span class="mute">
-
-                            ·
-
-                            ${esc(
-                              bgName(
-                                player.background
-                              )
-                            )}
-
-                            · Lvl
-                            ${player.level}
-
-                          </span>
-
-                        </span>
-
-                        <b>
-                          ${naira(
-                            player.cash
-                          )}
-                        </b>
-
-                      </div>
-                    `
-                  )
-                  .join("")
-              : `
-                <p class="mute">
-                  No players yet.
-                  Be the first.
-                </p>
-              `
-          }
-
-        </div>
-      `;
-    }
-
-
-    /* =========================================================
-       LOAD CURRENT USER / CHARACTER
-       ========================================================= */
-
-    async function load() {
-
-      if (!S.user) {
-
-        S.ch = null;
-
-        return viewAuth();
-      }
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await db.rpc(
-            "get_my_character"
-          );
-
-        if (error) {
-
-          setMsg(
-            error.message
-          );
-
-          return viewAuth();
-        }
-
-        S.ch =
-          data &&
-          data.id
-            ? data
-            : null;
-
-        if (S.ch) {
-
-          viewGame();
-
-        } else {
-
-          viewCreate();
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Load failed:",
-          error
-        );
-
-        setMsg(
-          error?.message ||
-          "Could not load the game."
-        );
-
-        viewAuth();
-      }
-    }
-
-
-    /* =========================================================
-       AUTH STATE
-       ========================================================= */
-
-    db.auth.onAuthStateChange(
-      (event, session) => {
-
-        S.user =
-          session
-            ? session.user
-            : null;
+      pin.onclick = () => {
 
         if (
-          event ===
-          "INITIAL_SESSION"
+          pin.dataset.id !== current
         ) {
-          return;
+          travel(pin.dataset.id);
         }
+      };
+    });
 
-        setTimeout(
-          () => load(),
-          0
+  main
+    .querySelectorAll("[data-travel]")
+    .forEach(button => {
+
+      button.onclick = () =>
+        travel(
+          button.dataset.travel
         );
-      }
+    });
+}
+
+async function travel(id) {
+
+  if (S.busy) return;
+
+  const district =
+    S.districts.find(
+      item =>
+        item.id === id
     );
 
+  if (!district) return;
 
-    /* =========================================================
-       INITIAL STARTUP
-       ========================================================= */
+  S.busy = true;
 
-    (async function init() {
+  try {
 
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await db.auth.getSession();
-
-        if (error) {
-          throw error;
+    const {
+      data,
+      error
+    } =
+      await db.rpc(
+        "travel",
+        {
+          p_district: id
         }
+      );
 
-        S.user =
-          data &&
-          data.session
-            ? data.session.user
-            : null;
+    S.busy = false;
 
-        await load();
+    if (error) {
 
-      } catch (error) {
+      S.mapMsg = {
+        t: error.message,
+        ok: false
+      };
 
-        console.error(
-          "Naija Hustle startup error:",
-          error
-        );
+      return viewGame();
+    }
 
-        app.innerHTML = `
-          <div class="stripe"></div>
+    S.ch = data;
 
-          <div class="wrap">
+    S.mapMsg = {
+      t:
+        `You reached ${district.name}.`,
+      ok: true
+    };
 
-            <h1>
-              Naija Hustle
-            </h1>
+    viewGame();
 
-            <div class="err">
+  } catch (error) {
 
-              <b>
-                Something went wrong while starting the game.
-              </b>
+    S.busy = false;
 
-              <br><br>
+    S.mapMsg = {
+      t:
+        error?.message ||
+        "Travel failed.",
+      ok: false
+    };
 
-              ${esc(
-                error?.message ||
-                "Unknown startup error."
-              )}
+    viewGame();
+  }
+}
 
-            </div>
 
-          </div>
-        `;
+/* =========================================================
+   LEADERBOARD
+   ========================================================= */
+
+async function boardView(main) {
+
+  main.innerHTML = `
+    <div class="card">
+
+      <h2>
+        Richest in Lagos
+      </h2>
+
+      <p class="mute">
+        Loading ranks...
+      </p>
+
+    </div>
+  `;
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("characters")
+      .select(
+        "name,background,cash,level"
+      )
+      .order(
+        "cash",
+        {
+          ascending: false
+        }
+      )
+      .limit(20);
+
+  if (S.tab !== "board") {
+    return;
+  }
+
+  if (error) {
+
+    main.innerHTML = `
+      <div class="err">
+        ${esc(error.message)}
+      </div>
+    `;
+
+    return;
+  }
+
+  const players =
+    data || [];
+
+  main.innerHTML = `
+    <div class="card">
+
+      <h2>
+        Richest in Lagos
+      </h2>
+
+      ${
+        players.length
+          ? players.map(
+              (player, index) => `
+                <div class="lb">
+
+                  <span>
+
+                    ${index + 1}.
+                    ${esc(player.name)}
+
+                    <span class="mute">
+                      ·
+                      ${esc(
+                        bgName(
+                          player.background
+                        )
+                      )}
+                      · Lvl
+                      ${player.level}
+                    </span>
+
+                  </span>
+
+                  <b>
+                    ${naira(player.cash)}
+                  </b>
+
+                </div>
+              `
+            ).join("")
+          : `
+            <p class="mute">
+              No players yet.
+            </p>
+          `
       }
 
-    })();
-  </script>
+    </div>
+  `;
+}
+
+
+/* =========================================================
+   LOAD
+   ========================================================= */
+
+async function load() {
+
+  if (!S.user) {
+
+    S.ch = null;
+
+    return viewAuth();
+  }
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await db.rpc(
+        "get_my_character"
+      );
+
+    if (error) {
+
+      setMsg(error.message);
+
+      return viewAuth();
+    }
+
+    S.ch =
+      data?.id
+        ? data
+        : null;
+
+    if (S.ch) {
+
+      /*
+       * Load personality names for the
+       * home/profile display.
+       */
+
+      try {
+        await loadPersonalityTraits();
+      } catch (_) {
+        /*
+         * Personality display is optional
+         * after character creation.
+         */
+      }
+
+      viewGame();
+
+    } else {
+
+      viewCreate();
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Load failed:",
+      error
+    );
+
+    setMsg(
+      error?.message ||
+      "Could not load the game."
+    );
+
+    viewAuth();
+  }
+}
+
+
+/* =========================================================
+   AUTH STATE
+   ========================================================= */
+
+db.auth.onAuthStateChange(
+  (event, session) => {
+
+    S.user =
+      session
+        ? session.user
+        : null;
+
+    if (
+      event ===
+      "INITIAL_SESSION"
+    ) {
+      return;
+    }
+
+    setTimeout(
+      () => load(),
+      0
+    );
+  }
+);
+
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+(async function init() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await db.auth.getSession();
+
+    if (error) {
+      throw error;
+    }
+
+    S.user =
+      data?.session
+        ? data.session.user
+        : null;
+
+    await load();
+
+  } catch (error) {
+
+    console.error(
+      "Naija Hustle startup error:",
+      error
+    );
+
+    app.innerHTML = `
+      <div class="stripe"></div>
+
+      <div class="wrap">
+
+        <h1>
+          Naija Hustle
+        </h1>
+
+        <div class="err">
+
+          <b>
+            Something went wrong while starting the game.
+          </b>
+
+          <br><br>
+
+          ${esc(
+            error?.message ||
+            "Unknown startup error."
+          )}
+
+        </div>
+
+      </div>
+    `;
+  }
+
+})();
+</script>
 
 </body>
   </html>
