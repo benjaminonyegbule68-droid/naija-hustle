@@ -916,15 +916,28 @@ function optionLabel(list, value) {
    ========================================================= */
 
 function avatarEmoji() {
-  if (S.accessory === "headphones") return "🎧";
-  if (S.accessory === "glasses") return "🤓";
-  if (S.accessory === "cap") return "🧢";
-  if (S.accessory === "chain") return "😎";
+
+  if (S.accessory === "headphones") {
+    return "🎧";
+  }
+
+  if (S.accessory === "glasses") {
+    return "🤓";
+  }
+
+  if (S.accessory === "cap") {
+    return "🧢";
+  }
+
+  if (S.accessory === "chain") {
+    return "😎";
+  }
 
   return "🧑🏿";
 }
 
 function characterPreviewHtml() {
+
   const trait1 =
     S.personalityTraits?.find(
       item => item.id === S.personality1
@@ -1150,9 +1163,17 @@ function startGameClock() {
 
     clock.textContent = info.time;
 
-    if (date) date.textContent = info.date;
-    if (phase) phase.textContent = info.phase;
-    if (icon) icon.textContent = info.icon;
+    if (date) {
+      date.textContent = info.date;
+    }
+
+    if (phase) {
+      phase.textContent = info.phase;
+    }
+
+    if (icon) {
+      icon.textContent = info.icon;
+    }
   };
 
   updateClock();
@@ -1182,10 +1203,16 @@ const needPct = value =>
   );
 
 const needClass = value => {
+
   const pct = needPct(value);
 
-  if (pct <= 20) return "need-low";
-  if (pct <= 50) return "need-mid";
+  if (pct <= 20) {
+    return "need-low";
+  }
+
+  if (pct <= 50) {
+    return "need-mid";
+  }
 
   return "need-good";
 };
@@ -1393,7 +1420,8 @@ function viewAuth() {
     window.naijaClockTimer = null;
   }
 
-  const login = S.mode === "login";
+  const login =
+    S.mode === "login";
 
   app.innerHTML = `
     <div class="stripe"></div>
@@ -1579,7 +1607,7 @@ async function loadPersonalityTraits() {
 
 
 /* =========================================================
-   CHARACTER CREATION
+   CHARACTER CREATION VIEW
    ========================================================= */
 
 async function viewCreate() {
@@ -1638,6 +1666,7 @@ async function viewCreate() {
       `).join("")}
 
       <div class="section-head">
+
         <h2>
           Personality
         </h2>
@@ -1653,15 +1682,19 @@ async function viewCreate() {
               .length
           } / 2 selected
         </span>
+
       </div>
 
       <div id="traitsArea">
+
         <div class="loading">
           Loading personality traits...
         </div>
+
       </div>
 
       <div class="section-head">
+
         <h2>
           Character design
         </h2>
@@ -1669,15 +1702,19 @@ async function viewCreate() {
         <p class="mute">
           Choose how your hustler looks.
         </p>
+
       </div>
 
       ${characterPreviewHtml()}
 
       <div class="card">
 
-        <h2>Skin tone</h2>
+        <h2>
+          Skin tone
+        </h2>
 
         <div class="choice-grid">
+
           ${SKIN_TONES.map(
             ([id, label]) => `
               <button
@@ -1694,6 +1731,7 @@ async function viewCreate() {
               </button>
             `
           ).join("")}
+
         </div>
 
         <h2 style="margin-top:18px">
@@ -1701,6 +1739,7 @@ async function viewCreate() {
         </h2>
 
         <div class="choice-grid">
+
           ${HAIRSTYLES.map(
             ([id, label]) => `
               <button
@@ -1717,6 +1756,7 @@ async function viewCreate() {
               </button>
             `
           ).join("")}
+
         </div>
 
         <h2 style="margin-top:18px">
@@ -1724,6 +1764,7 @@ async function viewCreate() {
         </h2>
 
         <div class="choice-grid">
+
           ${HAIR_COLORS.map(
             ([id, label]) => `
               <button
@@ -1740,6 +1781,7 @@ async function viewCreate() {
               </button>
             `
           ).join("")}
+
         </div>
 
         <h2 style="margin-top:18px">
@@ -1747,6 +1789,7 @@ async function viewCreate() {
         </h2>
 
         <div class="choice-grid">
+
           ${OUTFITS.map(
             ([id, label]) => `
               <button
@@ -1763,6 +1806,7 @@ async function viewCreate() {
               </button>
             `
           ).join("")}
+
         </div>
 
         <h2 style="margin-top:18px">
@@ -1770,6 +1814,7 @@ async function viewCreate() {
         </h2>
 
         <div class="choice-grid">
+
           ${ACCESSORIES.map(
             ([id, label]) => `
               <button
@@ -1786,6 +1831,7 @@ async function viewCreate() {
               </button>
             `
           ).join("")}
+
         </div>
 
       </div>
@@ -1815,6 +1861,7 @@ async function viewCreate() {
     document.getElementById("nm");
 
   nameInput.oninput = () => {
+
     S.nameDraft =
       nameInput.value;
 
@@ -1957,7 +2004,6 @@ async function viewCreate() {
           } else {
 
             S.personality2 = id;
-
           }
 
           viewCreate();
@@ -1986,6 +2032,9 @@ async function viewCreate() {
 
 /* =========================================================
    CREATE CHARACTER
+   IMPORTANT:
+   All personality + appearance values are now sent
+   directly to create_character.
    ========================================================= */
 
 async function createCharacter(event) {
@@ -1994,11 +2043,15 @@ async function createCharacter(event) {
     return;
   }
 
+  const nameInput =
+    document.getElementById("nm");
+
+  if (!nameInput) {
+    return;
+  }
+
   const name =
-    document
-      .getElementById("nm")
-      .value
-      .trim();
+    nameInput.value.trim();
 
   S.nameDraft = name;
 
@@ -2023,8 +2076,10 @@ async function createCharacter(event) {
     return viewCreate();
   }
 
-  if (!S.personality1 ||
-      !S.personality2) {
+  if (
+    !S.personality1 ||
+    !S.personality2
+  ) {
 
     setMsg(
       "Pick exactly two personality traits."
@@ -2047,56 +2102,43 @@ async function createCharacter(event) {
 
   S.busy = true;
 
-  event.target.disabled = true;
+  if (event?.target) {
+    event.target.disabled = true;
+  }
 
   try {
 
     /*
-     * STEP 1
-     * Existing character creation.
+     * ONE SERVER-SIDE CHARACTER CREATION CALL.
      *
-     * This preserves your current starting
-     * money, background, skills, district,
-     * energy, etc.
+     * create_character must already accept:
+     * p_name
+     * p_background
+     * p_trait_1
+     * p_trait_2
+     * p_skin_tone
+     * p_hairstyle
+     * p_hair_color
+     * p_outfit
+     * p_accessory
      */
 
     const {
+      data,
       error
     } =
       await db.rpc(
         "create_character",
         {
           p_name: name,
-          p_background: S.picked
-        }
-      );
 
-    if (error) {
-      throw error;
-    }
+          p_background:
+            S.picked,
 
-    /*
-     * STEP 2
-     * Securely save personality and appearance.
-     *
-     * This requires:
-     *
-     * public.customize_character(...)
-     *
-     * The RPC must identify the user with
-     * auth.uid() on the server.
-     */
-
-    const {
-      error: customizeError
-    } =
-      await db.rpc(
-        "customize_character",
-        {
-          p_personality_1:
+          p_trait_1:
             S.personality1,
 
-          p_personality_2:
+          p_trait_2:
             S.personality2,
 
           p_skin_tone:
@@ -2116,19 +2158,41 @@ async function createCharacter(event) {
         }
       );
 
-    if (customizeError) {
-      throw customizeError;
+    if (error) {
+      throw error;
+    }
+
+    /*
+     * Use the returned character immediately
+     * when available.
+     */
+
+    if (
+      data &&
+      data.id
+    ) {
+      S.ch = data;
     }
 
     S.busy = false;
 
     setMsg(null);
 
+    /*
+     * Refreshes energy + needs and retrieves
+     * the authoritative character from Supabase.
+     */
+
     await load();
 
   } catch (error) {
 
     S.busy = false;
+
+    console.error(
+      "Character creation failed:",
+      error
+    );
 
     setMsg(
       error?.message ||
@@ -2180,6 +2244,7 @@ async function go(tab) {
     }
 
   } catch (error) {
+
     console.error(
       "Navigation refresh failed:",
       error
@@ -2520,7 +2585,9 @@ function homeHtml(c) {
 
 async function doActivity(activity) {
 
-  if (S.busy) return;
+  if (S.busy) {
+    return;
+  }
 
   S.busy = true;
 
@@ -2688,7 +2755,9 @@ async function jobsView(main) {
     main.innerHTML = `
       <div class="card">
         <h2>Job board</h2>
-        <p class="mute">Loading jobs...</p>
+        <p class="mute">
+          Loading jobs...
+        </p>
       </div>
     `;
 
@@ -2763,7 +2832,9 @@ async function jobsView(main) {
 
 async function doJob(id) {
 
-  if (S.busy) return;
+  if (S.busy) {
+    return;
+  }
 
   S.busy = true;
 
@@ -3131,7 +3202,9 @@ async function bizView(main) {
 
       <div class="card">
 
-        <h2>Restock</h2>
+        <h2>
+          Restock
+        </h2>
 
         <p class="mute">
           Each unit costs
@@ -3177,7 +3250,9 @@ async function bizView(main) {
 
       <div class="card">
 
-        <h2>Upgrade</h2>
+        <h2>
+          Upgrade
+        </h2>
 
         ${
           Number(business.level) < 5
@@ -3190,6 +3265,7 @@ async function bizView(main) {
               >
                 Upgrade to level
                 ${Number(business.level) + 1}
+
                 <small>
                   ${naira(upgradeCost)}
                 </small>
@@ -3258,7 +3334,9 @@ async function bizAct(
   successText
 ) {
 
-  if (S.busy) return;
+  if (S.busy) {
+    return;
+  }
 
   S.busy = true;
 
@@ -3292,7 +3370,10 @@ async function bizAct(
     if (
       Object.prototype
         .hasOwnProperty
-        .call(data || {}, "business")
+        .call(
+          data || {},
+          "business"
+        )
     ) {
       S.biz = data.business;
     }
@@ -3483,10 +3564,15 @@ async function mapView(main) {
 
     main.innerHTML = `
       <div class="card">
-        <h2>Lagos map</h2>
+
+        <h2>
+          Lagos map
+        </h2>
+
         <p class="mute">
           Checking traffic...
         </p>
+
       </div>
     `;
 
@@ -3630,7 +3716,9 @@ async function mapView(main) {
 
 async function travel(id) {
 
-  if (S.busy) return;
+  if (S.busy) {
+    return;
+  }
 
   const district =
     S.districts.find(
@@ -3638,7 +3726,9 @@ async function travel(id) {
         item.id === id
     );
 
-  if (!district) return;
+  if (!district) {
+    return;
+  }
 
   S.busy = true;
 
@@ -3835,18 +3925,17 @@ async function load() {
 
     if (S.ch) {
 
-      /*
-       * Load personality names for the
-       * home/profile display.
-       */
-
       try {
+
         await loadPersonalityTraits();
+
       } catch (_) {
+
         /*
          * Personality display is optional
          * after character creation.
          */
+
       }
 
       viewGame();
