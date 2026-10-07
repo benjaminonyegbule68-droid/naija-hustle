@@ -24,6 +24,9 @@ input{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:10
 input:focus-visible,button:focus-visible{outline:3px solid var(--danfo);outline-offset:2px}
 .btn{width:100%;padding:14px;border:0;border-radius:10px;background:var(--lagoon);color:#fff;font-weight:800;font-size:1.05rem;margin-top:16px;cursor:pointer}
 .btn:disabled{opacity:.6}
+.btn.alt{background:#fff;color:var(--lagoon);border:2px solid var(--lagoon);margin-top:0;padding:10px 4px;font-size:.95rem}
+.btn.alt small{display:block;font-weight:600;color:var(--mute)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .link{background:none;border:0;color:var(--lagoon);font-weight:600;text-decoration:underline;padding:8px 0;cursor:pointer}
 .err{background:#FDE8E0;color:#7A2A08;border-radius:10px;padding:10px 12px;margin:0 0 12px}
 .ok{background:#E2F3E7;color:#1C5B2E;border-radius:10px;padding:10px 12px;margin:0 0 12px}
@@ -47,6 +50,7 @@ input:focus-visible,button:focus-visible{outline:3px solid var(--danfo);outline-
 .lb:last-child{border:0}
 .pill{display:inline-block;background:var(--danfo);color:#14201F;font-weight:800;border-radius:20px;padding:2px 10px;font-size:.85rem;white-space:nowrap}
 .lock{color:var(--brick);font-weight:600;margin-top:10px}
+.big{font-size:1.8rem;font-weight:800;color:var(--lagoon)}
 </style>
 </head>
 <body>
@@ -59,7 +63,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const app = document.getElementById("app");
-const S = { user: null, ch: null, tab: "home", mode: "login", msg: null, picked: null, busy: false, jobs: null, jobMsg: null };
+const S = { user: null, ch: null, tab: "home", mode: "login", msg: null, picked: null, busy: false, jobs: null, jobMsg: null, bizTypes: null, biz: null, bizLoaded: false, bizMsg: null };
 
 const BG = [
   { id: "street_boy", name: "Street Boy", meta: "Starts in Mushin · ₦5,000", d: "No capital, no connections, plenty of hustle. Your only collateral is gist." },
@@ -132,8 +136,10 @@ function viewCreate() {
 }
 
 async function go(t) {
-  S.tab = t; S.jobMsg = null;
+  S.tab = t; S.jobMsg = null; S.bizMsg = null;
+  if (t === "business") S.bizLoaded = false;
   viewGame();
+  if (t === "business") return;
   const { data } = await db.rpc("get_my_character");
   if (data && data.id && S.tab === t && S.ch && data.energy !== S.ch.energy) { S.ch = data; viewGame(); }
 }
@@ -155,6 +161,7 @@ function viewGame() {
   const m = document.getElementById("main");
   if (S.tab === "home") m.innerHTML = homeHtml(c);
   else if (S.tab === "jobs") jobsView(m);
+  else if (S.tab === "business") bizView(m);
   else if (S.tab === "board") boardView(m);
   else m.innerHTML = soon(S.tab);
   const lo = document.getElementById("lo2"); if (lo) lo.onclick = () => db.auth.signOut();
@@ -163,14 +170,13 @@ function viewGame() {
 function homeHtml(c) {
   const sk = [["hustle", c.skill_hustle], ["edu", c.skill_edu], ["charm", c.skill_charm], ["tech", c.skill_tech]];
   return `<div class="card"><h2>Welcome to ${cap(c.district)}, ${esc(c.name)}</h2>
-    <p class="mute">${bgName(c.background)} · ${cap(c.city)}. Head to Jobs to start earning. Energy refills 1 point every minute.</p></div>
+    <p class="mute">${bgName(c.background)} · ${cap(c.city)}. Work jobs to earn, then buy a shop in Business. Energy refills 1 point every minute.</p></div>
     <div class="card"><h2>Skills</h2>${sk.map(([k, v]) => `<div class="sk"><div class="row"><span>${SK[k]}</span><b>${v}</b></div><div class="bar"><i style="width:${Math.min(v * 10, 100)}%"></i></div></div>`).join("")}</div>
     <button class="link" id="lo2">Log out</button>`;
 }
 
 function soon(t) {
   const j = {
-    business: ["Your business", "Contractor says the shop will be ready next week. Next week is loading."],
     map: ["Lagos map", "Go-slow has blocked the map. Traffic should clear in the next update."]
   }[t];
   return `<div class="card"><h2>${j[0]}</h2><p class="mute">${j[1]}</p></div>`;
@@ -214,6 +220,98 @@ async function doJob(id) {
   Object.keys(SK).forEach(k => { if (data["skill_" + k] > before["skill_" + k]) t += ` ${SK[k]} went up to ${data["skill_" + k]}.`; });
   S.ch = data;
   S.jobMsg = { t, ok: true };
+  viewGame();
+}
+
+function buyCard(t, c) {
+  const perHr = t.base_rate * (t.unit_price - t.unit_cost);
+  const locked = c.level < t.min_level;
+  return `<div class="card">
+    <div class="row"><h2>${esc(t.name)}</h2><span class="pill">${naira(t.buy_cost)}</span></div>
+    <p class="mute">${esc(t.description)}</p>
+    <div class="row" style="font-size:.95rem"><span>Up to ${naira(perHr)} profit per hour</span><span>Holds ${t.base_capacity} units</span></div>
+    ${locked ? `<div class="lock">Locked: needs level ${t.min_level}</div>` : `<button class="btn" data-buy="${esc(t.id)}">Buy for ${naira(t.buy_cost)}</button>`}
+  </div>`;
+}
+
+async function bizView(m) {
+  const head = S.bizMsg ? `<div class="${S.bizMsg.ok ? "ok" : "err"}" role="alert">${esc(S.bizMsg.t)}</div>` : "";
+  if (!S.bizTypes || !S.bizLoaded) {
+    m.innerHTML = `<div class="card"><h2>Your business</h2><p class="mute">Opening the shop...</p></div>`;
+    if (!S.bizTypes) {
+      const r = await db.from("business_types").select("*").order("buy_cost");
+      if (r.error) { m.innerHTML = `<div class="err">${esc(r.error.message)}</div>`; return; }
+      S.bizTypes = r.data;
+    }
+    const s = await db.rpc("get_my_business");
+    if (s.error) { m.innerHTML = `<div class="err">${esc(s.error.message)}</div>`; return; }
+    S.biz = s.data.business;
+    if (s.data.character) S.ch = s.data.character;
+    S.bizLoaded = true;
+    if (S.tab !== "business") return;
+    return viewGame();
+  }
+
+  if (!S.biz) {
+    m.innerHTML = head + `<div class="card"><h2>Start a business</h2><p class="mute">Buy a shop, stock it, and earn while you work other jobs. You can own one business for now.</p></div>` + S.bizTypes.map(t => buyCard(t, S.ch)).join("");
+    m.querySelectorAll("[data-buy]").forEach(b => b.onclick = () => {
+      const t = S.bizTypes.find(x => x.id === b.dataset.buy);
+      bizAct("buy_business", { p_type: t.id }, () => `You bought a ${t.name}. Restock it so customers have something to buy.`);
+    });
+    return;
+  }
+
+  const b = S.biz, t = S.bizTypes.find(x => x.id === b.type_id);
+  const rate = t.base_rate * b.level, capU = t.base_capacity * b.level;
+  const perHr = rate * (t.unit_price - t.unit_cost);
+  const fill = capU - b.stock;
+  const upCost = Math.floor(t.buy_cost * b.level / 2);
+  const pct = Math.round((b.stock / capU) * 100);
+  m.innerHTML = head + `<div class="card">
+      <div class="row"><h2>${esc(t.name)}</h2><span class="pill">Level ${b.level}</span></div>
+      <p class="mute">Sells ${rate} units per hour at ${naira(t.unit_price)} each. Profit up to ${naira(perHr)} per hour while stocked.</p>
+      <div class="sk"><div class="row"><span>Stock</span><b>${b.stock}/${capU}</b></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+      ${b.stock === 0 ? `<div class="lock">Shelves are empty. Restock to keep earning.</div>` : ""}
+    </div>
+    <div class="card">
+      <div class="mute">Ready to collect</div>
+      <div class="big">${naira(b.uncollected)}</div>
+      <button class="btn" id="collect" style="margin-top:12px">Collect earnings</button>
+    </div>
+    <div class="card">
+      <h2>Restock</h2>
+      <p class="mute">Each unit costs ${naira(t.unit_cost)}.</p>
+      ${fill > 0 ? `<div class="grid3">
+        <button class="btn alt" data-stock="10">+10<small>${naira(10 * t.unit_cost)}</small></button>
+        <button class="btn alt" data-stock="50">+50<small>${naira(50 * t.unit_cost)}</small></button>
+        <button class="btn alt" data-stock="${fill}">Fill<small>${naira(fill * t.unit_cost)}</small></button>
+      </div>` : `<p>Your shop is full.</p>`}
+    </div>
+    <div class="card">
+      <h2>Upgrade</h2>
+      <p class="mute">More level means more sales per hour and more shelf space.</p>
+      ${b.level < 5 ? `<button class="btn alt" id="upgrade" style="width:100%">Upgrade to level ${b.level + 1}<small>${naira(upCost)}</small></button>` : `<p>Max level reached.</p>`}
+    </div>`;
+  document.getElementById("collect").onclick = () => bizAct("collect_earnings", {}, () => `Collected ${naira(b.uncollected)}.`);
+  m.querySelectorAll("[data-stock]").forEach(el => el.onclick = () => {
+    const n = Number(el.dataset.stock);
+    bizAct("restock_business", { p_units: n }, () => `Restocked ${n} units for ${naira(n * t.unit_cost)}.`);
+  });
+  const up = document.getElementById("upgrade");
+  if (up) up.onclick = () => bizAct("upgrade_business", {}, () => `Upgraded to level ${b.level + 1}.`);
+}
+
+async function bizAct(fn, args, okText) {
+  if (S.busy) return;
+  S.busy = true;
+  const { data, error } = await db.rpc(fn, args);
+  S.busy = false;
+  if (error) { S.bizMsg = { t: error.message, ok: false }; return viewGame(); }
+  const text = okText();
+  S.ch = data.character;
+  S.biz = data.business;
+  S.bizLoaded = true;
+  S.bizMsg = { t: text, ok: true };
   viewGame();
 }
 
