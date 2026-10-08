@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>3D Avatar</title>
+  <title>Naija Hustle — 3D Avatar</title>
+
+  <!-- =========================================================
+       SUPABASE
+  ========================================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -32,13 +38,20 @@
     #loading {
       position: fixed;
       inset: 0;
-      z-index: 20;
+      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
+      gap: 10px;
       background: #111;
       color: white;
       font-size: 18px;
+    }
+
+    #loading small {
+      opacity: 0.65;
+      font-size: 13px;
     }
 
     #info {
@@ -46,16 +59,38 @@
       top: 15px;
       left: 15px;
       z-index: 10;
+      min-width: 190px;
       padding: 12px 15px;
       border-radius: 12px;
       background: rgba(0, 0, 0, 0.55);
       color: white;
       backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
     #info strong {
       display: block;
       margin-bottom: 5px;
+      font-size: 16px;
+    }
+
+    #playerName {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    #playerDetails {
+      display: block;
+      margin-top: 4px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    #status {
+      display: block;
+      margin-top: 7px;
+      font-size: 12px;
+      color: #ffd66b;
     }
 
     #controls {
@@ -82,6 +117,24 @@
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     }
 
+    #backButton {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 15;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.55);
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    #backButton:hover {
+      background: rgba(0, 0, 0, 0.75);
+    }
+
     #desktopControls {
       position: fixed;
       right: 15px;
@@ -95,12 +148,18 @@
     }
 
     @media (max-width: 600px) {
+
       #desktopControls {
         display: none;
       }
 
       #info {
         font-size: 13px;
+        min-width: 165px;
+      }
+
+      #backButton {
+        font-size: 12px;
       }
     }
   </style>
@@ -108,14 +167,23 @@
 
 <body>
 
-  <div id="loading">Loading 3D Avatar...</div>
+  <div id="loading">
+    <div>Loading 3D Avatar...</div>
+    <small>Loading your Naija Hustle character</small>
+  </div>
 
   <div id="game"></div>
 
   <div id="info">
-    <strong>3D Avatar</strong>
-    <span id="status">Idle</span>
+    <strong>Naija Hustle</strong>
+    <span id="playerName">Loading player...</span>
+    <span id="playerDetails"></span>
+    <span id="status">Loading...</span>
   </div>
+
+  <button id="backButton" type="button">
+    ← Back
+  </button>
 
   <div id="controls">
     <div id="stick"></div>
@@ -125,40 +193,64 @@
     WASD / Arrow Keys — Move
   </div>
 
+
   <script type="module">
+
+    /* =========================================================
+       SUPABASE CONFIG
+    ========================================================== */
+
+    const SUPABASE_URL =
+      "https://pbqtbwiymlwksdtfsfcb.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
+
+    const db =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+
+
+    /* =========================================================
+       THREE.JS
+    ========================================================== */
 
     import * as THREE from
       "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-    import { OrbitControls } from
-      "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js";
-
 
     /* =========================================================
        SCENE
-    ========================================================= */
+    ========================================================== */
 
-    const scene = new THREE.Scene();
+    const scene =
+      new THREE.Scene();
 
-    scene.background = new THREE.Color(0x87ceeb);
+    scene.background =
+      new THREE.Color(0x87ceeb);
 
-    scene.fog = new THREE.Fog(
-      0x87ceeb,
-      25,
-      100
-    );
+    scene.fog =
+      new THREE.Fog(
+        0x87ceeb,
+        25,
+        100
+      );
 
 
     /* =========================================================
        CAMERA
-    ========================================================= */
+    ========================================================== */
 
-    const camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      500
-    );
+    const camera =
+      new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth /
+          window.innerHeight,
+        0.1,
+        500
+      );
 
     camera.position.set(
       0,
@@ -169,14 +261,18 @@
 
     /* =========================================================
        RENDERER
-    ========================================================= */
+    ========================================================== */
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true
-    });
+    const renderer =
+      new THREE.WebGLRenderer({
+        antialias: true
+      });
 
     renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, 2)
+      Math.min(
+        window.devicePixelRatio,
+        2
+      )
     );
 
     renderer.setSize(
@@ -191,12 +287,14 @@
 
     document
       .getElementById("game")
-      .appendChild(renderer.domElement);
+      .appendChild(
+        renderer.domElement
+      );
 
 
     /* =========================================================
        LIGHTING
-    ========================================================= */
+    ========================================================== */
 
     const ambientLight =
       new THREE.HemisphereLight(
@@ -205,7 +303,9 @@
         2
       );
 
-    scene.add(ambientLight);
+    scene.add(
+      ambientLight
+    );
 
 
     const sun =
@@ -222,15 +322,18 @@
 
     sun.castShadow = true;
 
-    sun.shadow.mapSize.width = 2048;
-    sun.shadow.mapSize.height = 2048;
+    sun.shadow.mapSize.width =
+      2048;
+
+    sun.shadow.mapSize.height =
+      2048;
 
     scene.add(sun);
 
 
     /* =========================================================
        GROUND
-    ========================================================= */
+    ========================================================== */
 
     const groundGeometry =
       new THREE.PlaneGeometry(
@@ -259,7 +362,7 @@
 
     /* =========================================================
        ROAD
-    ========================================================= */
+    ========================================================== */
 
     const roadGeometry =
       new THREE.PlaneGeometry(
@@ -289,7 +392,7 @@
 
     /* =========================================================
        ROAD MARKINGS
-    ========================================================= */
+    ========================================================== */
 
     for (
       let z = -95;
@@ -327,7 +430,7 @@
 
     /* =========================================================
        AVATAR
-    ========================================================= */
+    ========================================================== */
 
     const avatar =
       new THREE.Group();
@@ -342,8 +445,8 @@
 
 
     /* =========================================================
-       MATERIALS
-    ========================================================= */
+       DEFAULT MATERIALS
+    ========================================================== */
 
     const skinMaterial =
       new THREE.MeshStandardMaterial({
@@ -378,7 +481,7 @@
 
     /* =========================================================
        BODY
-    ========================================================= */
+    ========================================================== */
 
     const body =
       new THREE.Mesh(
@@ -401,7 +504,7 @@
 
     /* =========================================================
        HEAD
-    ========================================================= */
+    ========================================================== */
 
     const head =
       new THREE.Mesh(
@@ -423,7 +526,7 @@
 
     /* =========================================================
        HAIR
-    ========================================================= */
+    ========================================================== */
 
     const hair =
       new THREE.Mesh(
@@ -448,8 +551,20 @@
 
 
     /* =========================================================
+       EXTRA HAIR GROUPS
+    ========================================================== */
+
+    const hairExtras =
+      new THREE.Group();
+
+    avatar.add(
+      hairExtras
+    );
+
+
+    /* =========================================================
        ARMS
-    ========================================================= */
+    ========================================================== */
 
     function createArm(side) {
 
@@ -489,7 +604,7 @@
 
     /* =========================================================
        LEGS
-    ========================================================= */
+    ========================================================== */
 
     function createLeg(side) {
 
@@ -526,7 +641,7 @@
 
     /* =========================================================
        SHOES
-    ========================================================= */
+    ========================================================== */
 
     function createShoe(side) {
 
@@ -561,10 +676,1083 @@
 
 
     /* =========================================================
+       ACCESSORY GROUP
+    ========================================================== */
+
+    const accessoryGroup =
+      new THREE.Group();
+
+    avatar.add(
+      accessoryGroup
+    );
+
+
+    /* =========================================================
+       APPEARANCE HELPERS
+    ========================================================== */
+
+    function normalize(value) {
+
+      return String(
+        value || ""
+      )
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, "_");
+    }
+
+
+    function setMaterialColor(
+      material,
+      color
+    ) {
+
+      material.color.set(
+        color
+      );
+    }
+
+
+    /* =========================================================
+       SKIN TONE
+    ========================================================== */
+
+    function applySkinTone(
+      value
+    ) {
+
+      const tone =
+        normalize(value);
+
+      const colors = {
+
+        light:
+          0xc68662,
+
+        medium:
+          0x9f6948,
+
+        deep:
+          0x6b3f24,
+
+        dark:
+          0x542f1c,
+
+        brown:
+          0x8d5524
+
+      };
+
+      const color =
+        colors[tone] ||
+        colors.medium;
+
+      setMaterialColor(
+        skinMaterial,
+        color
+      );
+    }
+
+
+    /* =========================================================
+       HAIR COLOR
+    ========================================================== */
+
+    function applyHairColor(
+      value
+    ) {
+
+      const colorMap = {
+
+        black:
+          0x151515,
+
+        brown:
+          0x4b2e1f,
+
+        blonde:
+          0xd4af37,
+
+        red:
+          0x7a2e1e
+
+      };
+
+      const color =
+        colorMap[
+          normalize(value)
+        ] ||
+        colorMap.black;
+
+      setMaterialColor(
+        hairMaterial,
+        color
+      );
+    }
+
+
+    /* =========================================================
+       OUTFIT
+    ========================================================== */
+
+    function applyOutfit(
+      value
+    ) {
+
+      const outfit =
+        normalize(value);
+
+      const outfits = {
+
+        casual: {
+          shirt: 0x222222,
+          pants: 0x333333
+        },
+
+        streetwear: {
+          shirt: 0x111111,
+          pants: 0x181818
+        },
+
+        formal: {
+          shirt: 0x101010,
+          pants: 0x090909
+        },
+
+        traditional: {
+          shirt: 0x8b5a2b,
+          pants: 0x6f451f
+        },
+
+        sport: {
+          shirt: 0x174a72,
+          pants: 0x202020
+        },
+
+        business: {
+          shirt: 0x1a1a1a,
+          pants: 0x111111
+        }
+
+      };
+
+      const selected =
+        outfits[outfit] ||
+        outfits.casual;
+
+      setMaterialColor(
+        shirtMaterial,
+        selected.shirt
+      );
+
+      setMaterialColor(
+        pantsMaterial,
+        selected.pants
+      );
+    }
+
+
+    /* =========================================================
+       HAIRSTYLE
+    ========================================================== */
+
+    function clearHairExtras() {
+
+      while (
+        hairExtras.children.length
+      ) {
+
+        const child =
+          hairExtras.children.pop();
+
+        child.traverse(
+          object => {
+
+            if (
+              object.geometry
+            ) {
+
+              object.geometry.dispose();
+            }
+          }
+        );
+      }
+    }
+
+
+    function createHairPiece(
+      x,
+      y,
+      z,
+      scaleX,
+      scaleY,
+      scaleZ
+    ) {
+
+      const piece =
+        new THREE.Mesh(
+          new THREE.SphereGeometry(
+            0.16,
+            12,
+            10
+          ),
+          hairMaterial
+        );
+
+      piece.position.set(
+        x,
+        y,
+        z
+      );
+
+      piece.scale.set(
+        scaleX,
+        scaleY,
+        scaleZ
+      );
+
+      piece.castShadow = true;
+
+      hairExtras.add(
+        piece
+      );
+
+      return piece;
+    }
+
+
+    function applyHairstyle(
+      value
+    ) {
+
+      const style =
+        normalize(value);
+
+      clearHairExtras();
+
+      hair.visible = true;
+
+      if (
+        style === "short"
+      ) {
+
+        hair.scale.set(
+          1,
+          0.75,
+          1
+        );
+
+        return;
+      }
+
+
+      if (
+        style === "low_cut" ||
+        style === "lowcut"
+      ) {
+
+        hair.scale.set(
+          1,
+          0.48,
+          1
+        );
+
+        return;
+      }
+
+
+      if (
+        style === "fade"
+      ) {
+
+        hair.scale.set(
+          1,
+          0.58,
+          1
+        );
+
+        createHairPiece(
+          0,
+          2.93,
+          0,
+          0.7,
+          0.25,
+          0.7
+        );
+
+        return;
+      }
+
+
+      if (
+        style === "afro"
+      ) {
+
+        hair.scale.set(
+          1.3,
+          1.15,
+          1.3
+        );
+
+        return;
+      }
+
+
+      if (
+        style === "braids"
+      ) {
+
+        hair.scale.set(
+          1.05,
+          0.9,
+          1.05
+        );
+
+        for (
+          let i = -2;
+          i <= 2;
+          i++
+        ) {
+
+          createHairPiece(
+            i * 0.13,
+            2.72,
+            -0.02,
+            0.45,
+            1.25,
+            0.45
+          );
+        }
+
+        return;
+      }
+
+
+      if (
+        style === "dreads"
+      ) {
+
+        hair.scale.set(
+          1.1,
+          0.95,
+          1.1
+        );
+
+        for (
+          let i = -2;
+          i <= 2;
+          i++
+        ) {
+
+          createHairPiece(
+            i * 0.14,
+            2.62,
+            0,
+            0.42,
+            1.5,
+            0.42
+          );
+        }
+
+        return;
+      }
+
+
+      if (
+        style === "natural"
+      ) {
+
+        hair.scale.set(
+          1.15,
+          1,
+          1.15
+        );
+
+        return;
+      }
+
+
+      if (
+        style === "long"
+      ) {
+
+        hair.scale.set(
+          1.1,
+          1.15,
+          1.1
+        );
+
+        createHairPiece(
+          -0.3,
+          2.48,
+          0,
+          0.35,
+          1.6,
+          0.4
+        );
+
+        createHairPiece(
+          0.3,
+          2.48,
+          0,
+          0.35,
+          1.6,
+          0.4
+        );
+
+        return;
+      }
+
+
+      /* DEFAULT */
+
+      hair.scale.set(
+        1,
+        0.75,
+        1
+      );
+    }
+
+
+    /* =========================================================
+       ACCESSORIES
+    ========================================================== */
+
+    function clearAccessories() {
+
+      while (
+        accessoryGroup.children.length
+      ) {
+
+        const child =
+          accessoryGroup.children.pop();
+
+        child.traverse(
+          object => {
+
+            if (
+              object.geometry
+            ) {
+
+              object.geometry.dispose();
+            }
+          }
+        );
+      }
+    }
+
+
+    function createGlasses() {
+
+      const frameMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0x111111,
+          roughness: 0.4
+        });
+
+      const left =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.18,
+            0.08,
+            0.03
+          ),
+          frameMaterial
+        );
+
+      const right =
+        left.clone();
+
+      left.position.set(
+        -0.18,
+        2.67,
+        -0.39
+      );
+
+      right.position.set(
+        0.18,
+        2.67,
+        -0.39
+      );
+
+      accessoryGroup.add(
+        left,
+        right
+      );
+    }
+
+
+    function createCap() {
+
+      const capMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0x111111,
+          roughness: 0.7
+        });
+
+      const cap =
+        new THREE.Mesh(
+          new THREE.SphereGeometry(
+            0.46,
+            24,
+            12,
+            0,
+            Math.PI * 2,
+            0,
+            Math.PI / 2
+          ),
+          capMaterial
+        );
+
+      cap.position.set(
+        0,
+        2.91,
+        0
+      );
+
+      cap.scale.set(
+        1.05,
+        0.5,
+        1.05
+      );
+
+      accessoryGroup.add(
+        cap
+      );
+
+
+      const visor =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.55,
+            0.05,
+            0.3
+          ),
+          capMaterial
+        );
+
+      visor.position.set(
+        0,
+        2.86,
+        -0.38
+      );
+
+      accessoryGroup.add(
+        visor
+      );
+    }
+
+
+    function createChain() {
+
+      const chainMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0xd4af37,
+          metalness: 0.7,
+          roughness: 0.3
+        });
+
+      const chain =
+        new THREE.Mesh(
+          new THREE.TorusGeometry(
+            0.27,
+            0.025,
+            8,
+            32,
+            Math.PI
+          ),
+          chainMaterial
+        );
+
+      chain.rotation.x =
+        Math.PI;
+
+      chain.position.set(
+        0,
+        1.83,
+        -0.42
+      );
+
+      accessoryGroup.add(
+        chain
+      );
+    }
+
+
+    function createWatch() {
+
+      const watchMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0xd4af37,
+          metalness: 0.7,
+          roughness: 0.3
+        });
+
+      const watch =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.16,
+            0.18,
+            0.08
+          ),
+          watchMaterial
+        );
+
+      watch.position.set(
+        0.7,
+        1.35,
+        -0.02
+      );
+
+      watch.rotation.z =
+        0.15;
+
+      accessoryGroup.add(
+        watch
+      );
+    }
+
+
+    function createEarrings() {
+
+      const material =
+        new THREE.MeshStandardMaterial({
+          color: 0xd4af37,
+          metalness: 0.8,
+          roughness: 0.2
+        });
+
+      const left =
+        new THREE.Mesh(
+          new THREE.TorusGeometry(
+            0.07,
+            0.018,
+            8,
+            16
+          ),
+          material
+        );
+
+      const right =
+        left.clone();
+
+      left.position.set(
+        -0.43,
+        2.58,
+        0
+      );
+
+      right.position.set(
+        0.43,
+        2.58,
+        0
+      );
+
+      accessoryGroup.add(
+        left,
+        right
+      );
+    }
+
+
+    function createHeadphones() {
+
+      const material =
+        new THREE.MeshStandardMaterial({
+          color: 0x111111,
+          roughness: 0.6
+        });
+
+      const band =
+        new THREE.Mesh(
+          new THREE.TorusGeometry(
+            0.45,
+            0.045,
+            8,
+            32,
+            Math.PI
+          ),
+          material
+        );
+
+      band.rotation.x =
+        Math.PI / 2;
+
+      band.position.y =
+        2.78;
+
+      accessoryGroup.add(
+        band
+      );
+
+
+      const left =
+        new THREE.Mesh(
+          new THREE.CylinderGeometry(
+            0.11,
+            0.11,
+            0.12,
+            16
+          ),
+          material
+        );
+
+      const right =
+        left.clone();
+
+      left.rotation.z =
+        Math.PI / 2;
+
+      right.rotation.z =
+        Math.PI / 2;
+
+      left.position.set(
+        -0.45,
+        2.62,
+        0
+      );
+
+      right.position.set(
+        0.45,
+        2.62,
+        0
+      );
+
+      accessoryGroup.add(
+        left,
+        right
+      );
+    }
+
+
+    function applyAccessory(
+      value
+    ) {
+
+      clearAccessories();
+
+      const accessory =
+        normalize(value);
+
+      if (
+        !accessory ||
+        accessory === "none"
+      ) {
+
+        return;
+      }
+
+      if (
+        accessory === "cap"
+      ) {
+
+        createCap();
+        return;
+      }
+
+      if (
+        accessory === "glasses"
+      ) {
+
+        createGlasses();
+        return;
+      }
+
+      if (
+        accessory === "chain"
+      ) {
+
+        createChain();
+        return;
+      }
+
+      if (
+        accessory === "watch"
+      ) {
+
+        createWatch();
+        return;
+      }
+
+      if (
+        accessory === "earrings"
+      ) {
+
+        createEarrings();
+        return;
+      }
+
+      if (
+        accessory === "headphones"
+      ) {
+
+        createHeadphones();
+        return;
+      }
+    }
+
+
+    /* =========================================================
+       APPLY COMPLETE CHARACTER
+    ========================================================== */
+
+    function applyCharacterAppearance(
+      character
+    ) {
+
+      applySkinTone(
+        character.skin_tone
+      );
+
+      applyHairColor(
+        character.hair_color
+      );
+
+      applyHairstyle(
+        character.hairstyle
+      );
+
+      applyOutfit(
+        character.outfit
+      );
+
+      applyAccessory(
+        character.accessory
+      );
+    }
+
+
+    /* =========================================================
+       CHARACTER DATA
+    ========================================================== */
+
+    let currentCharacter =
+      null;
+
+
+    async function loadCharacter() {
+
+      try {
+
+        const {
+          data: sessionData,
+          error: sessionError
+        } =
+          await db.auth.getSession();
+
+
+        if (
+          sessionError
+        ) {
+
+          throw sessionError;
+        }
+
+
+        const session =
+          sessionData?.session;
+
+
+        if (
+          !session
+        ) {
+
+          throw new Error(
+            "You are not logged in."
+          );
+        }
+
+
+        const {
+          data,
+          error
+        } =
+          await db.rpc(
+            "get_my_character"
+          );
+
+
+        if (
+          error
+        ) {
+
+          throw error;
+        }
+
+
+        if (
+          !data
+        ) {
+
+          throw new Error(
+            "No Naija Hustle character was found for this account."
+          );
+        }
+
+
+        /*
+         * Some Supabase RPCs return an object,
+         * while others can return a single-row array.
+         */
+
+        currentCharacter =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+
+        if (
+          !currentCharacter
+        ) {
+
+          throw new Error(
+            "Character data is empty."
+          );
+        }
+
+
+        applyCharacterAppearance(
+          currentCharacter
+        );
+
+
+        /* PLAYER INFO */
+
+        document
+          .getElementById(
+            "playerName"
+          )
+          .textContent =
+            currentCharacter.name ||
+            "Player";
+
+
+        const district =
+          currentCharacter.district ||
+          currentCharacter.current_district ||
+          "";
+
+
+        const level =
+          currentCharacter.level;
+
+
+        const details = [];
+
+
+        if (
+          district
+        ) {
+
+          details.push(
+            district
+          );
+        }
+
+
+        if (
+          level !== undefined &&
+          level !== null
+        ) {
+
+          details.push(
+            `Level ${level}`
+          );
+        }
+
+
+        document
+          .getElementById(
+            "playerDetails"
+          )
+          .textContent =
+            details.join(
+              " • "
+            );
+
+
+        document
+          .getElementById(
+            "status"
+          )
+          .textContent =
+            "Idle";
+
+
+        document
+          .getElementById(
+            "loading"
+          )
+          .style.display =
+            "none";
+
+
+        return true;
+
+      } catch (
+        error
+      ) {
+
+        console.error(
+          "3D character load error:",
+          error
+        );
+
+
+        document
+          .getElementById(
+            "loading"
+          )
+          .innerHTML = `
+            <div>Unable to load your character.</div>
+            <small>${escapeHtml(
+              error?.message ||
+              "Unknown error"
+            )}</small>
+          `;
+
+
+        return false;
+      }
+    }
+
+
+    function escapeHtml(
+      value
+    ) {
+
+      return String(
+        value || ""
+      )
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+    }
+
+
+    /* =========================================================
        CONTROLS
-    ========================================================= */
+    ========================================================== */
 
     const keys = {};
+
 
     window.addEventListener(
       "keydown",
@@ -576,6 +1764,7 @@
 
       }
     );
+
 
     window.addEventListener(
       "keyup",
@@ -591,7 +1780,7 @@
 
     /* =========================================================
        MOBILE JOYSTICK
-    ========================================================= */
+    ========================================================== */
 
     const joystick =
       document.getElementById(
@@ -617,22 +1806,30 @@
       const rect =
         joystick.getBoundingClientRect();
 
+
       const centerX =
         rect.left +
         rect.width / 2;
+
 
       const centerY =
         rect.top +
         rect.height / 2;
 
+
       let dx =
-        clientX - centerX;
+        clientX -
+        centerX;
+
 
       let dy =
-        clientY - centerY;
+        clientY -
+        centerY;
+
 
       const maxDistance =
         45;
+
 
       const distance =
         Math.sqrt(
@@ -640,28 +1837,36 @@
           dy * dy
         );
 
+
       if (
         distance >
         maxDistance
       ) {
 
         dx =
-          dx / distance *
+          dx /
+          distance *
           maxDistance;
 
         dy =
-          dy / distance *
+          dy /
+          distance *
           maxDistance;
       }
+
 
       stick.style.transform =
         `translate(${dx}px, ${dy}px)`;
 
+
       joystickX =
-        dx / maxDistance;
+        dx /
+        maxDistance;
+
 
       joystickY =
-        dy / maxDistance;
+        dy /
+        maxDistance;
     }
 
 
@@ -687,7 +1892,9 @@
       "pointermove",
       event => {
 
-        if (!dragging) return;
+        if (
+          !dragging
+        ) return;
 
         updateJoystick(
           event.clientX,
@@ -697,27 +1904,36 @@
     );
 
 
+    function resetJoystick() {
+
+      dragging = false;
+
+      joystickX = 0;
+      joystickY = 0;
+
+      stick.style.transform =
+        "translate(0, 0)";
+    }
+
+
     joystick.addEventListener(
       "pointerup",
-      () => {
+      resetJoystick
+    );
 
-        dragging = false;
-
-        joystickX = 0;
-        joystickY = 0;
-
-        stick.style.transform =
-          "translate(0, 0)";
-      }
+    joystick.addEventListener(
+      "pointercancel",
+      resetJoystick
     );
 
 
     /* =========================================================
        MOVEMENT
-    ========================================================= */
+    ========================================================== */
 
     const clock =
       new THREE.Clock();
+
 
     const status =
       document.getElementById(
@@ -778,7 +1994,9 @@
         Math.abs(z) > 0.05;
 
 
-      if (moving) {
+      if (
+        moving
+      ) {
 
         const length =
           Math.sqrt(
@@ -786,8 +2004,14 @@
             z * z
           );
 
-        x /= length;
-        z /= length;
+
+        if (
+          length > 0
+        ) {
+
+          x /= length;
+          z /= length;
+        }
 
 
         const speed =
@@ -796,6 +2020,7 @@
 
         avatar.position.x +=
           x * speed;
+
 
         avatar.position.z +=
           z * speed;
@@ -820,22 +2045,29 @@
           "Walking";
 
 
-        /* WALK ANIMATION */
-
         const time =
           performance.now() *
           0.012;
 
-        leftLeg.rotation.x =
-          Math.sin(time) * 0.65;
 
-        rightLeg.rotation.x =
-          Math.sin(time + Math.PI) *
+        leftLeg.rotation.x =
+          Math.sin(time) *
           0.65;
 
+
+        rightLeg.rotation.x =
+          Math.sin(
+            time + Math.PI
+          ) *
+          0.65;
+
+
         leftArm.rotation.x =
-          Math.sin(time + Math.PI) *
+          Math.sin(
+            time + Math.PI
+          ) *
           0.45;
+
 
         rightArm.rotation.x =
           Math.sin(time) *
@@ -847,17 +2079,24 @@
           "Idle";
 
 
-        /* IDLE */
+        leftLeg.rotation.x *=
+          0.85;
 
-        leftLeg.rotation.x *= 0.85;
-        rightLeg.rotation.x *= 0.85;
 
-        leftArm.rotation.x *= 0.85;
-        rightArm.rotation.x *= 0.85;
+        rightLeg.rotation.x *=
+          0.85;
+
+
+        leftArm.rotation.x *=
+          0.85;
+
+
+        rightArm.rotation.x *=
+          0.85;
       }
 
 
-      /* KEEP AVATAR ON MAP */
+      /* MAP BOUNDS */
 
       avatar.position.x =
         THREE.MathUtils.clamp(
@@ -865,6 +2104,7 @@
           -5,
           5
         );
+
 
       avatar.position.z =
         THREE.MathUtils.clamp(
@@ -877,7 +2117,7 @@
 
     /* =========================================================
        CAMERA FOLLOW
-    ========================================================= */
+    ========================================================== */
 
     function updateCamera() {
 
@@ -910,34 +2150,8 @@
 
 
     /* =========================================================
-       OPTIONAL CAMERA CONTROLS
-    ========================================================= */
-
-    const cameraControls =
-      new OrbitControls(
-        camera,
-        renderer.domElement
-      );
-
-    cameraControls.enablePan =
-      false;
-
-    cameraControls.enableZoom =
-      true;
-
-    cameraControls.minDistance =
-      4;
-
-    cameraControls.maxDistance =
-      12;
-
-    cameraControls.maxPolarAngle =
-      Math.PI / 2.05;
-
-
-    /* =========================================================
        RESIZE
-    ========================================================= */
+    ========================================================== */
 
     window.addEventListener(
       "resize",
@@ -947,7 +2161,9 @@
           window.innerWidth /
           window.innerHeight;
 
+
         camera.updateProjectionMatrix();
+
 
         renderer.setSize(
           window.innerWidth,
@@ -958,8 +2174,40 @@
 
 
     /* =========================================================
+       BACK BUTTON
+    ========================================================== */
+
+    document
+      .getElementById(
+        "backButton"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          /*
+           * If this page was opened from
+           * the main game, return there.
+           */
+
+          if (
+            window.history.length > 1
+          ) {
+
+            window.history.back();
+
+          } else {
+
+            window.location.href =
+              "index.html";
+          }
+        }
+      );
+
+
+    /* =========================================================
        ANIMATION LOOP
-    ========================================================= */
+    ========================================================== */
 
     function animate() {
 
@@ -992,15 +2240,21 @@
 
     /* =========================================================
        START
-    ========================================================= */
+    ========================================================== */
 
-    document
-      .getElementById("loading")
-      .style.display = "none";
+    const characterLoaded =
+      await loadCharacter();
 
-    animate();
+
+    if (
+      characterLoaded
+    ) {
+
+      animate();
+
+    }
 
   </script>
 
 </body>
-</html>
+  </html>
