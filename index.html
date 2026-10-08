@@ -2934,7 +2934,8 @@ function frame(now){
   updateNPCs(dt);
   updateTraffic(dt);
   updatePlaces(dt,t);
-  updateCamera(dt);
+updateSocialSystem();
+updateCamera(dt);
   updateSun();
 
   $("status").textContent=state.status;
