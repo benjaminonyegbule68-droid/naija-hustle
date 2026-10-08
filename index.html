@@ -444,65 +444,310 @@ function applyQuality(){
 
 /* ---------- character system ---------- */
 function addHair(root,cfg,headRadius){
-  const hc=mat(cfg.hairColor==="black"?"#151313":cfg.hairColor==="darkBrown"?"#2c1b14":cfg.hairColor==="brown"?"#4b2c1e":cfg.hairColor==="burgundy"?"#541d2c":cfg.hairColor==="blonde"?"#d6ad65":"#8d8d8d");
+  const hairColors={
+    black:"#151313",
+    darkBrown:"#2c1b14",
+    brown:"#4b2c1e",
+    burgundy:"#541d2c",
+    blonde:"#d6ad65",
+    grey:"#8d8d8d"
+  };
+
+  const hc=mat(
+    hairColors[cfg.hairColor]||hairColors.black,
+    .9
+  );
+
   const style=cfg.hairstyle;
+
   if(style==="bald")return;
+
   if(style==="headwrap"){
-    const band=new THREE.Mesh(torusG(headRadius*.88,.11,8,24),mat("#d6ad65"));
-    band.rotation.x=Math.PI/2;band.position.y=.12;root.add(band);return;
+    const wrap=new THREE.Mesh(
+      sphereG(headRadius*1.05),
+      mat("#d6ad65")
+    );
+
+    wrap.scale.set(1.02,.48,1.02);
+    wrap.position.y=.20;
+    root.add(wrap);
+
+    const band=new THREE.Mesh(
+      torusG(headRadius*.91,.065,10,28),
+      mat("#8f641b")
+    );
+
+    band.rotation.x=Math.PI/2;
+    band.position.y=.13;
+    root.add(band);
+    return;
   }
+
   if(style==="afro"){
-    const h=new THREE.Mesh(sphereG(headRadius*1.14),hc);h.scale.y=.8;h.position.y=.17;root.add(h);return;
+    const hair=new THREE.Mesh(
+      sphereG(headRadius*1.18),
+      hc
+    );
+
+    hair.scale.set(1.04,.86,1.04);
+    hair.position.y=.16;
+    root.add(hair);
+
+    const front=new THREE.Mesh(
+      sphereG(headRadius*.72),
+      hc
+    );
+
+    front.scale.set(1.05,.55,.72);
+    front.position.set(0,.34,.20);
+    root.add(front);
+    return;
   }
+
   if(style==="high_top"){
-    const h=new THREE.Mesh(capsuleG(headRadius*.58,.45),hc);h.position.y=.38;root.add(h);return;
+    const sides=new THREE.Mesh(
+      sphereG(headRadius*.98),
+      hc
+    );
+
+    sides.scale.set(1,.55,.98);
+    sides.position.y=.16;
+    root.add(sides);
+
+    const top=new THREE.Mesh(
+      capsuleG(headRadius*.52,.34),
+      hc
+    );
+
+    top.scale.set(1.12,1,.95);
+    top.position.y=.40;
+    root.add(top);
+    return;
   }
-  if(style==="twists"||style==="locs"||style==="braids"){
-    const count=style==="braids"?9:style==="locs"?12:8;
+
+  if(
+    style==="twists"||
+    style==="locs"||
+    style==="braids"
+  ){
+    const count=
+      style==="braids"?12:
+      style==="locs"?14:
+      10;
+
+    const length=
+      style==="braids"?.30:
+      style==="locs"?.34:
+      .26;
+
+    const cap=new THREE.Mesh(
+      sphereG(headRadius*.98),
+      hc
+    );
+
+    cap.scale.set(1,.62,1);
+    cap.position.y=.17;
+    root.add(cap);
+
     for(let i=0;i<count;i++){
       const a=i/count*Math.PI*2;
-      const h=new THREE.Mesh(capsuleG(.065,.28+Math.random()*.18),hc);
-      h.position.set(Math.cos(a)*headRadius*.72,.25+Math.random()*.1,Math.sin(a)*headRadius*.72);
-      h.rotation.z=Math.cos(a)*.3;h.rotation.x=-Math.sin(a)*.3;root.add(h);
-    }
-    const cap=new THREE.Mesh(sphereG(headRadius*.95),hc);cap.scale.y=.58;cap.position.y=.17;root.add(cap);return;
-  }
-  const cap=new THREE.Mesh(sphereG(headRadius*1.01),hc);
-  cap.scale.y=style==="fade"?.52:.62;
-  cap.position.y=.22;root.add(cap);
-}
 
+      const strand=new THREE.Mesh(
+        capsuleG(.055,length),
+        hc
+      );
+
+      strand.position.set(
+        Math.cos(a)*headRadius*.78,
+        .18,
+        Math.sin(a)*headRadius*.78
+      );
+
+      strand.rotation.z=Math.cos(a)*.28;
+      strand.rotation.x=-Math.sin(a)*.28;
+
+      root.add(strand);
+    }
+
+    return;
+  }
+
+  /*
+    Fade / low cut.
+  */
+  const cap=new THREE.Mesh(
+    sphereG(headRadius*1.015),
+    hc
+  );
+
+  cap.scale.set(
+    1,
+    style==="fade"?.54:.64,
+    1
+  );
+
+  cap.position.y=.20;
+  root.add(cap);
+
+  if(style==="fade"){
+    const hairline=new THREE.Mesh(
+      torusG(headRadius*.91,.035,8,28),
+      hc
+    );
+
+    hairline.rotation.x=Math.PI/2;
+    hairline.position.y=.08;
+    root.add(hairline);
+  }
+  
 function addBeard(root,cfg,headRadius){
   if(cfg.beard==="none")return;
-  const bc=mat(cfg.hairColor==="black"?"#151313":cfg.hairColor==="darkBrown"?"#2c1b14":cfg.hairColor==="brown"?"#4b2c1e":cfg.hairColor==="burgundy"?"#541d2c":cfg.hairColor==="blonde"?"#d6ad65":"#777");
+
+  const hairColors={
+    black:"#151313",
+    darkBrown:"#2c1b14",
+    brown:"#4b2c1e",
+    burgundy:"#541d2c",
+    blonde:"#d6ad65",
+    grey:"#777"
+  };
+
+  const bc=mat(
+    hairColors[cfg.hairColor]||hairColors.black,
+    .92
+  );
+
   if(cfg.beard==="stubble"){
-    const b=new THREE.Mesh(sphereG(headRadius*.55),bc);b.scale.set(.75,.42,.3);b.position.set(0,-.15,.37);root.add(b);
-  }else if(cfg.beard==="goatee"){
-    const b=new THREE.Mesh(capsuleG(.11,.2),bc);b.position.set(0,-.28,.42);root.add(b);
-  }else{
-    const b=new THREE.Mesh(sphereG(headRadius*.62),bc);b.scale.set(.78,.55,.4);b.position.set(0,-.15,.39);root.add(b);
+    const beard=new THREE.Mesh(
+      sphereG(headRadius*.53),
+      bc
+    );
+
+    beard.scale.set(.78,.40,.24);
+    beard.position.set(0,-.15,.36);
+    root.add(beard);
+    return;
   }
+
+  if(cfg.beard==="goatee"){
+    const chin=new THREE.Mesh(
+      sphereG(headRadius*.28),
+      bc
+    );
+
+    chin.scale.set(.8,1.15,.65);
+    chin.position.set(0,-.25,.38);
+    root.add(chin);
+
+    const moustache=new THREE.Mesh(
+      capsuleG(.055,.16),
+      bc
+    );
+
+    moustache.rotation.z=Math.PI/2;
+    moustache.position.set(0,-.08,.40);
+    root.add(moustache);
+    return;
+  }
+
+  const beard=new THREE.Mesh(
+    sphereG(headRadius*.60),
+    bc
+  );
+
+  beard.scale.set(.82,.60,.32);
+  beard.position.set(0,-.15,.36);
+  root.add(beard);
 }
 
 function addAccessory(root,cfg,headRadius){
   if(cfg.accessory==="none")return;
+
   if(cfg.accessory==="cap"){
-    const cap=new THREE.Mesh(sphereG(headRadius*1.05),mat("#171717"));
-    cap.scale.y=.42;cap.position.y=.3;root.add(cap);
-    const brim=new THREE.Mesh(boxG(.72,.05,.3),mat("#171717"));brim.position.set(0,.22,.48);root.add(brim);
-  }else if(cfg.accessory==="glasses"||cfg.accessory==="sunglasses"){
-    const g=mat(cfg.accessory==="sunglasses"?"#101010":"#333");
-    for(const x of [-.16,.16]){
-      const lens=new THREE.Mesh(boxG(.2,.11,.025),g);lens.position.set(x,.03,.45);root.add(lens);
-    }
-    const bridge=new THREE.Mesh(boxG(.12,.035,.025),g);bridge.position.set(0,.03,.45);root.add(bridge);
-  }else if(cfg.accessory==="chain"){
-    const chain=new THREE.Mesh(torusG(.25,.025,6,20),mat("#d7a928",.3,.75));chain.rotation.x=Math.PI/2;chain.position.set(0,-.5,.42);root.add(chain);
-  }else if(cfg.accessory==="headphones"){
-    const band=new THREE.Mesh(torusG(headRadius*1.02,.055,8,24,Math.PI),mat("#151515"));band.rotation.z=Math.PI;band.position.y=.12;root.add(band);
-    for(const x of [-.5,.5]){const d=new THREE.Mesh(cylG(.12,.12,.12),mat("#222"));d.rotation.z=Math.PI/2;d.position.set(x,.05,0);root.add(d)}
+    const cap=new THREE.Mesh(
+      sphereG(headRadius*1.04),
+      mat("#171717")
+    );
+
+    cap.scale.set(1,.46,1);
+    cap.position.y=.29;
+    root.add(cap);
+
+    const brim=new THREE.Mesh(
+      boxG(.66,.045,.28),
+      mat("#171717")
+    );
+
+    brim.position.set(0,.22,.45);
+    root.add(brim);
+    return;
   }
-}
+
+  if(
+    cfg.accessory==="glasses"||
+    cfg.accessory==="sunglasses"
+  ){
+    const frame=mat(
+      cfg.accessory==="sunglasses"
+        ?"#101010"
+        :"#333"
+    );
+
+    for(const x of [-.16,.16]){
+      const lens=new THREE.Mesh(
+        boxG(.19,.105,.035),
+        frame
+      );
+
+      lens.position.set(x,.035,.445);
+      root.add(lens);
+    }
+
+    const bridge=new THREE.Mesh(
+      boxG(.12,.032,.035),
+      frame
+    );
+
+    bridge.position.set(0,.035,.445);
+    root.add(bridge);
+
+    return;
+  }
+
+  if(cfg.accessory==="chain"){
+    const chain=new THREE.Mesh(
+      torusG(.25,.022,8,24),
+      mat("#d7a928",.3,.75)
+    );
+
+    chain.rotation.x=Math.PI/2;
+    chain.position.set(0,-.50,.40);
+    root.add(chain);
+    return;
+  }
+
+  if(cfg.accessory==="headphones"){
+    const band=new THREE.Mesh(
+      torusG(headRadius*1.03,.05,8,28,Math.PI),
+      mat("#151515")
+    );
+
+    band.rotation.z=Math.PI;
+    band.position.y=.12;
+    root.add(band);
+
+    for(const x of [-.36,.36]){
+      const cup=new THREE.Mesh(
+        cylG(.105,.105,.10),
+        mat("#222")
+      );
+
+      cup.rotation.z=Math.PI/2;
+      cup.position.set(x,.02,0);
+      root.add(cup);
+    }
+  }
+    }
 
 function addOutfitDetails(root,cfg,bodyW){
   const color=cfg.outfitColor==="default"?"#315d50":OPTIONS.outfitColor.values[cfg.outfitColor];
