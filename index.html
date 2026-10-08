@@ -476,13 +476,31 @@ const colliders=[], buildingRects=[], markers=[], poiList=[], npcs=[], buses=[];
 const wish=new THREE.Vector3(), fwd=new THREE.Vector3(), right=new THREE.Vector3();
 
 const geoCache=new Map(), matCache=new Map(), labelCache=new Map();
-function geo(key,make){if(!geoCache.has(key))geoCache.set(key,make());return geoCache.get(key)}
-function mat(color,rough=.72,metal=0,opts={}){
-  const k=`\( {color}| \){rough}|\( {metal}| \){JSON.stringify(opts)}`;
-  if(matCache.has(k))return matCache.get(k);
-  const m=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,...opts});
-  matCache.set(k,m);return m;
+
+function geo(key,make){
+  if(!geoCache.has(key)){
+    geoCache.set(key,make());
+  }
+  return geoCache.get(key);
 }
+
+function mat(color,rough=.72,metal=0,opts={}){
+  const k=`${color}|${rough}|${metal}|${JSON.stringify(opts)}`;
+
+  if(matCache.has(k)){
+    return matCache.get(k);
+  }
+
+  const m=new THREE.MeshStandardMaterial({
+    color,
+    roughness:rough,
+    metalness:metal,
+    ...opts
+  });
+
+  matCache.set(k,m);
+  return m;
+  }
 function sphereG(r){return geo(`s${r}`,()=>new THREE.SphereGeometry(r,18,14))}
 function capsuleG(r,l){return geo(`c\( {r}_ \){l}`,()=>new THREE.CapsuleGeometry(r,l,8,12))}
 function cylG(rt,rb,h,s=12){return geo(`y\( {rt}_ \){rb}_\( {h}_ \){s}`,()=>new THREE.CylinderGeometry(rt,rb,h,s))}
