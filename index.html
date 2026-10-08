@@ -3717,14 +3717,21 @@ function viewGame() {
 
     mapView(main);
 
-
   } else if (
     S.tab === "board"
   ) {
 
     boardView(main);
 
+  } else if (
+    S.tab === "profile"
+  ) {
+
+    main.innerHTML =
+      profileHtml(c);
+
   }
+ 
 
 
   const logout =
