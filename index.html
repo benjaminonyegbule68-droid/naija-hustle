@@ -837,34 +837,126 @@ function createCharacter(rawCfg,opts={}){
   spine.add(neck);
 
   const head=new THREE.Group();
-  head.position.y=1.12*height;
-  spine.add(head);
+head.position.y=1.12*height;
+spine.add(head);
 
-  const headR=.36;
+const headR=.36;
 
-  const face=new THREE.Mesh(
-    sphereG(headR),
+/* FACE */
+const face=new THREE.Mesh(
+  sphereG(headR),
+  skin
+);
+
+face.scale.set(1,.99,.93);
+head.add(face);
+
+/* CHEEKS */
+for(const x of [-.19,.19]){
+  const cheek=new THREE.Mesh(
+    sphereG(.16),
     skin
   );
 
-  face.scale.set(1,1.04,.94);
-  head.add(face);
+  cheek.scale.set(.95,.82,.72);
+  cheek.position.set(x,-.055,.255);
+  head.add(cheek);
+}
 
-  const eyes=[];
+/* EARS */
+for(const x of [-.345,.345]){
+  const ear=new THREE.Mesh(
+    sphereG(.085),
+    skin
+  );
 
-  for(const x of [-.125,.125]){
-    const eye=new THREE.Mesh(
-      sphereG(.035),
-      eyeMat
-    );
+  ear.scale.set(.62,1,.55);
+  ear.position.set(x,0,.01);
+  head.add(ear);
+}
 
-    eye.scale.set(.95,.95,.25);
-    eye.position.set(x,.035,.342);
-    head.add(eye);
-    eyes.push(eye);
-  }
+/* EYES */
+const eyes=[];
 
-  addHair(head,cfg
+for(const x of [-.125,.125]){
+  const white=new THREE.Mesh(
+    sphereG(.085),
+    mat("#f4f1ea")
+  );
+
+  white.scale.set(1.05,.88,.48);
+  white.position.set(x,.045,.325);
+  head.add(white);
+
+  const pupil=new THREE.Mesh(
+    sphereG(.043),
+    eyeMat
+  );
+
+  pupil.scale.set(.9,.95,.42);
+  pupil.position.set(x,.045,.365);
+  head.add(pupil);
+
+  eyes.push(white);
+}
+
+/* EYEBROWS */
+const browMat=mat(
+  OPTIONS.hairColor.values[cfg.hairColor]||"#151313"
+);
+
+for(const x of [-.125,.125]){
+  const brow=new THREE.Mesh(
+    capsuleG(.025,.13),
+    browMat
+  );
+
+  brow.rotation.z=x<0?.08:-.08;
+  brow.position.set(x,.145,.335);
+  head.add(brow);
+}
+
+/* NOSE */
+const nose=new THREE.Mesh(
+  sphereG(.075),
+  skin
+);
+
+nose.scale.set(.72,.95,1.25);
+nose.position.set(0,-.035,.355);
+head.add(nose);
+
+const noseTip=new THREE.Mesh(
+  sphereG(.055),
+  skin
+);
+
+noseTip.scale.set(1,.72,.95);
+noseTip.position.set(0,-.09,.385);
+head.add(noseTip);
+
+/* MOUTH */
+const mouth=new THREE.Mesh(
+  capsuleG(.035,.13),
+  mat("#5a2925")
+);
+
+mouth.rotation.z=Math.PI/2;
+mouth.scale.set(1,.65,.55);
+mouth.position.set(0,-.165,.345);
+head.add(mouth);
+
+/* LOWER LIP */
+const lip=new THREE.Mesh(
+  sphereG(.045),
+  mat("#8b5148")
+);
+
+lip.scale.set(1.45,.48,.55);
+lip.position.set(0,-.205,.35);
+head.add(lip);
+
+addHair(head,cfg,headR);
 
 function animateCharacter(c,dt,st){
   c.time+=dt;c.phase+=dt*(1+Math.min(2,st.speed*.35));
