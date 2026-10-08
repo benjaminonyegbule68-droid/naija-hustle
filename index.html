@@ -676,6 +676,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+
 /* =========================================================
    SUPABASE
    ========================================================= */
@@ -694,12 +695,17 @@ if (
 ) {
   app.innerHTML = `
     <div class="stripe"></div>
+
     <div class="wrap">
+
       <h1>Naija Hustle</h1>
+
       <div class="err">
-        <b>Naija Hustle could not start.</b><br><br>
+        <b>Naija Hustle could not start.</b>
+        <br><br>
         The Supabase connection library failed to load.
       </div>
+
     </div>
   `;
 
@@ -720,6 +726,7 @@ const db =
    ========================================================= */
 
 const S = {
+
   user: null,
   ch: null,
 
@@ -754,6 +761,7 @@ const S = {
 
   districts: null,
   mapMsg: null
+
 };
 
 
@@ -762,31 +770,41 @@ const S = {
    ========================================================= */
 
 const BG = [
+
   {
     id: "street_boy",
     name: "Street Boy",
     meta: "Starts in Mushin · ₦5,000",
-    d: "No capital, no connections, plenty of hustle. Your only collateral is gist."
+    d:
+      "No capital, no connections, plenty of hustle. Your only collateral is gist."
   },
+
   {
     id: "graduate",
     name: "Graduate",
     meta: "Starts in Yaba · ₦20,000",
-    d: "First class degree, zero job offers. The CV is strong, the NYSC is done."
+    d:
+      "First class degree, zero job offers. The CV is strong, the NYSC is done."
   },
+
   {
     id: "nepo_baby",
     name: "Nepo Baby",
     meta: "Starts in Lekki · ₦500,000",
-    d: "Daddy's name opens doors. Now prove the doors were worth opening."
+    d:
+      "Daddy's name opens doors. Now prove the doors were worth opening."
   },
+
   {
     id: "returnee",
     name: "Returnee",
     meta: "Starts in Ikeja · ₦150,000",
-    d: "Came back from abroad with savings and a strong accent. Lagos will humble you."
+    d:
+      "Came back from abroad with savings and a strong accent. Lagos will humble you."
   }
+
 ];
+
 
 const SK = {
   hustle: "Hustle",
@@ -795,11 +813,13 @@ const SK = {
   tech: "Tech"
 };
 
+
 const SKIN_TONES = [
   ["light", "Light"],
   ["medium", "Medium"],
   ["deep", "Deep"]
 ];
+
 
 const HAIRSTYLES = [
   ["short", "Short"],
@@ -812,12 +832,14 @@ const HAIRSTYLES = [
   ["long", "Long"]
 ];
 
+
 const HAIR_COLORS = [
   ["black", "Black"],
   ["brown", "Brown"],
   ["blonde", "Blonde"],
   ["red", "Red"]
 ];
+
 
 const OUTFITS = [
   ["casual", "Casual"],
@@ -827,6 +849,7 @@ const OUTFITS = [
   ["sport", "Sport"],
   ["business", "Business"]
 ];
+
 
 const ACCESSORIES = [
   ["none", "None"],
@@ -855,36 +878,57 @@ const esc = value =>
     }[char])
   );
 
+
 const naira = value =>
   "₦" +
   Number(value || 0).toLocaleString("en-NG");
 
+
 const cap = value => {
-  const str = String(value || "");
+
+  const str =
+    String(value || "");
 
   return str
-    ? str.charAt(0).toUpperCase() + str.slice(1)
+    ? str.charAt(0).toUpperCase() +
+      str.slice(1)
     : "";
+
 };
 
+
 const bgName = id => {
-  const bg = BG.find(item => item.id === id);
-  return bg ? bg.name : id;
+
+  const bg =
+    BG.find(
+      item => item.id === id
+    );
+
+  return bg
+    ? bg.name
+    : id;
+
 };
+
 
 const setMsg = (
   text,
   ok = false
 ) => {
-  S.msg = text
-    ? {
-        t: text,
-        ok
-      }
-    : null;
+
+  S.msg =
+    text
+      ? {
+          t: text,
+          ok
+        }
+      : null;
+
 };
 
+
 const msgHtml = () => {
+
   if (!S.msg) {
     return "";
   }
@@ -898,16 +942,24 @@ const msgHtml = () => {
       ${esc(S.msg.t)}
     </div>
   `;
+
 };
 
-function optionLabel(list, value) {
-  const found = list.find(
-    item => item[0] === value
-  );
+
+function optionLabel(
+  list,
+  value
+) {
+
+  const found =
+    list.find(
+      item => item[0] === value
+    );
 
   return found
     ? found[1]
     : cap(value);
+
 }
 
 
@@ -933,22 +985,35 @@ function avatarEmoji() {
     return "😎";
   }
 
+  if (S.accessory === "watch") {
+    return "⌚";
+  }
+
+  if (S.accessory === "earrings") {
+    return "✨";
+  }
+
   return "🧑🏿";
+
 }
+
 
 function characterPreviewHtml() {
 
   const trait1 =
     S.personalityTraits?.find(
-      item => item.id === S.personality1
+      item =>
+        item.id === S.personality1
     );
 
   const trait2 =
     S.personalityTraits?.find(
-      item => item.id === S.personality2
+      item =>
+        item.id === S.personality2
     );
 
   return `
+
     <div class="look-preview">
 
       <div class="avatar">
@@ -963,11 +1028,26 @@ function characterPreviewHtml() {
       </div>
 
       <div class="look-meta">
-        ${optionLabel(SKIN_TONES, S.skinTone)}
+
+        ${optionLabel(
+          SKIN_TONES,
+          S.skinTone
+        )}
+
         ·
-        ${optionLabel(HAIRSTYLES, S.hairstyle)}
+
+        ${optionLabel(
+          HAIRSTYLES,
+          S.hairstyle
+        )}
+
         ·
-        ${optionLabel(OUTFITS, S.outfit)}
+
+        ${optionLabel(
+          OUTFITS,
+          S.outfit
+        )}
+
       </div>
 
       <div
@@ -978,21 +1058,33 @@ function characterPreviewHtml() {
           flex-wrap:wrap;
         "
       >
+
         ${
           trait1
-            ? `<span class="pill">${esc(trait1.name)}</span>`
+            ? `
+              <span class="pill">
+                ${esc(trait1.name)}
+              </span>
+            `
             : ""
         }
 
         ${
           trait2
-            ? `<span class="pill">${esc(trait2.name)}</span>`
+            ? `
+              <span class="pill">
+                ${esc(trait2.name)}
+              </span>
+            `
             : ""
         }
+
       </div>
 
     </div>
+
   `;
+
 }
 
 
@@ -1002,7 +1094,8 @@ function characterPreviewHtml() {
 
 function realTimeInfo() {
 
-  const now = new Date();
+  const now =
+    new Date();
 
   const timeFormatter =
     new Intl.DateTimeFormat(
@@ -1039,16 +1132,31 @@ function realTimeInfo() {
     );
 
   const hour =
-    Number(hourFormatter.format(now));
+    Number(
+      hourFormatter.format(now)
+    );
 
-  let phase = "Morning";
+  let phase =
+    "Morning";
 
-  if (hour >= 12 && hour < 17) {
-    phase = "Afternoon";
-  } else if (hour >= 17 && hour < 21) {
-    phase = "Evening";
-  } else if (hour >= 21 || hour < 5) {
-    phase = "Night";
+  if (
+    hour >= 12 &&
+    hour < 17
+  ) {
+    phase =
+      "Afternoon";
+  } else if (
+    hour >= 17 &&
+    hour < 21
+  ) {
+    phase =
+      "Evening";
+  } else if (
+    hour >= 21 ||
+    hour < 5
+  ) {
+    phase =
+      "Night";
   }
 
   const icon =
@@ -1061,18 +1169,26 @@ function realTimeInfo() {
           : "🌙";
 
   return {
-    time: timeFormatter.format(now),
-    date: dateFormatter.format(now),
+    time:
+      timeFormatter.format(now),
+
+    date:
+      dateFormatter.format(now),
+
     phase,
     icon
   };
+
 }
+
 
 function gameClockHtml() {
 
-  const info = realTimeInfo();
+  const info =
+    realTimeInfo();
 
   return `
+
     <div class="card clock-card">
 
       <div class="row">
@@ -1095,7 +1211,9 @@ function gameClockHtml() {
 
         </div>
 
-        <div style="text-align:right">
+        <div
+          style="text-align:right"
+        >
 
           <div
             style="font-size:1.5rem"
@@ -1126,13 +1244,20 @@ function gameClockHtml() {
       </div>
 
     </div>
+
   `;
+
 }
+
 
 function startGameClock() {
 
   if (window.naijaClockTimer) {
-    clearInterval(window.naijaClockTimer);
+
+    clearInterval(
+      window.naijaClockTimer
+    );
+
   }
 
   const updateClock = () => {
@@ -1142,9 +1267,12 @@ function startGameClock() {
         "[data-game-clock]"
       );
 
-    if (!clock) return;
+    if (!clock) {
+      return;
+    }
 
-    const info = realTimeInfo();
+    const info =
+      realTimeInfo();
 
     const date =
       document.querySelector(
@@ -1161,19 +1289,24 @@ function startGameClock() {
         "[data-game-phase-icon]"
       );
 
-    clock.textContent = info.time;
+    clock.textContent =
+      info.time;
 
     if (date) {
-      date.textContent = info.date;
+      date.textContent =
+        info.date;
     }
 
     if (phase) {
-      phase.textContent = info.phase;
+      phase.textContent =
+        info.phase;
     }
 
     if (icon) {
-      icon.textContent = info.icon;
+      icon.textContent =
+        info.icon;
     }
+
   };
 
   updateClock();
@@ -1183,9 +1316,15 @@ function startGameClock() {
       "[data-game-clock]"
     )
   ) {
+
     window.naijaClockTimer =
-      setInterval(updateClock, 1000);
+      setInterval(
+        updateClock,
+        1000
+      );
+
   }
+
 }
 
 
@@ -1202,9 +1341,11 @@ const needPct = value =>
     )
   );
 
+
 const needClass = value => {
 
-  const pct = needPct(value);
+  const pct =
+    needPct(value);
 
   if (pct <= 20) {
     return "need-low";
@@ -1215,64 +1356,81 @@ const needClass = value => {
   }
 
   return "need-good";
+
 };
+
 
 function needsHtml(c) {
 
   const needs = [
+
     ["🍗", "Hunger", c.hunger],
     ["🎮", "Fun", c.fun],
     ["🤝", "Social", c.social],
     ["🧼", "Hygiene", c.hygiene]
+
   ];
 
   return `
+
     <div class="card needs-card">
 
-      <h2>Needs</h2>
+      <h2>
+        Needs
+      </h2>
 
       <p class="mute">
         Keep yourself in good shape while you hustle.
       </p>
 
-      ${needs.map(
-        ([icon, name, value]) => {
+      ${
+        needs.map(
+          ([icon, name, value]) => {
 
-          const pct = needPct(value);
+            const pct =
+              needPct(value);
 
-          return `
-            <div class="need-row">
+            return `
 
-              <div class="need-label">
+              <div class="need-row">
 
-                <span class="need-name">
-                  ${icon} ${name}
-                </span>
+                <div class="need-label">
 
-                <span class="need-value">
-                  ${pct}/100
-                </span>
+                  <span class="need-name">
+                    ${icon} ${name}
+                  </span>
+
+                  <span class="need-value">
+                    ${pct}/100
+                  </span>
+
+                </div>
+
+                <div class="need-bar">
+
+                  <i
+                    class="${needClass(pct)}"
+                    style="width:${pct}%"
+                  ></i>
+
+                </div>
 
               </div>
 
-              <div class="need-bar">
-                <i
-                  class="${needClass(pct)}"
-                  style="width:${pct}%"
-                ></i>
-              </div>
+            `;
 
-            </div>
-          `;
-        }
-      ).join("")}
+          }
+        ).join("")
+      }
 
       <div class="needs-note">
         Low needs will matter more as daily life expands.
       </div>
 
     </div>
+
   `;
+
 }
 
 
@@ -1295,6 +1453,7 @@ function activitiesHtml() {
       : "";
 
   const activities = [
+
     {
       id: "eat",
       icon: "🍲",
@@ -1305,6 +1464,7 @@ function activitiesHtml() {
       energy: 1,
       restore: "+30 Hunger"
     },
+
     {
       id: "entertainment",
       icon: "🎮",
@@ -1315,6 +1475,7 @@ function activitiesHtml() {
       energy: 2,
       restore: "+30 Fun"
     },
+
     {
       id: "socialize",
       icon: "🤝",
@@ -1325,6 +1486,7 @@ function activitiesHtml() {
       energy: 1,
       restore: "+30 Social"
     },
+
     {
       id: "freshen_up",
       icon: "🧼",
@@ -1335,12 +1497,16 @@ function activitiesHtml() {
       energy: 1,
       restore: "+30 Hygiene"
     }
+
   ];
 
   return `
+
     <div class="card">
 
-      <h2>Activities</h2>
+      <h2>
+        Activities
+      </h2>
 
       <p class="mute">
         Look after yourself so you can keep chasing the bag.
@@ -1348,64 +1514,70 @@ function activitiesHtml() {
 
       ${message}
 
-      ${activities.map(
-        activity => `
-          <div class="card activity-card">
+      ${
+        activities.map(
+          activity => `
 
-            <div class="row">
+            <div class="card activity-card">
 
-              <div style="flex:1">
+              <div class="row">
 
-                <h2 style="margin:0">
+                <div style="flex:1">
 
-                  <span class="activity-icon">
-                    ${activity.icon}
-                  </span>
+                  <h2 style="margin:0">
 
-                  ${activity.name}
+                    <span class="activity-icon">
+                      ${activity.icon}
+                    </span>
 
-                </h2>
+                    ${activity.name}
 
-                <p
-                  class="mute"
-                  style="
-                    margin:4px 0 0;
-                    font-size:.9rem;
-                  "
+                  </h2>
+
+                  <p
+                    class="mute"
+                    style="
+                      margin:4px 0 0;
+                      font-size:.9rem;
+                    "
+                  >
+                    ${activity.description}
+                  </p>
+
+                </div>
+
+                <button
+                  class="btn activity-action"
+                  type="button"
+                  data-activity="${activity.id}"
                 >
-                  ${activity.description}
-                </p>
+                  Do it
+                </button>
 
               </div>
 
-              <button
-                class="btn activity-action"
-                type="button"
-                data-activity="${activity.id}"
+              <p
+                class="mute"
+                style="
+                  margin:10px 0 0;
+                  font-size:.9rem;
+                "
               >
-                Do it
-              </button>
+                ${naira(activity.cost)}
+                · ${activity.energy} energy
+                · ${activity.restore}
+              </p>
 
             </div>
 
-            <p
-              class="mute"
-              style="
-                margin:10px 0 0;
-                font-size:.9rem;
-              "
-            >
-              ${naira(activity.cost)}
-              · ${activity.energy} energy
-              · ${activity.restore}
-            </p>
-
-          </div>
-        `
-      ).join("")}
+          `
+        ).join("")
+      }
 
     </div>
+
   `;
+
 }
 
 
@@ -1416,19 +1588,28 @@ function activitiesHtml() {
 function viewAuth() {
 
   if (window.naijaClockTimer) {
-    clearInterval(window.naijaClockTimer);
-    window.naijaClockTimer = null;
+
+    clearInterval(
+      window.naijaClockTimer
+    );
+
+    window.naijaClockTimer =
+      null;
+
   }
 
   const login =
     S.mode === "login";
 
   app.innerHTML = `
+
     <div class="stripe"></div>
 
     <div class="wrap">
 
-      <h1>Naija Hustle</h1>
+      <h1>
+        Naija Hustle
+      </h1>
 
       <p class="mute">
         Start from the bottom. Own the block.
@@ -1457,7 +1638,11 @@ function viewAuth() {
         <input
           id="pw"
           type="password"
-          autocomplete="${login ? "current-password" : "new-password"}"
+          autocomplete="${
+            login
+              ? "current-password"
+              : "new-password"
+          }"
           placeholder="At least 6 characters"
         >
 
@@ -1486,19 +1671,23 @@ function viewAuth() {
       </div>
 
     </div>
+
   `;
 
-  document.getElementById("sw").onclick = () => {
+  document.getElementById("sw").onclick =
+    () => {
 
-    S.mode =
-      login
-        ? "signup"
-        : "login";
+      S.mode =
+        login
+          ? "signup"
+          : "login";
 
-    setMsg(null);
+      setMsg(null);
 
-    viewAuth();
-  };
+      viewAuth();
+
+    };
+
 
   document.getElementById("go").onclick =
     async event => {
@@ -1510,49 +1699,72 @@ function viewAuth() {
           .trim();
 
       const password =
-        document.getElementById("pw").value;
+        document
+          .getElementById("pw")
+          .value;
 
       if (
         !email ||
         password.length < 6
       ) {
+
         setMsg(
           "Enter your email and a password of at least 6 characters."
         );
 
         return viewAuth();
+
       }
 
-      event.target.disabled = true;
+      event.target.disabled =
+        true;
 
       try {
 
         if (login) {
 
-          const { error } =
+          const {
+            error
+          } =
             await db.auth.signInWithPassword({
               email,
               password
             });
 
           if (error) {
-            setMsg(error.message);
-            viewAuth();
+
+            setMsg(
+              error.message
+            );
+
+            return viewAuth();
+
           }
 
           return;
         }
 
-        const { data, error } =
+
+        const {
+          data,
+          error
+        } =
           await db.auth.signUp({
             email,
             password
           });
 
+
         if (error) {
-          setMsg(error.message);
+
+          setMsg(
+            error.message
+          );
+
           return viewAuth();
+
         }
+
 
         if (!data.session) {
 
@@ -1562,6 +1774,7 @@ function viewAuth() {
           );
 
           return viewAuth();
+
         }
 
       } catch (error) {
@@ -1572,8 +1785,11 @@ function viewAuth() {
         );
 
         viewAuth();
+
       }
+
     };
+
 }
 
 
@@ -1587,7 +1803,10 @@ async function loadPersonalityTraits() {
     return S.personalityTraits;
   }
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await db
       .from("personality_traits")
       .select(
@@ -1603,21 +1822,29 @@ async function loadPersonalityTraits() {
     data || [];
 
   return S.personalityTraits;
+
 }
 
 
 /* =========================================================
-   CHARACTER CREATION VIEW
+   CHARACTER CREATION
    ========================================================= */
 
 async function viewCreate() {
 
   if (window.naijaClockTimer) {
-    clearInterval(window.naijaClockTimer);
-    window.naijaClockTimer = null;
+
+    clearInterval(
+      window.naijaClockTimer
+    );
+
+    window.naijaClockTimer =
+      null;
+
   }
 
   app.innerHTML = `
+
     <div class="stripe"></div>
 
     <div class="wrap">
@@ -1644,26 +1871,35 @@ async function viewCreate() {
 
       <div style="height:14px"></div>
 
-      ${BG.map(bg => `
-        <button
-          class="bg"
-          type="button"
-          data-bg="${bg.id}"
-          aria-pressed="${S.picked === bg.id}"
-        >
+      ${
+        BG.map(
+          bg => `
 
-          <b>
-            ${esc(bg.name)}
-          </b>
+            <button
+              class="bg"
+              type="button"
+              data-bg="${bg.id}"
+              aria-pressed="${
+                S.picked === bg.id
+              }"
+            >
 
-          <div class="meta">
-            ${esc(bg.meta)}
-          </div>
+              <b>
+                ${esc(bg.name)}
+              </b>
 
-          ${esc(bg.d)}
+              <div class="meta">
+                ${esc(bg.meta)}
+              </div>
 
-        </button>
-      `).join("")}
+              ${esc(bg.d)}
+
+            </button>
+
+          `
+        ).join("")
+      }
+
 
       <div class="section-head">
 
@@ -1672,18 +1908,25 @@ async function viewCreate() {
         </h2>
 
         <p class="mute">
-          Pick exactly two traits. They will shape how your character plays.
+          Pick exactly two traits.
+          They will shape how your character plays.
         </p>
 
         <span class="counter">
+
           ${
-            [S.personality1, S.personality2]
-              .filter(Boolean)
-              .length
-          } / 2 selected
+            [
+              S.personality1,
+              S.personality2
+            ].filter(Boolean).length
+          }
+
+          / 2 selected
+
         </span>
 
       </div>
+
 
       <div id="traitsArea">
 
@@ -1692,6 +1935,7 @@ async function viewCreate() {
         </div>
 
       </div>
+
 
       <div class="section-head">
 
@@ -1705,7 +1949,9 @@ async function viewCreate() {
 
       </div>
 
+
       ${characterPreviewHtml()}
+
 
       <div class="card">
 
@@ -1715,24 +1961,29 @@ async function viewCreate() {
 
         <div class="choice-grid">
 
-          ${SKIN_TONES.map(
-            ([id, label]) => `
-              <button
-                class="choice ${
-                  S.skinTone === id
-                    ? "selected"
-                    : ""
-                }"
-                type="button"
-                data-choice-type="skinTone"
-                data-choice="${id}"
-              >
-                <b>${label}</b>
-              </button>
-            `
-          ).join("")}
+          ${
+            SKIN_TONES.map(
+              ([id, label]) => `
+
+                <button
+                  class="choice ${
+                    S.skinTone === id
+                      ? "selected"
+                      : ""
+                  }"
+                  type="button"
+                  data-choice-type="skinTone"
+                  data-choice="${id}"
+                >
+                  <b>${label}</b>
+                </button>
+
+              `
+            ).join("")
+          }
 
         </div>
+
 
         <h2 style="margin-top:18px">
           Hairstyle
@@ -1740,24 +1991,29 @@ async function viewCreate() {
 
         <div class="choice-grid">
 
-          ${HAIRSTYLES.map(
-            ([id, label]) => `
-              <button
-                class="choice ${
-                  S.hairstyle === id
-                    ? "selected"
-                    : ""
-                }"
-                type="button"
-                data-choice-type="hairstyle"
-                data-choice="${id}"
-              >
-                <b>${label}</b>
-              </button>
-            `
-          ).join("")}
+          ${
+            HAIRSTYLES.map(
+              ([id, label]) => `
+
+                <button
+                  class="choice ${
+                    S.hairstyle === id
+                      ? "selected"
+                      : ""
+                  }"
+                  type="button"
+                  data-choice-type="hairstyle"
+                  data-choice="${id}"
+                >
+                  <b>${label}</b>
+                </button>
+
+              `
+            ).join("")
+          }
 
         </div>
+
 
         <h2 style="margin-top:18px">
           Hair colour
@@ -1765,24 +2021,29 @@ async function viewCreate() {
 
         <div class="choice-grid">
 
-          ${HAIR_COLORS.map(
-            ([id, label]) => `
-              <button
-                class="choice ${
-                  S.hairColor === id
-                    ? "selected"
-                    : ""
-                }"
-                type="button"
-                data-choice-type="hairColor"
-                data-choice="${id}"
-              >
-                <b>${label}</b>
-              </button>
-            `
-          ).join("")}
+          ${
+            HAIR_COLORS.map(
+              ([id, label]) => `
+
+                <button
+                  class="choice ${
+                    S.hairColor === id
+                      ? "selected"
+                      : ""
+                  }"
+                  type="button"
+                  data-choice-type="hairColor"
+                  data-choice="${id}"
+                >
+                  <b>${label}</b>
+                </button>
+
+              `
+            ).join("")
+          }
 
         </div>
+
 
         <h2 style="margin-top:18px">
           Outfit
@@ -1790,24 +2051,29 @@ async function viewCreate() {
 
         <div class="choice-grid">
 
-          ${OUTFITS.map(
-            ([id, label]) => `
-              <button
-                class="choice ${
-                  S.outfit === id
-                    ? "selected"
-                    : ""
-                }"
-                type="button"
-                data-choice-type="outfit"
-                data-choice="${id}"
-              >
-                <b>${label}</b>
-              </button>
-            `
-          ).join("")}
+          ${
+            OUTFITS.map(
+              ([id, label]) => `
+
+                <button
+                  class="choice ${
+                    S.outfit === id
+                      ? "selected"
+                      : ""
+                  }"
+                  type="button"
+                  data-choice-type="outfit"
+                  data-choice="${id}"
+                >
+                  <b>${label}</b>
+                </button>
+
+              `
+            ).join("")
+          }
 
         </div>
+
 
         <h2 style="margin-top:18px">
           Accessory
@@ -1815,28 +2081,34 @@ async function viewCreate() {
 
         <div class="choice-grid">
 
-          ${ACCESSORIES.map(
-            ([id, label]) => `
-              <button
-                class="choice ${
-                  S.accessory === id
-                    ? "selected"
-                    : ""
-                }"
-                type="button"
-                data-choice-type="accessory"
-                data-choice="${id}"
-              >
-                <b>${label}</b>
-              </button>
-            `
-          ).join("")}
+          ${
+            ACCESSORIES.map(
+              ([id, label]) => `
+
+                <button
+                  class="choice ${
+                    S.accessory === id
+                      ? "selected"
+                      : ""
+                  }"
+                  type="button"
+                  data-choice-type="accessory"
+                  data-choice="${id}"
+                >
+                  <b>${label}</b>
+                </button>
+
+              `
+            ).join("")
+          }
 
         </div>
 
       </div>
 
+
       ${msgHtml()}
+
 
       <button
         class="btn"
@@ -1845,6 +2117,7 @@ async function viewCreate() {
       >
         Start hustling
       </button>
+
 
       <button
         class="link"
@@ -1855,160 +2128,217 @@ async function viewCreate() {
       </button>
 
     </div>
+
   `;
+
 
   const nameInput =
     document.getElementById("nm");
 
-  nameInput.oninput = () => {
 
-    S.nameDraft =
-      nameInput.value;
+  nameInput.oninput =
+    () => {
 
-    const name =
-      document.querySelector(
-        ".look-name"
-      );
+      S.nameDraft =
+        nameInput.value;
 
-    if (name) {
-      name.textContent =
-        S.nameDraft ||
-        "Your Hustler";
-    }
-  };
+      const name =
+        document.querySelector(
+          ".look-name"
+        );
+
+      if (name) {
+
+        name.textContent =
+          S.nameDraft ||
+          "Your Hustler";
+
+      }
+
+    };
+
 
   document
     .querySelectorAll("[data-bg]")
     .forEach(button => {
 
-      button.onclick = () => {
+      button.onclick =
+        () => {
 
-        S.nameDraft =
-          nameInput.value;
+          S.nameDraft =
+            nameInput.value;
 
-        S.picked =
-          button.dataset.bg;
+          S.picked =
+            button.dataset.bg;
 
-        viewCreate();
-      };
+          viewCreate();
+
+        };
+
     });
+
 
   document
     .querySelectorAll("[data-choice-type]")
     .forEach(button => {
 
-      button.onclick = () => {
+      button.onclick =
+        () => {
 
-        const type =
-          button.dataset.choiceType;
+          const type =
+            button.dataset.choiceType;
 
-        const value =
-          button.dataset.choice;
+          const value =
+            button.dataset.choice;
 
-        S[type] = value;
+          S[type] =
+            value;
 
-        viewCreate();
-      };
+          viewCreate();
+
+        };
+
     });
 
-  document
-    .getElementById("lo")
-    .onclick = () =>
+
+  document.getElementById("lo").onclick =
+    () =>
       db.auth.signOut();
 
-  document
-    .getElementById("mk")
-    .onclick = createCharacter;
+
+  document.getElementById("mk").onclick =
+    createCharacter;
+
 
   try {
 
     const traits =
       await loadPersonalityTraits();
 
-    if (!document.getElementById("traitsArea")) {
+    const area =
+      document.getElementById(
+        "traitsArea"
+      );
+
+    if (!area) {
       return;
     }
 
-    document.getElementById("traitsArea").innerHTML = `
+
+    area.innerHTML = `
+
       <div class="trait-grid">
 
-        ${traits.map(
-          trait => {
+        ${
+          traits.map(
+            trait => {
 
-            const selected =
-              trait.id === S.personality1 ||
-              trait.id === S.personality2;
+              const selected =
+                trait.id ===
+                  S.personality1 ||
+                trait.id ===
+                  S.personality2;
 
-            const number =
-              trait.id === S.personality1
-                ? "1"
-                : trait.id === S.personality2
-                  ? "2"
-                  : "";
+              const number =
+                trait.id ===
+                  S.personality1
+                    ? "1"
+                    : trait.id ===
+                        S.personality2
+                      ? "2"
+                      : "";
 
-            return `
-              <button
-                class="trait"
-                type="button"
-                data-trait="${esc(trait.id)}"
-                aria-pressed="${selected}"
-              >
+              return `
 
-                <span class="trait-number">
-                  ${number}
-                </span>
+                <button
+                  class="trait"
+                  type="button"
+                  data-trait="${esc(trait.id)}"
+                  aria-pressed="${selected}"
+                >
 
-                <b>
-                  ${esc(trait.name)}
-                </b>
+                  <span class="trait-number">
+                    ${number}
+                  </span>
 
-                <small>
-                  ${esc(trait.description)}
-                </small>
+                  <b>
+                    ${esc(trait.name)}
+                  </b>
 
-              </button>
-            `;
-          }
-        ).join("")}
+                  <small>
+                    ${esc(trait.description)}
+                  </small>
+
+                </button>
+
+              `;
+
+            }
+          ).join("")
+        }
 
       </div>
+
     `;
+
 
     document
       .querySelectorAll("[data-trait]")
       .forEach(button => {
 
-        button.onclick = () => {
+        button.onclick =
+          () => {
 
-          const id =
-            button.dataset.trait;
+            const id =
+              button.dataset.trait;
 
-          if (S.personality1 === id) {
 
-            S.personality1 = null;
+            if (
+              S.personality1 === id
+            ) {
 
-          } else if (
-            S.personality2 === id
-          ) {
+              S.personality1 =
+                null;
 
-            S.personality2 = null;
+            } else if (
+              S.personality2 === id
+            ) {
 
-          } else if (!S.personality1) {
+              S.personality2 =
+                null;
 
-            S.personality1 = id;
+            } else if (
+              !S.personality1
+            ) {
 
-          } else if (!S.personality2) {
+              S.personality1 =
+                id;
 
-            S.personality2 = id;
+            } else if (
+              !S.personality2
+            ) {
 
-          } else {
+              S.personality2 =
+                id;
 
-            S.personality2 = id;
-          }
+            } else {
 
-          viewCreate();
-        };
+              /*
+               * If two are already selected,
+               * replace the second trait.
+               */
+
+              S.personality2 =
+                id;
+
+            }
+
+            viewCreate();
+
+          };
+
       });
+
 
   } catch (error) {
 
@@ -2020,21 +2350,28 @@ async function viewCreate() {
     if (area) {
 
       area.innerHTML = `
+
         <div class="err">
+
           Could not load personality traits.
+
+          <br><br>
+
           ${esc(error.message)}
+
         </div>
+
       `;
+
     }
+
   }
+
 }
 
 
 /* =========================================================
    CREATE CHARACTER
-   IMPORTANT:
-   All personality + appearance values are now sent
-   directly to create_character.
    ========================================================= */
 
 async function createCharacter(event) {
@@ -2043,17 +2380,23 @@ async function createCharacter(event) {
     return;
   }
 
+
   const nameInput =
     document.getElementById("nm");
+
 
   if (!nameInput) {
     return;
   }
 
+
   const name =
     nameInput.value.trim();
 
-  S.nameDraft = name;
+
+  S.nameDraft =
+    name;
+
 
   if (
     name.length < 3 ||
@@ -2065,7 +2408,9 @@ async function createCharacter(event) {
     );
 
     return viewCreate();
+
   }
+
 
   if (!S.picked) {
 
@@ -2074,7 +2419,9 @@ async function createCharacter(event) {
     );
 
     return viewCreate();
+
   }
+
 
   if (
     !S.personality1 ||
@@ -2086,7 +2433,9 @@ async function createCharacter(event) {
     );
 
     return viewCreate();
+
   }
+
 
   if (
     S.personality1 ===
@@ -2098,30 +2447,21 @@ async function createCharacter(event) {
     );
 
     return viewCreate();
+
   }
 
-  S.busy = true;
+
+  S.busy =
+    true;
+
 
   if (event?.target) {
-    event.target.disabled = true;
+    event.target.disabled =
+      true;
   }
 
-  try {
 
-    /*
-     * ONE SERVER-SIDE CHARACTER CREATION CALL.
-     *
-     * create_character must already accept:
-     * p_name
-     * p_background
-     * p_trait_1
-     * p_trait_2
-     * p_skin_tone
-     * p_hairstyle
-     * p_hair_color
-     * p_outfit
-     * p_accessory
-     */
+  try {
 
     const {
       data,
@@ -2130,7 +2470,9 @@ async function createCharacter(event) {
       await db.rpc(
         "create_character",
         {
-          p_name: name,
+
+          p_name:
+            name,
 
           p_background:
             S.picked,
@@ -2155,52 +2497,63 @@ async function createCharacter(event) {
 
           p_accessory:
             S.accessory
+
         }
       );
+
 
     if (error) {
       throw error;
     }
 
-    /*
-     * Use the returned character immediately
-     * when available.
-     */
 
     if (
       data &&
       data.id
     ) {
-      S.ch = data;
+
+      S.ch =
+        data;
+
     }
 
-    S.busy = false;
+
+    S.busy =
+      false;
 
     setMsg(null);
 
+
     /*
-     * Refreshes energy + needs and retrieves
-     * the authoritative character from Supabase.
+     * Reload the authoritative
+     * character from Supabase.
      */
 
     await load();
 
+
   } catch (error) {
 
-    S.busy = false;
+    S.busy =
+      false;
+
 
     console.error(
       "Character creation failed:",
       error
     );
 
+
     setMsg(
       error?.message ||
       "Character creation failed."
     );
 
+
     viewCreate();
+
   }
+
 }
 
 
@@ -2210,38 +2563,73 @@ async function createCharacter(event) {
 
 async function go(tab) {
 
-  S.tab = tab;
+  S.tab =
+    tab;
 
-  S.jobMsg = null;
-  S.activityMsg = null;
-  S.bizMsg = null;
-  S.mapMsg = null;
+  S.jobMsg =
+    null;
 
-  if (tab === "business") {
-    S.bizLoaded = false;
+  S.activityMsg =
+    null;
+
+  S.bizMsg =
+    null;
+
+  S.mapMsg =
+    null;
+
+
+  if (
+    tab === "business"
+  ) {
+
+    S.bizLoaded =
+      false;
+
   }
+
 
   viewGame();
 
-  if (tab === "business") {
+
+  if (
+    tab === "business"
+  ) {
+
     return;
+
   }
+
 
   try {
 
-    const { data } =
+    const {
+      data,
+      error
+    } =
       await db.rpc(
         "get_my_character"
       );
+
+
+    if (error) {
+      throw error;
+    }
+
 
     if (
       data &&
       data.id &&
       S.tab === tab
     ) {
-      S.ch = data;
+
+      S.ch =
+        data;
+
       viewGame();
+
     }
+
 
   } catch (error) {
 
@@ -2249,7 +2637,9 @@ async function go(tab) {
       "Navigation refresh failed:",
       error
     );
+
   }
+
 }
 
 
@@ -2259,23 +2649,46 @@ async function go(tab) {
 
 function viewGame() {
 
-  const c = S.ch;
+  /*
+   * IMPORTANT:
+   * A logged-in user without a character
+   * belongs on the character creation screen,
+   * NOT the login screen.
+   */
 
-  if (!c) {
+  if (!S.ch) {
+
+    if (S.user) {
+
+      return viewCreate();
+
+    }
+
     return viewAuth();
+
   }
 
+
   if (window.naijaClockTimer) {
+
     clearInterval(
       window.naijaClockTimer
     );
+
   }
+
+
+  const c =
+    S.ch;
+
 
   const maxEnergy =
     Number(c.max_energy) || 1;
 
+
   const energy =
     Number(c.energy) || 0;
+
 
   const pct =
     Math.max(
@@ -2283,23 +2696,32 @@ function viewGame() {
       Math.min(
         100,
         Math.round(
-          (energy / maxEnergy) * 100
+          (
+            energy /
+            maxEnergy
+          ) * 100
         )
       )
     );
 
+
   const xpPct =
     Number(c.xp || 0) % 100;
 
+
   const tabs = [
+
     ["home", "Home"],
     ["jobs", "Jobs"],
     ["business", "Business"],
     ["map", "Map"],
     ["board", "Ranks"]
+
   ];
 
+
   app.innerHTML = `
+
     <div class="top">
 
       <div class="in">
@@ -2311,15 +2733,23 @@ function viewGame() {
           </b>
 
           <span class="pill">
-            Lvl ${Number(c.level) || 1}
-            · ${xpPct}/100 XP
+
+            Lvl
+            ${Number(c.level) || 1}
+
+            ·
+
+            ${xpPct}/100 XP
+
           </span>
 
         </div>
 
+
         <div class="cash">
           ${naira(c.cash)}
         </div>
+
 
         <div
           class="row"
@@ -2338,58 +2768,84 @@ function viewGame() {
 
         </div>
 
+
         <div class="bar">
-          <i style="width:${pct}%"></i>
+
+          <i
+            style="width:${pct}%"
+          ></i>
+
         </div>
 
       </div>
 
+
       <div class="stripe"></div>
 
     </div>
+
 
     <div
       class="wrap"
       id="main"
     ></div>
 
+
     <nav class="nav">
 
-      ${tabs.map(
-        ([key, label]) => `
-          <button
-            type="button"
-            data-t="${key}"
-            ${
-              S.tab === key
-                ? 'aria-current="page"'
-                : ""
-            }
-          >
-            ${label}
-          </button>
-        `
-      ).join("")}
+      ${
+        tabs.map(
+          ([key, label]) => `
+
+            <button
+              type="button"
+              data-t="${key}"
+              ${
+                S.tab === key
+                  ? 'aria-current="page"'
+                  : ""
+              }
+            >
+              ${label}
+            </button>
+
+          `
+        ).join("")
+      }
 
     </nav>
+
   `;
 
+
   document
-    .querySelectorAll(".nav button")
+    .querySelectorAll(
+      ".nav button"
+    )
     .forEach(button => {
 
-      button.onclick = () =>
-        go(button.dataset.t);
+      button.onclick =
+        () =>
+          go(
+            button.dataset.t
+          );
 
     });
 
-  const main =
-    document.getElementById("main");
 
-  if (S.tab === "home") {
+  const main =
+    document.getElementById(
+      "main"
+    );
+
+
+  if (
+    S.tab === "home"
+  ) {
 
     main.innerHTML =
       homeHtml(c);
+
 
     main
       .querySelectorAll(
@@ -2397,39 +2853,62 @@ function viewGame() {
       )
       .forEach(button => {
 
-        button.onclick = () =>
-          doActivity(
-            button.dataset.activity
-          );
+        button.onclick =
+          () =>
+            doActivity(
+              button.dataset.activity
+            );
 
       });
 
-  } else if (S.tab === "jobs") {
+
+  } else if (
+    S.tab === "jobs"
+  ) {
 
     jobsView(main);
 
-  } else if (S.tab === "business") {
+
+  } else if (
+    S.tab === "business"
+  ) {
 
     bizView(main);
 
-  } else if (S.tab === "map") {
+
+  } else if (
+    S.tab === "map"
+  ) {
 
     mapView(main);
 
-  } else if (S.tab === "board") {
+
+  } else if (
+    S.tab === "board"
+  ) {
 
     boardView(main);
+
   }
+
 
   const logout =
-    document.getElementById("lo2");
+    document.getElementById(
+      "lo2"
+    );
+
 
   if (logout) {
-    logout.onclick = () =>
-      db.auth.signOut();
+
+    logout.onclick =
+      () =>
+        db.auth.signOut();
+
   }
 
+
   startGameClock();
+
 }
 
 
@@ -2440,50 +2919,70 @@ function viewGame() {
 function homeHtml(c) {
 
   const skills = [
+
     ["hustle", c.skill_hustle],
     ["edu", c.skill_edu],
     ["charm", c.skill_charm],
     ["tech", c.skill_tech]
+
   ];
+
 
   const personality1 =
     S.personalityTraits?.find(
       trait =>
-        trait.id === c.personality_1
+        trait.id ===
+        c.personality_1
     );
+
 
   const personality2 =
     S.personalityTraits?.find(
       trait =>
-        trait.id === c.personality_2
+        trait.id ===
+        c.personality_2
     );
+
 
   return `
 
     ${gameClockHtml()}
 
+
     <div class="card">
 
       <h2>
+
         Welcome to
         ${cap(c.district)},
         ${esc(c.name)}
+
       </h2>
+
 
       <p class="mute">
 
-        ${esc(bgName(c.background))}
+        ${esc(
+          bgName(
+            c.background
+          )
+        )}
+
         ·
+
         ${cap(c.city)}.
 
-        Work jobs to earn, then build your empire.
+        Work jobs to earn,
+        then build your empire.
 
       </p>
+
 
       ${
         personality1 ||
         personality2
           ? `
+
             <div
               style="
                 display:flex;
@@ -2495,30 +2994,43 @@ function homeHtml(c) {
 
               ${
                 personality1
-                  ? `<span class="pill">
-                      ${esc(personality1.name)}
-                    </span>`
+                  ? `
+                    <span class="pill">
+                      ${esc(
+                        personality1.name
+                      )}
+                    </span>
+                  `
                   : ""
               }
 
+
               ${
                 personality2
-                  ? `<span class="pill">
-                      ${esc(personality2.name)}
-                    </span>`
+                  ? `
+                    <span class="pill">
+                      ${esc(
+                        personality2.name
+                      )}
+                    </span>
+                  `
                   : ""
               }
 
             </div>
+
           `
           : ""
       }
 
     </div>
 
+
     ${needsHtml(c)}
 
+
     ${activitiesHtml()}
+
 
     <div class="card">
 
@@ -2526,47 +3038,59 @@ function homeHtml(c) {
         Skills
       </h2>
 
-      ${skills.map(
-        ([key, value]) => {
 
-          const skillValue =
-            Number(value) || 0;
+      ${
+        skills.map(
+          ([key, value]) => {
 
-          const width =
-            Math.min(
-              skillValue * 10,
-              100
-            );
+            const skillValue =
+              Number(value) || 0;
 
-          return `
-            <div class="sk">
 
-              <div class="row">
+            const width =
+              Math.min(
+                skillValue * 10,
+                100
+              );
 
-                <span>
-                  ${SK[key]}
-                </span>
 
-                <b>
-                  ${skillValue}
-                </b>
+            return `
+
+              <div class="sk">
+
+                <div class="row">
+
+                  <span>
+                    ${SK[key]}
+                  </span>
+
+                  <b>
+                    ${skillValue}
+                  </b>
+
+                </div>
+
+
+                <div class="bar">
+
+                  <i
+                    style="
+                      width:${width}%
+                    "
+                  ></i>
+
+                </div>
 
               </div>
 
-              <div class="bar">
+            `;
 
-                <i
-                  style="width:${width}%"
-                ></i>
-
-              </div>
-
-            </div>
-          `;
-        }
-      ).join("")}
+          }
+        ).join("")
+      }
 
     </div>
+
 
     <button
       class="link"
@@ -2575,7 +3099,9 @@ function homeHtml(c) {
     >
       Log out
     </button>
+
   `;
+
 }
 
 
@@ -2583,13 +3109,18 @@ function homeHtml(c) {
    ACTIVITIES ACTION
    ========================================================= */
 
-async function doActivity(activity) {
+async function doActivity(
+  activity
+) {
 
   if (S.busy) {
     return;
   }
 
-  S.busy = true;
+
+  S.busy =
+    true;
+
 
   try {
 
@@ -2600,57 +3131,99 @@ async function doActivity(activity) {
       await db.rpc(
         "do_activity",
         {
-          p_activity: activity
+          p_activity:
+            activity
         }
       );
 
-    S.busy = false;
+
+    S.busy =
+      false;
+
 
     if (error) {
 
       S.activityMsg = {
-        t: error.message,
-        ok: false
+
+        t:
+          error.message,
+
+        ok:
+          false
+
       };
 
       return viewGame();
+
     }
 
-    S.ch = data;
+
+    S.ch =
+      data;
+
 
     const names = {
-      eat: "Meal",
-      entertainment: "Entertainment",
-      socialize: "Socializing",
-      freshen_up: "Freshening up"
+
+      eat:
+        "Meal",
+
+      entertainment:
+        "Entertainment",
+
+      socialize:
+        "Socializing",
+
+      freshen_up:
+        "Freshening up"
+
     };
 
+
     S.activityMsg = {
+
       t:
-        `${names[activity] || "Activity"} completed.` +
+        `${
+          names[activity] ||
+          "Activity"
+        } completed.` +
+
         (
           data.last_event
             ? ` ${data.last_event}`
             : ""
         ),
-      ok: true
+
+      ok:
+        true
+
     };
 
+
     viewGame();
+
 
   } catch (error) {
 
-    S.busy = false;
+    S.busy =
+      false;
+
 
     S.activityMsg = {
+
       t:
         error?.message ||
         "Activity failed.",
-      ok: false
+
+      ok:
+        false
+
     };
 
+
     viewGame();
+
   }
+
 }
 
 
@@ -2658,19 +3231,27 @@ async function doActivity(activity) {
    JOBS
    ========================================================= */
 
-function jobCard(job, character) {
+function jobCard(
+  job,
+  character
+) {
 
-  const needs = [];
+  const needs =
+    [];
+
 
   if (
     Number(character.level) <
     Number(job.min_level)
   ) {
+
     needs.push(
       "level " +
       job.min_level
     );
+
   }
+
 
   if (
     job.req_skill &&
@@ -2680,16 +3261,24 @@ function jobCard(job, character) {
         job.req_skill
       ]
     ) <
-    Number(job.req_skill_level)
+    Number(
+      job.req_skill_level
+    )
   ) {
+
     needs.push(
+
       SK[job.req_skill] +
       " " +
       job.req_skill_level
+
     );
+
   }
 
+
   return `
+
     <div class="card">
 
       <div class="row">
@@ -2704,9 +3293,11 @@ function jobCard(job, character) {
 
       </div>
 
+
       <p class="mute">
         ${esc(job.description)}
       </p>
+
 
       <div
         class="row"
@@ -2714,10 +3305,13 @@ function jobCard(job, character) {
       >
 
         <span>
+
           ${naira(job.pay_min)}
           to
           ${naira(job.pay_max)}
+
         </span>
+
 
         <span>
           +${job.xp} XP
@@ -2725,15 +3319,25 @@ function jobCard(job, character) {
 
       </div>
 
+
       ${
         needs.length
           ? `
+
             <div class="lock">
+
               Locked: needs
-              ${esc(needs.join(" and "))}
+              ${esc(
+                needs.join(
+                  " and "
+                )
+              )}
+
             </div>
+
           `
           : `
+
             <button
               class="btn"
               type="button"
@@ -2741,25 +3345,39 @@ function jobCard(job, character) {
             >
               Work this job
             </button>
+
           `
       }
 
     </div>
+
   `;
+
 }
 
-async function jobsView(main) {
+
+async function jobsView(
+  main
+) {
 
   if (!S.jobs) {
 
     main.innerHTML = `
+
       <div class="card">
-        <h2>Job board</h2>
+
+        <h2>
+          Job board
+        </h2>
+
         <p class="mute">
           Loading jobs...
         </p>
+
       </div>
+
     `;
+
 
     const {
       data,
@@ -2771,32 +3389,50 @@ async function jobsView(main) {
         .order("min_level")
         .order("pay_min");
 
+
     if (error) {
 
       main.innerHTML = `
+
         <div class="err">
           ${esc(error.message)}
         </div>
+
       `;
 
       return;
+
     }
 
-    S.jobs = data || [];
+
+    S.jobs =
+      data || [];
+
   }
 
+
   main.innerHTML = `
+
     ${
       S.jobMsg
         ? `
+
           <div
-            class="${S.jobMsg.ok ? "ok" : "err"}"
+            class="${
+              S.jobMsg.ok
+                ? "ok"
+                : "err"
+            }"
           >
-            ${esc(S.jobMsg.t)}
+            ${esc(
+              S.jobMsg.t
+            )}
           </div>
+
         `
         : ""
     }
+
 
     ${
       S.jobs.length
@@ -2810,25 +3446,41 @@ async function jobsView(main) {
             )
             .join("")
         : `
+
           <div class="card">
-            <h2>Job board</h2>
+
+            <h2>
+              Job board
+            </h2>
+
             <p class="mute">
               No jobs available yet.
             </p>
+
           </div>
+
         `
     }
+
   `;
 
+
   main
-    .querySelectorAll("[data-job]")
+    .querySelectorAll(
+      "[data-job]"
+    )
     .forEach(button => {
 
-      button.onclick = () =>
-        doJob(button.dataset.job);
+      button.onclick =
+        () =>
+          doJob(
+            button.dataset.job
+          );
 
     });
+
 }
+
 
 async function doJob(id) {
 
@@ -2836,9 +3488,14 @@ async function doJob(id) {
     return;
   }
 
-  S.busy = true;
 
-  const before = S.ch;
+  S.busy =
+    true;
+
+
+  const before =
+    S.ch;
+
 
   try {
 
@@ -2849,21 +3506,32 @@ async function doJob(id) {
       await db.rpc(
         "do_job",
         {
-          p_job_id: id
+          p_job_id:
+            id
         }
       );
 
-    S.busy = false;
+
+    S.busy =
+      false;
+
 
     if (error) {
 
       S.jobMsg = {
-        t: error.message,
-        ok: false
+
+        t:
+          error.message,
+
+        ok:
+          false
+
       };
 
       return viewGame();
+
     }
+
 
     const job =
       S.jobs.find(
@@ -2871,54 +3539,88 @@ async function doJob(id) {
           item.id === id
       );
 
-    S.ch = data;
+
+    S.ch =
+      data;
+
 
     let message =
       job
         ? `${job.title} completed.`
         : "Job completed.";
 
+
     const diff =
       Number(data.cash) -
       Number(before.cash);
 
+
     message +=
-      ` Cash ${diff >= 0 ? "+" : "-"}${naira(Math.abs(diff))}.`;
+      ` Cash ${
+        diff >= 0
+          ? "+"
+          : "-"
+      }${naira(
+        Math.abs(diff)
+      )}.`;
+
 
     if (
       Number(data.level) >
       Number(before.level)
     ) {
+
       message +=
         ` Level up! You're now level ${data.level}.`;
+
     }
 
+
     if (data.last_event) {
+
       message +=
         " " +
         data.last_event;
+
     }
 
+
     S.jobMsg = {
-      t: message,
-      ok: true
+
+      t:
+        message,
+
+      ok:
+        true
+
     };
 
+
     viewGame();
+
 
   } catch (error) {
 
-    S.busy = false;
+    S.busy =
+      false;
+
 
     S.jobMsg = {
+
       t:
         error?.message ||
         "The job could not be completed.",
-      ok: false
+
+      ok:
+        false
+
     };
 
+
     viewGame();
+
   }
+
 }
 
 
@@ -2926,7 +3628,9 @@ async function doJob(id) {
    BUSINESS
    ========================================================= */
 
-async function bizView(main) {
+async function bizView(
+  main
+) {
 
   if (
     !S.bizTypes ||
@@ -2934,13 +3638,21 @@ async function bizView(main) {
   ) {
 
     main.innerHTML = `
+
       <div class="card">
-        <h2>Your business</h2>
+
+        <h2>
+          Your business
+        </h2>
+
         <p class="mute">
           Opening the shop...
         </p>
+
       </div>
+
     `;
+
 
     if (!S.bizTypes) {
 
@@ -2950,67 +3662,104 @@ async function bizView(main) {
           .select("*")
           .order("buy_cost");
 
+
       if (result.error) {
 
         main.innerHTML = `
+
           <div class="err">
-            ${esc(result.error.message)}
+            ${esc(
+              result.error.message
+            )}
           </div>
+
         `;
 
         return;
+
       }
+
 
       S.bizTypes =
         result.data || [];
+
     }
+
 
     const result =
       await db.rpc(
         "get_my_business"
       );
 
+
     if (result.error) {
 
       main.innerHTML = `
+
         <div class="err">
-          ${esc(result.error.message)}
+          ${esc(
+            result.error.message
+          )}
         </div>
+
       `;
 
       return;
+
     }
+
 
     S.biz =
       result.data?.business ||
       null;
 
-    if (result.data?.character) {
+
+    if (
+      result.data?.character
+    ) {
+
       S.ch =
         result.data.character;
+
     }
 
-    S.bizLoaded = true;
+
+    S.bizLoaded =
+      true;
+
 
     return viewGame();
+
   }
+
 
   const head =
     S.bizMsg
       ? `
+
         <div
-          class="${S.bizMsg.ok ? "ok" : "err"}"
+          class="${
+            S.bizMsg.ok
+              ? "ok"
+              : "err"
+          }"
         >
-          ${esc(S.bizMsg.t)}
+          ${esc(
+            S.bizMsg.t
+          )}
         </div>
+
       `
       : "";
+
 
   if (!S.biz) {
 
     main.innerHTML =
       head +
+
       `
+
         <div class="card">
 
           <h2>
@@ -3018,64 +3767,89 @@ async function bizView(main) {
           </h2>
 
           <p class="mute">
-            Buy a shop, stock it, and earn
-            while you work other jobs.
+
+            Buy a shop, stock it,
+            and earn while you
+            work other jobs.
+
           </p>
 
         </div>
+
       ` +
+
       S.bizTypes
-        .map(type => `
-          <div class="card">
+        .map(
+          type => `
 
-            <div class="row">
+            <div class="card">
 
-              <h2>
-                ${esc(type.name)}
-              </h2>
+              <div class="row">
 
-              <span class="pill">
-                ${naira(type.buy_cost)}
-              </span>
+                <h2>
+                  ${esc(type.name)}
+                </h2>
+
+                <span class="pill">
+                  ${naira(
+                    type.buy_cost
+                  )}
+                </span>
+
+              </div>
+
+              <p class="mute">
+                ${esc(
+                  type.description
+                )}
+              </p>
+
+              <button
+                class="btn"
+                type="button"
+                data-buy="${esc(type.id)}"
+              >
+                Buy for
+                ${naira(
+                  type.buy_cost
+                )}
+              </button>
 
             </div>
 
-            <p class="mute">
-              ${esc(type.description)}
-            </p>
+          `
+        ).join("");
 
-            <button
-              class="btn"
-              type="button"
-              data-buy="${esc(type.id)}"
-            >
-              Buy for ${naira(type.buy_cost)}
-            </button>
-
-          </div>
-        `)
-        .join("");
 
     main
-      .querySelectorAll("[data-buy]")
+      .querySelectorAll(
+        "[data-buy]"
+      )
       .forEach(button => {
 
-        button.onclick = () =>
-          bizAct(
-            "buy_business",
-            {
-              p_type:
-                button.dataset.buy
-            },
-            () =>
-              "Business purchased. Restock it and start earning."
-          );
+        button.onclick =
+          () =>
+            bizAct(
+              "buy_business",
+              {
+                p_type:
+                  button.dataset.buy
+              },
+              () =>
+                "Business purchased. Restock it and start earning."
+            );
+
       });
 
+
     return;
+
   }
 
-  const business = S.biz;
+
+  const business =
+    S.biz;
+
 
   const type =
     S.bizTypes.find(
@@ -3084,26 +3858,33 @@ async function bizView(main) {
         business.type_id
     );
 
+
   if (!type) {
 
     main.innerHTML = `
+
       ${head}
 
       <div class="err">
         Your business type could not be found.
       </div>
+
     `;
 
     return;
+
   }
+
 
   const rate =
     Number(type.base_rate) *
     Number(business.level);
 
+
   const capacity =
     Number(type.base_capacity) *
     Number(business.level);
+
 
   const perHour =
     rate *
@@ -3112,14 +3893,19 @@ async function bizView(main) {
       Number(type.unit_cost)
     );
 
+
   const stock =
-    Number(business.stock) || 0;
+    Number(
+      business.stock
+    ) || 0;
+
 
   const fill =
     Math.max(
       0,
       capacity - stock
     );
+
 
   const upgradeCost =
     Math.floor(
@@ -3128,9 +3914,12 @@ async function bizView(main) {
       2
     );
 
+
   main.innerHTML =
     head +
+
     `
+
       <div class="card">
 
         <div class="row">
@@ -3140,45 +3929,63 @@ async function bizView(main) {
           </h2>
 
           <span class="pill">
-            Level ${business.level}
+            Level
+            ${business.level}
           </span>
 
         </div>
 
         <p class="mute">
-          ${rate} units per hour.
+
+          ${rate}
+          units per hour.
+
           Potential profit:
           ${naira(perHour)}
           per hour while stocked.
+
         </p>
+
 
         <div class="sk">
 
           <div class="row">
-            <span>Stock</span>
+
+            <span>
+              Stock
+            </span>
+
             <b>
               ${stock}/${capacity}
             </b>
+
           </div>
 
+
           <div class="bar">
+
             <i
               style="
                 width:${
                   capacity
                     ? Math.min(
                         100,
-                        (stock / capacity) * 100
+                        (
+                          stock /
+                          capacity
+                        ) * 100
                       )
                     : 0
                 }%
               "
             ></i>
+
           </div>
 
         </div>
 
       </div>
+
 
       <div class="card">
 
@@ -3187,7 +3994,9 @@ async function bizView(main) {
         </div>
 
         <div class="big">
-          ${naira(business.uncollected)}
+          ${naira(
+            business.uncollected
+          )}
         </div>
 
         <button
@@ -3200,6 +4009,7 @@ async function bizView(main) {
 
       </div>
 
+
       <div class="card">
 
         <h2>
@@ -3207,28 +4017,42 @@ async function bizView(main) {
         </h2>
 
         <p class="mute">
+
           Each unit costs
-          ${naira(type.unit_cost)}.
+          ${naira(
+            type.unit_cost
+          )}.
+
         </p>
+
 
         ${
           fill > 0
             ? `
+
               <div class="grid3">
 
                 <button
                   class="btn alt"
-                  data-stock="${Math.min(10, fill)}"
+                  data-stock="${Math.min(
+                    10,
+                    fill
+                  )}"
                 >
                   +10
                 </button>
 
+
                 <button
                   class="btn alt"
-                  data-stock="${Math.min(50, fill)}"
+                  data-stock="${Math.min(
+                    50,
+                    fill
+                  )}"
                 >
                   +50
                 </button>
+
 
                 <button
                   class="btn alt"
@@ -3238,15 +4062,19 @@ async function bizView(main) {
                 </button>
 
               </div>
+
             `
             : `
+
               <p>
                 Your shop is full.
               </p>
+
             `
         }
 
       </div>
+
 
       <div class="card">
 
@@ -3255,78 +4083,112 @@ async function bizView(main) {
         </h2>
 
         ${
-          Number(business.level) < 5
+          Number(
+            business.level
+          ) < 5
             ? `
+
               <button
                 class="btn alt"
                 id="upgrade"
                 type="button"
                 style="width:100%"
               >
+
                 Upgrade to level
-                ${Number(business.level) + 1}
+                ${
+                  Number(
+                    business.level
+                  ) + 1
+                }
 
                 <small>
-                  ${naira(upgradeCost)}
+                  ${naira(
+                    upgradeCost
+                  )}
                 </small>
+
               </button>
+
             `
             : `
+
               <p>
                 Max level reached.
               </p>
+
             `
         }
 
       </div>
+
     `;
 
+
   const collect =
-    document.getElementById("collect");
+    document.getElementById(
+      "collect"
+    );
+
 
   if (collect) {
 
-    collect.onclick = () =>
-      bizAct(
-        "collect_earnings",
-        {},
-        () =>
-          "Earnings collected."
-      );
+    collect.onclick =
+      () =>
+        bizAct(
+          "collect_earnings",
+          {},
+          () =>
+            "Earnings collected."
+        );
+
   }
 
+
   main
-    .querySelectorAll("[data-stock]")
+    .querySelectorAll(
+      "[data-stock]"
+    )
     .forEach(button => {
 
-      button.onclick = () =>
-        bizAct(
-          "restock_business",
-          {
-            p_units:
-              Number(
-                button.dataset.stock
-              )
-          },
-          () =>
-            "Business restocked."
-        );
+      button.onclick =
+        () =>
+          bizAct(
+            "restock_business",
+            {
+              p_units:
+                Number(
+                  button.dataset.stock
+                )
+            },
+            () =>
+              "Business restocked."
+          );
+
     });
 
+
   const upgrade =
-    document.getElementById("upgrade");
+    document.getElementById(
+      "upgrade"
+    );
+
 
   if (upgrade) {
 
-    upgrade.onclick = () =>
-      bizAct(
-        "upgrade_business",
-        {},
-        () =>
-          "Business upgraded."
-      );
+    upgrade.onclick =
+      () =>
+        bizAct(
+          "upgrade_business",
+          {},
+          () =>
+            "Business upgraded."
+        );
+
   }
+
 }
+
 
 async function bizAct(
   functionName,
@@ -3338,7 +4200,10 @@ async function bizAct(
     return;
   }
 
-  S.busy = true;
+
+  S.busy =
+    true;
+
 
   try {
 
@@ -3351,21 +4216,37 @@ async function bizAct(
         args
       );
 
-    S.busy = false;
+
+    S.busy =
+      false;
+
 
     if (error) {
 
       S.bizMsg = {
-        t: error.message,
-        ok: false
+
+        t:
+          error.message,
+
+        ok:
+          false
+
       };
 
       return viewGame();
+
     }
 
-    if (data?.character) {
-      S.ch = data.character;
+
+    if (
+      data?.character
+    ) {
+
+      S.ch =
+        data.character;
+
     }
+
 
     if (
       Object.prototype
@@ -3375,31 +4256,53 @@ async function bizAct(
           "business"
         )
     ) {
-      S.biz = data.business;
+
+      S.biz =
+        data.business;
+
     }
 
-    S.bizLoaded = true;
+
+    S.bizLoaded =
+      true;
+
 
     S.bizMsg = {
-      t: successText(data),
-      ok: true
+
+      t:
+        successText(data),
+
+      ok:
+        true
+
     };
 
+
     viewGame();
+
 
   } catch (error) {
 
-    S.busy = false;
+    S.busy =
+      false;
+
 
     S.bizMsg = {
+
       t:
         error?.message ||
         "Business action failed.",
-      ok: false
+
+      ok:
+        false
+
     };
 
+
     viewGame();
+
   }
+
 }
 
 
@@ -3413,20 +4316,25 @@ async function loadDistricts() {
     return S.districts;
   }
 
+
   const result =
     await db
       .from("districts")
       .select("*")
       .order("travel_cost");
 
+
   if (result.error) {
     return null;
   }
 
+
   S.districts =
     result.data || [];
 
+
   return S.districts;
+
 }
 
 
@@ -3434,88 +4342,167 @@ async function loadDistricts() {
    MAP
    ========================================================= */
 
-function mapSvg(currentDistrict) {
+function mapSvg(
+  currentDistrict
+) {
 
   const positions = {
-    ikeja: [68, 42],
-    mushin: [128, 88],
-    yaba: [218, 92],
-    victoria_island: [195, 175],
-    lekki: [278, 188]
+
+    ikeja:
+      [68, 42],
+
+    mushin:
+      [128, 88],
+
+    yaba:
+      [218, 92],
+
+    victoria_island:
+      [195, 175],
+
+    lekki:
+      [278, 188]
+
   };
+
 
   const labels = {
-    ikeja: "Ikeja",
-    mushin: "Mushin",
-    yaba: "Yaba",
-    victoria_island: "VI",
-    lekki: "Lekki"
+
+    ikeja:
+      "Ikeja",
+
+    mushin:
+      "Mushin",
+
+    yaba:
+      "Yaba",
+
+    victoria_island:
+      "VI",
+
+    lekki:
+      "Lekki"
+
   };
 
+
   const links = [
+
     ["ikeja", "mushin"],
+
     ["mushin", "yaba"],
+
     ["yaba", "victoria_island"],
+
     ["victoria_island", "lekki"]
+
   ];
+
 
   const lines =
     links.map(
       ([from, to]) => `
+
         <line
+
           x1="${positions[from][0]}"
           y1="${positions[from][1]}"
+
           x2="${positions[to][0]}"
           y2="${positions[to][1]}"
+
           stroke="#94A3A2"
           stroke-width="2.5"
           stroke-dasharray="6 5"
           stroke-linecap="round"
+
         />
+
       `
     ).join("");
 
+
   const dots =
-    Object.keys(positions)
-      .map(id => {
+    Object.keys(
+      positions
+    )
+      .map(
+        id => {
 
-        const [x, y] =
-          positions[id];
+          const [
+            x,
+            y
+          ] =
+            positions[id];
 
-        const current =
-          id === currentDistrict;
 
-        return `
-          <g
-            class="map-pin"
-            data-id="${id}"
-          >
+          const current =
+            id ===
+            currentDistrict;
 
-            <circle
-              cx="${x}"
-              cy="${y}"
-              r="${current ? 13 : 9}"
-              fill="${current ? "#FFC20E" : "#fff"}"
-              stroke="${current ? "#14201F" : "#0F6B6F"}"
-              stroke-width="3"
-            />
 
-            <text
-              x="${x}"
-              y="${y + 28}"
-              text-anchor="middle"
-              font-size="12"
-              font-weight="700"
-              fill="#14201F"
+          return `
+
+            <g
+              class="map-pin"
+              data-id="${id}"
             >
-              ${labels[id]}
-            </text>
 
-          </g>
-        `;
-      }).join("");
+              <circle
+
+                cx="${x}"
+                cy="${y}"
+
+                r="${
+                  current
+                    ? 13
+                    : 9
+                }"
+
+                fill="${
+                  current
+                    ? "#FFC20E"
+                    : "#fff"
+                }"
+
+                stroke="${
+                  current
+                    ? "#14201F"
+                    : "#0F6B6F"
+                }"
+
+                stroke-width="3"
+
+              />
+
+
+              <text
+
+                x="${x}"
+                y="${y + 28}"
+
+                text-anchor="middle"
+
+                font-size="12"
+
+                font-weight="700"
+
+                fill="#14201F"
+
+              >
+                ${labels[id]}
+              </text>
+
+            </g>
+
+          `;
+
+        }
+      ).join("");
+
 
   return `
+
     <div class="card map-card">
 
       <svg
@@ -3530,24 +4517,38 @@ function mapSvg(currentDistrict) {
           fill="#F7F4EC"
         />
 
+
         <path
-          d="M0 128 C55 112 125 155 205 132
-             S305 122 320 138
-             L320 162
-             C265 152 200 178 115 162
-             S35 152 0 155 Z"
+
+          d="
+            M0 128
+            C55 112 125 155 205 132
+            S305 122 320 138
+            L320 162
+            C265 152 200 178 115 162
+            S35 152 0 155 Z
+          "
+
           fill="#A8D5D5"
+
         />
 
+
         <text
+
           x="28"
           y="152"
+
           font-size="11"
+
           fill="#0F6B6F"
+
           font-weight="600"
+
         >
           Lagos Lagoon
         </text>
+
 
         ${lines}
         ${dots}
@@ -3555,14 +4556,20 @@ function mapSvg(currentDistrict) {
       </svg>
 
     </div>
+
   `;
+
 }
 
-async function mapView(main) {
+
+async function mapView(
+  main
+) {
 
   if (!S.districts) {
 
     main.innerHTML = `
+
       <div class="card">
 
         <h2>
@@ -3574,145 +4581,222 @@ async function mapView(main) {
         </p>
 
       </div>
+
     `;
 
+
     await loadDistricts();
+
   }
+
 
   if (!S.districts) {
 
     main.innerHTML = `
+
       <div class="err">
         Could not load the map.
       </div>
+
     `;
 
     return;
+
   }
+
 
   const current =
     S.ch.district;
 
-  main.innerHTML =
-    `
-      ${
-        S.mapMsg
-          ? `
-            <div
-              class="${S.mapMsg.ok ? "ok" : "err"}"
-            >
-              ${esc(S.mapMsg.t)}
-            </div>
-          `
-          : ""
-      }
 
-      <div class="card">
+  main.innerHTML = `
 
-        <h2>
-          Lagos Map
-        </h2>
+    ${
+      S.mapMsg
+        ? `
 
-        <p class="mute">
-          Move between districts.
-        </p>
+          <div
+            class="${
+              S.mapMsg.ok
+                ? "ok"
+                : "err"
+            }"
+          >
+            ${esc(
+              S.mapMsg.t
+            )}
+          </div>
 
-      </div>
+        `
+        : ""
+    }
 
-      ${mapSvg(current)}
 
-      ${S.districts.map(
+    <div class="card">
+
+      <h2>
+        Lagos Map
+      </h2>
+
+      <p class="mute">
+        Move between districts.
+      </p>
+
+    </div>
+
+
+    ${mapSvg(current)}
+
+
+    ${
+      S.districts.map(
         district => {
 
           const here =
-            district.id === current;
+            district.id ===
+            current;
+
 
           return `
+
             <div
               class="card district-card${
-                here ? " here" : ""
+                here
+                  ? " here"
+                  : ""
               }"
             >
 
               <div class="row">
 
                 <h2>
-                  ${esc(district.name)}
+                  ${esc(
+                    district.name
+                  )}
                 </h2>
+
 
                 ${
                   here
                     ? `
+
                       <span class="pill">
                         You are here
                       </span>
+
                     `
                     : `
+
                       <span class="pill">
-                        ${naira(district.travel_cost)}
+                        ${naira(
+                          district.travel_cost
+                        )}
                       </span>
+
                     `
                 }
 
               </div>
 
+
               <p class="mute">
-                ${esc(district.description)}
+                ${esc(
+                  district.description
+                )}
               </p>
 
+
               <div class="bonus">
-                +${district.bonus_pct}% pay on
+
+                +${district.bonus_pct}%
+                pay on
+
                 ${
-                  SK[district.bonus_skill] ||
+                  SK[
+                    district.bonus_skill
+                  ] ||
                   district.bonus_skill
                 }
+
                 jobs
+
               </div>
+
 
               ${
                 here
                   ? ""
                   : `
+
                     <button
                       class="btn"
-                      data-travel="${esc(district.id)}"
+                      data-travel="${esc(
+                        district.id
+                      )}"
                     >
+
                       Travel to
-                      ${esc(district.name)}
+                      ${esc(
+                        district.name
+                      )}
+
                     </button>
+
                   `
               }
 
             </div>
+
           `;
+
         }
-      ).join("")}
-    `;
+      ).join("")
+    }
+
+  `;
+
 
   main
-    .querySelectorAll(".map-pin")
+    .querySelectorAll(
+      ".map-pin"
+    )
     .forEach(pin => {
 
-      pin.onclick = () => {
+      pin.onclick =
+        () => {
 
-        if (
-          pin.dataset.id !== current
-        ) {
-          travel(pin.dataset.id);
-        }
-      };
+          if (
+            pin.dataset.id !==
+            current
+          ) {
+
+            travel(
+              pin.dataset.id
+            );
+
+          }
+
+        };
+
     });
+
 
   main
-    .querySelectorAll("[data-travel]")
+    .querySelectorAll(
+      "[data-travel]"
+    )
     .forEach(button => {
 
-      button.onclick = () =>
-        travel(
-          button.dataset.travel
-        );
+      button.onclick =
+        () =>
+          travel(
+            button.dataset.travel
+          );
+
     });
+
 }
+
 
 async function travel(id) {
 
@@ -3720,17 +4804,22 @@ async function travel(id) {
     return;
   }
 
+
   const district =
     S.districts.find(
       item =>
         item.id === id
     );
 
+
   if (!district) {
     return;
   }
 
-  S.busy = true;
+
+  S.busy =
+    true;
+
 
   try {
 
@@ -3741,45 +4830,73 @@ async function travel(id) {
       await db.rpc(
         "travel",
         {
-          p_district: id
+          p_district:
+            id
         }
       );
 
-    S.busy = false;
+
+    S.busy =
+      false;
+
 
     if (error) {
 
       S.mapMsg = {
-        t: error.message,
-        ok: false
+
+        t:
+          error.message,
+
+        ok:
+          false
+
       };
 
       return viewGame();
+
     }
 
-    S.ch = data;
+
+    S.ch =
+      data;
+
 
     S.mapMsg = {
+
       t:
         `You reached ${district.name}.`,
-      ok: true
+
+      ok:
+        true
+
     };
 
+
     viewGame();
+
 
   } catch (error) {
 
-    S.busy = false;
+    S.busy =
+      false;
+
 
     S.mapMsg = {
+
       t:
         error?.message ||
         "Travel failed.",
-      ok: false
+
+      ok:
+        false
+
     };
 
+
     viewGame();
+
   }
+
 }
 
 
@@ -3787,9 +4904,12 @@ async function travel(id) {
    LEADERBOARD
    ========================================================= */
 
-async function boardView(main) {
+async function boardView(
+  main
+) {
 
   main.innerHTML = `
+
     <div class="card">
 
       <h2>
@@ -3801,7 +4921,9 @@ async function boardView(main) {
       </p>
 
     </div>
+
   `;
+
 
   const {
     data,
@@ -3815,76 +4937,111 @@ async function boardView(main) {
       .order(
         "cash",
         {
-          ascending: false
+          ascending:
+            false
         }
       )
       .limit(20);
 
-  if (S.tab !== "board") {
+
+  if (
+    S.tab !== "board"
+  ) {
     return;
   }
+
 
   if (error) {
 
     main.innerHTML = `
+
       <div class="err">
-        ${esc(error.message)}
+        ${esc(
+          error.message
+        )}
       </div>
+
     `;
 
     return;
+
   }
+
 
   const players =
     data || [];
 
+
   main.innerHTML = `
+
     <div class="card">
 
       <h2>
         Richest in Lagos
       </h2>
 
+
       ${
         players.length
-          ? players.map(
-              (player, index) => `
-                <div class="lb">
+          ? players
+              .map(
+                (
+                  player,
+                  index
+                ) => `
 
-                  <span>
+                  <div class="lb">
 
-                    ${index + 1}.
-                    ${esc(player.name)}
+                    <span>
 
-                    <span class="mute">
-                      ·
+                      ${index + 1}.
                       ${esc(
-                        bgName(
-                          player.background
-                        )
+                        player.name
                       )}
-                      · Lvl
-                      ${player.level}
+
+                      <span class="mute">
+
+                        ·
+
+                        ${esc(
+                          bgName(
+                            player.background
+                          )
+                        )}
+
+                        · Lvl
+                        ${player.level}
+
+                      </span>
+
                     </span>
 
-                  </span>
 
-                  <b>
-                    ${naira(player.cash)}
-                  </b>
+                    <b>
+                      ${naira(
+                        player.cash
+                      )}
+                    </b>
 
-                </div>
-              `
-            ).join("")
+                  </div>
+
+                `
+              )
+              .join("")
+
           : `
-            <p class="mute">
-              No players yet.
-            </p>
-          `
+
+              <p class="mute">
+                No players yet.
+              </p>
+
+            `
       }
 
     </div>
+
   `;
+
 }
 
 
@@ -3896,10 +5053,13 @@ async function load() {
 
   if (!S.user) {
 
-    S.ch = null;
+    S.ch =
+      null;
 
     return viewAuth();
+
   }
+
 
   try {
 
@@ -3911,17 +5071,40 @@ async function load() {
         "get_my_character"
       );
 
+
     if (error) {
 
-      setMsg(error.message);
+      /*
+       * Do not automatically send a logged-in
+       * user to the login page.
+       */
 
-      return viewAuth();
+      console.error(
+        "get_my_character failed:",
+        error
+      );
+
+
+      setMsg(
+        error.message
+      );
+
+
+      /*
+       * If authentication is still valid,
+       * keep the user in the character flow.
+       */
+
+      return viewCreate();
+
     }
+
 
     S.ch =
       data?.id
         ? data
         : null;
+
 
     if (S.ch) {
 
@@ -3938,12 +5121,19 @@ async function load() {
 
       }
 
+
       viewGame();
 
     } else {
 
+      /*
+       * Authenticated user with no character.
+       */
+
       viewCreate();
+
     }
+
 
   } catch (error) {
 
@@ -3952,13 +5142,29 @@ async function load() {
       error
     );
 
+
+    if (S.user) {
+
+      setMsg(
+        error?.message ||
+        "Could not load your character."
+      );
+
+      return viewCreate();
+
+    }
+
+
     setMsg(
       error?.message ||
       "Could not load the game."
     );
 
+
     viewAuth();
+
   }
+
 }
 
 
@@ -3967,12 +5173,16 @@ async function load() {
    ========================================================= */
 
 db.auth.onAuthStateChange(
-  (event, session) => {
+  (
+    event,
+    session
+  ) => {
 
     S.user =
       session
         ? session.user
         : null;
+
 
     if (
       event ===
@@ -3981,10 +5191,13 @@ db.auth.onAuthStateChange(
       return;
     }
 
+
     setTimeout(
-      () => load(),
+      () =>
+        load(),
       0
     );
+
   }
 );
 
@@ -4003,16 +5216,20 @@ db.auth.onAuthStateChange(
     } =
       await db.auth.getSession();
 
+
     if (error) {
       throw error;
     }
+
 
     S.user =
       data?.session
         ? data.session.user
         : null;
 
+
     await load();
+
 
   } catch (error) {
 
@@ -4021,7 +5238,9 @@ db.auth.onAuthStateChange(
       error
     );
 
+
     app.innerHTML = `
+
       <div class="stripe"></div>
 
       <div class="wrap">
@@ -4029,6 +5248,7 @@ db.auth.onAuthStateChange(
         <h1>
           Naija Hustle
         </h1>
+
 
         <div class="err">
 
@@ -4046,10 +5266,13 @@ db.auth.onAuthStateChange(
         </div>
 
       </div>
+
     `;
+
   }
 
 })();
+
 </script>
 
 </body>
