@@ -1,45 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
->
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
-<title>Naija Hustle — 3D Avatar</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Naija Hustle — Avatar</title>
 
 <style>
-:root{
-  --glass:rgba(8,10,12,.62);
-  --glass-border:rgba(255,255,255,.12);
-  --accent:#ffd66b;
-}
-
 *{
   box-sizing:border-box;
-  margin:0;
-  padding:0;
+  -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body{
+html,body{
   width:100%;
   height:100%;
+  margin:0;
   overflow:hidden;
-  background:#101214;
-  font-family:Arial,Helvetica,sans-serif;
-  touch-action:none;
+  background:#87c9d8;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:#fff;
 }
 
 body{
-  overscroll-behavior:none;
-}
-
-button{
-  font:inherit;
+  touch-action:none;
 }
 
 #game{
@@ -51,349 +36,314 @@ canvas{
   display:block;
   width:100%;
   height:100%;
-  touch-action:none;
 }
 
-/* =========================================================
-   LOADING
-========================================================= */
-
-#loading{
-  position:fixed;
-  inset:0;
-  z-index:100;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  gap:10px;
-  padding:24px;
-  background:
-    radial-gradient(
-      circle at 50% 35%,
-      rgba(255,214,107,.08),
-      transparent 35%
-    ),
-    #101214;
-  color:#fff;
-  text-align:center;
-  font-size:18px;
-}
-
-#loading small{
-  max-width:340px;
-  line-height:1.5;
-  opacity:.65;
-  font-size:13px;
-}
-
-#loading.error{
-  color:#fff;
-}
-
-#loading .loadingIcon{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  border:3px solid rgba(255,255,255,.16);
-  border-top-color:var(--accent);
-  animation:spin .8s linear infinite;
-}
-
-@keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
-}
-
-#retryButton{
-  margin-top:8px;
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:10px;
-  padding:10px 14px;
-  background:rgba(255,255,255,.08);
-  color:#fff;
-  cursor:pointer;
-}
-
-/* =========================================================
-   PLAYER INFO
-========================================================= */
-
-#info{
+#hud{
   position:fixed;
   top:14px;
   left:14px;
+  right:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  pointer-events:none;
   z-index:20;
-  min-width:220px;
-  max-width:calc(100vw - 92px);
-  padding:13px 15px;
-  border:1px solid var(--glass-border);
-  border-radius:15px;
-  background:var(--glass);
-  color:#fff;
+}
+
+.panel{
+  background:rgba(10,16,20,.72);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
-  box-shadow:0 12px 35px rgba(0,0,0,.18);
+  border-radius:16px;
 }
 
-#info strong{
-  display:block;
-  margin-bottom:5px;
-  font-size:16px;
-  letter-spacing:.1px;
+#info{
+  padding:11px 14px;
+  min-width:145px;
 }
 
-#playerName{
-  display:block;
-  font-size:14px;
-  font-weight:700;
+#name{
+  font-size:15px;
+  font-weight:800;
 }
 
-#playerDetails{
-  display:block;
-  margin-top:4px;
-  color:rgba(255,255,255,.68);
-  font-size:12px;
+#sub{
+  margin-top:2px;
+  color:#c9d4d8;
+  font-size:11px;
 }
 
 #status{
+  margin-top:7px;
+  color:#ffd54a;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+#topButtons{
   display:flex;
-  align-items:center;
-  gap:7px;
-  margin-top:8px;
-  color:var(--accent);
-  font-size:12px;
-  font-weight:700;
+  gap:8px;
+  pointer-events:auto;
 }
 
-#statusDot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:var(--accent);
-  box-shadow:0 0 10px rgba(255,214,107,.65);
-}
-
-#backButton{
-  position:fixed;
-  top:14px;
-  right:14px;
-  z-index:25;
-  border:1px solid var(--glass-border);
-  border-radius:11px;
-  padding:10px 14px;
-  background:var(--glass);
-  color:#fff;
+.uiBtn{
+  min-width:44px;
+  height:44px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:13px;
+  background:rgba(10,16,20,.75);
+  color:white;
+  font-weight:800;
   cursor:pointer;
   backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  transition:
-    transform .15s ease,
-    background .15s ease;
 }
 
-#backButton:hover{
-  background:rgba(0,0,0,.78);
+.uiBtn:active{
+  transform:scale(.95);
 }
 
-#backButton:active{
-  transform:scale(.96);
-}
-
-/* =========================================================
-   MOBILE JOYSTICK
-========================================================= */
-
-#controls{
+#backBtn{
   position:fixed;
-  left:22px;
-  bottom:22px;
-  z-index:25;
-  width:138px;
-  height:138px;
-  border:2px solid rgba(255,255,255,.15);
+  left:14px;
+  bottom:14px;
+  z-index:30;
+  height:48px;
+  padding:0 17px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(10,16,20,.78);
+  color:white;
+  font-weight:800;
+}
+
+#customizeBtn{
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  z-index:30;
+  height:48px;
+  padding:0 17px;
+  border:0;
+  border-radius:15px;
+  background:#f3c53f;
+  color:#171717;
+  font-weight:900;
+  box-shadow:0 8px 25px rgba(0,0,0,.2);
+}
+
+#joystick{
+  position:fixed;
+  left:18px;
+  bottom:82px;
+  width:126px;
+  height:126px;
   border-radius:50%;
-  background:
-    radial-gradient(
-      circle,
-      rgba(255,255,255,.09),
-      rgba(255,255,255,.035)
-    );
-  box-shadow:
-    inset 0 0 25px rgba(255,255,255,.025),
-    0 12px 30px rgba(0,0,0,.2);
-  touch-action:none;
+  background:rgba(10,16,20,.22);
+  border:1px solid rgba(255,255,255,.18);
+  z-index:25;
+  display:none;
 }
 
 #stick{
   position:absolute;
-  left:50%;
-  top:50%;
-  width:60px;
-  height:60px;
-  margin-left:-30px;
-  margin-top:-30px;
-  border:1px solid rgba(255,255,255,.25);
+  width:54px;
+  height:54px;
+  left:36px;
+  top:36px;
   border-radius:50%;
-  background:
-    radial-gradient(
-      circle at 32% 28%,
-      rgba(255,255,255,.72),
-      rgba(255,255,255,.45)
-    );
-  box-shadow:
-    0 8px 22px rgba(0,0,0,.3),
-    inset 0 2px 5px rgba(255,255,255,.22);
-  pointer-events:none;
-  will-change:transform;
+  background:rgba(255,255,255,.86);
+  box-shadow:0 5px 18px rgba(0,0,0,.2);
 }
 
-/* =========================================================
-   ACTION BUTTONS
-========================================================= */
-
-#actions{
+#runBtn{
   position:fixed;
   right:18px;
-  bottom:18px;
+  bottom:82px;
+  width:76px;
+  height:76px;
+  border-radius:50%;
   z-index:25;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.actionButton{
-  min-width:78px;
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:12px;
-  padding:10px 12px;
-  background:var(--glass);
-  color:#fff;
-  cursor:pointer;
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  box-shadow:0 8px 24px rgba(0,0,0,.16);
-  transition:
-    transform .12s ease,
-    background .12s ease;
-}
-
-.actionButton:hover{
-  background:rgba(0,0,0,.78);
-}
-
-.actionButton:active{
-  transform:scale(.96);
-}
-
-#sprintButton{
   display:none;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(10,16,20,.68);
+  color:white;
+  font-weight:900;
 }
 
-/* =========================================================
-   DESKTOP HINT
-========================================================= */
+#runBtn.active{
+  background:#f3c53f;
+  color:#171717;
+}
 
-#desktopControls{
+#customizer{
   position:fixed;
-  right:18px;
-  bottom:18px;
-  z-index:20;
-  padding:10px 14px;
-  border:1px solid var(--glass-border);
-  border-radius:11px;
-  background:var(--glass);
-  color:rgba(255,255,255,.86);
-  font-size:12px;
-  line-height:1.45;
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
+  z-index:100;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(8,12,15,.96);
+  border-top:1px solid rgba(255,255,255,.1);
+  box-shadow:0 -20px 50px rgba(0,0,0,.35);
+  transform:translateY(105%);
+  transition:transform .3s cubic-bezier(.22,.8,.25,1);
+  padding:14px;
+  max-height:76vh;
+  overflow:auto;
+  overscroll-behavior:contain;
 }
 
-#desktopControls strong{
+#customizer.open{
+  transform:translateY(0);
+}
+
+.sheetHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+
+.sheetTitle{
+  font-size:17px;
+  font-weight:900;
+}
+
+.close{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#151c20;
   color:#fff;
 }
 
-#cameraHint{
-  position:fixed;
-  left:50%;
-  bottom:16px;
-  transform:translateX(-50%);
-  z-index:15;
-  padding:7px 10px;
-  border-radius:999px;
-  background:rgba(0,0,0,.34);
-  color:rgba(255,255,255,.56);
-  font-size:11px;
-  pointer-events:none;
-  white-space:nowrap;
+.section{
+  margin-top:15px;
 }
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+.sectionTitle{
+  font-size:11px;
+  color:#9eabb0;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  font-weight:900;
+  margin-bottom:8px;
+}
 
-@media(max-width:700px){
+.options{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:4px;
+}
 
-  #desktopControls,
-  #cameraHint{
-    display:none;
-  }
+.option{
+  flex:0 0 auto;
+  min-width:82px;
+  min-height:56px;
+  padding:9px 11px;
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#151c20;
+  color:#e9edef;
+  font-size:11px;
+  font-weight:800;
+}
 
-  #info{
-    min-width:172px;
-    padding:10px 12px;
-  }
+.option.selected{
+  border-color:#f3c53f;
+  background:#332d17;
+  color:#ffd84e;
+}
 
-  #info strong{
-    font-size:14px;
-  }
+#saveConfig{
+  width:100%;
+  height:50px;
+  margin-top:17px;
+  border:0;
+  border-radius:15px;
+  background:#f3c53f;
+  color:#151515;
+  font-weight:950;
+  font-size:14px;
+}
 
-  #playerName{
-    font-size:13px;
-  }
+#jsonOutput{
+  display:none;
+  width:100%;
+  min-height:110px;
+  margin-top:10px;
+  resize:none;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;
+  padding:10px;
+  background:#090d0f;
+  color:#b9e7d4;
+  font:11px monospace;
+}
 
-  #playerDetails{
-    font-size:11px;
-  }
+#loading{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:#10191d;
+  transition:opacity .35s ease;
+}
 
-  #status{
-    font-size:11px;
-  }
+#loading.hidden{
+  opacity:0;
+  pointer-events:none;
+}
 
-  #controls{
-    left:18px;
-    bottom:18px;
-    width:130px;
-    height:130px;
-  }
+.loader{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:4px solid rgba(255,255,255,.15);
+  border-top-color:#f3c53f;
+  animation:spin .8s linear infinite;
+}
 
-  #stick{
-    width:55px;
-    height:55px;
-    margin-left:-27.5px;
-    margin-top:-27.5px;
-  }
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
 
-  #actions{
-    right:16px;
-    bottom:18px;
-  }
+.loadingText{
+  margin-top:13px;
+  color:#d9e0e2;
+  font-size:12px;
+  font-weight:700;
+}
 
-  .actionButton{
-    min-width:72px;
-    padding:9px 11px;
-    font-size:12px;
-  }
-
-  #sprintButton{
+@media (pointer:coarse){
+  #joystick,
+  #runBtn{
     display:block;
   }
+}
 
-  #backButton{
-    padding:9px 12px;
-    font-size:12px;
+@media (min-width:800px){
+  #customizer{
+    left:auto;
+    right:18px;
+    bottom:18px;
+    width:390px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:20px;
+    transform:translateX(110%);
+    max-height:80vh;
+  }
+
+  #customizer.open{
+    transform:translateX(0);
   }
 }
 </style>
@@ -401,1082 +351,877 @@ canvas{
 
 <body>
 
-<div id="loading">
-  <div class="loadingIcon"></div>
-  <div>Loading 3D Avatar...</div>
-  <small>Loading your Naija Hustle character</small>
-</div>
-
 <div id="game"></div>
 
-<div id="info">
-  <strong>Naija Hustle</strong>
-  <span id="playerName">Loading player...</span>
-  <span id="playerDetails"></span>
+<div id="hud">
+  <div id="info" class="panel">
+    <div id="name">Naija Hustle</div>
+    <div id="sub">Avatar</div>
+    <div id="status">Idle</div>
+  </div>
 
-  <span id="status">
-    <span id="statusDot"></span>
-    <span id="statusText">Loading...</span>
-  </span>
+  <div id="topButtons">
+    <button class="uiBtn" id="cameraBtn">C</button>
+  </div>
 </div>
 
-<button id="backButton">← Back</button>
+<button id="backBtn">← Back</button>
+<button id="customizeBtn">Customize</button>
 
-<div id="controls">
+<div id="joystick">
   <div id="stick"></div>
 </div>
 
-<div id="actions">
-  <button
-    class="actionButton"
-    id="cameraButton"
-    type="button"
-  >
-    Camera
-  </button>
+<button id="runBtn">RUN</button>
 
-  <button
-    class="actionButton"
-    id="sprintButton"
-    type="button"
-  >
-    Run
-  </button>
+<div id="customizer">
+  <div class="sheetHead">
+    <div class="sheetTitle">Customize Avatar</div>
+    <button class="close" id="closeCustomizer">×</button>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Skin tone</div>
+    <div class="options" id="skinOptions"></div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Hairstyle</div>
+    <div class="options" id="hairOptions"></div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Hair colour</div>
+    <div class="options" id="hairColorOptions"></div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Outfit</div>
+    <div class="options" id="outfitOptions"></div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle">Accessory</div>
+    <div class="options" id="accessoryOptions"></div>
+  </div>
+
+  <button id="saveConfig">SAVE AVATAR</button>
+  <textarea id="jsonOutput" readonly></textarea>
 </div>
 
-<div id="desktopControls">
-  <strong>Move:</strong> WASD / Arrow Keys<br>
-  <strong>Run:</strong> Shift<br>
-  <strong>Camera:</strong> C or drag
+<div id="loading">
+  <div class="loader"></div>
+  <div class="loadingText">Loading Naija Hustle...</div>
 </div>
-
-<div id="cameraHint">
-  Drag the screen to look around
-</div>
-
 
 <script type="module">
-
-/* =========================================================
-   SUPABASE
-========================================================= */
-
-const SUPABASE_URL =
-  "https://pbqtbwiymlwksdtfsfcb.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
-
-const db =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
 
 /* =========================================================
    THREE.JS
 ========================================================= */
 
 import * as THREE from
-  "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
 
 /* =========================================================
-   DOM
+   CONFIGURATION
 ========================================================= */
 
-const loading =
-  document.getElementById(
-    "loading"
-  );
+const CONFIG = {
 
-const playerName =
-  document.getElementById(
-    "playerName"
-  );
+  movement:{
+    walkSpeed:4.1,
+    runSpeed:6.6,
+    acceleration:12,
+    deceleration:16,
+    rotationSpeed:10
+  },
 
-const playerDetails =
-  document.getElementById(
-    "playerDetails"
-  );
+  world:{
+    size:110,
+    roadWidth:14
+  },
 
-const statusText =
-  document.getElementById(
-    "statusText"
-  );
+  camera:{
+    distance:7.2,
+    height:4.0,
+    smoothing:7
+  },
 
-const cameraButton =
-  document.getElementById(
-    "cameraButton"
-  );
+  avatar:{
+    height:3.15
+  }
 
-const sprintButton =
-  document.getElementById(
-    "sprintButton"
-  );
+};
+
+
+/* =========================================================
+   CUSTOMIZATION DATA
+   Add new options here.
+========================================================= */
+
+const OPTIONS = {
+
+  skinTone:{
+    light:"#f3c39e",
+    honey:"#d99b6c",
+    brown:"#a96842",
+    deep:"#70412f",
+    dark:"#4c2d25"
+  },
+
+  hairstyle:{
+    low_cut:"Low Cut",
+    fade:"Fade",
+    afro:"Afro",
+    twists:"Twists",
+    braids:"Braids",
+    locs:"Locs",
+    headwrap:"Headwrap"
+  },
+
+  hairColor:{
+    black:"#171311",
+    brown:"#3a2419",
+    darkBrown:"#211712",
+    burgundy:"#3b171d"
+  },
+
+  outfit:{
+    hoodie:{
+      name:"Hoodie",
+      shirt:"#263747",
+      pants:"#171b20"
+    },
+
+    jersey:{
+      name:"Jersey",
+      shirt:"#147a73",
+      pants:"#20252b"
+    },
+
+    kaftan:{
+      name:"Kaftan",
+      shirt:"#d7d0bc",
+      pants:"#3b3b38"
+    },
+
+    agbada:{
+      name:"Agbada",
+      shirt:"#f0e6c9",
+      pants:"#4b4232"
+    },
+
+    ankara:{
+      name:"Ankara",
+      shirt:"#d8a22b",
+      pants:"#222d39"
+    },
+
+    suit:{
+      name:"Suit",
+      shirt:"#20252e",
+      pants:"#17191e"
+    }
+  },
+
+  accessory:{
+    none:"None",
+    cap:"Cap",
+    glasses:"Glasses",
+    chain:"Chain",
+    headphones:"Headphones"
+  }
+
+};
+
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+const state = {
+
+  config:{
+    skinTone:"brown",
+    hairstyle:"fade",
+    hairColor:"black",
+    outfit:"hoodie",
+    accessory:"none"
+  },
+
+  keys:{
+    up:false,
+    down:false,
+    left:false,
+    right:false,
+    run:false
+  },
+
+  joystick:{
+    active:false,
+    x:0,
+    y:0
+  },
+
+  running:false,
+  cameraMode:0,
+
+  velocity:new THREE.Vector3(),
+
+  cameraYaw:0,
+
+  cameraPitch:.18
+
+};
 
 
 /* =========================================================
    SCENE
 ========================================================= */
 
-const scene =
-  new THREE.Scene();
+const scene = new THREE.Scene();
 
-scene.background =
-  new THREE.Color(
-    0x86cdec
-  );
+scene.background = new THREE.Color("#8fcbd6");
 
-scene.fog =
-  new THREE.Fog(
-    0x86cdec,
-    35,
-    125
-  );
+scene.fog = new THREE.Fog(
+  "#8fcbd6",
+  28,
+  105
+);
 
 
-/* =========================================================
-   CAMERA
-========================================================= */
+const camera = new THREE.PerspectiveCamera(
+  48,
+  innerWidth / innerHeight,
+  .05,
+  180
+);
 
-const camera =
-  new THREE.PerspectiveCamera(
-    55,
-    window.innerWidth /
-      window.innerHeight,
-    .08,
-    350
-  );
-
-
-/*
-  Start slightly in front of the character
-  so the user's face is immediately visible.
-  Dragging rotates the camera freely.
-*/
-
-let cameraYaw =
-  Math.PI;
-
-let cameraPitch =
-  .30;
-
-const CAMERA_DISTANCE =
-  6.4;
-
-const CAMERA_HEIGHT =
-  1.8;
-
-const cameraPositionTarget =
-  new THREE.Vector3();
-
-const cameraLookTarget =
-  new THREE.Vector3();
+camera.position.set(
+  0,
+  4,
+  7
+);
 
 
-/* =========================================================
-   RENDERER
-========================================================= */
-
-const renderer =
-  new THREE.WebGLRenderer({
-    antialias:true,
-    powerPreference:
-      "high-performance"
-  });
+const renderer = new THREE.WebGLRenderer({
+  antialias:true,
+  powerPreference:"high-performance"
+});
 
 renderer.setPixelRatio(
-  Math.min(
-    window.devicePixelRatio || 1,
-    1.75
-  )
+  Math.min(devicePixelRatio,2)
 );
 
 renderer.setSize(
-  window.innerWidth,
-  window.innerHeight
+  innerWidth,
+  innerHeight
 );
 
 renderer.shadowMap.enabled=true;
 
-renderer.shadowMap.type =
+renderer.shadowMap.type=
   THREE.PCFSoftShadowMap;
 
-renderer.outputColorSpace =
+renderer.outputColorSpace=
   THREE.SRGBColorSpace;
 
-renderer.toneMapping =
+renderer.toneMapping=
   THREE.ACESFilmicToneMapping;
 
-renderer.toneMappingExposure =
-  1.06;
-
-renderer.domElement.style.touchAction =
-  "none";
+renderer.toneMappingExposure=1.05;
 
 document
   .getElementById("game")
-  .appendChild(
-    renderer.domElement
-  );
+  .appendChild(renderer.domElement);
 
 
 /* =========================================================
    LIGHTING
 ========================================================= */
 
-const hemisphere =
+const hemi =
   new THREE.HemisphereLight(
-    0xffffff,
-    0x33472e,
+    "#e7fbff",
+    "#3f5547",
     2.1
   );
 
-scene.add(
-  hemisphere
-);
+scene.add(hemi);
 
 
-const sun =
+const key =
   new THREE.DirectionalLight(
-    0xffffff,
-    3
+    "#fff2d1",
+    3.0
   );
 
-sun.position.set(
-  15,
-  25,
-  12
+key.position.set(
+  -8,
+  14,
+  8
 );
 
-sun.castShadow=true;
+key.castShadow=true;
 
-sun.shadow.mapSize.width=
-  1536;
-
-sun.shadow.mapSize.height=
-  1536;
-
-sun.shadow.camera.left=
-  -30;
-
-sun.shadow.camera.right=
-  30;
-
-sun.shadow.camera.top=
-  30;
-
-sun.shadow.camera.bottom=
-  -30;
-
-sun.shadow.camera.near=
-  .5;
-
-sun.shadow.camera.far=
-  90;
-
-sun.shadow.bias=
-  -.0005;
-
-scene.add(
-  sun
+key.shadow.mapSize.set(
+  1024,
+  1024
 );
 
+key.shadow.camera.left=-20;
+key.shadow.camera.right=20;
+key.shadow.camera.top=20;
+key.shadow.camera.bottom=-20;
 
-/* subtle fill */
+key.shadow.bias=-.0005;
 
-const fill =
+scene.add(key);
+
+
+const rim =
   new THREE.DirectionalLight(
-    0xbfdcff,
-    .45
+    "#77d9d0",
+    1.1
   );
 
-fill.position.set(
-  -15,
+rim.position.set(
   8,
-  -20
+  7,
+  -8
 );
 
-scene.add(
-  fill
-);
+scene.add(rim);
 
 
 /* =========================================================
-   WORLD MATERIALS
+   MATERIAL CACHE
 ========================================================= */
 
-const groundMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x4e7c43,
-    roughness:1
-  });
+const materialCache = new Map();
 
 
-const roadMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x303235,
-    roughness:.95
-  });
+function material(
+  color,
+  roughness=.72,
+  metalness=0
+){
+
+  const key =
+    `${color}_${roughness}_${metalness}`;
+
+  if(materialCache.has(key)){
+    return materialCache.get(key);
+  }
+
+  const m =
+    new THREE.MeshStandardMaterial({
+      color,
+      roughness,
+      metalness
+    });
+
+  materialCache.set(key,m);
+
+  return m;
+}
 
 
-const concreteMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x8a8b88,
-    roughness:.95
-  });
+/* =========================================================
+   GEOMETRY CACHE
+========================================================= */
+
+const geometryCache = {};
 
 
-const lineMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0xf2f1dd,
-    roughness:.72
-  });
+function sphereGeometry(
+  radius,
+  width=24,
+  height=16
+){
+
+  const key=
+    `sphere_${radius}_${width}_${height}`;
+
+  if(!geometryCache[key]){
+    geometryCache[key]=
+      new THREE.SphereGeometry(
+        radius,
+        width,
+        height
+      );
+  }
+
+  return geometryCache[key];
+}
+
+
+function capsuleGeometry(
+  radius,
+  length,
+  capSegments=6,
+  radialSegments=12
+){
+
+  const key=
+    `capsule_${radius}_${length}_${capSegments}_${radialSegments}`;
+
+  if(!geometryCache[key]){
+
+    geometryCache[key]=
+      new THREE.CapsuleGeometry(
+        radius,
+        length,
+        capSegments,
+        radialSegments
+      );
+
+  }
+
+  return geometryCache[key];
+}
+
+
+/* =========================================================
+   MESH HELPERS
+========================================================= */
+
+function makeSphere(
+  radius,
+  color
+){
+
+  const mesh =
+    new THREE.Mesh(
+      sphereGeometry(radius),
+      material(color)
+    );
+
+  mesh.castShadow=true;
+  mesh.receiveShadow=true;
+
+  return mesh;
+}
+
+
+function makeCapsule(
+  radius,
+  length,
+  color
+){
+
+  const mesh =
+    new THREE.Mesh(
+      capsuleGeometry(radius,length),
+      material(color)
+    );
+
+  mesh.castShadow=true;
+  mesh.receiveShadow=true;
+
+  return mesh;
+}
+
+
+function makeBox(
+  x,
+  y,
+  z,
+  color,
+  radius=.08
+){
+
+  const geometry =
+    new THREE.BoxGeometry(
+      x,y,z
+    );
+
+  const mesh =
+    new THREE.Mesh(
+      geometry,
+      material(color)
+    );
+
+  mesh.castShadow=true;
+  mesh.receiveShadow=true;
+
+  return mesh;
+}
 
 
 /* =========================================================
    WORLD
 ========================================================= */
 
-const ground =
-  new THREE.Mesh(
-    new THREE.PlaneGeometry(
-      220,
-      220
-    ),
-    groundMaterial
-  );
+function createWorld(){
 
-ground.rotation.x=
-  -Math.PI/2;
-
-ground.receiveShadow=true;
-
-scene.add(
-  ground
-);
-
-
-/* Road */
-
-const road =
-  new THREE.Mesh(
-    new THREE.PlaneGeometry(
-      12,
-      220
-    ),
-    roadMaterial
-  );
-
-road.rotation.x=
-  -Math.PI/2;
-
-road.position.y=.01;
-
-road.receiveShadow=true;
-
-scene.add(
-  road
-);
-
-
-/* Sidewalks */
-
-const leftWalk =
-  new THREE.Mesh(
-    new THREE.BoxGeometry(
-      2.25,
-      .16,
-      220
-    ),
-    concreteMaterial
-  );
-
-leftWalk.position.set(
-  -7.12,
-  .08,
-  0
-);
-
-leftWalk.receiveShadow=true;
-
-scene.add(
-  leftWalk
-);
-
-
-const rightWalk =
-  leftWalk.clone();
-
-rightWalk.position.x=
-  7.12;
-
-scene.add(
-  rightWalk
-);
-
-
-/* Road markings */
-
-for(
-  let z=-105;
-  z<110;
-  z+=8
-){
-
-  const line =
+  const ground =
     new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .26,
-        .025,
-        4
+      new THREE.PlaneGeometry(
+        CONFIG.world.size,
+        CONFIG.world.size
       ),
-      lineMaterial
+      material("#4d7755")
     );
 
-  line.position.set(
-    0,
-    .035,
-    z
-  );
+  ground.rotation.x=-Math.PI/2;
+  ground.receiveShadow=true;
 
-  scene.add(
-    line
-  );
-}
+  scene.add(ground);
 
 
-/* Edge lines */
+  /* Road */
 
-for(
-  const x of [-5.25,5.25]
-){
-
-  const edge =
+  const road =
     new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .055,
-        .02,
-        220
+      new THREE.PlaneGeometry(
+        CONFIG.world.roadWidth,
+        CONFIG.world.size
       ),
-      lineMaterial
+      material("#303437",.92)
     );
 
-  edge.position.set(
-    x,
-    .031,
-    0
-  );
+  road.rotation.x=-Math.PI/2;
+  road.position.y=.008;
 
-  scene.add(
-    edge
-  );
-}
+  scene.add(road);
 
 
-/* =========================================================
-   WORLD BUILDING MATERIALS
-========================================================= */
-
-const buildingMaterials=[
-  new THREE.MeshStandardMaterial({
-    color:0xb28767,
-    roughness:.95
-  }),
-
-  new THREE.MeshStandardMaterial({
-    color:0x8b8d8f,
-    roughness:.95
-  }),
-
-  new THREE.MeshStandardMaterial({
-    color:0x9b7359,
-    roughness:.95
-  }),
-
-  new THREE.MeshStandardMaterial({
-    color:0x73777b,
-    roughness:.95
-  }),
-
-  new THREE.MeshStandardMaterial({
-    color:0xa58a65,
-    roughness:.95
-  })
-];
-
-
-const windowMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x7fb7cb,
-    roughness:.35,
-    metalness:.08
-  });
-
-
-const darkMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x222426,
-    roughness:.8
-  });
-
-
-/* =========================================================
-   BUILDINGS
-========================================================= */
-
-function createBuilding(
-  x,
-  z,
-  width,
-  depth,
-  height,
-  materialIndex
-){
-
-  const group =
-    new THREE.Group();
-
-  group.position.set(
-    x,
-    0,
-    z
-  );
-
-  scene.add(
-    group
-  );
-
-
-  const building =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        width,
-        height,
-        depth
-      ),
-      buildingMaterials[
-        materialIndex %
-        buildingMaterials.length
-      ]
-    );
-
-  building.position.y=
-    height/2;
-
-  building.castShadow=true;
-  building.receiveShadow=true;
-
-  group.add(
-    building
-  );
-
-
-  /* roof */
-
-  const roof =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        width+.10,
-        .12,
-        depth+.10
-      ),
-      darkMaterial
-    );
-
-  roof.position.y=
-    height+.06;
-
-  roof.castShadow=true;
-
-  group.add(
-    roof
-  );
-
-
-  /* door */
-
-  const door =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .6,
-        1.25,
-        .03
-      ),
-      darkMaterial
-    );
-
-  door.position.set(
-    0,
-    .63,
-    depth/2+.016
-  );
-
-  group.add(
-    door
-  );
-
-
-  /* windows */
-
-  const columns=
-    Math.max(
-      1,
-      Math.floor(
-        width/1.8
-      )
-    );
-
-  const rows=
-    Math.max(
-      1,
-      Math.floor(
-        height/2.1
-      )
-    );
-
+  /* Lane markings */
 
   for(
-    let row=0;
-    row<rows;
-    row++
+    let z=-50;
+    z<55;
+    z+=8
   ){
 
-    for(
-      let col=0;
-      col<columns;
-      col++
-    ){
-
-      const windowMesh =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            .42,
-            .58,
-            .03
-          ),
-          windowMaterial
-        );
-
-
-      const usableWidth =
-        Math.max(
-          0,
-          width-1.25
-        );
-
-
-      const windowX =
-        columns===1
-          ? 0
-          : -usableWidth/2+
-            col*
-            (
-              usableWidth/
-              (columns-1)
-            );
-
-
-      windowMesh.position.set(
-        windowX,
-        1.35+
-          row*1.85,
-        depth/2+.018
+    const marker =
+      new THREE.Mesh(
+        new THREE.PlaneGeometry(
+          .16,
+          4
+        ),
+        material("#eee9cf")
       );
 
-      group.add(
-        windowMesh
-      );
-    }
+    marker.rotation.x=-Math.PI/2;
+
+    marker.position.set(
+      0,
+      .015,
+      z
+    );
+
+    scene.add(marker);
   }
 
 
-  /* side shadow wall detail */
+  /* Pavements */
 
-  const sideDetail =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .06,
-        height*.72,
-        depth*.55
-      ),
-      darkMaterial
+  for(const x of [-9,9]){
+
+    const pavement =
+      new THREE.Mesh(
+        new THREE.BoxGeometry(
+          3,
+          .16,
+          CONFIG.world.size
+        ),
+        material("#8a8980")
+      );
+
+    pavement.position.set(
+      x,
+      .08,
+      0
     );
 
-  sideDetail.position.set(
-    width/2+.032,
-    height*.42,
-    0
-  );
+    pavement.receiveShadow=true;
 
-  sideDetail.material =
-    sideDetail.material.clone();
-
-  sideDetail.material.color
-    .multiplyScalar(.88);
-
-  group.add(
-    sideDetail
-  );
+    scene.add(pavement);
+  }
 
 
-  return group;
-}
+  createBuildings();
+  createStreetLights();
+  createTrees();
+  createDanfo();
 
 
-/* left side */
+  /* Distant Lagos skyline */
 
-createBuilding(
-  -10,
-  -16,
-  4.4,
-  8.5,
-  6.2,
-  0
-);
-
-createBuilding(
-  -10.5,
-  11,
-  4.7,
-  9,
-  5.7,
-  2
-);
-
-createBuilding(
-  -10,
-  42,
-  4.2,
-  8,
-  6.1,
-  1
-);
-
-createBuilding(
-  -10.5,
-  71,
-  4.6,
-  9,
-  6.7,
-  4
-);
-
-
-/* right side */
-
-createBuilding(
-  10.5,
-  -31,
-  4.6,
-  9,
-  7,
-  1
-);
-
-createBuilding(
-  10.2,
-  -2,
-  4.2,
-  8,
-  5.6,
-  3
-);
-
-createBuilding(
-  10.5,
-  27,
-  4.5,
-  9,
-  6.5,
-  0
-);
-
-createBuilding(
-  10,
-  60,
-  4.2,
-  8,
-  5.8,
-  2
-);
-
-createBuilding(
-  10.6,
-  88,
-  4.4,
-  8,
-  6.4,
-  3
-);
-
-
-/* =========================================================
-   STREET LIGHTS
-========================================================= */
-
-function createStreetLight(
-  x,
-  z
-){
-
-  const poleMaterial =
-    new THREE.MeshStandardMaterial({
-      color:0x282a2c,
-      roughness:.85
-    });
-
-
-  const pole =
-    new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .045,
-        .07,
-        3.6,
-        10
-      ),
-      poleMaterial
-    );
-
-  pole.position.set(
-    x,
-    1.8,
-    z
-  );
-
-  pole.castShadow=true;
-
-  scene.add(
-    pole
-  );
-
-
-  const arm =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .7,
-        .05,
-        .05
-      ),
-      poleMaterial
-    );
-
-  arm.position.set(
-    x+
-      (x<0 ? .31 : -.31),
-    3.42,
-    z
-  );
-
-  scene.add(
-    arm
-  );
-
-
-  const lampMaterial =
-    new THREE.MeshStandardMaterial({
-      color:0xffe6a3,
-      emissive:0xffc85c,
-      emissiveIntensity:.85,
-      roughness:.3
-    });
-
-
-  const lamp =
-    new THREE.Mesh(
-      new THREE.SphereGeometry(
-        .11,
-        12,
-        12
-      ),
-      lampMaterial
-    );
-
-  lamp.position.set(
-    x+
-      (x<0 ? .61 : -.61),
-    3.39,
-    z
-  );
-
-  scene.add(
-    lamp
-  );
-}
-
-
-for(
-  let z=-88;
-  z<100;
-  z+=18
-){
-
-  createStreetLight(
-    -6.25,
-    z
-  );
-
-  createStreetLight(
-    6.25,
-    z+9
-  );
-}
-
-
-/* =========================================================
-   TREES
-========================================================= */
-
-const trunkMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x5c3823,
-    roughness:1
-  });
-
-
-const leafMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x376b36,
-    roughness:1
-  });
-
-
-function createTree(
-  x,
-  z,
-  scale=1
-){
-
-  const group =
+  const skyline =
     new THREE.Group();
 
-  group.position.set(
-    x,
-    0,
-    z
-  );
+  for(
+    let i=0;
+    i<22;
+    i++
+  ){
 
-  group.scale.setScalar(
-    scale
-  );
+    const width=
+      2+Math.random()*4;
 
-  scene.add(
-    group
-  );
+    const height=
+      5+Math.random()*13;
 
+    const building=
+      makeBox(
+        width,
+        height,
+        2+Math.random()*3,
+        i%3===0
+          ? "#6d8b91"
+          : "#526c73"
+      );
 
-  const trunk =
-    new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .10,
-        .14,
-        1.45,
-        8
-      ),
-      trunkMaterial
+    building.position.set(
+      -52+i*5,
+      height/2,
+      -38-Math.random()*8
     );
 
-  trunk.position.y=
-    .72;
+    skyline.add(building);
+  }
 
-  trunk.castShadow=true;
-
-  group.add(
-    trunk
-  );
-
-
-  const crown1 =
-    new THREE.Mesh(
-      new THREE.IcosahedronGeometry(
-        .65,
-        1
-      ),
-      leafMaterial
-    );
-
-  crown1.position.y=
-    1.65;
-
-  crown1.castShadow=true;
-
-  group.add(
-    crown1
-  );
-
-
-  const crown2 =
-    crown1.clone();
-
-  crown2.scale.setScalar(
-    .72
-  );
-
-  crown2.position.set(
-    -.28,
-    1.95,
-    .05
-  );
-
-  group.add(
-    crown2
-  );
-
-
-  const crown3 =
-    crown1.clone();
-
-  crown3.scale.setScalar(
-    .68
-  );
-
-  crown3.position.set(
-    .30,
-    1.92,
-    -.04
-  );
-
-  group.add(
-    crown3
-  );
+  scene.add(skyline);
 }
 
 
-createTree(
-  -6.2,
-  -6,
-  .9
-);
+function createBuildings(){
 
-createTree(
-  6.2,
-  7,
-  1.0
-);
+  for(
+    let z=-45;
+    z<=45;
+    z+=12
+  ){
 
-createTree(
-  -6.2,
-  31,
-  .95
-);
+    for(
+      const x of [-16,16]
+    ){
 
-createTree(
-  6.2,
-  48,
-  .9
-);
+      const width=
+        5+Math.random()*3;
 
-createTree(
-  -6.2,
-  73,
-  1
-);
+      const depth=
+        6+Math.random()*3;
+
+      const height=
+        5+Math.random()*8;
+
+      const building=
+        makeBox(
+          width,
+          height,
+          depth,
+          Math.random()>.5
+            ? "#c1a783"
+            : "#a8b4ae"
+        );
+
+      building.position.set(
+        x,
+        height/2,
+        z
+      );
+
+      scene.add(building);
+
+
+      /* windows */
+
+      for(
+        let y=1.7;
+        y<height-1;
+        y+=1.7
+      ){
+
+        const windows=
+          makeBox(
+            width*.62,
+            .65,
+            .04,
+            "#273b40"
+          );
+
+        windows.position.set(
+          x,
+          y,
+          z-depth/2-.025
+        );
+
+        scene.add(windows);
+      }
+    }
+  }
+}
+
+
+function createStreetLights(){
+
+  for(
+    let z=-48;
+    z<=48;
+    z+=12
+  ){
+
+    for(
+      const x of [-10.5,10.5]
+    ){
+
+      const pole=
+        makeCapsule(
+          .055,
+          3.2,
+          "#35383a"
+        );
+
+      pole.position.set(
+        x,
+        1.7,
+        z
+      );
+
+      scene.add(pole);
+
+
+      const lamp=
+        makeSphere(
+          .18,
+          "#ffd76b"
+        );
+
+      lamp.position.set(
+        x,
+        3.4,
+        z
+      );
+
+      scene.add(lamp);
+    }
+  }
+}
+
+
+function createTrees(){
+
+  for(
+    let i=0;
+    i<18;
+    i++
+  ){
+
+    const x=
+      (Math.random()>.5?1:-1)
+      *(12+Math.random()*7);
+
+    const z=
+      -50+Math.random()*100;
+
+
+    const trunk=
+      makeCapsule(
+        .16,
+        1.8,
+        "#684a32"
+      );
+
+    trunk.position.set(
+      x,
+      .9,
+      z
+    );
+
+    scene.add(trunk);
+
+
+    const crown=
+      makeSphere(
+        .85+Math.random()*.35,
+        "#2d6b45"
+      );
+
+    crown.position.set(
+      x,
+      2.25,
+      z
+    );
+
+    scene.add(crown);
+  }
+}
+
+
+function createDanfo(){
+
+  const bus=
+    new THREE.Group();
+
+  const body=
+    makeBox(
+      2.25,
+      1.15,
+      4.2,
+      "#e7b928"
+    );
+
+  body.position.y=.9;
+
+  bus.add(body);
+
+
+  const lower=
+    makeBox(
+      2.28,
+      .25,
+      4.22,
+      "#26282b"
+    );
+
+  lower.position.y=.38;
+
+  bus.add(lower);
+
+
+  for(
+    const z of [-1.3,0,1.3]
+  ){
+
+    const window=
+      makeBox(
+        2.3,
+        .48,
+        .7,
+        "#28464c"
+      );
+
+    window.position.set(
+      0,
+      1.22,
+      z
+    );
+
+    bus.add(window);
+  }
+
+
+  bus.position.set(
+    13,
+    1,
+    -12
+  );
+
+  bus.rotation.y=
+    Math.PI/2;
+
+  scene.add(bus);
+}
 
 
 /* =========================================================
-   AVATAR ROOT
+   AVATAR
 ========================================================= */
 
 const avatar =
@@ -1488,1525 +1233,560 @@ avatar.position.set(
   0
 );
 
-scene.add(
-  avatar
-);
+scene.add(avatar);
 
 
-/*
-  visualRoot allows the character to rotate
-  independently from world movement.
-*/
-
-const visualRoot =
+const rig =
   new THREE.Group();
 
-avatar.add(
-  visualRoot
-);
+avatar.add(rig);
 
 
-const bodyRoot =
+const hips =
   new THREE.Group();
 
-visualRoot.add(
-  bodyRoot
-);
+hips.position.y=.98;
 
+rig.add(hips);
 
-/* Character front is LOCAL -Z. */
-let avatarYaw =
-  Math.PI;
-
-
-/* =========================================================
-   MATERIALS
-========================================================= */
-
-const skinMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x8d5524,
-    roughness:.76
-  });
-
-
-const skinDarkMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x643a21,
-    roughness:.84
-  });
-
-
-const shirtMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x202224,
-    roughness:.72
-  });
-
-
-const shirtSecondaryMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x35383b,
-    roughness:.72
-  });
-
-
-const pantsMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x252729,
-    roughness:.82
-  });
-
-
-const shoeMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x111315,
-    roughness:.52
-  });
-
-
-const shoeAccentMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x2c3034,
-    roughness:.42
-  });
-
-
-const soleMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x070809,
-    roughness:.72
-  });
-
-
-const hairMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x111111,
-    roughness:.98
-  });
-
-
-const whiteMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0xf5f1e8,
-    roughness:.42
-  });
-
-
-const eyeMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x130d09,
-    roughness:.25
-  });
-
-
-const mouthMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x431b1e,
-    roughness:.64
-  });
-
-
-const lipMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x774446,
-    roughness:.62
-  });
-
-
-const goldMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0xd4af37,
-    metalness:.78,
-    roughness:.23
-  });
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function mesh(
-  geometry,
-  material
-){
-
-  const object =
-    new THREE.Mesh(
-      geometry,
-      material
-    );
-
-  object.castShadow=true;
-  object.receiveShadow=true;
-
-  return object;
-}
-
-
-function sphere(
-  radius,
-  material,
-  widthSegments=20,
-  heightSegments=16
-){
-
-  return mesh(
-    new THREE.SphereGeometry(
-      radius,
-      widthSegments,
-      heightSegments
-    ),
-    material
-  );
-}
-
-
-function capsule(
-  radius,
-  length,
-  material
-){
-
-  return mesh(
-    new THREE.CapsuleGeometry(
-      radius,
-      length,
-      8,
-      16
-    ),
-    material
-  );
-}
-
-
-function box(
-  x,
-  y,
-  z,
-  material
-){
-
-  return mesh(
-    new THREE.BoxGeometry(
-      x,
-      y,
-      z
-    ),
-    material
-  );
-}
-
-
-function normalize(
-  value
-){
-
-  return String(
-    value || ""
-  )
-  .trim()
-  .toLowerCase()
-  .replace(
-    /[\s-]+/g,
-    "_"
-  );
-}
-
-
-function damp(
-  current,
-  target,
-  smoothing,
-  delta
-){
-
-  return THREE.MathUtils.damp(
-    current,
-    target,
-    smoothing,
-    delta
-  );
-}
-
-
-function dampAngle(
-  current,
-  target,
-  smoothing,
-  delta
-){
-
-  let difference =
-    target-current;
-
-  while(
-    difference>Math.PI
-  ){
-    difference-=Math.PI*2;
-  }
-
-  while(
-    difference<-Math.PI
-  ){
-    difference+=Math.PI*2;
-  }
-
-  return current+
-    difference*
-    (
-      1-
-      Math.exp(
-        -smoothing*
-        delta
-      )
-    );
-}
-
-
-/* =========================================================
-   FLOOR SHADOW
-========================================================= */
-
-const avatarShadow =
-  new THREE.Mesh(
-    new THREE.CircleGeometry(
-      .48,
-      32
-    ),
-    new THREE.MeshBasicMaterial({
-      color:0x000000,
-      transparent:true,
-      opacity:.17,
-      depthWrite:false
-    })
-  );
-
-avatarShadow.rotation.x=
-  -Math.PI/2;
-
-avatarShadow.position.y=
-  .015;
-
-avatar.add(
-  avatarShadow
-);
-
-
-/* =========================================================
-   LEGS
-========================================================= */
-
-function createLeg(
-  side
-){
-
-  const hip =
-    new THREE.Group();
-
-  hip.position.set(
-    side*.235,
-    1.05,
-    0
-  );
-
-  bodyRoot.add(
-    hip
-  );
-
-
-  const upperLeg =
-    capsule(
-      .16,
-      .54,
-      pantsMaterial
-    );
-
-  upperLeg.position.y=
-    -.29;
-
-  hip.add(
-    upperLeg
-  );
-
-
-  const kneeGroup =
-    new THREE.Group();
-
-  kneeGroup.position.y=
-    -.62;
-
-  hip.add(
-    kneeGroup
-  );
-
-
-  const knee =
-    sphere(
-      .166,
-      pantsMaterial,
-      16,
-      12
-    );
-
-  knee.scale.set(
-    .92,
-    .82,
-    .92
-  );
-
-  kneeGroup.add(
-    knee
-  );
-
-
-  const lowerLeg =
-    capsule(
-      .135,
-      .50,
-      pantsMaterial
-    );
-
-  lowerLeg.position.y=
-    -.29;
-
-  kneeGroup.add(
-    lowerLeg
-  );
-
-
-  const ankleGroup =
-    new THREE.Group();
-
-  ankleGroup.position.y=
-    -.58;
-
-  kneeGroup.add(
-    ankleGroup
-  );
-
-
-  const foot =
-    box(
-      .34,
-      .19,
-      .61,
-      shoeMaterial
-    );
-
-  foot.position.set(
-    0,
-    -.06,
-    -.10
-  );
-
-  ankleGroup.add(
-    foot
-  );
-
-
-  const sole =
-    box(
-      .36,
-      .055,
-      .64,
-      soleMaterial
-    );
-
-  sole.position.set(
-    0,
-    -.16,
-    -.10
-  );
-
-  ankleGroup.add(
-    sole
-  );
-
-
-  const toeAccent =
-    box(
-      .28,
-      .055,
-      .11,
-      shoeAccentMaterial
-    );
-
-  toeAccent.position.set(
-    0,
-    .005,
-    -.39
-  );
-
-  ankleGroup.add(
-    toeAccent
-  );
-
-
-  const lace1 =
-    box(
-      .06,
-      .025,
-      .16,
-      whiteMaterial
-    );
-
-  lace1.position.set(
-    -.055,
-    .04,
-    -.18
-  );
-
-  ankleGroup.add(
-    lace1
-  );
-
-
-  const lace2 =
-    lace1.clone();
-
-  lace2.position.x=
-    .055;
-
-  ankleGroup.add(
-    lace2
-  );
-
-
-  return {
-    hip,
-    kneeGroup,
-    ankleGroup,
-    upperLeg,
-    knee,
-    lowerLeg,
-    foot
-  };
-}
-
-
-const leftLeg =
-  createLeg(-1);
-
-const rightLeg =
-  createLeg(1);
-
-
-/* =========================================================
-   TORSO
-========================================================= */
 
 const torso =
   new THREE.Group();
 
-torso.position.y=
-  1.69;
+torso.position.y=1.25;
 
-bodyRoot.add(
-  torso
-);
+rig.add(torso);
 
 
-/* Main torso */
+const head =
+  new THREE.Group();
 
-const torsoMesh =
-  capsule(
-    .46,
-    .72,
-    shirtMaterial
-  );
+head.position.y=2.55;
 
-torsoMesh.scale.set(
-  1.04,
-  1,
-  .74
-);
-
-torso.add(
-  torsoMesh
-);
+rig.add(head);
 
 
-/* Waist */
+/* Body parts */
 
-const waist =
-  box(
-    .78,
-    .20,
-    .47,
-    pantsMaterial
-  );
+let bodyParts={};
 
-waist.position.y=
-  -.47;
-
-torso.add(
-  waist
-);
+let hairParts=[];
+let accessoryParts=[];
 
 
-/* Belt */
+function clearGroup(group){
 
-const beltMaterial =
-  new THREE.MeshStandardMaterial({
-    color:0x17191b,
-    roughness:.55
-  });
+  while(group.children.length){
 
+    const child=
+      group.children.pop();
 
-const belt =
-  box(
-    .82,
-    .075,
-    .50,
-    beltMaterial
-  );
+    child.traverse(obj=>{
 
-belt.position.y=
-  -.40;
+      if(obj.geometry &&
+         !Object.values(geometryCache)
+          .includes(obj.geometry)){
 
-torso.add(
-  belt
-);
+        obj.geometry.dispose();
+      }
 
+      if(obj.material &&
+         !materialCache.has(
+           [...materialCache.entries()]
+             .find(
+               ([,m])=>m===obj.material
+             )?.[0]
+         )){
 
-const beltBuckle =
-  box(
-    .12,
-    .11,
-    .035,
-    goldMaterial
-  );
+        obj.material.dispose();
+      }
 
-beltBuckle.position.set(
-  0,
-  -.40,
-  -.275
-);
-
-torso.add(
-  beltBuckle
-);
-
-
-/* shirt front panel */
-
-const chestPanel =
-  box(
-    .34,
-    .46,
-    .025,
-    shirtSecondaryMaterial
-  );
-
-chestPanel.position.set(
-  0,
-  .03,
-  -.348
-);
-
-torso.add(
-  chestPanel
-);
-
-
-/* buttons */
-
-for(
-  let i=0;
-  i<3;
-  i++
-){
-
-  const button =
-    sphere(
-      .018,
-      goldMaterial,
-      10,
-      8
-    );
-
-  button.position.set(
-    0,
-    .18-
-      i*.11,
-    -.371
-  );
-
-  torso.add(
-    button
-  );
+    });
+  }
 }
 
 
-/* collar */
-
-const collar =
-  new THREE.Mesh(
-    new THREE.TorusGeometry(
-      .16,
-      .032,
-      8,
-      24,
-      Math.PI*1.65
-    ),
-    whiteMaterial
-  );
-
-collar.rotation.x=
-  Math.PI/2;
-
-collar.position.set(
-  0,
-  .34,
-  -.31
-);
-
-torso.add(
-  collar
-);
-
-
 /* =========================================================
-   NECK
+   BUILD AVATAR
 ========================================================= */
 
-const neck =
-  capsule(
-    .15,
-    .16,
-    skinMaterial
-  );
+function buildAvatar(){
 
-neck.position.y=
-  2.18;
+  while(rig.children.length){
+    rig.remove(rig.children[0]);
+  }
 
-bodyRoot.add(
-  neck
-);
+  bodyParts={};
+  hairParts=[];
+  accessoryParts=[];
 
 
-/* =========================================================
-   HEAD
-========================================================= */
+  const skin =
+    OPTIONS.skinTone[state.config.skinTone]
+      || OPTIONS.skinTone.brown;
 
-const headGroup =
-  new THREE.Group();
+  const hair =
+    OPTIONS.hairColor[state.config.hairColor]
+      || OPTIONS.hairColor.black;
 
-headGroup.position.y=
-  2.63;
-
-bodyRoot.add(
-  headGroup
-);
+  const outfit =
+    OPTIONS.outfit[state.config.outfit]
+      || OPTIONS.outfit.hoodie;
 
 
-/*
-  Main head volume.
-  Multiple volumes make the face read more
-  naturally than one large smooth ball.
-*/
+  /* -------------------------
+     HIPS
+  ------------------------- */
 
-const head =
-  sphere(
-    .43,
-    skinMaterial,
-    32,
-    24
-  );
-
-head.scale.set(
-  .95,
-  1.08,
-  .90
-);
-
-headGroup.add(
-  head
-);
-
-
-/* jaw */
-
-const jaw =
-  sphere(
-    .29,
-    skinMaterial,
-    24,
-    16
-  );
-
-jaw.scale.set(
-  1.10,
-  .72,
-  .95
-);
-
-jaw.position.set(
-  0,
-  -.20,
-  -.015
-);
-
-headGroup.add(
-  jaw
-);
-
-
-/* chin */
-
-const chin =
-  sphere(
-    .16,
-    skinMaterial,
-    20,
-    14
-  );
-
-chin.scale.set(
-  1.05,
-  .66,
-  .84
-);
-
-chin.position.set(
-  0,
-  -.34,
-  -.035
-);
-
-headGroup.add(
-  chin
-);
-
-
-/* cheek volume */
-
-const cheekL =
-  sphere(
-    .17,
-    skinMaterial,
-    18,
-    14
-  );
-
-cheekL.scale.set(
-  1.03,
-  .74,
-  .75
-);
-
-cheekL.position.set(
-  -.245,
-  -.035,
-  -.265
-);
-
-headGroup.add(
-  cheekL
-);
-
-
-const cheekR =
-  cheekL.clone();
-
-cheekR.position.x=
-  .245;
-
-headGroup.add(
-  cheekR
-);
-
-
-/* =========================================================
-   EARS
-========================================================= */
-
-function createEar(
-  side
-){
-
-  const ear =
-    sphere(
-      .11,
-      skinMaterial,
-      18,
-      14
+  const pelvis=
+    makeCapsule(
+      .30,
+      .28,
+      skin
     );
 
-  ear.scale.set(
-    .54,
-    1.18,
-    .72
+  pelvis.scale.set(
+    1.15,
+    .72,
+    .82
   );
 
-  ear.position.set(
-    side*.412,
-    -.005,
+  hips.add(pelvis);
+
+
+  /* -------------------------
+     LEGS
+  ------------------------- */
+
+  bodyParts.leftUpperLeg=
+    makeCapsule(
+      .19,
+      .55,
+      outfit.pants
+    );
+
+  bodyParts.leftUpperLeg.position.set(
+    -.20,
+    -.43,
     0
   );
 
-  headGroup.add(
-    ear
+  hips.add(
+    bodyParts.leftUpperLeg
   );
 
 
-  const inner =
-    sphere(
-      .055,
-      skinDarkMaterial,
-      14,
-      10
+  bodyParts.rightUpperLeg=
+    makeCapsule(
+      .19,
+      .55,
+      outfit.pants
     );
 
-  inner.scale.set(
-    .52,
-    1,
-    .55
+  bodyParts.rightUpperLeg.position.set(
+    .20,
+    -.43,
+    0
   );
 
-  inner.position.set(
-    side*.438,
-    -.005,
-    -.015
-  );
-
-  headGroup.add(
-    inner
-  );
-}
-
-createEar(-1);
-createEar(1);
-
-
-/* =========================================================
-   EYES
-========================================================= */
-
-function createEye(
-  side
-){
-
-  /* subtle eye socket */
-
-  const socket =
-    sphere(
-      .094,
-      skinDarkMaterial,
-      16,
-      12
-    );
-
-  socket.scale.set(
-    1.16,
-    .82,
-    .40
-  );
-
-  socket.position.set(
-    side*.155,
-    .075,
-    -.374
-  );
-
-  headGroup.add(
-    socket
+  hips.add(
+    bodyParts.rightUpperLeg
   );
 
 
-  /* eye white */
-
-  const eyeWhite =
-    sphere(
-      .073,
-      whiteMaterial,
-      18,
-      14
-    );
-
-  eyeWhite.scale.set(
-    1.12,
-    .78,
-    .44
-  );
-
-  eyeWhite.position.set(
-    side*.155,
-    .075,
-    -.399
-  );
-
-  headGroup.add(
-    eyeWhite
-  );
-
-
-  /* iris */
-
-  const iris =
-    sphere(
-      .043,
-      new THREE.MeshStandardMaterial({
-        color:0x402516,
-        roughness:.3
-      }),
-      14,
-      10
-    );
-
-  iris.scale.set(
-    1,
-    1,
-    .38
-  );
-
-  iris.position.set(
-    side*.155,
-    .075,
-    -.432
-  );
-
-  headGroup.add(
-    iris
-  );
-
-
-  /* pupil */
-
-  const pupil =
-    sphere(
-      .021,
-      eyeMaterial,
-      12,
-      8
-    );
-
-  pupil.scale.z=
-    .35;
-
-  pupil.position.set(
-    side*.155,
-    .075,
-    -.449
-  );
-
-  headGroup.add(
-    pupil
-  );
-
-
-  /* eye highlight */
-
-  const highlight =
-    sphere(
-      .010,
-      whiteMaterial,
-      8,
-      8
-    );
-
-  highlight.position.set(
-    side*.142,
-    .091,
-    -.462
-  );
-
-  headGroup.add(
-    highlight
-  );
-}
-
-createEye(-1);
-createEye(1);
-
-
-/* =========================================================
-   EYEBROWS
-========================================================= */
-
-function createBrow(
-  side
-){
-
-  const brow =
-    capsule(
-      .021,
-      .115,
-      hairMaterial
-    );
-
-  brow.rotation.z=
-    side*.08;
-
-  brow.position.set(
-    side*.155,
-    .192,
-    -.395
-  );
-
-  headGroup.add(
-    brow
-  );
-}
-
-createBrow(-1);
-createBrow(1);
-
-
-/* =========================================================
-   NOSE
-========================================================= */
-
-const noseBridge =
-  capsule(
-    .035,
-    .11,
-    skinDarkMaterial
-  );
-
-noseBridge.rotation.x=
-  Math.PI/2;
-
-noseBridge.position.set(
-  0,
-  .035,
-  -.397
-);
-
-headGroup.add(
-  noseBridge
-);
-
-
-const noseTip =
-  sphere(
-    .073,
-    skinMaterial,
-    16,
-    12
-  );
-
-noseTip.scale.set(
-  1,
-  .72,
-  .84
-);
-
-noseTip.position.set(
-  0,
-  -.045,
-  -.433
-);
-
-headGroup.add(
-  noseTip
-);
-
-
-const nostrilL =
-  sphere(
-    .013,
-    skinDarkMaterial,
-    8,
-    8
-  );
-
-nostrilL.position.set(
-  -.040,
-  -.075,
-  -.464
-);
-
-headGroup.add(
-  nostrilL
-);
-
-
-const nostrilR =
-  nostrilL.clone();
-
-nostrilR.position.x=
-  .040;
-
-headGroup.add(
-  nostrilR
-);
-
-
-/* =========================================================
-   MOUTH
-========================================================= */
-
-const mouth =
-  new THREE.Mesh(
-    new THREE.TorusGeometry(
-      .086,
-      .014,
-      6,
-      24,
-      Math.PI
-    ),
-    mouthMaterial
-  );
-
-mouth.rotation.x=
-  Math.PI/2;
-
-mouth.position.set(
-  0,
-  -.157,
-  -.408
-);
-
-mouth.scale.x=
-  1.16;
-
-headGroup.add(
-  mouth
-);
-
-
-const lowerLip =
-  new THREE.Mesh(
-    new THREE.TorusGeometry(
-      .053,
-      .012,
-      6,
-      20,
-      Math.PI
-    ),
-    lipMaterial
-  );
-
-lowerLip.rotation.x=
-  Math.PI/2;
-
-lowerLip.rotation.z=
-  Math.PI;
-
-lowerLip.position.set(
-  0,
-  -.182,
-  -.411
-);
-
-headGroup.add(
-  lowerLip
-);
-
-
-/* =========================================================
-   HAIR
-========================================================= */
-
-const hair =
-  new THREE.Mesh(
-    new THREE.SphereGeometry(
-      1,
-      32,
-      20,
-      0,
-      Math.PI*2,
-      0,
-      Math.PI*.56
-    ),
-    hairMaterial
-  );
-
-hair.scale.set(
-  .45,
-  .36,
-  .405
-);
-
-hair.position.set(
-  0,
-  .25,
-  .005
-);
-
-hair.castShadow=true;
-
-headGroup.add(
-  hair
-);
-
-
-const hairline =
-  new THREE.Mesh(
-    new THREE.TorusGeometry(
-      .35,
-      .032,
-      6,
-      28,
-      Math.PI
-    ),
-    hairMaterial
-  );
-
-hairline.rotation.x=
-  Math.PI/2;
-
-hairline.position.set(
-  0,
-  .145,
-  -.275
-);
-
-hairline.scale.set(
-  1,
-  .72,
-  1
-);
-
-headGroup.add(
-  hairline
-);
-
-
-const hairExtras =
-  new THREE.Group();
-
-headGroup.add(
-  hairExtras
-);
-
-
-/* =========================================================
-   HAIRSTYLE SYSTEM
-========================================================= */
-
-function clearHairExtras(){
-
-  while(
-    hairExtras.children.length
-  ){
-
-    const child =
-      hairExtras.children.pop();
-
-    child.traverse(
-      object=>{
-        if(
-          object.geometry
-        ){
-          object.geometry.dispose();
-        }
-      }
-    );
-  }
-}
-
-
-function hairPiece(
-  x,
-  y,
-  z,
-  sx,
-  sy,
-  sz
-){
-
-  const piece =
-    sphere(
-      .12,
-      hairMaterial,
-      14,
-      10
-    );
-
-  piece.position.set(
-    x,
-    y,
-    z
-  );
-
-  piece.scale.set(
-    sx,
-    sy,
-    sz
-  );
-
-  hairExtras.add(
-    piece
-  );
-
-  return piece;
-}
-
-
-function applyHairstyle(
-  value
-){
-
-  const style =
-    normalize(value);
-
-  clearHairExtras();
-
-  hair.visible=true;
-  hairline.visible=true;
-
-
-  if(
-    style==="low_cut" ||
-    style==="lowcut"
-  ){
-
-    hair.scale.set(
-      .45,
-      .20,
-      .405
-    );
-
-    hairline.scale.set(
-      1,
-      .75,
-      1
-    );
-
-    return;
-  }
-
-
-  if(style==="fade"){
-
-    hair.scale.set(
-      .45,
-      .23,
-      .405
-    );
-
-    hairPiece(
-      0,
-      .42,
-      0,
-      1.7,
-      .26,
-      1.5
-    );
-
-    return;
-  }
-
-
-  if(style==="afro"){
-
-    hair.scale.set(
-      .58,
+  const leftLower=
+    makeCapsule(
+      .16,
       .52,
-      .54
+      skin
     );
 
-    return;
-  }
+  leftLower.position.y=-.82;
+
+  bodyParts.leftLowerLeg=
+    new THREE.Group();
+
+  bodyParts.leftLowerLeg.add(
+    leftLower
+  );
+
+  bodyParts.leftLowerLeg.position.x=-.20;
+
+  hips.add(
+    bodyParts.leftLowerLeg
+  );
 
 
-  if(style==="natural"){
-
-    hair.scale.set(
-      .51,
-      .44,
-      .47
+  const rightLower=
+    makeCapsule(
+      .16,
+      .52,
+      skin
     );
 
-    return;
-  }
+  rightLower.position.y=-.82;
+
+  bodyParts.rightLowerLeg=
+    new THREE.Group();
+
+  bodyParts.rightLowerLeg.add(
+    rightLower
+  );
+
+  bodyParts.rightLowerLeg.position.x=.20;
+
+  hips.add(
+    bodyParts.rightLowerLeg
+  );
 
 
-  if(style==="braids"){
+  /* shoes */
 
-    hair.scale.set(
-      .47,
-      .37,
-      .43
-    );
+  for(
+    const side of [-1,1]
+  ){
 
-    for(
-      let i=-3;
-      i<=3;
-      i++
-    ){
-
-      hairPiece(
-        i*.105,
-        -.015,
-        -.01,
-        .24,
-        1.48,
-        .25
+    const shoe=
+      makeCapsule(
+        .18,
+        .36,
+        "#242529"
       );
-    }
 
-    return;
+    shoe.scale.set(
+      1.15,
+      .62,
+      1.55
+    );
+
+    shoe.position.set(
+      side*.20,
+      -1.17,
+      -.08
+    );
+
+    hips.add(shoe);
   }
 
 
-  if(style==="dreads"){
+  /* -------------------------
+     TORSO
+  ------------------------- */
 
-    hair.scale.set(
-      .49,
-      .41,
-      .45
+  const chest=
+    makeCapsule(
+      .40,
+      .67,
+      outfit.shirt
     );
 
-    for(
-      let i=-3;
-      i<=3;
-      i++
-    ){
+  chest.scale.z=.70;
 
-      hairPiece(
-        i*.115,
-        -.12,
-        .01,
-        .25,
-        1.58,
-        .25
-      );
-    }
+  torso.add(chest);
 
-    return;
-  }
+  bodyParts.chest=chest;
 
 
-  if(style==="long"){
+  /* waist */
 
-    hair.scale.set(
-      .48,
-      .43,
-      .44
-    );
-
-    hairPiece(
-      -.32,
-      -.18,
-      .01,
-      .25,
-      1.65,
-      .33
-    );
-
-    hairPiece(
+  const waist=
+    makeCapsule(
       .32,
-      -.18,
-      .01,
-      .25,
-      1.65,
-      .33
+      .28,
+      outfit.shirt
     );
 
-    return;
+  waist.scale.z=.74;
+
+  waist.position.y=-.43;
+
+  torso.add(waist);
+
+
+  /* -------------------------
+     NECK
+  ------------------------- */
+
+  const neck=
+    makeCapsule(
+      .13,
+      .16,
+      skin
+    );
+
+  neck.position.y=.50;
+
+  torso.add(neck);
+
+
+  /* -------------------------
+     HEAD
+  ------------------------- */
+
+  const face=
+    makeSphere(
+      .54,
+      skin
+    );
+
+  face.scale.set(
+    .91,
+    1.02,
+    .92
+  );
+
+  head.add(face);
+
+
+  /* cheeks */
+
+  for(
+    const x of [-.30,.30]
+  ){
+
+    const cheek=
+      makeSphere(
+        .20,
+        skin
+      );
+
+    cheek.scale.set(
+      .95,
+      .70,
+      .65
+    );
+
+    cheek.position.set(
+      x,
+      -.10,
+      .42
+    );
+
+    head.add(cheek);
   }
 
 
-  /* default short */
+  /* ears */
 
-  hair.scale.set(
-    .45,
-    .30,
-    .405
+  for(
+    const x of [-.53,.53]
+  ){
+
+    const ear=
+      makeSphere(
+        .13,
+        skin
+      );
+
+    ear.scale.set(
+      .55,
+      .9,
+      .55
+    );
+
+    ear.position.set(
+      x,
+      .03,
+      0
+    );
+
+    head.add(ear);
+  }
+
+
+  /* -------------------------
+     EYES
+  ------------------------- */
+
+  for(
+    const x of [-.19,.19]
+  ){
+
+    const eye=
+      makeSphere(
+        .092,
+        "#fffdf8"
+      );
+
+    eye.scale.z=.48;
+
+    eye.position.set(
+      x,
+      .08,
+      -.49
+    );
+
+    head.add(eye);
+
+
+    const pupil=
+      makeSphere(
+        .045,
+        "#171717"
+      );
+
+    pupil.scale.z=.35;
+
+    pupil.position.set(
+      x,
+      .08,
+      -.535
+    );
+
+    head.add(pupil);
+
+
+    const highlight=
+      makeSphere(
+        .016,
+        "#ffffff"
+      );
+
+    highlight.position.set(
+      x-.014,
+      .105,
+      -.56
+    );
+
+    head.add(highlight);
+  }
+
+
+  /* eyebrows */
+
+  for(
+    const x of [-.19,.19]
+  ){
+
+    const brow=
+      makeCapsule(
+        .025,
+        .16,
+        "#241815"
+      );
+
+    brow.rotation.z=
+      x<0 ? -.12 : .12;
+
+    brow.position.set(
+      x,
+      .29,
+      -.50
+    );
+
+    head.add(brow);
+  }
+
+
+  /* nose */
+
+  const nose=
+    makeCapsule(
+      .055,
+      .13,
+      skin
+    );
+
+  nose.rotation.x=
+    Math.PI/2;
+
+  nose.position.set(
+    0,
+    -.02,
+    -.54
+  );
+
+  head.add(nose);
+
+
+  const noseTip=
+    makeSphere(
+      .07,
+      skin
+    );
+
+  noseTip.scale.set(
+    1,
+    .75,
+    .7
+  );
+
+  noseTip.position.set(
+    0,
+    -.07,
+    -.56
+  );
+
+  head.add(noseTip);
+
+
+  /* mouth */
+
+  const mouth=
+    makeCapsule(
+      .025,
+      .13,
+      "#632e32"
+    );
+
+  mouth.rotation.z=
+    Math.PI/2;
+
+  mouth.position.set(
+    0,
+    -.25,
+    -.51
+  );
+
+  head.add(mouth);
+
+  bodyParts.mouth=mouth;
+
+
+  /* -------------------------
+     HAIR
+  ------------------------- */
+
+  buildHair(
+    state.config.hairstyle,
+    hair
+  );
+
+
+  /* -------------------------
+     ARMS
+  ------------------------- */
+
+  createArm(
+    -1,
+    skin,
+    outfit.shirt
+  );
+
+  createArm(
+    1,
+    skin,
+    outfit.shirt
+  );
+
+
+  /* -------------------------
+     OUTFIT DETAILS
+  ------------------------- */
+
+  buildOutfitDetails(
+    state.config.outfit,
+    outfit.shirt
+  );
+
+
+  /* -------------------------
+     ACCESSORY
+  ------------------------- */
+
+  buildAccessory(
+    state.config.accessory,
+    hair
   );
 }
 
@@ -3016,1089 +1796,1420 @@ function applyHairstyle(
 ========================================================= */
 
 function createArm(
-  side
+  side,
+  skin,
+  shirtColor
 ){
 
-  const shoulder =
+  const shoulder=
     new THREE.Group();
 
   shoulder.position.set(
-    side*.515,
-    1.98,
+    side*.49,
+    1.52,
     0
   );
 
-  bodyRoot.add(
-    shoulder
-  );
+  torso.add(shoulder);
 
 
-  const shoulderCap =
-    sphere(
+  const upper=
+    makeCapsule(
+      .16,
+      .48,
+      shirtColor
+    );
+
+  upper.position.y=-.25;
+
+  shoulder.add(upper);
+
+
+  const elbow=
+    makeSphere(
       .155,
-      shirtMaterial,
-      18,
-      12
+      skin
     );
 
-  shoulder.add(
-    shoulderCap
-  );
+  elbow.position.y=-.54;
+
+  shoulder.add(elbow);
 
 
-  const upperArm =
-    capsule(
-      .13,
-      .43,
-      shirtMaterial
+  const lower=
+    makeCapsule(
+      .125,
+      .45,
+      skin
     );
 
-  upperArm.position.y=
-    -.25;
+  lower.position.y=-.78;
 
-  shoulder.add(
-    upperArm
-  );
+  shoulder.add(lower);
 
 
-  const elbowGroup =
-    new THREE.Group();
-
-  elbowGroup.position.y=
-    -.57;
-
-  shoulder.add(
-    elbowGroup
-  );
-
-
-  const elbow =
-    sphere(
-      .128,
-      skinMaterial,
-      16,
-      12
+  const hand=
+    makeSphere(
+      .15,
+      skin
     );
 
-  elbowGroup.add(
-    elbow
-  );
+  hand.scale.y=.9;
+
+  hand.position.y=-1.08;
+
+  shoulder.add(hand);
 
 
-  const forearm =
-    capsule(
-      .105,
-      .44,
-      skinMaterial
-    );
-
-  forearm.position.y=
-    -.25;
-
-  elbowGroup.add(
-    forearm
-  );
-
-
-  const handGroup =
-    new THREE.Group();
-
-  handGroup.position.y=
-    -.54;
-
-  elbowGroup.add(
-    handGroup
-  );
-
-
-  const palm =
-    sphere(
-      .12,
-      skinMaterial,
-      18,
-      12
-    );
-
-  palm.scale.set(
-    .84,
-    1.12,
-    .72
-  );
-
-  handGroup.add(
-    palm
-  );
-
-
-  /* Fingers */
-
-  for(
-    let i=-1;
-    i<=1;
-    i++
-  ){
-
-    const finger =
-      capsule(
-        .018,
-        .07,
-        skinMaterial
-      );
-
-    finger.position.set(
-      i*.033,
-      -.105,
-      -.018
-    );
-
-    handGroup.add(
-      finger
-    );
-  }
-
-
-  /* thumb */
-
-  const thumb =
-    capsule(
-      .022,
-      .08,
-      skinMaterial
-    );
-
-  thumb.rotation.z=
-    side*.60;
-
-  thumb.position.set(
-    side*.075,
-    -.025,
-    -.005
-  );
-
-  handGroup.add(
-    thumb
-  );
-
-
-  return {
-    shoulder,
-    upperArm,
-    elbowGroup,
-    forearm,
-    handGroup,
-    palm
-  };
+  bodyParts[
+    side<0
+      ? "leftArm"
+      : "rightArm"
+  ]=shoulder;
 }
-
-
-const leftArm =
-  createArm(-1);
-
-const rightArm =
-  createArm(1);
 
 
 /* =========================================================
-   CLOTHING DETAILS
+   HAIR
 ========================================================= */
 
-const shirtPocket =
-  box(
-    .18,
-    .20,
-    .02,
-    shirtSecondaryMaterial
-  );
-
-shirtPocket.position.set(
-  .19,
-  1.77,
-  -.36
-);
-
-bodyRoot.add(
-  shirtPocket
-);
-
-
-/* =========================================================
-   ACCESSORY SYSTEM
-========================================================= */
-
-let headAccessoryNodes=[];
-let bodyAccessoryNodes=[];
-let handAccessoryNodes=[];
-
-
-function removeNodes(
-  nodes
+function buildHair(
+  style,
+  color
 ){
 
-  for(
-    const node of nodes
-  ){
+  const hairMaterial=material(color);
 
-    if(
-      node.parent
-    ){
-      node.parent.remove(
-        node
+
+  if(style==="headwrap"){
+
+    const wrap=
+      makeSphere(
+        .59,
+        "#c8942f"
       );
-    }
 
-    node.traverse(
-      object=>{
-        if(
-          object.geometry
-        ){
-          object.geometry.dispose();
-        }
-      }
+    wrap.scale.set(
+      1,
+      .72,
+      1
     );
+
+    wrap.position.y=.20;
+
+    head.add(wrap);
+
+    hairParts.push(wrap);
+
+    return;
   }
 
-  nodes.length=0;
-}
 
+  /* base hair cap */
 
-function addHeadAccessory(
-  node
-){
-
-  headGroup.add(
-    node
-  );
-
-  headAccessoryNodes.push(
-    node
-  );
-
-  return node;
-}
-
-
-function addBodyAccessory(
-  node
-){
-
-  torso.add(
-    node
-  );
-
-  bodyAccessoryNodes.push(
-    node
-  );
-
-  return node;
-}
-
-
-function addHandAccessory(
-  node
-){
-
-  leftArm.handGroup.add(
-    node
-  );
-
-  handAccessoryNodes.push(
-    node
-  );
-
-  return node;
-}
-
-
-/* Cap */
-
-function createCap(){
-
-  const material =
-    new THREE.MeshStandardMaterial({
-      color:0x111315,
-      roughness:.68
-    });
-
-
-  const cap =
-    new THREE.Mesh(
-      new THREE.SphereGeometry(
-        .46,
-        24,
-        14,
-        0,
-        Math.PI*2,
-        0,
-        Math.PI/2
-      ),
-      material
+  const cap=
+    makeSphere(
+      .56,
+      color
     );
 
   cap.scale.set(
-    1.04,
-    .54,
-    1.04
+    1,
+    .66,
+    1
   );
 
-  cap.position.set(
-    0,
-    .43,
-    .005
-  );
+  cap.position.y=.28;
 
-  cap.castShadow=true;
+  head.add(cap);
 
-  addHeadAccessory(
-    cap
-  );
+  hairParts.push(cap);
 
 
-  const visor =
-    box(
-      .55,
-      .045,
+  if(style==="fade"){
+
+    const top=
+      makeSphere(
+        .42,
+        color
+      );
+
+    top.scale.set(
+      1,
+      .32,
+      .95
+    );
+
+    top.position.y=.52;
+
+    head.add(top);
+
+    hairParts.push(top);
+  }
+
+
+  if(style==="low_cut"){
+
+    const top=
+      makeSphere(
+        .45,
+        color
+      );
+
+    top.scale.set(
+      1,
       .28,
-      material
+      .94
     );
 
-  visor.position.set(
-    0,
-    .34,
-    -.39
-  );
+    top.position.y=.47;
 
-  addHeadAccessory(
-    visor
-  );
-}
+    head.add(top);
 
-
-/* Glasses */
-
-function createGlasses(){
-
-  const frame =
-    new THREE.MeshStandardMaterial({
-      color:0x131517,
-      roughness:.34
-    });
-
-
-  for(
-    const side of [-1,1]
-  ){
-
-    const lens =
-      new THREE.Mesh(
-        new THREE.TorusGeometry(
-          .105,
-          .018,
-          8,
-          20
-        ),
-        frame
-      );
-
-    lens.position.set(
-      side*.16,
-      .07,
-      -.405
-    );
-
-    addHeadAccessory(
-      lens
-    );
+    hairParts.push(top);
   }
 
 
-  const bridge =
-    box(
-      .13,
-      .026,
-      .025,
-      frame
-    );
+  if(style==="afro"){
 
-  bridge.position.set(
-    0,
-    .07,
-    -.405
-  );
+    for(
+      let i=0;
+      i<19;
+      i++
+    ){
 
-  addHeadAccessory(
-    bridge
-  );
-}
+      const angle=
+        Math.random()*Math.PI*2;
 
+      const radius=
+        .44+Math.random()*.12;
 
-/* Chain */
+      const puff=
+        makeSphere(
+          .16+Math.random()*.06,
+          color
+        );
 
-function createChain(){
-
-  const chain =
-    new THREE.Mesh(
-      new THREE.TorusGeometry(
-        .28,
-        .021,
-        8,
-        32,
-        Math.PI
-      ),
-      goldMaterial
-    );
-
-  chain.rotation.x=
-    Math.PI;
-
-  chain.position.set(
-    0,
-    -.02,
-    -.37
-  );
-
-  addBodyAccessory(
-    chain
-  );
-
-
-  const pendant =
-    new THREE.Mesh(
-      new THREE.OctahedronGeometry(
-        .065
-      ),
-      goldMaterial
-    );
-
-  pendant.position.set(
-    0,
-    -.19,
-    -.405
-  );
-
-  addBodyAccessory(
-    pendant
-  );
-}
-
-
-/* Watch */
-
-function createWatch(){
-
-  const watchCase =
-    new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .075,
-        .075,
-        .045,
-        16
-      ),
-      goldMaterial
-    );
-
-  watchCase.rotation.z=
-    Math.PI/2;
-
-  watchCase.position.set(
-    0,
-    -.02,
-    -.12
-  );
-
-  addHandAccessory(
-    watchCase
-  );
-
-
-  const watchFace =
-    new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .052,
-        .052,
-        .047,
-        16
-      ),
-      whiteMaterial
-    );
-
-  watchFace.rotation.z=
-    Math.PI/2;
-
-  watchFace.position.set(
-    0,
-    -.02,
-    -.145
-  );
-
-  addHandAccessory(
-    watchFace
-  );
-}
-
-
-/* Earrings */
-
-function createEarrings(){
-
-  for(
-    const side of [-1,1]
-  ){
-
-    const earring =
-      new THREE.Mesh(
-        new THREE.TorusGeometry(
-          .052,
-          .014,
-          8,
-          16
-        ),
-        goldMaterial
+      puff.position.set(
+        Math.cos(angle)*radius,
+        .35+Math.random()*.28,
+        Math.sin(angle)*radius*.75
       );
 
-    earring.position.set(
-      side*.435,
-      -.03,
-      0
-    );
+      head.add(puff);
 
-    addHeadAccessory(
-      earring
-    );
+      hairParts.push(puff);
+    }
   }
-}
-
-
-/* Headphones */
-
-function createHeadphones(){
-
-  const material =
-    new THREE.MeshStandardMaterial({
-      color:0x121517,
-      roughness:.55
-    });
-
-
-  const band =
-    new THREE.Mesh(
-      new THREE.TorusGeometry(
-        .46,
-        .037,
-        8,
-        32,
-        Math.PI
-      ),
-      material
-    );
-
-  band.rotation.x=
-    Math.PI/2;
-
-  band.position.set(
-    0,
-    .20,
-    0
-  );
-
-  addHeadAccessory(
-    band
-  );
-
-
-  for(
-    const side of [-1,1]
-  ){
-
-    const cup =
-      new THREE.Mesh(
-        new THREE.CylinderGeometry(
-          .105,
-          .105,
-          .13,
-          16
-        ),
-        material
-      );
-
-    cup.rotation.z=
-      Math.PI/2;
-
-    cup.position.set(
-      side*.442,
-      -.02,
-      0
-    );
-
-    addHeadAccessory(
-      cup
-    );
-  }
-}
-
-
-function applyAccessory(
-  value
-){
-
-  removeNodes(
-    headAccessoryNodes
-  );
-
-  removeNodes(
-    bodyAccessoryNodes
-  );
-
-  removeNodes(
-    handAccessoryNodes
-  );
-
-
-  const accessory =
-    normalize(value);
 
 
   if(
-    !accessory ||
-    accessory==="none"
+    style==="twists" ||
+    style==="braids" ||
+    style==="locs"
   ){
-    return;
-  }
 
-
-  if(accessory==="cap"){
-    createCap();
-    return;
-  }
-
-
-  if(accessory==="glasses"){
-    createGlasses();
-    return;
-  }
-
-
-  if(accessory==="chain"){
-    createChain();
-    return;
-  }
-
-
-  if(accessory==="watch"){
-    createWatch();
-    return;
-  }
-
-
-  if(accessory==="earrings"){
-    createEarrings();
-    return;
-  }
-
-
-  if(accessory==="headphones"){
-    createHeadphones();
-    return;
-  }
-}
-
-
-/* =========================================================
-   SKIN TONES
-========================================================= */
-
-function applySkinTone(
-  value
-){
-
-  const colors={
-    light:0xc68662,
-    medium:0x9f6948,
-    deep:0x6d4025,
-    dark:0x54301d,
-    brown:0x8d5524
-  };
-
-
-  const key =
-    normalize(value);
-
-
-  const color =
-    colors[key] ??
-    colors.medium;
-
-
-  skinMaterial.color.set(
-    color
-  );
-
-
-  skinDarkMaterial.color.set(
-    new THREE.Color(
-      color
-    ).multiplyScalar(
-      .72
-    )
-  );
-}
-
-
-/* =========================================================
-   HAIR COLOR
-========================================================= */
-
-function applyHairColor(
-  value
-){
-
-  const colors={
-    black:0x111111,
-    brown:0x482d20,
-    blonde:0xc99b45,
-    red:0x742f23
-  };
-
-
-  hairMaterial.color.set(
-    colors[
-      normalize(value)
-    ] ??
-    colors.black
-  );
-}
-
-
-/* =========================================================
-   OUTFITS
-========================================================= */
-
-const outfitDefinitions={
-
-  casual:{
-    shirt:0x222426,
-    secondary:0x35383b,
-    pants:0x34373a
-  },
-
-  streetwear:{
-    shirt:0x121416,
-    secondary:0x292d31,
-    pants:0x191b1e
-  },
-
-  formal:{
-    shirt:0x101214,
-    secondary:0x2c2e31,
-    pants:0x0a0c0d
-  },
-
-  traditional:{
-    shirt:0x8b5a2b,
-    secondary:0xa4753c,
-    pants:0x67431f
-  },
-
-  sport:{
-    shirt:0x184e77,
-    secondary:0x2e6a94,
-    pants:0x1d2328
-  },
-
-  business:{
-    shirt:0x1b1d20,
-    secondary:0x363a3f,
-    pants:0x111316
-  }
-};
-
-
-function applyOutfit(
-  value
-){
-
-  const definition =
-    outfitDefinitions[
-      normalize(value)
-    ] ??
-    outfitDefinitions.casual;
-
-
-  shirtMaterial.color.set(
-    definition.shirt
-  );
-
-
-  shirtSecondaryMaterial.color.set(
-    definition.secondary
-  );
-
-
-  pantsMaterial.color.set(
-    definition.pants
-  );
-}
-
-
-/* =========================================================
-   COMPLETE APPEARANCE
-========================================================= */
-
-function applyCharacterAppearance(
-  character
-){
-
-  applySkinTone(
-    character?.skin_tone
-  );
-
-
-  applyHairColor(
-    character?.hair_color
-  );
-
-
-  applyHairstyle(
-    character?.hairstyle
-  );
-
-
-  applyOutfit(
-    character?.outfit
-  );
-
-
-  applyAccessory(
-    character?.accessory
-  );
-}
-
-
-/* =========================================================
-   CHARACTER LOADING
-========================================================= */
-
-let currentCharacter=
-  null;
-
-
-async function loadCharacter(){
-
-  try{
-
-    const {
-      data:sessionData,
-      error:sessionError
-    } =
-      await db.auth.getSession();
-
-
-    if(sessionError){
-      throw sessionError;
-    }
-
-
-    const session =
-      sessionData?.session;
-
-
-    if(!session){
-
-      throw new Error(
-        "You are not logged in."
-      );
-    }
-
-
-    const {
-      data,
-      error
-    } =
-      await db.rpc(
-        "get_my_character"
+    const count=
+      style==="locs"
+        ? 15
+        : 13;
+
+    for(
+      let i=0;
+      i<count;
+      i++
+    ){
+
+      const angle=
+        (i/count)*Math.PI*2;
+
+      const strand=
+        makeCapsule(
+          style==="locs"
+            ? .065
+            : .045,
+          .30+
+            Math.random()*.35,
+          color
+        );
+
+      strand.position.set(
+        Math.cos(angle)*.48,
+        .20+
+          Math.random()*.12,
+        Math.sin(angle)*.42
       );
 
+      strand.rotation.x=
+        Math.cos(angle)*.35;
 
-    if(error){
-      throw error;
+      strand.rotation.z=
+        Math.sin(angle)*.35;
+
+      head.add(strand);
+
+      hairParts.push(strand);
     }
+  }
+}
 
 
-    if(!data){
+/* =========================================================
+   OUTFIT DETAILS
+========================================================= */
 
-      throw new Error(
-        "No Naija Hustle character was found."
+function buildOutfitDetails(
+  outfit,
+  color
+){
+
+  if(outfit==="agbada"){
+
+    const robe=
+      makeCapsule(
+        .52,
+        .55,
+        color
       );
-    }
+
+    robe.scale.set(
+      1.18,
+      1,
+      .78
+    );
+
+    robe.position.y=-.02;
+
+    torso.add(robe);
+  }
 
 
-    currentCharacter =
-      Array.isArray(data)
-        ? data[0]
-        : data;
+  if(outfit==="kaftan"){
 
-
-    if(!currentCharacter){
-
-      throw new Error(
-        "Character data is empty."
+    const collar=
+      makeCapsule(
+        .06,
+        .18,
+        "#ddd5bf"
       );
+
+    collar.position.set(
+      0,
+      .42,
+      -.36
+    );
+
+    torso.add(collar);
+  }
+
+
+  if(outfit==="suit"){
+
+    const lapelColor="#ded9cd";
+
+    for(
+      const side of [-1,1]
+    ){
+
+      const lapel=
+        makeBox(
+          .16,
+          .40,
+          .025,
+          lapelColor
+        );
+
+      lapel.rotation.z=
+        side*.20;
+
+      lapel.position.set(
+        side*.12,
+        .25,
+        -.34
+      );
+
+      torso.add(lapel);
     }
 
 
-    applyCharacterAppearance(
-      currentCharacter
+    const tie=
+      makeBox(
+        .08,
+        .34,
+        .035,
+        "#b68b26"
+      );
+
+    tie.position.set(
+      0,
+      .20,
+      -.37
+    );
+
+    torso.add(tie);
+  }
+
+
+  if(outfit==="ankara"){
+
+    for(
+      let i=0;
+      i<4;
+      i++
+    ){
+
+      const stripe=
+        makeBox(
+          .55,
+          .025,
+          .025,
+          i%2
+            ? "#243f5a"
+            : "#e4b62e"
+        );
+
+      stripe.position.set(
+        0,
+        .22-i*.13,
+        -.36
+      );
+
+      torso.add(stripe);
+    }
+  }
+
+
+  if(outfit==="jersey"){
+
+    const number=
+      makeBox(
+        .18,
+        .25,
+        .025,
+        "#f4f0df"
+      );
+
+    number.position.set(
+      0,
+      .02,
+      -.39
+    );
+
+    torso.add(number);
+  }
+}
+
+
+/* =========================================================
+   ACCESSORIES
+========================================================= */
+
+function buildAccessory(
+  type,
+  hairColor
+){
+
+  if(type==="cap"){
+
+    const cap=
+      makeSphere(
+        .61,
+        "#183e4a"
+      );
+
+    cap.scale.set(
+      1.02,
+      .36,
+      1
+    );
+
+    cap.position.y=.45;
+
+    head.add(cap);
+
+    accessoryParts.push(cap);
+
+
+    const brim=
+      makeBox(
+        .33,
+        .045,
+        .20,
+        "#183e4a"
+      );
+
+    brim.position.set(
+      0,
+      .40,
+      -.55
+    );
+
+    head.add(brim);
+
+    accessoryParts.push(brim);
+  }
+
+
+  if(type==="glasses"){
+
+    for(
+      const side of [-1,1]
+    ){
+
+      const lens=
+        makeSphere(
+          .14,
+          "#202a2d"
+        );
+
+      lens.scale.set(
+        1.35,
+        .72,
+        .18
+      );
+
+      lens.position.set(
+        side*.19,
+        .08,
+        -.54
+      );
+
+      head.add(lens);
+
+      accessoryParts.push(lens);
+    }
+
+
+    const bridge=
+      makeBox(
+        .18,
+        .035,
+        .035,
+        "#15191b"
+      );
+
+    bridge.position.set(
+      0,
+      .08,
+      -.55
+    );
+
+    head.add(bridge);
+
+    accessoryParts.push(bridge);
+  }
+
+
+  if(type==="chain"){
+
+    const chain=
+      new THREE.Mesh(
+        new THREE.TorusGeometry(
+          .25,
+          .025,
+          8,
+          24,
+          Math.PI
+        ),
+        material("#e1b936",.32,.7)
+      );
+
+    chain.rotation.x=Math.PI/2;
+
+    chain.position.set(
+      0,
+      .42,
+      -.40
+    );
+
+    torso.add(chain);
+
+    accessoryParts.push(chain);
+  }
+
+
+  if(type==="headphones"){
+
+    const band=
+      new THREE.Mesh(
+        new THREE.TorusGeometry(
+          .52,
+          .045,
+          8,
+          32,
+          Math.PI
+        ),
+        material("#202529",.5,.1)
+      );
+
+    band.rotation.z=Math.PI;
+
+    band.position.y=.15;
+
+    head.add(band);
+
+    accessoryParts.push(band);
+
+
+    for(
+      const x of [-.53,.53]
+    ){
+
+      const cup=
+        makeSphere(
+          .12,
+          "#202529"
+        );
+
+      cup.position.set(
+        x,
+        .02,
+        0
+      );
+
+      head.add(cup);
+
+      accessoryParts.push(cup);
+    }
+  }
+}
+
+
+/* =========================================================
+   INITIAL BUILD
+========================================================= */
+
+buildAvatar();
+
+
+/* =========================================================
+   CUSTOMIZER UI
+========================================================= */
+
+function createOptions(){
+
+  const groups=[
+    ["skinOptions","skinTone"],
+    ["hairOptions","hairstyle"],
+    ["hairColorOptions","hairColor"],
+    ["outfitOptions","outfit"],
+    ["accessoryOptions","accessory"]
+  ];
+
+
+  for(
+    const [elementId,type] of groups
+  ){
+
+    const container=
+      document.getElementById(
+        elementId
+      );
+
+    container.innerHTML="";
+
+
+    for(
+      const key of Object.keys(
+        OPTIONS[type]
+      )
+    ){
+
+      const button=
+        document.createElement("button");
+
+      button.className="option";
+
+      button.dataset.type=type;
+      button.dataset.value=key;
+
+
+      let label=key;
+
+      if(
+        typeof OPTIONS[type][key]==="object"
+      ){
+
+        label=
+          OPTIONS[type][key].name;
+      }
+      else{
+
+        label=
+          key
+            .replaceAll("_"," ")
+            .replace(/\b\w/g,c=>c.toUpperCase());
+      }
+
+
+      button.textContent=label;
+
+
+      button.addEventListener(
+        "click",
+        ()=>{
+          state.config[type]=key;
+
+          updateSelectedButtons();
+
+          buildAvatar();
+        }
+      );
+
+
+      container.appendChild(button);
+    }
+  }
+
+
+  updateSelectedButtons();
+}
+
+
+function updateSelectedButtons(){
+
+  document
+    .querySelectorAll(".option")
+    .forEach(button=>{
+
+      button.classList.toggle(
+        "selected",
+        state.config[
+          button.dataset.type
+        ]===button.dataset.value
+      );
+
+    });
+}
+
+
+createOptions();
+
+
+/* =========================================================
+   SAVE CONFIG
+========================================================= */
+
+document
+  .getElementById("saveConfig")
+  .addEventListener(
+    "click",
+    ()=>{
+
+      const json=
+        JSON.stringify(
+          state.config,
+          null,
+          2
+        );
+
+      const output=
+        document.getElementById(
+          "jsonOutput"
+        );
+
+      output.value=json;
+
+      output.style.display="block";
+
+      output.focus();
+      output.select();
+
+      try{
+        navigator.clipboard?.writeText(json);
+      }catch{}
+
+      document.getElementById(
+        "saveConfig"
+      ).textContent=
+        "SAVED ✓";
+    }
+  );
+
+
+/* =========================================================
+   CUSTOMIZER OPEN/CLOSE
+========================================================= */
+
+const customizer=
+  document.getElementById(
+    "customizer"
+  );
+
+
+document
+  .getElementById("customizeBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      customizer.classList.add("open");
+    }
+  );
+
+
+document
+  .getElementById("closeCustomizer")
+  .addEventListener(
+    "click",
+    ()=>{
+      customizer.classList.remove("open");
+    }
+  );
+
+
+/* =========================================================
+   MOVEMENT
+========================================================= */
+
+const clock=
+  new THREE.Clock();
+
+let previousTime=
+  performance.now();
+
+
+function getInput(){
+
+  let x=0;
+  let z=0;
+
+
+  if(state.keys.left) x-=1;
+  if(state.keys.right) x+=1;
+  if(state.keys.up) z-=1;
+  if(state.keys.down) z+=1;
+
+
+  if(
+    state.joystick.active
+  ){
+
+    x=state.joystick.x;
+    z=state.joystick.y;
+  }
+
+
+  const length=
+    Math.hypot(x,z);
+
+  if(length>1){
+
+    x/=length;
+    z/=length;
+  }
+
+
+  return {x,z};
+}
+
+
+function smoothDamp(
+  current,
+  target,
+  smoothing,
+  delta
+){
+
+  const t=
+    1-Math.exp(
+      -smoothing*delta
+    );
+
+  return THREE.MathUtils.lerp(
+    current,
+    target,
+    t
+  );
+}
+
+
+function moveAvatar(delta){
+
+  const input=
+    getInput();
+
+  const hasInput=
+    Math.hypot(
+      input.x,
+      input.z
+    )>.08;
+
+
+  const speed=
+    state.running
+      ? CONFIG.movement.runSpeed
+      : CONFIG.movement.walkSpeed;
+
+
+  const targetVelocity=
+    new THREE.Vector3(
+      input.x*speed,
+      0,
+      input.z*speed
     );
 
 
-    playerName.textContent =
-      currentCharacter.name ||
-      "Player";
+  const acceleration=
+    hasInput
+      ? CONFIG.movement.acceleration
+      : CONFIG.movement.deceleration;
 
 
-    const district =
-      currentCharacter.district ||
-      currentCharacter.current_district ||
-      "";
+  const blend=
+    1-Math.exp(
+      -acceleration*delta
+    );
 
 
-    const level =
-      currentCharacter.level;
+  state.velocity.lerp(
+    targetVelocity,
+    blend
+  );
 
 
-    const details=[];
+  /* Camera-relative movement */
+
+  const cameraForward=
+    new THREE.Vector3();
+
+  camera.getWorldDirection(
+    cameraForward
+  );
+
+  cameraForward.y=0;
+  cameraForward.normalize();
 
 
-    if(district){
-      details.push(
-        district
+  const cameraRight=
+    new THREE.Vector3(
+      cameraForward.z,
+      0,
+      -cameraForward.x
+  );
+
+
+  const movement=
+    new THREE.Vector3();
+
+  movement.addScaledVector(
+    cameraRight,
+    state.velocity.x*delta
+  );
+
+  movement.addScaledVector(
+    cameraForward,
+    -state.velocity.z*delta
+  );
+
+
+  avatar.position.add(
+    movement
+  );
+
+
+  /* World boundary */
+
+  const limit=
+    CONFIG.world.size/2-4;
+
+  avatar.position.x=
+    THREE.MathUtils.clamp(
+      avatar.position.x,
+      -limit,
+      limit
+    );
+
+  avatar.position.z=
+    THREE.MathUtils.clamp(
+      avatar.position.z,
+      -limit,
+      limit
+    );
+
+
+  /* Smooth character rotation */
+
+  if(hasInput){
+
+    const targetAngle=
+      Math.atan2(
+        movement.x,
+        movement.z
       );
-    }
+
+
+    let difference=
+      targetAngle-avatar.rotation.y;
+
+
+    difference=
+      Math.atan2(
+        Math.sin(difference),
+        Math.cos(difference)
+      );
+
+
+    avatar.rotation.y +=
+      difference*
+      Math.min(
+        1,
+        CONFIG.movement.rotationSpeed*
+        delta
+      );
+  }
+
+
+  const currentSpeed=
+    Math.hypot(
+      state.velocity.x,
+      state.velocity.z
+    );
+
+
+  const moving=
+    currentSpeed>.15;
+
+
+  if(
+    state.running &&
+    moving
+  ){
+
+    document
+      .getElementById("status")
+      .textContent="Running";
+
+  }
+  else if(moving){
+
+    document
+      .getElementById("status")
+      .textContent="Walking";
+
+  }
+  else{
+
+    document
+      .getElementById("status")
+      .textContent="Idle";
+  }
+
+
+  return {
+    moving,
+    speed:currentSpeed
+  };
+}
+
+
+/* =========================================================
+   CHARACTER ANIMATION
+========================================================= */
+
+let animationTime=0;
+
+
+function animateCharacter(
+  delta,
+  movement
+){
+
+  animationTime +=
+    delta*
+    (movement.moving
+      ? movement.speed*1.75
+      : .75);
+
+
+  const moving=
+    movement.moving;
+
+  const running=
+    state.running &&
+    moving;
+
+
+  const intensity=
+    running
+      ? 1.12
+      : .72;
+
+
+  const cycle=
+    animationTime;
+
+
+  /* Legs */
+
+  if(bodyParts.leftUpperLeg){
+
+    const swing=
+      Math.sin(cycle)*
+      (moving ? .58*intensity : .025);
+
+    bodyParts.leftUpperLeg.rotation.x=
+      swing;
+
+    bodyParts.rightUpperLeg.rotation.x=
+      -swing;
+
+    bodyParts.leftLowerLeg.rotation.x=
+      Math.max(
+        0,
+        -swing*.75
+      );
+
+    bodyParts.rightLowerLeg.rotation.x=
+      Math.max(
+        0,
+        swing*.75
+      );
+  }
+
+
+  /* Arms */
+
+  if(bodyParts.leftArm){
+
+    const swing=
+      Math.sin(cycle)*
+      (moving ? .48*intensity : .025);
+
+    bodyParts.leftArm.rotation.x=
+      -swing;
+
+    bodyParts.rightArm.rotation.x=
+      swing;
+  }
+
+
+  /* Breathing */
+
+  const breathing=
+    moving
+      ? 0
+      : Math.sin(
+          performance.now()*.0015
+        )*.018;
+
+
+  torso.scale.y=
+    1+breathing;
+
+  head.position.y=
+    2.55+
+    (
+      moving
+        ? Math.abs(Math.sin(cycle*2))*.035
+        : breathing*.45
+    );
+
+
+  /* Gentle torso movement */
+
+  if(moving){
+
+    torso.rotation.z=
+      Math.sin(cycle)*
+      .025;
+
+    torso.rotation.x=
+      Math.cos(cycle*2)*
+      .018;
+
+  }
+  else{
+
+    torso.rotation.z=
+      smoothDamp(
+        torso.rotation.z,
+        0,
+        7,
+        delta
+      );
+
+    torso.rotation.x=
+      smoothDamp(
+        torso.rotation.x,
+        0,
+        7,
+        delta
+      );
+  }
+
+
+  updateBlink();
+}
+
+
+/* =========================================================
+   BLINK
+========================================================= */
+
+let blinkTimer=
+  3.8+Math.random()*1.2;
+
+let blinkProgress=0;
+
+
+function updateBlink(){
+
+  const delta=
+    clock.getDelta();
+
+  blinkTimer-=delta;
+
+
+  if(
+    blinkTimer<=0 &&
+    blinkProgress===0
+  ){
+
+    blinkProgress=.001;
+
+    blinkTimer=
+      3+
+      Math.random()*2;
+  }
+
+
+  if(blinkProgress>0){
+
+    blinkProgress+=delta*7;
+
+    const amount=
+      Math.sin(
+        Math.min(
+          blinkProgress,
+          Math.PI
+        )
+      );
+
+
+    head.traverse(
+      object=>{
+
+        if(
+          object.geometry &&
+          object.geometry.type===
+            "SphereGeometry"
+        ){
+
+          /*
+            Deliberately subtle.
+            The eyes are found by position.
+          */
+
+          if(
+            object.position.z<-.5 &&
+            Math.abs(object.position.x)<.3 &&
+            object.position.y>.02 &&
+            object.position.y<.15
+          ){
+
+            object.scale.y=
+              Math.max(
+                .08,
+                1-amount*.9
+              );
+          }
+        }
+      }
+    );
 
 
     if(
-      level !== undefined &&
-      level !== null
+      blinkProgress>=Math.PI
     ){
-      details.push(
-        `Level ${level}`
+
+      blinkProgress=0;
+
+      head.traverse(
+        object=>{
+
+          if(
+            object.geometry &&
+            object.geometry.type===
+              "SphereGeometry" &&
+            object.position.z<-.5 &&
+            Math.abs(object.position.x)<.3 &&
+            object.position.y>.02 &&
+            object.position.y<.15
+          ){
+
+            object.scale.y=1;
+          }
+        }
       );
     }
-
-
-    playerDetails.textContent =
-      details.join(
-        " • "
-      );
-
-
-    statusText.textContent=
-      "Idle";
-
-
-    loading.style.display=
-      "none";
-
-
-    return true;
-
-  }catch(error){
-
-    console.error(
-      "3D avatar load error:",
-      error
-    );
-
-
-    loading.classList.add(
-      "error"
-    );
-
-
-    loading.innerHTML=`
-      <div style="
-        font-size:28px;
-        margin-bottom:4px;
-      ">⚠</div>
-
-      <div>Unable to load your character.</div>
-
-      <small>
-        ${escapeHtml(
-          error?.message ||
-          "Unknown error"
-        )}
-      </small>
-
-      <button
-        id="retryButton"
-        type="button"
-      >
-        Try Again
-      </button>
-    `;
-
-
-    document
-      .getElementById(
-        "retryButton"
-      )
-      ?.addEventListener(
-        "click",
-        ()=>location.reload()
-      );
-
-
-    return false;
   }
 }
 
 
-function escapeHtml(
-  value
-){
+/* =========================================================
+   CAMERA
+========================================================= */
 
-  return String(
-    value ?? ""
-  )
-  .replace(
-    /&/g,
-    "&amp;"
-  )
-  .replace(
-    /</g,
-    "&lt;"
-  )
-  .replace(
-    />/g,
-    "&gt;"
-  )
-  .replace(
-    /"/g,
-    "&quot;"
-  )
-  .replace(
-    /'/g,
-    "&#039;"
+const cameraTarget=
+  new THREE.Vector3();
+
+
+let cameraDistance=
+  CONFIG.camera.distance;
+
+let cameraDragging=false;
+
+let lastPointerX=0;
+let lastPointerY=0;
+
+
+function updateCamera(delta){
+
+  const target=
+    avatar.position.clone();
+
+  target.y+=1.45;
+
+
+  let desiredDistance=
+    cameraDistance;
+
+  let yaw=
+    state.cameraYaw;
+
+  let pitch=
+    state.cameraPitch;
+
+
+  if(state.cameraMode===1){
+
+    desiredDistance=5.0;
+
+    pitch=.10;
+
+  }
+
+
+  const offset=
+    new THREE.Vector3(
+      Math.sin(yaw)*
+        desiredDistance,
+      CONFIG.camera.height+
+        pitch*2,
+      Math.cos(yaw)*
+        desiredDistance
+    );
+
+
+  const desired=
+    target.clone().add(offset);
+
+
+  camera.position.lerp(
+    desired,
+    1-Math.exp(
+      -CONFIG.camera.smoothing*
+      delta
+    )
+  );
+
+
+  cameraTarget.lerp(
+    target,
+    1-Math.exp(
+      -9*delta
+    )
+  );
+
+
+  camera.lookAt(
+    cameraTarget
   );
 }
 
 
 /* =========================================================
-   INPUT STATE
+   CAMERA DRAG
 ========================================================= */
 
-const keys={
-  w:false,
-  a:false,
-  s:false,
-  d:false,
-  arrowup:false,
-  arrowleft:false,
-  arrowdown:false,
-  arrowright:false,
-  shift:false
-};
+renderer.domElement.addEventListener(
+  "pointerdown",
+  event=>{
 
+    cameraDragging=true;
+
+    lastPointerX=
+      event.clientX;
+
+    lastPointerY=
+      event.clientY;
+  }
+);
+
+
+renderer.domElement.addEventListener(
+  "pointermove",
+  event=>{
+
+    if(!cameraDragging)return;
+
+
+    const dx=
+      event.clientX-lastPointerX;
+
+    const dy=
+      event.clientY-lastPointerY;
+
+
+    lastPointerX=
+      event.clientX;
+
+    lastPointerY=
+      event.clientY;
+
+
+    state.cameraYaw-=
+      dx*.008;
+
+    state.cameraPitch=
+      THREE.MathUtils.clamp(
+        state.cameraPitch+
+        dy*.003,
+        -.25,
+        .65
+      );
+  }
+);
+
+
+window.addEventListener(
+  "pointerup",
+  ()=>{
+    cameraDragging=false;
+  }
+);
+
+
+/* =========================================================
+   CAMERA BUTTON
+========================================================= */
+
+document
+  .getElementById("cameraBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      state.cameraMode=
+        state.cameraMode===0
+          ? 1
+          : 0;
+    }
+  );
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
 
 window.addEventListener(
   "keydown",
@@ -4109,34 +3220,31 @@ window.addEventListener(
 
 
     if(
-      key in keys
+      ["w","a","s","d",
+       "arrowup","arrowdown",
+       "arrowleft","arrowright",
+       "shift"," "]
+       .includes(key)
     ){
 
-      keys[key]=true;
-
-
-      if(
-        [
-          "arrowup",
-          "arrowdown",
-          "arrowleft",
-          "arrowright",
-          " "
-        ].includes(key)
-      ){
-
-        event.preventDefault();
-      }
+      event.preventDefault();
     }
 
 
-    if(key==="c"){
+    if(key==="w" || key==="arrowup")
+      state.keys.up=true;
 
-      toggleCamera();
-    }
-  },
-  {
-    passive:false
+    if(key==="s" || key==="arrowdown")
+      state.keys.down=true;
+
+    if(key==="a" || key==="arrowleft")
+      state.keys.left=true;
+
+    if(key==="d" || key==="arrowright")
+      state.keys.right=true;
+
+    if(key==="shift")
+      state.keys.run=true;
   }
 );
 
@@ -4149,83 +3257,76 @@ window.addEventListener(
       event.key.toLowerCase();
 
 
-    if(
-      key in keys
-    ){
+    if(key==="w" || key==="arrowup")
+      state.keys.up=false;
 
-      keys[key]=false;
-    }
-  }
-);
+    if(key==="s" || key==="arrowdown")
+      state.keys.down=false;
 
+    if(key==="a" || key==="arrowleft")
+      state.keys.left=false;
 
-window.addEventListener(
-  "blur",
-  ()=>{
+    if(key==="d" || key==="arrowright")
+      state.keys.right=false;
 
-    for(
-      const key in keys
-    ){
-      keys[key]=false;
-    }
-
-    resetJoystick();
-    mobileSprint=false;
+    if(key==="shift")
+      state.keys.run=false;
   }
 );
 
 
 /* =========================================================
-   MOBILE SPRINT
+   RUN BUTTON
 ========================================================= */
 
-let mobileSprint=false;
+const runButton=
+  document.getElementById("runBtn");
 
 
-sprintButton.addEventListener(
-  "pointerdown",
-  event=>{
+function setRun(value){
 
-    event.preventDefault();
+  state.running=value;
 
-    mobileSprint=true;
-
-    sprintButton.setPointerCapture?.(
-      event.pointerId
-    );
-  }
-);
-
-
-function stopMobileSprint(){
-
-  mobileSprint=false;
+  runButton.classList.toggle(
+    "active",
+    value
+  );
 }
 
 
-sprintButton.addEventListener(
+runButton.addEventListener(
+  "pointerdown",
+  event=>{
+    event.preventDefault();
+    setRun(true);
+  }
+);
+
+
+runButton.addEventListener(
   "pointerup",
-  stopMobileSprint
+  event=>{
+    event.preventDefault();
+    setRun(false);
+  }
 );
 
-sprintButton.addEventListener(
+
+runButton.addEventListener(
   "pointercancel",
-  stopMobileSprint
-);
-
-sprintButton.addEventListener(
-  "lostpointercapture",
-  stopMobileSprint
+  ()=>{
+    setRun(false);
+  }
 );
 
 
 /* =========================================================
-   JOYSTICK
+   MOBILE JOYSTICK
 ========================================================= */
 
 const joystick=
   document.getElementById(
-    "controls"
+    "joystick"
   );
 
 const stick=
@@ -4234,9 +3335,7 @@ const stick=
   );
 
 
-let joystickX=0;
-let joystickY=0;
-let joystickDragging=false;
+let joystickPointer=null;
 
 
 function updateJoystick(
@@ -4247,81 +3346,46 @@ function updateJoystick(
   const rect=
     joystick.getBoundingClientRect();
 
-
   const centerX=
-    rect.left+
-    rect.width/2;
-
+    rect.left+rect.width/2;
 
   const centerY=
-    rect.top+
-    rect.height/2;
+    rect.top+rect.height/2;
 
 
-  let dx=
+  let x=
     clientX-centerX;
 
-
-  let dy=
+  let y=
     clientY-centerY;
 
 
-  const maxDistance=
-    rect.width*.33;
-
+  const radius=
+    rect.width*.34;
 
   const distance=
-    Math.hypot(
-      dx,
-      dy
-    );
+    Math.hypot(x,y);
 
 
-  if(
-    distance>
-    maxDistance
-  ){
+  if(distance>radius){
 
-    dx=
-      dx/distance*
-      maxDistance;
+    x=
+      x/distance*radius;
 
-    dy=
-      dy/distance*
-      maxDistance;
+    y=
+      y/distance*radius;
   }
 
 
-  joystickX=
-    THREE.MathUtils.clamp(
-      dx/maxDistance,
-      -1,
-      1
-    );
+  state.joystick.x=
+    x/radius;
 
-
-  joystickY=
-    THREE.MathUtils.clamp(
-      dy/maxDistance,
-      -1,
-      1
-    );
+  state.joystick.y=
+    y/radius;
 
 
   stick.style.transform=
-    `translate3d(${dx}px,${dy}px,0)`;
-}
-
-
-function resetJoystick(){
-
-  joystickDragging=false;
-
-  joystickX=0;
-  joystickY=0;
-
-  stick.style.transform=
-    "translate3d(0,0,0)";
+    `translate(${x}px,${y}px)`;
 }
 
 
@@ -4331,12 +3395,15 @@ joystick.addEventListener(
 
     event.preventDefault();
 
-    joystickDragging=true;
+    joystickPointer=
+      event.pointerId;
 
     joystick.setPointerCapture(
       event.pointerId
     );
 
+    state.joystick.active=true;
+
     updateJoystick(
       event.clientX,
       event.clientY
@@ -4349,8 +3416,9 @@ joystick.addEventListener(
   "pointermove",
   event=>{
 
-    if(!joystickDragging)
-      return;
+    if(
+      event.pointerId!==joystickPointer
+    )return;
 
     updateJoystick(
       event.clientX,
@@ -4360,11 +3428,24 @@ joystick.addEventListener(
 );
 
 
+function resetJoystick(){
+
+  joystickPointer=null;
+
+  state.joystick.active=false;
+
+  state.joystick.x=0;
+  state.joystick.y=0;
+
+  stick.style.transform=
+    "translate(0,0)";
+}
+
+
 joystick.addEventListener(
   "pointerup",
   resetJoystick
 );
-
 
 joystick.addEventListener(
   "pointercancel",
@@ -4372,1009 +3453,37 @@ joystick.addEventListener(
 );
 
 
-joystick.addEventListener(
-  "lostpointercapture",
-  resetJoystick
-);
-
-
 /* =========================================================
-   CAMERA DRAG
+   BACK BUTTON
 ========================================================= */
 
-let cameraDragging=false;
-let cameraPointerId=null;
-let cameraLastX=0;
-let cameraLastY=0;
-
-
-renderer.domElement.addEventListener(
-  "pointerdown",
-  event=>{
-
-    /*
-      Left mouse / primary touch.
-      Camera controls operate on the renderer,
-      not the joystick/buttons.
-    */
-
-    cameraDragging=true;
-    cameraPointerId=
-      event.pointerId;
-
-    cameraLastX=
-      event.clientX;
-
-    cameraLastY=
-      event.clientY;
-
-    renderer.domElement.setPointerCapture(
-      event.pointerId
-    );
-  }
-);
-
-
-renderer.domElement.addEventListener(
-  "pointermove",
-  event=>{
-
-    if(
-      !cameraDragging ||
-      event.pointerId !==
-      cameraPointerId
-    ){
-      return;
+document
+  .getElementById("backBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      if(history.length>1){
+        history.back();
+      }
+      else{
+        location.href="index.html";
+      }
     }
-
-
-    const dx=
-      event.clientX-
-      cameraLastX;
-
-
-    const dy=
-      event.clientY-
-      cameraLastY;
-
-
-    cameraLastX=
-      event.clientX;
-
-    cameraLastY=
-      event.clientY;
-
-
-    cameraYaw -=
-      dx*.008;
-
-
-    cameraPitch=
-      THREE.MathUtils.clamp(
-        cameraPitch+
-        dy*.005,
-        .10,
-        .78
-      );
-  }
-);
-
-
-function stopCameraDrag(){
-
-  cameraDragging=false;
-  cameraPointerId=null;
-}
-
-
-renderer.domElement.addEventListener(
-  "pointerup",
-  stopCameraDrag
-);
-
-
-renderer.domElement.addEventListener(
-  "pointercancel",
-  stopCameraDrag
-);
-
-
-renderer.domElement.addEventListener(
-  "lostpointercapture",
-  stopCameraDrag
-);
+  );
 
 
 /* =========================================================
-   CAMERA TOGGLE
+   CHARACTER NAME
 ========================================================= */
 
-function toggleCamera(){
-
-  cameraYaw+=
-    Math.PI;
-
-  while(
-    cameraYaw>Math.PI*2
-  ){
-    cameraYaw-=Math.PI*2;
-  }
-}
-
-
-cameraButton.addEventListener(
-  "click",
-  toggleCamera
-);
-
-
-/* =========================================================
-   MOVEMENT
-========================================================= */
-
-const velocity =
-  new THREE.Vector3();
-
-
-const desiredVelocity =
-  new THREE.Vector3();
-
-
-const movementDirection =
-  new THREE.Vector3();
-
-
-const cameraForward =
-  new THREE.Vector3();
-
-
-const cameraRight =
-  new THREE.Vector3();
-
-
-const inputVector =
-  new THREE.Vector2();
-
-
-let animationPhase=0;
-let lastState="Idle";
-
-
-function readInput(){
-
-  let x=0;
-  let y=0;
-
-
-  if(
-    keys.a ||
-    keys.arrowleft
-  ){
-    x-=1;
-  }
-
-
-  if(
-    keys.d ||
-    keys.arrowright
-  ){
-    x+=1;
-  }
-
-
-  if(
-    keys.w ||
-    keys.arrowup
-  ){
-    y+=1;
-  }
-
-
-  if(
-    keys.s ||
-    keys.arrowdown
-  ){
-    y-=1;
-  }
-
-
-  x+=joystickX;
-  y-=joystickY;
-
-
-  inputVector.set(
-    x,
-    y
-  );
-
-
-  if(
-    inputVector.length()>
-    1
-  ){
-    inputVector.normalize();
-  }
-
-
-  return inputVector.length()>
-    .045;
-}
-
-
-function getCameraBasis(){
-
-  cameraForward.set(
-    -Math.sin(
-      cameraYaw
-    ),
-    0,
-    -Math.cos(
-      cameraYaw
-    )
-  );
-
-
-  cameraForward.normalize();
-
-
-  cameraRight.set(
-    Math.cos(
-      cameraYaw
-    ),
-    0,
-    -Math.sin(
-      cameraYaw
-    )
-  );
-
-
-  cameraRight.normalize();
-}
-
-
-function updateMovement(
-  delta
-){
-
-  const hasInput=
-    readInput();
-
-
-  getCameraBasis();
-
-
-  if(hasInput){
-
-    movementDirection
-      .set(0,0,0)
-      .addScaledVector(
-        cameraRight,
-        inputVector.x
-      )
-      .addScaledVector(
-        cameraForward,
-        inputVector.y
-      );
-
-
-    movementDirection.y=0;
-
-
-    if(
-      movementDirection.lengthSq()>
-      .0001
-    ){
-
-      movementDirection.normalize();
-    }
-
-
-    const sprinting=
-      keys.shift ||
-      mobileSprint ||
-      Math.abs(joystickX)>.92 &&
-      Math.abs(joystickY)>.92;
-
-
-    const speed=
-      sprinting
-        ? 6.5
-        : 4.15;
-
-
-    desiredVelocity.copy(
-      movementDirection
-    ).multiplyScalar(
-      speed
-    );
-
-
-    const acceleration=
-      sprinting
-        ? 13
-        : 11;
-
-
-    velocity.x=
-      damp(
-        velocity.x,
-        desiredVelocity.x,
-        acceleration,
-        delta
-      );
-
-
-    velocity.z=
-      damp(
-        velocity.z,
-        desiredVelocity.z,
-        acceleration,
-        delta
-      );
-
-
-    /* rotate avatar toward movement */
-
-    const targetYaw=
-      Math.atan2(
-        movementDirection.x,
-        -movementDirection.z
-      );
-
-
-    avatarYaw=
-      dampAngle(
-        avatarYaw,
-        targetYaw,
-        12,
-        delta
-      );
-
-
-    visualRoot.rotation.y=
-      avatarYaw;
-
-
-  }else{
-
-    velocity.x=
-      damp(
-        velocity.x,
-        0,
-        9,
-        delta
-      );
-
-
-    velocity.z=
-      damp(
-        velocity.z,
-        0,
-        9,
-        delta
-      );
-  }
-
-
-  const speed=
-    Math.hypot(
-      velocity.x,
-      velocity.z
-    );
-
-
-  const moving=
-    speed>.12;
-
-
-  const running=
-    speed>5.0;
-
-
-  /* move */
-
-  avatar.position.x+=
-    velocity.x*
-    delta;
-
-  avatar.position.z+=
-    velocity.z*
-    delta;
-
-
-  /* keep player on the playable road */
-
-  avatar.position.x=
-    THREE.MathUtils.clamp(
-      avatar.position.x,
-      -4.6,
-      4.6
-    );
-
-
-  avatar.position.z=
-    THREE.MathUtils.clamp(
-      avatar.position.z,
-      -98,
-      98
-    );
-
-
-  /* prevent boundary velocity */
-
-  if(
-    avatar.position.x<=-4.6 ||
-    avatar.position.x>=4.6
-  ){
-    velocity.x=0;
-  }
-
-
-  if(
-    avatar.position.z<=-98 ||
-    avatar.position.z>=98
-  ){
-    velocity.z=0;
-  }
-
-
-  /* movement state */
-
-  let newState=
-    "Idle";
-
-
-  if(running){
-    newState=
-      "Running";
-  }else if(moving){
-    newState=
-      "Walking";
-  }
-
-
-  if(
-    newState !==
-    lastState
-  ){
-
-    lastState=
-      newState;
-
-    statusText.textContent=
-      newState;
-  }
-
-
-  if(moving){
-
-    const normalizedSpeed=
-      THREE.MathUtils.clamp(
-        speed/
-        (
-          running
-            ? 6.5
-            : 4.15
-        ),
-        0,
-        1
-      );
-
-
-    animationPhase +=
-      delta*
-      (
-        6.5+
-        normalizedSpeed*9
-      );
-
-
-    animateWalking(
-      animationPhase,
-      normalizedSpeed,
-      running,
-      delta
-    );
-
-  }else{
-
-    animationPhase +=
-      delta*1.8;
-
-    animateIdle(
-      animationPhase,
-      delta
-    );
-  }
-
-
-  /* shadow scale */
-
-  const shadowScale=
-    1+
-    Math.min(
-      speed*.025,
-      .12
-    );
-
-  avatarShadow.scale.x=
-    shadowScale;
-
-  avatarShadow.scale.y=
-    shadowScale;
-}
-
-
-/* =========================================================
-   WALK / RUN ANIMATION
-========================================================= */
-
-function animateWalking(
-  time,
-  intensity,
-  running,
-  delta
-){
-
-  const stride=
-    (
-      running
-        ? .53
-        : .36
-    )*
-    intensity;
-
-
-  const leftPhase=
-    Math.sin(time);
-
-
-  const rightPhase=
-    Math.sin(
-      time+
-      Math.PI
-    );
-
-
-  /* hips / thighs */
-
-  leftLeg.hip.rotation.x=
-    leftPhase*
-    stride;
-
-
-  rightLeg.hip.rotation.x=
-    rightPhase*
-    stride;
-
-
-  /* knees */
-
-  const leftKneeBend=
-    Math.max(
-      0,
-      -leftPhase
-    )*
-    (
-      running
-        ? .34
-        : .20
-    )*
-    intensity;
-
-
-  const rightKneeBend=
-    Math.max(
-      0,
-      -rightPhase
-    )*
-    (
-      running
-        ? .34
-        : .20
-    )*
-    intensity;
-
-
-  leftLeg.kneeGroup.rotation.x=
-    leftKneeBend;
-
-
-  rightLeg.kneeGroup.rotation.x=
-    rightKneeBend;
-
-
-  /* ankles */
-
-  leftLeg.ankleGroup.rotation.x=
-    -leftKneeBend*.25;
-
-
-  rightLeg.ankleGroup.rotation.x=
-    -rightKneeBend*.25;
-
-
-  /* arms opposite to legs */
-
-  leftArm.shoulder.rotation.x=
-    -leftPhase*
-    stride*
-    .82;
-
-
-  rightArm.shoulder.rotation.x=
-    -rightPhase*
-    stride*
-    .82;
-
-
-  /* elbow flex */
-
-  leftArm.elbowGroup.rotation.x=
-    -.06-
-    leftKneeBend*.42;
-
-
-  rightArm.elbowGroup.rotation.x=
-    -.06-
-    rightKneeBend*.42;
-
-
-  /* torso rhythm */
-
-  const torsoTwist=
-    Math.sin(time)*
-    .025*
-    intensity;
-
-
-  torso.rotation.z=
-    damp(
-      torso.rotation.z,
-      torsoTwist,
-      8,
-      delta
-    );
-
-
-  /* subtle torso bob */
-
-  const bob=
-    Math.abs(
-      Math.sin(time*2)
-    )*
-    (
-      running
-        ? .05
-        : .032
-    )*
-    intensity;
-
-
-  bodyRoot.position.y=
-    damp(
-      bodyRoot.position.y,
-      bob,
-      10,
-      delta
-    );
-
-
-  /* head remains more stable */
-
-  headGroup.rotation.z=
-    damp(
-      headGroup.rotation.z,
-      Math.sin(
-        time*
-        .75
-      )*.012*
-      intensity,
-      7,
-      delta
-    );
-}
-
-
-/* =========================================================
-   IDLE ANIMATION
-========================================================= */
-
-function animateIdle(
-  time,
-  delta
-){
-
-  const breathing=
-    Math.sin(
-      time*
-      1.55
-    );
-
-
-  bodyRoot.position.y=
-    damp(
-      bodyRoot.position.y,
-      Math.abs(
-        breathing
-      )*
-      .014,
-      5,
-      delta
-    );
-
-
-  torso.scale.y=
-    damp(
-      torso.scale.y,
-      1+
-      breathing*
-      .008,
-      4,
-      delta
-    );
-
-
-  torso.rotation.z=
-    damp(
-      torso.rotation.z,
-      Math.sin(
-        time*.6
-      )*
-      .008,
-      4,
-      delta
-    );
-
-
-  leftLeg.hip.rotation.x=
-    damp(
-      leftLeg.hip.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  rightLeg.hip.rotation.x=
-    damp(
-      rightLeg.hip.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  leftLeg.kneeGroup.rotation.x=
-    damp(
-      leftLeg.kneeGroup.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  rightLeg.kneeGroup.rotation.x=
-    damp(
-      rightLeg.kneeGroup.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  leftLeg.ankleGroup.rotation.x=
-    damp(
-      leftLeg.ankleGroup.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  rightLeg.ankleGroup.rotation.x=
-    damp(
-      rightLeg.ankleGroup.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  leftArm.shoulder.rotation.x=
-    damp(
-      leftArm.shoulder.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  rightArm.shoulder.rotation.x=
-    damp(
-      rightArm.shoulder.rotation.x,
-      0,
-      8,
-      delta
-    );
-
-
-  leftArm.elbowGroup.rotation.x=
-    damp(
-      leftArm.elbowGroup.rotation.x,
-      -.06,
-      8,
-      delta
-    );
-
-
-  rightArm.elbowGroup.rotation.x=
-    damp(
-      rightArm.elbowGroup.rotation.x,
-      -.06,
-      8,
-      delta
-    );
-
-
-  headGroup.rotation.z=
-    damp(
-      headGroup.rotation.z,
-      Math.sin(
-        time*.55
-      )*.006,
-      4,
-      delta
-    );
-}
-
-
-/* =========================================================
-   CAMERA
-========================================================= */
-
-function updateCamera(
-  delta
-){
-
-  const horizontalDistance=
-    CAMERA_DISTANCE*
-    Math.cos(
-      cameraPitch
-    );
-
-
-  const verticalOffset=
-    CAMERA_HEIGHT+
-    CAMERA_DISTANCE*
-    Math.sin(
-      cameraPitch
-    );
-
-
-  cameraPositionTarget.set(
-    avatar.position.x+
-      Math.sin(
-        cameraYaw
-      )*
-      horizontalDistance,
-
-    avatar.position.y+
-      verticalOffset,
-
-    avatar.position.z+
-      Math.cos(
-        cameraYaw
-      )*
-      horizontalDistance
-  );
-
-
-  /*
-    Dynamic look target makes the camera
-    feel less robotic while running.
-  */
-
-  const speed=
-    Math.hypot(
-      velocity.x,
-      velocity.z
-    );
-
-
-  cameraLookTarget.set(
-    avatar.position.x,
-    avatar.position.y+
-      1.52+
-      Math.min(
-        speed*.025,
-        .08
-      ),
-    avatar.position.z
-  );
-
-
-  camera.position.lerp(
-    cameraPositionTarget,
-    1-
-    Math.exp(
-      -7*
-      delta
-    )
-  );
-
-
-  const currentLook =
-    new THREE.Vector3();
-
-  currentLook.copy(
-    cameraLookTarget
-  );
-
-
-  camera.lookAt(
-    currentLook
-  );
-}
-
-
-/* =========================================================
-   CAMERA / PLAYER VISUAL POLISH
-========================================================= */
-
-function updateVisualPolish(
-  delta
-){
-
-  /*
-    Small acceleration-based lean.
-    This gives the character more weight.
-  */
-
-  const speed=
-    Math.hypot(
-      velocity.x,
-      velocity.z
-    );
-
-
-  const lean=
-    THREE.MathUtils.clamp(
-      speed*.018,
-      0,
-      .10
-    );
-
-
-  bodyRoot.rotation.x=
-    damp(
-      bodyRoot.rotation.x,
-      -lean,
-      6,
-      delta
-    );
-
-
-  /*
-    Slight side sway while moving.
-  */
-
-  const lateral=
-    THREE.MathUtils.clamp(
-      velocity.x*.008,
-      -.045,
-      .045
-    );
-
-
-  bodyRoot.rotation.z=
-    damp(
-      bodyRoot.rotation.z,
-      lateral,
-      6,
-      delta
-    );
-}
+document.getElementById(
+  "name"
+).textContent="God";
+
+document.getElementById(
+  "sub"
+).textContent=
+  "Lagos · Street Boy";
 
 
 /* =========================================================
@@ -5384,63 +3493,24 @@ function updateVisualPolish(
 window.addEventListener(
   "resize",
   ()=>{
-
     camera.aspect=
-      window.innerWidth/
-      window.innerHeight;
+      innerWidth/innerHeight;
 
     camera.updateProjectionMatrix();
 
+    renderer.setSize(
+      innerWidth,
+      innerHeight
+    );
 
     renderer.setPixelRatio(
       Math.min(
-        window.devicePixelRatio || 1,
-        1.75
+        devicePixelRatio,
+        2
       )
-    );
-
-
-    renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
     );
   }
 );
-
-
-/* =========================================================
-   BACK BUTTON
-========================================================= */
-
-document
-  .getElementById(
-    "backButton"
-  )
-  .addEventListener(
-    "click",
-    ()=>{
-
-      if(
-        window.history.length>1
-      ){
-
-        window.history.back();
-
-      }else{
-
-        window.location.href=
-          "index.html";
-      }
-    }
-  );
-
-
-/* =========================================================
-   CLOCK
-========================================================= */
-
-const clock=
-  new THREE.Clock();
 
 
 /* =========================================================
@@ -5454,20 +3524,33 @@ function animate(){
   );
 
 
+  const now=
+    performance.now();
+
   const delta=
     Math.min(
-      clock.getDelta(),
-      .05
+      .033,
+      (now-previousTime)/1000
+    );
+
+  previousTime=now;
+
+
+  state.running=
+    state.keys.run ||
+    (
+      state.running &&
+      state.joystick.active
     );
 
 
-  updateMovement(
-    delta
-  );
+  const movement=
+    moveAvatar(delta);
 
 
-  updateVisualPolish(
-    delta
+  animateCharacter(
+    delta,
+    movement
   );
 
 
@@ -5483,24 +3566,57 @@ function animate(){
 }
 
 
+createWorld();
+
+updateCamera(.016);
+
+animate();
+
+
 /* =========================================================
-   STARTUP
+   LOADING SCREEN
 ========================================================= */
 
-const loaded=
-  await loadCharacter();
+requestAnimationFrame(
+  ()=>{
+    setTimeout(
+      ()=>{
+        document
+          .getElementById("loading")
+          .classList.add("hidden");
+      },
+      450
+    );
+  }
+);
 
 
-if(loaded){
+/* =========================================================
+   CLEANUP
+========================================================= */
 
-  avatarYaw=
-    Math.PI;
+window.addEventListener(
+  "beforeunload",
+  ()=>{
+    renderer.dispose();
 
-  visualRoot.rotation.y=
-    avatarYaw;
+    for(
+      const geometry of Object.values(
+        geometryCache
+      )
+    ){
 
-  animate();
-}
+      geometry.dispose();
+    }
+
+    for(
+      const material of materialCache.values()
+    ){
+
+      material.dispose();
+    }
+  }
+);
 
 </script>
 
