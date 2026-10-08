@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>3D Avatar</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #111;
+      font-family: Arial, sans-serif;
+    }
+
+    #game {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #111;
+      color: white;
+      font-size: 18px;
+    }
+
+    #info {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 10;
+      padding: 12px 15px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.55);
+      color: white;
+      backdrop-filter: blur(8px);
+    }
+
+    #info strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    #controls {
+      position: fixed;
+      bottom: 25px;
+      left: 25px;
+      z-index: 10;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      touch-action: none;
+    }
+
+    #stick {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      left: 40px;
+      top: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    #desktopControls {
+      position: fixed;
+      right: 15px;
+      bottom: 15px;
+      z-index: 10;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.55);
+      color: #fff;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      #desktopControls {
+        display: none;
+      }
+
+      #info {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="loading">Loading 3D Avatar...</div>
+
+  <div id="game"></div>
+
+  <div id="info">
+    <strong>3D Avatar</strong>
+    <span id="status">Idle</span>
+  </div>
+
+  <div id="controls">
+    <div id="stick"></div>
+  </div>
+
+  <div id="desktopControls">
+    WASD / Arrow Keys — Move
+  </div>
+
+  <script type="module">
+
+    import * as THREE from
+      "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+    import { OrbitControls } from
+      "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js";
+
+
+    /* =========================================================
+       SCENE
+    ========================================================= */
+
+    const scene = new THREE.Scene();
+
+    scene.background = new THREE.Color(0x87ceeb);
+
+    scene.fog = new THREE.Fog(
+      0x87ceeb,
+      25,
+      100
+    );
+
+
+    /* =========================================================
+       CAMERA
+    ========================================================= */
+
+    const camera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      500
+    );
+
+    camera.position.set(
+      0,
+      4,
+      7
+    );
+
+
+    /* =========================================================
+       RENDERER
+    ========================================================= */
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true
+    });
+
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, 2)
+    );
+
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+
+    renderer.shadowMap.enabled = true;
+
+    renderer.shadowMap.type =
+      THREE.PCFSoftShadowMap;
+
+    document
+      .getElementById("game")
+      .appendChild(renderer.domElement);
+
+
+    /* =========================================================
+       LIGHTING
+    ========================================================= */
+
+    const ambientLight =
+      new THREE.HemisphereLight(
+        0xffffff,
+        0x555555,
+        2
+      );
+
+    scene.add(ambientLight);
+
+
+    const sun =
+      new THREE.DirectionalLight(
+        0xffffff,
+        3
+      );
+
+    sun.position.set(
+      10,
+      20,
+      10
+    );
+
+    sun.castShadow = true;
+
+    sun.shadow.mapSize.width = 2048;
+    sun.shadow.mapSize.height = 2048;
+
+    scene.add(sun);
+
+
+    /* =========================================================
+       GROUND
+    ========================================================= */
+
+    const groundGeometry =
+      new THREE.PlaneGeometry(
+        200,
+        200
+      );
+
+    const groundMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x4d7c3f
+      });
+
+    const ground =
+      new THREE.Mesh(
+        groundGeometry,
+        groundMaterial
+      );
+
+    ground.rotation.x =
+      -Math.PI / 2;
+
+    ground.receiveShadow = true;
+
+    scene.add(ground);
+
+
+    /* =========================================================
+       ROAD
+    ========================================================= */
+
+    const roadGeometry =
+      new THREE.PlaneGeometry(
+        12,
+        200
+      );
+
+    const roadMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x333333
+      });
+
+    const road =
+      new THREE.Mesh(
+        roadGeometry,
+        roadMaterial
+      );
+
+    road.rotation.x =
+      -Math.PI / 2;
+
+    road.position.y =
+      0.01;
+
+    scene.add(road);
+
+
+    /* =========================================================
+       ROAD MARKINGS
+    ========================================================= */
+
+    for (
+      let z = -95;
+      z < 100;
+      z += 8
+    ) {
+
+      const markingGeometry =
+        new THREE.BoxGeometry(
+          0.3,
+          0.02,
+          4
+        );
+
+      const markingMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0xffffff
+        });
+
+      const marking =
+        new THREE.Mesh(
+          markingGeometry,
+          markingMaterial
+        );
+
+      marking.position.set(
+        0,
+        0.03,
+        z
+      );
+
+      scene.add(marking);
+    }
+
+
+    /* =========================================================
+       AVATAR
+    ========================================================= */
+
+    const avatar =
+      new THREE.Group();
+
+    avatar.position.set(
+      0,
+      0,
+      0
+    );
+
+    scene.add(avatar);
+
+
+    /* =========================================================
+       MATERIALS
+    ========================================================= */
+
+    const skinMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x8d5524,
+        roughness: 0.8
+      });
+
+    const shirtMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x111111,
+        roughness: 0.7
+      });
+
+    const pantsMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x222222,
+        roughness: 0.8
+      });
+
+    const shoeMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x111111,
+        roughness: 0.6
+      });
+
+    const hairMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x151515,
+        roughness: 1
+      });
+
+
+    /* =========================================================
+       BODY
+    ========================================================= */
+
+    const body =
+      new THREE.Mesh(
+        new THREE.CapsuleGeometry(
+          0.48,
+          1.0,
+          8,
+          16
+        ),
+        shirtMaterial
+      );
+
+    body.position.y =
+      1.65;
+
+    body.castShadow = true;
+
+    avatar.add(body);
+
+
+    /* =========================================================
+       HEAD
+    ========================================================= */
+
+    const head =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          0.42,
+          24,
+          24
+        ),
+        skinMaterial
+      );
+
+    head.position.y =
+      2.65;
+
+    head.castShadow = true;
+
+    avatar.add(head);
+
+
+    /* =========================================================
+       HAIR
+    ========================================================= */
+
+    const hair =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          0.44,
+          24,
+          16,
+          0,
+          Math.PI * 2,
+          0,
+          Math.PI * 0.55
+        ),
+        hairMaterial
+      );
+
+    hair.position.y =
+      2.78;
+
+    hair.castShadow = true;
+
+    avatar.add(hair);
+
+
+    /* =========================================================
+       ARMS
+    ========================================================= */
+
+    function createArm(side) {
+
+      const arm =
+        new THREE.Mesh(
+          new THREE.CapsuleGeometry(
+            0.13,
+            0.75,
+            6,
+            12
+          ),
+          shirtMaterial
+        );
+
+      arm.position.set(
+        side * 0.62,
+        1.72,
+        0
+      );
+
+      arm.rotation.z =
+        side * -0.12;
+
+      arm.castShadow = true;
+
+      avatar.add(arm);
+
+      return arm;
+    }
+
+    const leftArm =
+      createArm(-1);
+
+    const rightArm =
+      createArm(1);
+
+
+    /* =========================================================
+       LEGS
+    ========================================================= */
+
+    function createLeg(side) {
+
+      const leg =
+        new THREE.Mesh(
+          new THREE.CapsuleGeometry(
+            0.16,
+            0.8,
+            6,
+            12
+          ),
+          pantsMaterial
+        );
+
+      leg.position.set(
+        side * 0.25,
+        0.72,
+        0
+      );
+
+      leg.castShadow = true;
+
+      avatar.add(leg);
+
+      return leg;
+    }
+
+    const leftLeg =
+      createLeg(-1);
+
+    const rightLeg =
+      createLeg(1);
+
+
+    /* =========================================================
+       SHOES
+    ========================================================= */
+
+    function createShoe(side) {
+
+      const shoe =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.34,
+            0.18,
+            0.55
+          ),
+          shoeMaterial
+        );
+
+      shoe.position.set(
+        side * 0.25,
+        0.17,
+        -0.08
+      );
+
+      shoe.castShadow = true;
+
+      avatar.add(shoe);
+
+      return shoe;
+    }
+
+    const leftShoe =
+      createShoe(-1);
+
+    const rightShoe =
+      createShoe(1);
+
+
+    /* =========================================================
+       CONTROLS
+    ========================================================= */
+
+    const keys = {};
+
+    window.addEventListener(
+      "keydown",
+      event => {
+
+        keys[
+          event.key.toLowerCase()
+        ] = true;
+
+      }
+    );
+
+    window.addEventListener(
+      "keyup",
+      event => {
+
+        keys[
+          event.key.toLowerCase()
+        ] = false;
+
+      }
+    );
+
+
+    /* =========================================================
+       MOBILE JOYSTICK
+    ========================================================= */
+
+    const joystick =
+      document.getElementById(
+        "controls"
+      );
+
+    const stick =
+      document.getElementById(
+        "stick"
+      );
+
+    let joystickX = 0;
+    let joystickY = 0;
+
+    let dragging = false;
+
+
+    function updateJoystick(
+      clientX,
+      clientY
+    ) {
+
+      const rect =
+        joystick.getBoundingClientRect();
+
+      const centerX =
+        rect.left +
+        rect.width / 2;
+
+      const centerY =
+        rect.top +
+        rect.height / 2;
+
+      let dx =
+        clientX - centerX;
+
+      let dy =
+        clientY - centerY;
+
+      const maxDistance =
+        45;
+
+      const distance =
+        Math.sqrt(
+          dx * dx +
+          dy * dy
+        );
+
+      if (
+        distance >
+        maxDistance
+      ) {
+
+        dx =
+          dx / distance *
+          maxDistance;
+
+        dy =
+          dy / distance *
+          maxDistance;
+      }
+
+      stick.style.transform =
+        `translate(${dx}px, ${dy}px)`;
+
+      joystickX =
+        dx / maxDistance;
+
+      joystickY =
+        dy / maxDistance;
+    }
+
+
+    joystick.addEventListener(
+      "pointerdown",
+      event => {
+
+        dragging = true;
+
+        joystick.setPointerCapture(
+          event.pointerId
+        );
+
+        updateJoystick(
+          event.clientX,
+          event.clientY
+        );
+      }
+    );
+
+
+    joystick.addEventListener(
+      "pointermove",
+      event => {
+
+        if (!dragging) return;
+
+        updateJoystick(
+          event.clientX,
+          event.clientY
+        );
+      }
+    );
+
+
+    joystick.addEventListener(
+      "pointerup",
+      () => {
+
+        dragging = false;
+
+        joystickX = 0;
+        joystickY = 0;
+
+        stick.style.transform =
+          "translate(0, 0)";
+      }
+    );
+
+
+    /* =========================================================
+       MOVEMENT
+    ========================================================= */
+
+    const clock =
+      new THREE.Clock();
+
+    const status =
+      document.getElementById(
+        "status"
+      );
+
+
+    function updateMovement(
+      delta
+    ) {
+
+      let x = 0;
+      let z = 0;
+
+
+      if (
+        keys["w"] ||
+        keys["arrowup"]
+      ) {
+
+        z -= 1;
+      }
+
+
+      if (
+        keys["s"] ||
+        keys["arrowdown"]
+      ) {
+
+        z += 1;
+      }
+
+
+      if (
+        keys["a"] ||
+        keys["arrowleft"]
+      ) {
+
+        x -= 1;
+      }
+
+
+      if (
+        keys["d"] ||
+        keys["arrowright"]
+      ) {
+
+        x += 1;
+      }
+
+
+      x += joystickX;
+      z += joystickY;
+
+
+      const moving =
+        Math.abs(x) > 0.05 ||
+        Math.abs(z) > 0.05;
+
+
+      if (moving) {
+
+        const length =
+          Math.sqrt(
+            x * x +
+            z * z
+          );
+
+        x /= length;
+        z /= length;
+
+
+        const speed =
+          4 * delta;
+
+
+        avatar.position.x +=
+          x * speed;
+
+        avatar.position.z +=
+          z * speed;
+
+
+        const targetRotation =
+          Math.atan2(
+            x,
+            z
+          );
+
+
+        avatar.rotation.y =
+          THREE.MathUtils.lerp(
+            avatar.rotation.y,
+            targetRotation,
+            0.15
+          );
+
+
+        status.textContent =
+          "Walking";
+
+
+        /* WALK ANIMATION */
+
+        const time =
+          performance.now() *
+          0.012;
+
+        leftLeg.rotation.x =
+          Math.sin(time) * 0.65;
+
+        rightLeg.rotation.x =
+          Math.sin(time + Math.PI) *
+          0.65;
+
+        leftArm.rotation.x =
+          Math.sin(time + Math.PI) *
+          0.45;
+
+        rightArm.rotation.x =
+          Math.sin(time) *
+          0.45;
+
+      } else {
+
+        status.textContent =
+          "Idle";
+
+
+        /* IDLE */
+
+        leftLeg.rotation.x *= 0.85;
+        rightLeg.rotation.x *= 0.85;
+
+        leftArm.rotation.x *= 0.85;
+        rightArm.rotation.x *= 0.85;
+      }
+
+
+      /* KEEP AVATAR ON MAP */
+
+      avatar.position.x =
+        THREE.MathUtils.clamp(
+          avatar.position.x,
+          -5,
+          5
+        );
+
+      avatar.position.z =
+        THREE.MathUtils.clamp(
+          avatar.position.z,
+          -95,
+          95
+        );
+    }
+
+
+    /* =========================================================
+       CAMERA FOLLOW
+    ========================================================= */
+
+    function updateCamera() {
+
+      const target =
+        new THREE.Vector3(
+          avatar.position.x,
+          avatar.position.y + 1.5,
+          avatar.position.z
+        );
+
+
+      const desired =
+        new THREE.Vector3(
+          avatar.position.x,
+          avatar.position.y + 4,
+          avatar.position.z + 7
+        );
+
+
+      camera.position.lerp(
+        desired,
+        0.08
+      );
+
+
+      camera.lookAt(
+        target
+      );
+    }
+
+
+    /* =========================================================
+       OPTIONAL CAMERA CONTROLS
+    ========================================================= */
+
+    const cameraControls =
+      new OrbitControls(
+        camera,
+        renderer.domElement
+      );
+
+    cameraControls.enablePan =
+      false;
+
+    cameraControls.enableZoom =
+      true;
+
+    cameraControls.minDistance =
+      4;
+
+    cameraControls.maxDistance =
+      12;
+
+    cameraControls.maxPolarAngle =
+      Math.PI / 2.05;
+
+
+    /* =========================================================
+       RESIZE
+    ========================================================= */
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        camera.aspect =
+          window.innerWidth /
+          window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+          window.innerWidth,
+          window.innerHeight
+        );
+      }
+    );
+
+
+    /* =========================================================
+       ANIMATION LOOP
+    ========================================================= */
+
+    function animate() {
+
+      requestAnimationFrame(
+        animate
+      );
+
+
+      const delta =
+        Math.min(
+          clock.getDelta(),
+          0.05
+        );
+
+
+      updateMovement(
+        delta
+      );
+
+
+      updateCamera();
+
+
+      renderer.render(
+        scene,
+        camera
+      );
+    }
+
+
+    /* =========================================================
+       START
+    ========================================================= */
+
+    document
+      .getElementById("loading")
+      .style.display = "none";
+
+    animate();
+
+  </script>
+
+</body>
+</html>
