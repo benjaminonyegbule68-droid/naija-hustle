@@ -2766,6 +2766,630 @@ async function createCharacter(event) {
 
 }
 
+/* =========================================================
+   CHARACTER PROFILE
+   ========================================================= */
+
+function profileHtml(c) {
+
+  const trait1 =
+    S.personalityTraits?.find(
+      trait =>
+        trait.id === c.trait_1
+    );
+
+  const trait2 =
+    S.personalityTraits?.find(
+      trait =>
+        trait.id === c.trait_2
+    );
+
+
+  const level =
+    Number(c.level) || 1;
+
+  const xp =
+    Number(c.xp) || 0;
+
+  const xpPct =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        xp % 100
+      )
+    );
+
+
+  const skillData = [
+
+    [
+      "Hustle",
+      Number(c.skill_hustle) || 0
+    ],
+
+    [
+      "Education",
+      Number(c.skill_edu) || 0
+    ],
+
+    [
+      "Charm",
+      Number(c.skill_charm) || 0
+    ],
+
+    [
+      "Tech",
+      Number(c.skill_tech) || 0
+    ]
+
+  ];
+
+
+  const skillHtml =
+    skillData.map(
+      ([name, value]) => {
+
+        const width =
+          Math.min(
+            100,
+            Math.max(
+              0,
+              value * 10
+            )
+          );
+
+        return `
+
+          <div class="profile-skill">
+
+            <div class="profile-skill-head">
+
+              <span>
+                ${name}
+              </span>
+
+              <strong>
+                ${value}
+              </strong>
+
+            </div>
+
+            <div class="profile-skill-bar">
+
+              <i
+                style="width:${width}%"
+              ></i>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+
+  const businessText =
+    S.biz
+      ? "Business owner"
+      : "No business yet";
+
+
+  return `
+
+    <div class="profile-hero">
+
+      <div class="profile-avatar">
+
+        ${esc(
+          String(
+            c.name || "?"
+          )
+            .charAt(0)
+            .toUpperCase()
+        )}
+
+      </div>
+
+
+      <div class="profile-identity">
+
+        <div class="eyebrow">
+          YOUR HUSTLE IDENTITY
+        </div>
+
+        <h1>
+          ${esc(
+            c.name ||
+            "Unknown Hustler"
+          )}
+        </h1>
+
+        <p>
+
+          ${esc(
+            bgName(
+              c.background
+            )
+          )}
+
+          ·
+
+          Level ${level}
+
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="profile-card">
+
+      <div class="profile-card-title">
+
+        <span>💰</span>
+
+        <strong>
+          Financial Position
+        </strong>
+
+      </div>
+
+
+      <div class="profile-stat-grid">
+
+        <div class="profile-stat">
+
+          <span>
+            Cash
+          </span>
+
+          <strong>
+            ${naira(c.cash)}
+          </strong>
+
+        </div>
+
+
+        <div class="profile-stat">
+
+          <span>
+            Reputation
+          </span>
+
+          <strong>
+            ${Number(
+              c.reputation || 0
+            )}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="profile-card">
+
+      <div class="profile-card-title">
+
+        <span>⭐</span>
+
+        <strong>
+          Level Progress
+        </strong>
+
+      </div>
+
+
+      <div class="row">
+
+        <span>
+          Level ${level}
+        </span>
+
+        <b>
+          ${xpPct}/100 XP
+        </b>
+
+      </div>
+
+
+      <div
+        class="bar"
+        style="
+          background:var(--line);
+          margin-top:8px;
+        "
+      >
+
+        <i
+          style="
+            width:${xpPct}%;
+            background:var(--lagoon);
+          "
+        ></i>
+
+      </div>
+
+    </div>
+
+
+    <div class="profile-card">
+
+      <div class="profile-card-title">
+
+        <span>🧠</span>
+
+        <strong>
+          Personality
+        </strong>
+
+      </div>
+
+
+      <div class="profile-traits">
+
+        ${
+          trait1
+            ? `
+              <span class="profile-trait">
+                ${esc(
+                  trait1.name
+                )}
+              </span>
+            `
+            : ""
+        }
+
+
+        ${
+          trait2
+            ? `
+              <span class="profile-trait">
+                ${esc(
+                  trait2.name
+                )}
+              </span>
+            `
+            : ""
+        }
+
+
+        ${
+          !trait1 &&
+          !trait2
+            ? `
+              <span class="mute">
+                Personality data unavailable.
+              </span>
+            `
+            : ""
+        }
+
+      </div>
+
+    </div>
+
+
+    <div class="profile-card">
+
+      <div class="profile-card-title">
+
+        <span>🎨</span>
+
+        <strong>
+          Character Design
+        </strong>
+
+      </div>
+
+
+      <div class="profile-details">
+
+        <div class="profile-detail">
+
+          <span>
+            Skin tone
+          </span>
+
+          <strong>
+            ${esc(
+              optionLabel(
+                SKIN_TONES,
+                c.skin_tone
+              )
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Hairstyle
+          </span>
+
+          <strong>
+            ${esc(
+              optionLabel(
+                HAIRSTYLES,
+                c.hairstyle
+              )
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Hair colour
+          </span>
+
+          <strong>
+            ${esc(
+              optionLabel(
+                HAIR_COLORS,
+                c.hair_color
+              )
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Outfit
+          </span>
+
+          <strong>
+            ${esc(
+              optionLabel(
+                OUTFITS,
+                c.outfit
+              )
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Accessory
+          </span>
+
+          <strong>
+            ${esc(
+              optionLabel(
+                ACCESSORIES,
+                c.accessory
+              )
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            District
+          </span>
+
+          <strong>
+            ${esc(
+              cap(
+                c.district
+              )
+            )}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="profile-card">
+
+      <div class="profile-card-title">
+
+        <span>⚡</span>
+
+        <strong>
+          Skills
+        </strong>
+
+      </div>
+
+
+      ${skillHtml}
+
+    </div>
+
+
+    <div class="profile-card">
+
+      <div class="profile-card-title">
+
+        <span>❤️</span>
+
+        <strong>
+          Condition
+        </strong>
+
+      </div>
+
+
+      <div class="profile-details">
+
+        <div class="profile-detail">
+
+          <span>
+            Energy
+          </span>
+
+          <strong>
+            ${Number(c.energy || 0)}
+            /
+            ${Number(c.max_energy || 0)}
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Hunger
+          </span>
+
+          <strong>
+            ${Number(c.hunger || 0)}/100
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Fun
+          </span>
+
+          <strong>
+            ${Number(c.fun || 0)}/100
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Social
+          </span>
+
+          <strong>
+            ${Number(c.social || 0)}/100
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail">
+
+          <span>
+            Hygiene
+          </span>
+
+          <strong>
+            ${Number(c.hygiene || 0)}/100
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="profile-card">
+
+      <div class="profile-card-title">
+
+        <span>🏪</span>
+
+        <strong>
+          Hustle Assets
+        </strong>
+
+      </div>
+
+
+      <div class="profile-status">
+
+        <strong>
+          ${businessText}
+        </strong>
+
+        <br>
+
+        ${
+          S.biz
+            ? `
+              Business level:
+              ${Number(
+                S.biz.level || 1
+              )}
+            `
+            : `
+              Buy your first business from the Business tab.
+            `
+        }
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="card"
+      style="
+        background:var(--ink);
+        color:#fff;
+        border:0;
+      "
+    >
+
+      <div
+        style="
+          color:var(--danfo);
+          font-weight:800;
+          font-size:.75rem;
+          letter-spacing:.08em;
+        "
+      >
+        YOUR JOURNEY
+      </div>
+
+      <h2
+        style="
+          margin-top:5px;
+          color:#fff;
+        "
+      >
+        Hustle → Earn → Improve → Build
+      </h2>
+
+      <p
+        style="
+          color:rgba(255,255,255,.72);
+          margin:0;
+        "
+      >
+        Build your wealth, reputation and influence
+        until your name carries weight across Nigeria.
+      </p>
+
+    </div>
+
+  `;
+
+  }
+  
 
 /* =========================================================
    NAVIGATION
