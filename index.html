@@ -501,7 +501,6 @@ function mat(color,rough=.72,metal=0,opts={}){
   matCache.set(k,m);
   return m;
   }
-function sphereG(r){return geo(`s${r}`,()=>new THREE.SphereGeometry(r,18,14))}
 function sphereG(r){
   return geo(
     `s${r}`,
@@ -536,7 +535,6 @@ function torusG(r,t,rs=10,ts=20,arc=Math.PI*2){
     ()=>new THREE.TorusGeometry(r,t,rs,ts,arc)
   );
 }
-
 function labelTexture(text,color="#ffffff"){
   const key=`${text}|${color}`;
 
