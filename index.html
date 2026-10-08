@@ -1,880 +1,854 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
-  <meta name="theme-color" content="#0F6B6F">
-
-  <title>Naija Hustle</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap"
-    rel="stylesheet"
-  >
-
-  <style>
-    :root {
-      --bg: #EEF1F0;
-      --ink: #14201F;
-      --lagoon: #0F6B6F;
-      --danfo: #FFC20E;
-      --brick: #C2410C;
-      --card: #fff;
-      --mute: #5C6B6A;
-      --line: #D5DCDA;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: "Bricolage Grotesque", system-ui, sans-serif;
-      line-height: 1.45;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    button {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .stripe {
-      height: 8px;
-      background: repeating-linear-gradient(
-        90deg,
-        var(--danfo) 0 28px,
-        #14201F 28px 36px
-      );
-    }
-
-    .wrap {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 16px 16px 96px;
-    }
-
-    h1 {
-      font-size: 2.4rem;
-      font-weight: 800;
-      line-height: 1.05;
-      margin: 24px 0 8px;
-      letter-spacing: -0.02em;
-    }
-
-    h2 {
-      font-size: 1.3rem;
-      font-weight: 800;
-      margin: 0 0 4px;
-    }
-
-    p {
-      margin: 0 0 12px;
-    }
-
-    .mute {
-      color: var(--mute);
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    label {
-      display: block;
-      font-weight: 600;
-      margin: 12px 0 4px;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 13px 14px;
-      border: 2px solid var(--line);
-      border-radius: 10px;
-      background: #fff;
-      color: var(--ink);
-    }
-
-    input:focus-visible,
-    select:focus-visible,
-    button:focus-visible {
-      outline: 3px solid var(--danfo);
-      outline-offset: 2px;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 10px;
-      background: var(--lagoon);
-      color: #fff;
-      font-weight: 800;
-      font-size: 1.05rem;
-      margin-top: 16px;
-      cursor: pointer;
-    }
-
-    .btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-
-    .btn.alt {
-      background: #fff;
-      color: var(--lagoon);
-      border: 2px solid var(--lagoon);
-      margin-top: 0;
-      padding: 10px 4px;
-      font-size: .95rem;
-    }
-
-    .btn.alt small {
-      display: block;
-      font-weight: 600;
-      color: var(--mute);
-    }
-
-    .grid3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .link {
-      background: none;
-      border: 0;
-      color: var(--lagoon);
-      font-weight: 600;
-      text-decoration: underline;
-      padding: 8px 0;
-      cursor: pointer;
-    }
-
-    .err {
-      background: #FDE8E0;
-      color: #7A2A08;
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin: 0 0 12px;
-    }
-
-    .ok {
-      background: #E2F3E7;
-      color: #1C5B2E;
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin: 0 0 12px;
-    }
-
-    /* BACKGROUND CARDS */
-
-    .bg {
-      display: block;
-      width: 100%;
-      text-align: left;
-      background: #fff;
-      border: 2px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      color: var(--ink);
-    }
-
-    .bg[aria-pressed="true"] {
-      border-color: var(--lagoon);
-      box-shadow: inset 6px 0 0 var(--danfo);
-    }
-
-    .bg b {
-      font-size: 1.1rem;
-    }
-
-    .bg .meta {
-      color: var(--lagoon);
-      font-weight: 600;
-      font-size: .9rem;
-      margin: 2px 0 4px;
-    }
-
-    /* PERSONALITY */
-
-    .section-head {
-      margin: 22px 0 8px;
-    }
-
-    .section-head h2 {
-      margin-bottom: 3px;
-    }
-
-    .counter {
-      display: inline-block;
-      background: var(--ink);
-      color: #fff;
-      padding: 4px 9px;
-      border-radius: 20px;
-      font-size: .8rem;
-      font-weight: 800;
-      margin-top: 5px;
-    }
-
-    .trait-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 10px;
-    }
-
-    .trait {
-      min-height: 125px;
-      text-align: left;
-      background: #fff;
-      border: 2px solid var(--line);
-      border-radius: 13px;
-      padding: 12px;
-      color: var(--ink);
-      cursor: pointer;
-    }
-
-    .trait[aria-pressed="true"] {
-      border-color: var(--lagoon);
-      box-shadow: inset 0 -5px 0 var(--danfo);
-      background: #F4FAF9;
-    }
-
-    .trait b {
-      display: block;
-      font-size: 1rem;
-      margin-bottom: 4px;
-    }
-
-    .trait small {
-      display: block;
-      color: var(--mute);
-      line-height: 1.35;
-    }
-
-    .trait-number {
-      float: right;
-      width: 21px;
-      height: 21px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: var(--line);
-      font-size: .72rem;
-      font-weight: 800;
-    }
-
-    .trait[aria-pressed="true"] .trait-number {
-      background: var(--danfo);
-    }
-
-    /* CHARACTER DESIGN */
-
-    .look-preview {
-      background: linear-gradient(
-        135deg,
-        #14201F,
-        #0F6B6F
-      );
-      color: #fff;
-      border-radius: 16px;
-      padding: 18px;
-      margin: 10px 0 16px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .look-preview::after {
-      content: "NAIJA HUSTLE";
-      position: absolute;
-      right: -4px;
-      bottom: -7px;
-      font-size: 2rem;
-      font-weight: 800;
-      opacity: .08;
-    }
-
-    .avatar {
-      width: 86px;
-      height: 86px;
-      border-radius: 50%;
-      background: var(--danfo);
-      display: grid;
-      place-items: center;
-      font-size: 2.7rem;
-      margin-bottom: 10px;
-      border: 4px solid rgba(255,255,255,.8);
-    }
-
-    .look-name {
-      font-size: 1.35rem;
-      font-weight: 800;
-    }
-
-    .look-meta {
-      color: rgba(255,255,255,.78);
-      font-size: .85rem;
-    }
-
-    .choice-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .choice {
-      border: 2px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      border-radius: 10px;
-      padding: 11px 9px;
-      cursor: pointer;
-      text-align: left;
-    }
-
-    .choice.selected {
-      border-color: var(--lagoon);
-      background: #EAF7F6;
-    }
-
-    .choice b {
-      display: block;
-      font-size: .9rem;
-    }
-
-    .choice small {
-      color: var(--mute);
-    }
-
-    /* PROFILE */
-
-    .profile-hero {
-      background: linear-gradient(
-        135deg,
-        var(--ink),
-        var(--lagoon)
-      );
-      color: #fff;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .profile-hero::after {
-      content: "NAIJA HUSTLE";
-      position: absolute;
-      right: -8px;
-      bottom: -8px;
-      font-size: 2rem;
-      font-weight: 800;
-      opacity: .06;
-    }
-
-    .profile-avatar {
-      width: 72px;
-      height: 72px;
-      min-width: 72px;
-      border-radius: 50%;
-      background: var(--danfo);
-      color: var(--ink);
-      display: grid;
-      place-items: center;
-      font-size: 2rem;
-      font-weight: 800;
-      border: 4px solid rgba(255,255,255,.8);
-    }
-
-    .profile-identity {
-      min-width: 0;
-    }
-
-    .profile-identity .eyebrow {
-      font-size: .7rem;
-      font-weight: 800;
-      letter-spacing: .08em;
-      color: rgba(255,255,255,.7);
-      margin-bottom: 2px;
-    }
-
-    .profile-identity h1 {
-      color: #fff;
-      font-size: 1.7rem;
-      margin: 0 0 3px;
-      overflow-wrap: anywhere;
-    }
-
-    .profile-identity p {
-      color: rgba(255,255,255,.78);
-      margin: 0;
-      font-size: .9rem;
-    }
-
-    .profile-card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .profile-card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 13px;
-    }
-
-    .profile-card-title span {
-      font-size: 1.15rem;
-    }
-
-    .profile-card-title strong {
-      font-size: 1.05rem;
-    }
-
-    .profile-stat-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .profile-stat {
-      background: #F7F9F8;
-      border-radius: 11px;
-      padding: 12px;
-    }
-
-    .profile-stat span {
-      display: block;
-      color: var(--mute);
-      font-size: .8rem;
-      margin-bottom: 3px;
-    }
-
-    .profile-stat strong {
-      display: block;
-      color: var(--lagoon);
-      font-size: 1.2rem;
-    }
-
-    .profile-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .profile-detail {
-      background: #F7F9F8;
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .profile-detail span {
-      display: block;
-      color: var(--mute);
-      font-size: .78rem;
-      margin-bottom: 2px;
-    }
-
-    .profile-detail strong {
-      display: block;
-      font-size: .95rem;
-      overflow-wrap: anywhere;
-    }
-
-    .profile-traits {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .profile-trait {
-      background: #E8F5F5;
-      color: var(--lagoon);
-      border: 1px solid #C5E3E2;
-      border-radius: 20px;
-      padding: 7px 11px;
-      font-weight: 800;
-      font-size: .85rem;
-    }
-
-    .profile-skill {
-      margin: 12px 0;
-    }
-
-    .profile-skill:first-child {
-      margin-top: 0;
-    }
-
-    .profile-skill:last-child {
-      margin-bottom: 0;
-    }
-
-    .profile-skill-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 5px;
-    }
-
-    .profile-skill-head span {
-      font-weight: 700;
-    }
-
-    .profile-skill-head strong {
-      color: var(--lagoon);
-    }
-
-    .profile-skill-bar {
-      height: 9px;
-      background: var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .profile-skill-bar i {
-      display: block;
-      height: 100%;
-      background: var(--lagoon);
-      border-radius: 8px;
-    }
-
-    .profile-status {
-      background: #F7F4EC;
-      border-radius: 11px;
-      padding: 12px;
-      color: var(--mute);
-    }
-
-    .profile-status strong {
-      color: var(--ink);
-    }
-
-    /* GAME */
-
-    .top {
-      background: var(--lagoon);
-      color: #fff;
-      position: sticky;
-      top: 0;
-      z-index: 5;
-    }
-
-    .top .in {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 12px 16px;
-    }
-
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .cash {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--danfo);
-    }
-
-    .bar {
-      height: 10px;
-      background: rgba(255,255,255,.25);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-
-    .bar i {
-      display: block;
-      height: 100%;
-      background: var(--danfo);
-    }
-
-    .sk {
-      margin: 10px 0;
-    }
-
-    .sk .bar {
-      background: var(--line);
-      margin-top: 4px;
-    }
-
-    .sk .bar i {
-      background: var(--lagoon);
-    }
-
-    .nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #fff;
-      border-top: 1px solid var(--line);
-      display: flex;
-      padding-bottom: env(safe-area-inset-bottom);
-      z-index: 20;
-    }
-
-    .nav button {
-      flex: 1;
-      padding: 14px 4px;
-      border: 0;
-      background: none;
-      font-weight: 600;
-      color: var(--mute);
-      cursor: pointer;
-      border-top: 4px solid transparent;
-    }
-
-    .nav button[aria-current="page"] {
-      color: var(--lagoon);
-      border-top-color: var(--danfo);
-    }
-
-    .lb {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--line);
-      gap: 10px;
-    }
-
-    .lb:last-child {
-      border: 0;
-    }
-
-    .pill {
-      display: inline-block;
-      background: var(--danfo);
-      color: #14201F;
-      font-weight: 800;
-      border-radius: 20px;
-      padding: 2px 10px;
-      font-size: .85rem;
-      white-space: nowrap;
-    }
-
-    .lock {
-      color: var(--brick);
-      font-weight: 600;
-      margin-top: 10px;
-    }
-
-    .big {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--lagoon);
-    }
-
-    .map-card {
-      padding: 10px !important;
-      overflow: hidden;
-    }
-
-    .map-svg {
-      width: 100%;
-      display: block;
-      border-radius: 10px;
-    }
-
-    .map-pin {
-      cursor: pointer;
-    }
-
-    .district-card.here {
-      border-color: var(--danfo);
-      box-shadow: 0 0 0 3px rgba(255,194,14,.25);
-    }
-
-    .bonus {
-      display: inline-block;
-      background: #E8F5F5;
-      color: var(--lagoon);
-      font-weight: 700;
-      font-size: .85rem;
-      padding: 3px 9px;
-      border-radius: 20px;
-      margin-top: 6px;
-    }
-
-    /* NEEDS */
-
-    .needs-card {
-      position: relative;
-    }
-
-    .need-row {
-      margin: 14px 0;
-    }
-
-    .need-row:last-child {
-      margin-bottom: 2px;
-    }
-
-    .need-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 5px;
-    }
-
-    .need-name {
-      font-weight: 700;
-    }
-
-    .need-value {
-      font-weight: 800;
-    }
-
-    .need-bar {
-      height: 10px;
-      background: var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .need-bar i {
-      display: block;
-      height: 100%;
-      border-radius: 8px;
-    }
-
-    .need-good {
-      background: var(--lagoon);
-    }
-
-    .need-mid {
-      background: var(--danfo);
-    }
-
-    .need-low {
-      background: var(--brick);
-    }
-
-    .needs-note {
-      background: #F7F4EC;
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: var(--mute);
-      font-size: .9rem;
-      margin-top: 12px;
-    }
-
-    /* CLOCK */
-
-    .clock-card {
-      background: var(--ink);
-      color: #fff;
-      border: 0;
-    }
-
-    .clock-day {
-      color: var(--danfo);
-      font-size: .8rem;
-      font-weight: 800;
-      letter-spacing: .08em;
-    }
-
-    .clock-time {
-      font-size: 1.8rem;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-top: 2px;
-    }
-
-    .clock-phase {
-      color: rgba(255,255,255,.75);
-      font-size: .85rem;
-    }
-
-    /* ACTIVITIES */
-
-    .activity-card {
-      margin: 10px 0 0;
-      background: #F7F9F8;
-    }
-
-    .activity-icon {
-      font-size: 1.35rem;
-      margin-right: 5px;
-    }
-
-    .activity-action {
-      width: auto;
-      margin-top: 0;
-      padding: 10px 14px;
-      white-space: nowrap;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 24px 12px;
-      color: var(--mute);
-    }
-
-    @media (max-width: 380px) {
-      .wrap {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .top .in {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .trait-grid,
-      .choice-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .grid3 {
-        grid-template-columns: 1fr;
-      }
-
-      .activity-card .row {
-        align-items: flex-start;
-      }
-
-      .activity-action {
-        padding: 9px 10px;
-        font-size: .9rem;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14201F">
+
+<title>Naija Hustle</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg:#EEF1F0;
+  --ink:#14201F;
+  --lagoon:#0F6B6F;
+  --danfo:#FFC20E;
+  --brick:#C2410C;
+  --card:#fff;
+  --mute:#5C6B6A;
+  --line:#D5DCDA;
+  --good:#087443;
+  --danger:#B42318;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Bricolage Grotesque",sans-serif;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+input,
+select{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px 14px;
+  background:#fff;
+  color:var(--ink);
+  outline:none;
+}
+
+input:focus,
+select:focus{
+  border-color:var(--lagoon);
+  box-shadow:0 0 0 3px rgba(15,107,111,.1);
+}
+
+.wrap{
+  width:min(100% - 24px,480px);
+  margin:0 auto;
+  padding-bottom:100px;
+}
+
+h1,
+h2,
+h3,
+p{
+  margin-top:0;
+}
+
+h1{
+  font-size:2rem;
+  line-height:1.05;
+}
+
+h2{
+  font-size:1.25rem;
+  line-height:1.15;
+}
+
+p{
+  line-height:1.5;
+}
+
+.mute{
+  color:var(--mute);
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.grid{
+  display:grid;
+  gap:12px;
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:16px;
+  margin:12px 0;
+  box-shadow:0 5px 18px rgba(20,32,31,.04);
+}
+
+.btn{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  background:var(--lagoon);
+  color:#fff;
+  padding:13px 15px;
+  font-weight:800;
+  margin-top:10px;
+}
+
+.btn:hover{
+  filter:brightness(.96);
+}
+
+.btn.alt{
+  background:#fff;
+  color:var(--ink);
+  border:1px solid var(--line);
+}
+
+.btn.gold{
+  background:var(--danfo);
+  color:var(--ink);
+}
+
+.link{
+  border:0;
+  background:none;
+  color:var(--lagoon);
+  font-weight:800;
+  padding:10px 0;
+}
+
+.err,
+.ok{
+  border-radius:14px;
+  padding:12px 14px;
+  margin:10px 0;
+  line-height:1.4;
+}
+
+.err{
+  background:#FDECEC;
+  color:var(--danger);
+  border:1px solid #F4C7C4;
+}
+
+.ok{
+  background:#EAF8F0;
+  color:var(--good);
+  border:1px solid #BEE6CE;
+}
+
+.stripe{
+  height:7px;
+  background:linear-gradient(
+    90deg,
+    var(--brick) 0 33%,
+    #fff 33% 66%,
+    var(--good) 66%
+  );
+}
+
+.top{
+  background:var(--ink);
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.top .in{
+  width:min(100% - 24px,480px);
+  margin:auto;
+  padding:13px 0;
+}
+
+.cash{
+  color:var(--danfo);
+  font-size:1.7rem;
+  font-weight:800;
+  margin:6px 0;
+}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:5px 9px;
+  background:#E9F0EF;
+  color:var(--ink);
+  font-size:.78rem;
+  font-weight:800;
+}
+
+.top .pill{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+}
+
+.bar{
+  height:9px;
+  background:var(--line);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:7px;
+}
+
+.bar i{
+  display:block;
+  height:100%;
+  background:var(--lagoon);
+  border-radius:inherit;
+}
+
+.nav{
+  position:fixed;
+  z-index:30;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#fff;
+  border-top:1px solid var(--line);
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  padding:7px 4px calc(7px + env(safe-area-inset-bottom));
+}
+
+.nav button{
+  border:0;
+  background:none;
+  color:var(--mute);
+  font-size:.68rem;
+  font-weight:800;
+  padding:8px 2px;
+}
+
+.nav button[aria-current="page"]{
+  color:var(--lagoon);
+}
+
+.auth{
+  padding-top:45px;
+}
+
+.auth-logo{
+  display:inline-flex;
+  background:var(--ink);
+  color:#fff;
+  border-radius:14px;
+  padding:8px 12px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:10px;
+  margin:18px 0 10px;
+}
+
+.counter{
+  color:var(--mute);
+  font-size:.8rem;
+  font-weight:800;
+}
+
+.bg{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  background:#fff;
+  text-align:left;
+  width:100%;
+}
+
+.bg.selected{
+  border:2px solid var(--lagoon);
+  background:#F1FAF9;
+}
+
+.bg h3{
+  margin:0 0 5px;
+}
+
+.bg p{
+  margin:0;
+  color:var(--mute);
+  font-size:.86rem;
+}
+
+.trait-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.trait{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:13px;
+  background:#fff;
+  text-align:left;
+}
+
+.trait.selected{
+  border:2px solid var(--lagoon);
+  background:#F1FAF9;
+}
+
+.trait-number{
+  position:absolute;
+  right:9px;
+  top:9px;
+  width:22px;
+  height:22px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:var(--danfo);
+  font-size:.7rem;
+  font-weight:800;
+}
+
+.trait strong{
+  display:block;
+  padding-right:24px;
+  margin-bottom:5px;
+}
+
+.trait small{
+  color:var(--mute);
+  line-height:1.35;
+}
+
+.look-preview{
+  background:linear-gradient(
+    145deg,
+    #14201F,
+    #0F6B6F
+  );
+  color:#fff;
+  border-radius:22px;
+  padding:18px;
+  margin:12px 0;
+  text-align:center;
+}
+
+.look-name{
+  font-size:1.25rem;
+  font-weight:800;
+  margin-top:8px;
+}
+
+.look-meta{
+  color:rgba(255,255,255,.72);
+  font-size:.82rem;
+  margin-top:4px;
+}
+
+.look-traits{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+
+.look-traits .pill{
+  background:rgba(255,255,255,.13);
+  color:#fff;
+}
+
+.choice-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+
+.choice{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:13px;
+  padding:10px;
+  font-weight:700;
+}
+
+.choice.selected{
+  background:#E7F5F4;
+  border:2px solid var(--lagoon);
+  color:var(--lagoon);
+}
+
+.profile-hero{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:16px;
+  margin:12px 0;
+  border-radius:22px;
+  background:var(--ink);
+  color:#fff;
+}
+
+.profile-avatar{
+  width:72px;
+  height:72px;
+  flex:0 0 72px;
+  border-radius:20px;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  overflow:hidden;
+}
+
+.profile-identity h1{
+  margin:2px 0 4px;
+  font-size:1.55rem;
+}
+
+.profile-identity p{
+  margin:0;
+  color:rgba(255,255,255,.7);
+}
+
+.eyebrow{
+  color:var(--danfo);
+  font-size:.68rem;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.profile-card-title{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:13px;
+}
+
+.profile-stat-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.profile-stat{
+  background:#F5F7F6;
+  border-radius:14px;
+  padding:12px;
+}
+
+.profile-stat span{
+  display:block;
+  color:var(--mute);
+  font-size:.75rem;
+}
+
+.profile-stat strong{
+  display:block;
+  margin-top:3px;
+}
+
+.profile-traits{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.profile-trait{
+  background:#E7F5F4;
+  color:var(--lagoon);
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:.8rem;
+  font-weight:800;
+}
+
+.profile-details{
+  display:grid;
+  gap:9px;
+}
+
+.profile-detail{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid var(--line);
+  padding-bottom:8px;
+}
+
+.profile-detail:last-child{
+  border-bottom:0;
+  padding-bottom:0;
+}
+
+.profile-detail span{
+  color:var(--mute);
+}
+
+.profile-detail strong{
+  text-align:right;
+}
+
+.profile-skill{
+  margin:13px 0;
+}
+
+.profile-skill-head{
+  display:flex;
+  justify-content:space-between;
+  font-size:.9rem;
+  margin-bottom:6px;
+}
+
+.profile-skill-bar{
+  height:8px;
+  border-radius:999px;
+  background:var(--line);
+  overflow:hidden;
+}
+
+.profile-skill-bar i{
+  display:block;
+  height:100%;
+  background:var(--lagoon);
+}
+
+.profile-status{
+  padding:12px;
+  border-radius:14px;
+  background:#F5F7F6;
+}
+
+.need-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.need{
+  background:#F5F7F6;
+  border-radius:15px;
+  padding:11px;
+}
+
+.need-head{
+  display:flex;
+  justify-content:space-between;
+  font-size:.8rem;
+  margin-bottom:6px;
+}
+
+.need .bar{
+  height:7px;
+  margin:0;
+}
+
+.need.low .bar i{
+  background:var(--brick);
+}
+
+.need.mid .bar i{
+  background:var(--danfo);
+}
+
+.need.high .bar i{
+  background:var(--good);
+}
+
+.activity-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.activity{
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:#fff;
+  padding:12px;
+  text-align:left;
+}
+
+.activity strong{
+  display:block;
+}
+
+.activity small{
+  color:var(--mute);
+  display:block;
+  margin:4px 0;
+}
+
+.activity button{
+  width:100%;
+  border:0;
+  border-radius:11px;
+  background:var(--lagoon);
+  color:#fff;
+  padding:9px;
+  font-weight:800;
+  margin-top:6px;
+}
+
+.clock{
+  border-radius:18px;
+  background:#fff;
+  border:1px solid var(--line);
+  padding:14px;
+  margin:12px 0;
+}
+
+.clock-time{
+  font-size:1.7rem;
+  font-weight:800;
+}
+
+.clock-phase{
+  color:var(--lagoon);
+  font-weight:800;
+}
+
+.sk{
+  margin:13px 0;
+}
+
+.lb{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:13px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.lb:last-child{
+  border-bottom:0;
+}
+
+.lock{
+  background:#FFF5D7;
+  color:#785500;
+  padding:10px;
+  border-radius:12px;
+  font-size:.84rem;
+  margin-top:9px;
+}
+
+.bonus{
+  display:inline-block;
+  background:#E7F5F4;
+  color:var(--lagoon);
+  border-radius:999px;
+  padding:6px 9px;
+  font-size:.75rem;
+  font-weight:800;
+  margin:6px 0;
+}
+
+.big{
+  font-size:2rem;
+  font-weight:800;
+  margin:6px 0 12px;
+}
+
+.map-card{
+  padding:8px;
+  overflow:hidden;
+}
+
+.map-svg{
+  display:block;
+  width:100%;
+}
+
+.map-pin{
+  cursor:pointer;
+}
+
+.district-card.here{
+  border-color:var(--lagoon);
+  background:#F2FAF9;
+}
+
+/* =========================================================
+AVATAR
+========================================================= */
+
+.avatar-stage{
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      #FFFFFF 0%,
+      #E6ECEB 58%,
+      #CCD7D5 100%
+    );
+  border:1px solid var(--line);
+  border-radius:24px;
+  min-height:310px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  position:relative;
+}
+
+.avatar-stage:after{
+  content:"";
+  position:absolute;
+  bottom:15px;
+  width:145px;
+  height:24px;
+  background:rgba(20,32,31,.12);
+  border-radius:50%;
+  filter:blur(8px);
+}
+
+.avatar-stage svg{
+  width:245px;
+  height:275px;
+  position:relative;
+  z-index:2;
+  filter:drop-shadow(0 12px 12px rgba(20,32,31,.12));
+}
+
+.avatar-mini svg{
+  width:60px;
+  height:72px;
+}
+
+.avatar-large svg{
+  width:110px;
+  height:125px;
+}
+
+.avatar-controls{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+
+.avatar-control{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:13px;
+  padding:9px 4px;
+  font-size:.72rem;
+  font-weight:800;
+}
+
+.avatar-control.active{
+  background:var(--ink);
+  color:#fff;
+}
+
+.avatar-spin{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:9px;
+}
+
+.avatar-spin button{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:999px;
+  padding:8px 14px;
+  font-weight:800;
+}
+
+.avatar-spin button:hover{
+  background:#F5F7F6;
+}
+
+.avatar-note{
+  text-align:center;
+  color:var(--mute);
+  font-size:.75rem;
+  margin:8px 0 0;
+}
+
+.loading{
+  text-align:center;
+  padding:35px 10px;
+  color:var(--mute);
+}
+
+@media(max-width:380px){
+
+  .wrap{
+    width:min(100% - 18px,480px);
+  }
+
+  .nav button{
+    font-size:.6rem;
+  }
+
+  .trait-grid{
+    grid-template-columns:1fr;
+  }
+
+  .avatar-controls{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+}
+
+</style>
 </head>
 
 <body>
@@ -886,10 +860,11 @@
 <script>
 
 /* =========================================================
-   SUPABASE
-   ========================================================= */
+SUPABASE
+========================================================= */
 
-const app = document.getElementById("app");
+const app =
+  document.getElementById("app");
 
 const SUPABASE_URL =
   "https://pbqtbwiymlwksdtfsfcb.supabase.co";
@@ -899,23 +874,28 @@ const SUPABASE_ANON_KEY =
 
 if (
   !window.supabase ||
-  typeof window.supabase.createClient !== "function"
+  !window.supabase.createClient
 ) {
+
   app.innerHTML = `
-    <div class="stripe"></div>
     <div class="wrap">
-      <h1>Naija Hustle</h1>
-      <div class="err">
-        <b>Naija Hustle could not start.</b>
-        <br><br>
-        The Supabase connection library failed to load.
+      <div class="stripe"></div>
+
+      <div class="card">
+        <h1>Naija Hustle</h1>
+
+        <div class="err">
+          Supabase could not be loaded.
+          Check your internet connection and refresh.
+        </div>
       </div>
     </div>
   `;
 
   throw new Error(
-    "Supabase JavaScript library failed to load."
+    "Supabase JS unavailable"
   );
+
 }
 
 const db =
@@ -926,238 +906,288 @@ const db =
 
 
 /* =========================================================
-   STATE
-   ========================================================= */
+STATE
+========================================================= */
 
 const S = {
 
-  user: null,
-  ch: null,
+  user:null,
 
-  tab: "home",
-  mode: "login",
+  ch:null,
 
-  msg: null,
-  busy: false,
+  tab:"home",
 
-  picked: null,
-  nameDraft: "",
+  mode:"login",
 
-  personalityTraits: null,
-  personality1: null,
-  personality2: null,
+  msg:null,
 
-  skinTone: "medium",
-  hairstyle: "short",
-  hairColor: "black",
-  outfit: "casual",
-  accessory: "none",
+  busy:false,
 
-  jobs: null,
-  jobMsg: null,
+  picked:null,
 
-  activityMsg: null,
+  nameDraft:"",
 
-  bizTypes: null,
-  biz: null,
-  bizLoaded: false,
-  bizMsg: null,
+  personalityTraits:null,
 
-  districts: null,
-  mapMsg: null
+  personality1:null,
+
+  personality2:null,
+
+  skinTone:"medium",
+
+  hairstyle:"short",
+
+  hairColor:"black",
+
+  outfit:"casual",
+
+  accessory:"none",
+
+  jobs:null,
+
+  jobMsg:null,
+
+  activityMsg:null,
+
+  bizTypes:null,
+
+  biz:null,
+
+  bizLoaded:false,
+
+  bizMsg:null,
+
+  districts:null,
+
+  mapMsg:null,
+
+  avatarRotation:0
 
 };
 
 
 /* =========================================================
-   GAME DATA
-   ========================================================= */
+GAME DATA
+========================================================= */
 
 const BG = [
 
   {
-    id: "street_boy",
-    name: "Street Boy",
-    meta: "Starts in Mushin · ₦5,000",
-    d:
-      "No capital, no connections, plenty of hustle. Your only collateral is gist."
+    id:"street_boy",
+    name:"Street Boy",
+    meta:"Starts in Mushin · ₦5,000",
+    d:"No capital, no connections, plenty of hustle. Your only collateral is gist."
   },
 
   {
-    id: "graduate",
-    name: "Graduate",
-    meta: "Starts in Yaba · ₦20,000",
-    d:
-      "First class degree, zero job offers. The CV is strong, the NYSC is done."
+    id:"graduate",
+    name:"Graduate",
+    meta:"Starts in Yaba · ₦20,000",
+    d:"First class degree, zero job offers. The CV is strong, the NYSC is done."
   },
 
   {
-    id: "nepo_baby",
-    name: "Nepo Baby",
-    meta: "Starts in Lekki · ₦500,000",
-    d:
-      "Daddy's name opens doors. Now prove the doors were worth opening."
+    id:"nepo_baby",
+    name:"Nepo Baby",
+    meta:"Starts in Lekki · ₦500,000",
+    d:"Daddy's name opens doors. Now prove the doors were worth opening."
   },
 
   {
-    id: "returnee",
-    name: "Returnee",
-    meta: "Starts in Ikeja · ₦150,000",
-    d:
-      "Came back from abroad with savings and a strong accent. Lagos will humble you."
+    id:"returnee",
+    name:"Returnee",
+    meta:"Starts in Ikeja · ₦150,000",
+    d:"Came back from abroad with savings and a strong accent. Lagos will humble you."
   }
 
 ];
 
-
 const SK = {
-  hustle: "Hustle",
-  edu: "Education",
-  charm: "Charm",
-  tech: "Tech"
+
+  hustle:"Hustle",
+
+  edu:"Education",
+
+  charm:"Charm",
+
+  tech:"Tech"
+
 };
 
 
 const SKIN_TONES = [
-  ["light", "Light"],
-  ["medium", "Medium"],
-  ["deep", "Deep"]
-];
 
+  ["light","Light"],
+
+  ["medium","Medium"],
+
+  ["deep","Deep"]
+
+];
 
 const HAIRSTYLES = [
-  ["short", "Short"],
-  ["low_cut", "Low Cut"],
-  ["fade", "Fade"],
-  ["afro", "Afro"],
-  ["braids", "Braids"],
-  ["dreads", "Dreads"],
-  ["natural", "Natural"],
-  ["long", "Long"]
-];
 
+  ["short","Short"],
+
+  ["low_cut","Low Cut"],
+
+  ["fade","Fade"],
+
+  ["afro","Afro"],
+
+  ["braids","Braids"],
+
+  ["dreads","Dreads"],
+
+  ["natural","Natural"],
+
+  ["long","Long"]
+
+];
 
 const HAIR_COLORS = [
-  ["black", "Black"],
-  ["brown", "Brown"],
-  ["blonde", "Blonde"],
-  ["red", "Red"]
-];
 
+  ["black","Black"],
+
+  ["brown","Brown"],
+
+  ["blonde","Blonde"],
+
+  ["red","Red"]
+
+];
 
 const OUTFITS = [
-  ["casual", "Casual"],
-  ["streetwear", "Streetwear"],
-  ["formal", "Formal"],
-  ["traditional", "Traditional"],
-  ["sport", "Sport"],
-  ["business", "Business"]
+
+  ["casual","Casual"],
+
+  ["streetwear","Streetwear"],
+
+  ["formal","Formal"],
+
+  ["traditional","Traditional"],
+
+  ["sport","Sport"],
+
+  ["business","Business"]
+
 ];
 
-
 const ACCESSORIES = [
-  ["none", "None"],
-  ["cap", "Cap"],
-  ["glasses", "Glasses"],
-  ["chain", "Chain"],
-  ["watch", "Watch"],
-  ["earrings", "Earrings"],
-  ["headphones", "Headphones"]
+
+  ["none","None"],
+
+  ["cap","Cap"],
+
+  ["glasses","Glasses"],
+
+  ["chain","Chain"],
+
+  ["watch","Watch"],
+
+  ["earrings","Earrings"],
+
+  ["headphones","Headphones"]
+
 ];
 
 
 /* =========================================================
-   HELPERS
-   ========================================================= */
+HELPERS
+========================================================= */
 
-const esc = value =>
-  String(value ?? "").replace(
-    /[&<>"']/g,
-    char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[char])
-  );
+const esc =
+  value =>
+    String(value ?? "")
+      .replace(
+        /[&<>"']/g,
+        char =>
+          ({
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#39;"
+          }[char])
+      );
 
+const naira =
+  value =>
+    "₦" +
+    Number(value || 0)
+      .toLocaleString("en-NG");
 
-const naira = value =>
-  "₦" +
-  Number(value || 0).toLocaleString("en-NG");
+const cap =
+  value => {
 
+    const str =
+      String(value || "");
 
-const cap = value => {
+    return str
+      ? str.charAt(0).toUpperCase() +
+        str.slice(1)
+      : "";
 
-  const str =
-    String(value || "");
+  };
 
-  return str
-    ? str.charAt(0).toUpperCase() +
-      str.slice(1)
-    : "";
+const bgName =
+  id => {
 
-};
+    const bg =
+      BG.find(
+        item =>
+          item.id === id
+      );
 
+    return bg
+      ? bg.name
+      : id;
 
-const bgName = id => {
+  };
 
-  const bg =
-    BG.find(
-      item => item.id === id
-    );
+const setMsg =
+  (
+    text,
+    ok=false
+  ) => {
 
-  return bg
-    ? bg.name
-    : id;
+    S.msg =
+      text
+        ? {
+            t:text,
+            ok
+          }
+        : null;
 
-};
+  };
 
+const msgHtml =
+  () => {
 
-const setMsg = (
-  text,
-  ok = false
-) => {
+    if (!S.msg) {
+      return "";
+    }
 
-  S.msg =
-    text
-      ? {
-          t: text,
-          ok
-        }
-      : null;
+    return `
+      <div
+        class="${S.msg.ok ? "ok" : "err"}"
+        role="alert"
+      >
+        ${esc(S.msg.t)}
+      </div>
+    `;
 
-};
-
-
-const msgHtml = () => {
-
-  if (!S.msg) {
-    return "";
-  }
-
-  return `
-    <div
-      class="${S.msg.ok ? "ok" : "err"}"
-      role="alert"
-      style="margin:12px 0 0"
-    >
-      ${esc(S.msg.t)}
-    </div>
-  `;
-
-};
-
+  };
 
 function optionLabel(
   list,
   value
-) {
+){
 
   const found =
     list.find(
-      item => item[0] === value
+      item =>
+        item[0] === value
     );
 
   return found
@@ -1168,60 +1198,754 @@ function optionLabel(
 
 
 /* =========================================================
-   CHARACTER PREVIEW
-   ========================================================= */
+AVATAR ENGINE
+========================================================= */
 
-function avatarEmoji() {
+const AVATAR_SKIN = {
 
-  if (S.accessory === "headphones") {
-    return "🎧";
+  light:"#F1C7A8",
+
+  medium:"#C98F6B",
+
+  deep:"#8D573D",
+
+  dark:"#6B3F2D"
+
+};
+
+const AVATAR_HAIR = {
+
+  black:"#171717",
+
+  brown:"#4A2A1B",
+
+  blonde:"#C99A3E",
+
+  red:"#7B2D26"
+
+};
+
+function avatarSkin(value){
+
+  return (
+    AVATAR_SKIN[value] ||
+    AVATAR_SKIN.medium
+  );
+
+}
+
+function avatarHair(value){
+
+  return (
+    AVATAR_HAIR[value] ||
+    AVATAR_HAIR.black
+  );
+
+}
+
+function avatarSvg(
+  c,
+  size=220
+){
+
+  const skin =
+    avatarSkin(
+      c?.skin_tone
+    );
+
+  const hair =
+    avatarHair(
+      c?.hair_color
+    );
+
+  const hairstyle =
+    c?.hairstyle ||
+    "short";
+
+  const outfit =
+    c?.outfit ||
+    "casual";
+
+  const accessory =
+    c?.accessory ||
+    "none";
+
+  let clothes = `
+
+    <path
+      d="
+        M58 210
+        C62 178 78 164 110 160
+        C142 164 158 178 162 210
+        Z
+      "
+      fill="#0F6B6F"
+    />
+
+  `;
+
+  if(
+    outfit === "streetwear"
+  ){
+
+    clothes = `
+
+      <path
+        d="
+          M50 210
+          C54 175 76 158 110 158
+          C144 158 166 175 170 210
+          Z
+        "
+        fill="#14201F"
+      />
+
+      <path
+        d="
+          M76 170
+          L110 205
+          L144 170
+        "
+        fill="none"
+        stroke="#FFC20E"
+        stroke-width="7"
+      />
+
+    `;
+
   }
 
-  if (S.accessory === "glasses") {
-    return "🤓";
+  if(
+    outfit === "formal"
+  ){
+
+    clothes = `
+
+      <path
+        d="
+          M54 210
+          C58 176 78 160 110 158
+          C142 160 162 176 166 210
+          Z
+        "
+        fill="#17242B"
+      />
+
+      <path
+        d="
+          M96 162
+          L110 185
+          L124 162
+        "
+        fill="#FFFFFF"
+      />
+
+      <path
+        d="
+          M110 181
+          L105 210
+          L115 210
+          Z
+        "
+        fill="#C2410C"
+      />
+
+    `;
+
   }
 
-  if (S.accessory === "cap") {
-    return "🧢";
+  if(
+    outfit === "traditional"
+  ){
+
+    clothes = `
+
+      <path
+        d="
+          M50 210
+          C54 174 76 157 110 157
+          C144 157 166 174 170 210
+          Z
+        "
+        fill="#D4A017"
+      />
+
+      <path
+        d="
+          M58 185
+          Q110 205 162 185
+        "
+        fill="none"
+        stroke="#14201F"
+        stroke-width="5"
+      />
+
+      <path
+        d="
+          M62 198
+          Q110 216 158 198
+        "
+        fill="none"
+        stroke="#0F6B6F"
+        stroke-width="5"
+      />
+
+    `;
+
   }
 
-  if (S.accessory === "chain") {
-    return "😎";
+  if(
+    outfit === "sport"
+  ){
+
+    clothes = `
+
+      <path
+        d="
+          M52 210
+          C56 174 78 158 110 158
+          C142 158 164 174 168 210
+          Z
+        "
+        fill="#C2410C"
+      />
+
+      <path
+        d="
+          M78 168
+          L78 210
+        "
+        stroke="#FFFFFF"
+        stroke-width="5"
+      />
+
+      <path
+        d="
+          M142 168
+          L142 210
+        "
+        stroke="#FFFFFF"
+        stroke-width="5"
+      />
+
+    `;
+
   }
 
-  if (S.accessory === "watch") {
-    return "⌚";
+  if(
+    outfit === "business"
+  ){
+
+    clothes = `
+
+      <path
+        d="
+          M52 210
+          C56 176 78 159 110 158
+          C142 159 164 176 168 210
+          Z
+        "
+        fill="#14201F"
+      />
+
+      <path
+        d="
+          M110 160
+          L110 210
+        "
+        stroke="#FFFFFF"
+        stroke-width="4"
+      />
+
+      <path
+        d="
+          M101 161
+          L110 181
+          L119 161
+          Z
+        "
+        fill="#FFC20E"
+      />
+
+    `;
+
   }
 
-  if (S.accessory === "earrings") {
-    return "✨";
+  let hairShape = `
+
+    <path
+      d="
+        M69 91
+        C66 53 84 32 110 32
+        C136 32 154 53 151 91
+        C141 71 79 71 69 91
+        Z
+      "
+      fill="${hair}"
+    />
+
+  `;
+
+  if(
+    hairstyle === "low_cut"
+  ){
+
+    hairShape = `
+
+      <path
+        d="
+          M70 73
+          C73 45 88 34 110 34
+          C132 34 147 45 150 73
+          C135 59 85 59 70 73
+          Z
+        "
+        fill="${hair}"
+      />
+
+    `;
+
   }
 
-  return "🧑🏿";
+  if(
+    hairstyle === "fade"
+  ){
+
+    hairShape = `
+
+      <path
+        d="
+          M73 76
+          C75 48 91 34 110 34
+          C129 34 145 48 147 76
+          C133 61 87 61 73 76
+          Z
+        "
+        fill="${hair}"
+      />
+
+    `;
+
+  }
+
+  if(
+    hairstyle === "afro"
+  ){
+
+    hairShape = `
+
+      <circle
+        cx="110"
+        cy="63"
+        r="42"
+        fill="${hair}"
+      />
+
+      <circle
+        cx="76"
+        cy="67"
+        r="17"
+        fill="${hair}"
+      />
+
+      <circle
+        cx="144"
+        cy="67"
+        r="17"
+        fill="${hair}"
+      />
+
+    `;
+
+  }
+
+  if(
+    hairstyle === "braids"
+  ){
+
+    hairShape = `
+
+      <path
+        d="
+          M70 88
+          C65 45 84 27 110 27
+          C136 27 155 45 150 88
+          Z
+        "
+        fill="${hair}"
+      />
+
+      <g
+        stroke="${hair}"
+        stroke-width="7"
+        stroke-linecap="round"
+      >
+
+        <path d="M73 73 L58 115"/>
+        <path d="M83 64 L70 124"/>
+        <path d="M95 59 L86 128"/>
+        <path d="M125 59 L134 128"/>
+        <path d="M137 64 L150 124"/>
+        <path d="M147 73 L162 115"/>
+
+      </g>
+
+    `;
+
+  }
+
+  if(
+    hairstyle === "dreads"
+  ){
+
+    hairShape = `
+
+      <path
+        d="
+          M69 84
+          C66 45 84 27 110 27
+          C136 27 154 45 151 84
+          Z
+        "
+        fill="${hair}"
+      />
+
+      <g
+        stroke="${hair}"
+        stroke-width="8"
+        stroke-linecap="round"
+      >
+
+        <path d="M72 72 L60 118"/>
+        <path d="M84 62 L76 132"/>
+        <path d="M96 57 L92 128"/>
+        <path d="M124 57 L128 128"/>
+        <path d="M136 62 L144 132"/>
+        <path d="M148 72 L160 118"/>
+
+      </g>
+
+    `;
+
+  }
+
+  if(
+    hairstyle === "long"
+  ){
+
+    hairShape = `
+
+      <path
+        d="
+          M67 88
+          C63 45 84 27 110 27
+          C136 27 157 45 153 88
+          L153 142
+          C143 151 136 147 131 139
+          L131 83
+          C120 71 100 71 89 83
+          L89 139
+          C84 147 77 151 67 142
+          Z
+        "
+        fill="${hair}"
+      />
+
+    `;
+
+  }
+
+  let accessorySvg = "";
+
+  if(
+    accessory === "cap"
+  ){
+
+    accessorySvg = `
+
+      <path
+        d="
+          M68 58
+          Q110 22 152 58
+          L157 67
+          Q110 55 63 67
+          Z
+        "
+        fill="#C2410C"
+      />
+
+      <path
+        d="
+          M112 57
+          Q146 57 164 67
+        "
+        fill="none"
+        stroke="#14201F"
+        stroke-width="5"
+        stroke-linecap="round"
+      />
+
+    `;
+
+  }
+
+  if(
+    accessory === "glasses"
+  ){
+
+    accessorySvg = `
+
+      <g
+        fill="none"
+        stroke="#14201F"
+        stroke-width="4"
+      >
+
+        <rect
+          x="77"
+          y="87"
+          width="25"
+          height="17"
+          rx="6"
+        />
+
+        <rect
+          x="118"
+          y="87"
+          width="25"
+          height="17"
+          rx="6"
+        />
+
+        <path
+          d="M102 93 L118 93"
+        />
+
+      </g>
+
+    `;
+
+  }
+
+  if(
+    accessory === "chain"
+  ){
+
+    accessorySvg = `
+
+      <path
+        d="
+          M87 146
+          Q110 164 133 146
+        "
+        fill="none"
+        stroke="#FFC20E"
+        stroke-width="5"
+      />
+
+      <circle
+        cx="110"
+        cy="160"
+        r="5"
+        fill="#FFC20E"
+      />
+
+    `;
+
+  }
+
+  if(
+    accessory === "watch"
+  ){
+
+    accessorySvg = `
+
+      <rect
+        x="150"
+        y="173"
+        width="14"
+        height="22"
+        rx="4"
+        fill="#FFC20E"
+      />
+
+    `;
+
+  }
+
+  if(
+    accessory === "earrings"
+  ){
+
+    accessorySvg = `
+
+      <circle
+        cx="68"
+        cy="115"
+        r="4"
+        fill="#FFC20E"
+      />
+
+      <circle
+        cx="152"
+        cy="115"
+        r="4"
+        fill="#FFC20E"
+      />
+
+    `;
+
+  }
+
+  if(
+    accessory === "headphones"
+  ){
+
+    accessorySvg = `
+
+      <path
+        d="
+          M66 100
+          C66 55 154 55 154 100
+        "
+        fill="none"
+        stroke="#14201F"
+        stroke-width="8"
+        stroke-linecap="round"
+      />
+
+      <rect
+        x="59"
+        y="96"
+        width="15"
+        height="29"
+        rx="6"
+        fill="#14201F"
+      />
+
+      <rect
+        x="146"
+        y="96"
+        width="15"
+        height="29"
+        rx="6"
+        fill="#14201F"
+      />
+
+    `;
+
+  }
+
+  return `
+
+    <svg
+      viewBox="0 0 220 230"
+      role="img"
+      aria-label="Your Naija Hustle character"
+      style="
+        width:${size}px;
+        height:${Math.round(size * 1.05)}px;
+      "
+    >
+
+      <ellipse
+        cx="110"
+        cy="214"
+        rx="55"
+        ry="9"
+        fill="rgba(20,32,31,.12)"
+      />
+
+      ${clothes}
+
+      <rect
+        x="97"
+        y="142"
+        width="26"
+        height="30"
+        rx="11"
+        fill="${skin}"
+      />
+
+      <ellipse
+        cx="110"
+        cy="104"
+        rx="43"
+        ry="51"
+        fill="${skin}"
+      />
+
+      ${hairShape}
+
+      <ellipse
+        cx="92"
+        cy="105"
+        rx="4"
+        ry="5"
+        fill="#14201F"
+      />
+
+      <ellipse
+        cx="128"
+        cy="105"
+        rx="4"
+        ry="5"
+        fill="#14201F"
+      />
+
+      <path
+        d="M100 125 Q110 132 120 125"
+        fill="none"
+        stroke="#7B3F2F"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+
+      ${accessorySvg}
+
+    </svg>
+
+  `;
 
 }
 
 
-function characterPreviewHtml() {
+/* =========================================================
+AVATAR PREVIEW
+========================================================= */
+
+function characterPreviewHtml(){
 
   const trait1 =
     S.personalityTraits?.find(
-      item =>
-        item.id === S.personality1
+      trait =>
+        trait.id ===
+        S.personality1
     );
 
   const trait2 =
     S.personalityTraits?.find(
-      item =>
-        item.id === S.personality2
+      trait =>
+        trait.id ===
+        S.personality2
     );
 
   return `
 
     <div class="look-preview">
 
-      <div class="avatar">
-        ${avatarEmoji()}
+      <div class="avatar-large">
+        ${avatarSvg(
+          {
+            name:S.nameDraft || "Your Hustler",
+            skin_tone:S.skinTone,
+            hairstyle:S.hairstyle,
+            hair_color:S.hairColor,
+            outfit:S.outfit,
+            accessory:S.accessory
+          },
+          105
+        )}
       </div>
 
       <div class="look-name">
@@ -1254,14 +1978,7 @@ function characterPreviewHtml() {
 
       </div>
 
-      <div
-        style="
-          margin-top:10px;
-          display:flex;
-          gap:6px;
-          flex-wrap:wrap;
-        "
-      >
+      <div class="look-traits">
 
         ${
           trait1
@@ -1293,158 +2010,119 @@ function characterPreviewHtml() {
 
 
 /* =========================================================
-   REAL NIGERIAN CLOCK
-   ========================================================= */
+AVATAR STAGE
+========================================================= */
 
-function realTimeInfo() {
-
-  const now =
-    new Date();
-
-  const timeFormatter =
-    new Intl.DateTimeFormat(
-      "en-NG",
-      {
-        timeZone: "Africa/Lagos",
-        hour: "numeric",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true
-      }
-    );
-
-  const dateFormatter =
-    new Intl.DateTimeFormat(
-      "en-NG",
-      {
-        timeZone: "Africa/Lagos",
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      }
-    );
-
-  const hourFormatter =
-    new Intl.DateTimeFormat(
-      "en-NG",
-      {
-        timeZone: "Africa/Lagos",
-        hour: "numeric",
-        hour12: false
-      }
-    );
-
-  const hour =
-    Number(
-      hourFormatter.format(now)
-    );
-
-  let phase =
-    "Morning";
-
-  if (
-    hour >= 12 &&
-    hour < 17
-  ) {
-    phase =
-      "Afternoon";
-  } else if (
-    hour >= 17 &&
-    hour < 21
-  ) {
-    phase =
-      "Evening";
-  } else if (
-    hour >= 21 ||
-    hour < 5
-  ) {
-    phase =
-      "Night";
-  }
-
-  const icon =
-    phase === "Morning"
-      ? "🌅"
-      : phase === "Afternoon"
-        ? "☀️"
-        : phase === "Evening"
-          ? "🌆"
-          : "🌙";
-
-  return {
-    time:
-      timeFormatter.format(now),
-
-    date:
-      dateFormatter.format(now),
-
-    phase,
-    icon
-  };
-
-}
-
-
-function gameClockHtml() {
-
-  const info =
-    realTimeInfo();
+function avatarStageHtml(c){
 
   return `
 
-    <div class="card clock-card">
+    <div class="card">
 
-      <div class="row">
+      <div class="section-head">
 
         <div>
+          <h2>Avatar Stage</h2>
 
-          <div
-            class="clock-day"
-            data-real-date
-          >
-            ${info.date}
-          </div>
-
-          <div
-            class="clock-time"
-            data-game-clock
-          >
-            ${info.time}
-          </div>
-
-        </div>
-
-        <div
-          style="text-align:right"
-        >
-
-          <div
-            style="font-size:1.5rem"
-            data-game-phase-icon
-          >
-            ${info.icon}
-          </div>
-
-          <div
-            class="clock-phase"
-            data-game-phase
-          >
-            ${info.phase}
-          </div>
-
+          <p class="mute">
+            This is your hustler.
+            Your look can evolve as you rise.
+          </p>
         </div>
 
       </div>
 
-      <div
-        style="
-          margin-top:8px;
-          font-size:.78rem;
-          color:rgba(255,255,255,.6);
-        "
-      >
-        🇳🇬 Nigeria · Live time
+      <div class="avatar-stage">
+
+        ${avatarSvg(
+          c,
+          240
+        )}
+
+      </div>
+
+      <div class="avatar-spin">
+
+        <button
+          type="button"
+          data-avatar-rotate="-1"
+        >
+          ← Rotate
+        </button>
+
+        <button
+          type="button"
+          data-avatar-rotate="1"
+        >
+          Rotate →
+        </button>
+
+      </div>
+
+      <p class="avatar-note">
+        Full 3D rotation will come in the next avatar stage.
+        This version gives you the customizable character foundation.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <div class="profile-card-title">
+        <span>🎨</span>
+        <strong>Character Look</strong>
+      </div>
+
+      <div class="profile-details">
+
+        <div class="profile-detail">
+          <span>Skin</span>
+          <strong>
+            ${esc(
+              optionLabel(
+                SKIN_TONES,
+                c.skin_tone
+              )
+            )}
+          </strong>
+        </div>
+
+        <div class="profile-detail">
+          <span>Hair</span>
+          <strong>
+            ${esc(
+              optionLabel(
+                HAIRSTYLES,
+                c.hairstyle
+              )
+            )}
+          </strong>
+        </div>
+
+        <div class="profile-detail">
+          <span>Outfit</span>
+          <strong>
+            ${esc(
+              optionLabel(
+                OUTFITS,
+                c.outfit
+              )
+            )}
+          </strong>
+        </div>
+
+        <div class="profile-detail">
+          <span>Accessory</span>
+          <strong>
+            ${esc(
+              optionLabel(
+                ACCESSORIES,
+                c.accessory
+              )
+            )}
+          </strong>
+        </div>
+
       </div>
 
     </div>
@@ -1454,9 +2132,148 @@ function gameClockHtml() {
 }
 
 
-function startGameClock() {
+/* =========================================================
+REAL NIGERIAN CLOCK
+========================================================= */
 
-  if (window.naijaClockTimer) {
+function realTimeInfo(){
+
+  const now =
+    new Date();
+
+  const time =
+    new Intl.DateTimeFormat(
+      "en-NG",
+      {
+        timeZone:"Africa/Lagos",
+        hour:"numeric",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:true
+      }
+    ).format(now);
+
+  const hour =
+    Number(
+      new Intl.DateTimeFormat(
+        "en-NG",
+        {
+          timeZone:"Africa/Lagos",
+          hour:"numeric",
+          hourCycle:"h23"
+        }
+      ).format(now)
+    );
+
+  let phase =
+    "Night";
+
+  let icon =
+    "🌙";
+
+  if(
+    hour >= 5 &&
+    hour < 12
+  ){
+
+    phase =
+      "Morning";
+
+    icon =
+      "🌅";
+
+  }else if(
+    hour >= 12 &&
+    hour < 17
+  ){
+
+    phase =
+      "Afternoon";
+
+    icon =
+      "☀️";
+
+  }else if(
+    hour >= 17 &&
+    hour < 21
+  ){
+
+    phase =
+      "Evening";
+
+    icon =
+      "🌆";
+
+  }
+
+  const date =
+    new Intl.DateTimeFormat(
+      "en-NG",
+      {
+        timeZone:"Africa/Lagos",
+        weekday:"long",
+        day:"numeric",
+        month:"long"
+      }
+    ).format(now);
+
+  return {
+    time,
+    phase,
+    icon,
+    date
+  };
+
+}
+
+function gameClockHtml(){
+
+  const info =
+    realTimeInfo();
+
+  return `
+
+    <div class="clock">
+
+      <div class="row">
+
+        <div>
+
+          <div class="clock-time">
+            ${info.time}
+          </div>
+
+          <div class="clock-phase">
+            ${info.icon}
+            ${info.phase}
+          </div>
+
+        </div>
+
+        <div class="mute">
+          Lagos time
+        </div>
+
+      </div>
+
+      <div
+        class="mute"
+        style="margin-top:6px;font-size:.78rem"
+      >
+        ${esc(info.date)}
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+function startGameClock(){
+
+  if(
+    window.naijaClockTimer
+  ){
 
     clearInterval(
       window.naijaClockTimer
@@ -1464,80 +2281,39 @@ function startGameClock() {
 
   }
 
-  const updateClock = () => {
+  window.naijaClockTimer =
+    setInterval(
+      () => {
 
-    const clock =
-      document.querySelector(
-        "[data-game-clock]"
-      );
+        const clock =
+          document.querySelector(
+            ".clock"
+          );
 
-    if (!clock) {
-      return;
-    }
+        if(
+          clock &&
+          S.ch
+        ){
 
-    const info =
-      realTimeInfo();
+          clock.outerHTML =
+            gameClockHtml();
 
-    const date =
-      document.querySelector(
-        "[data-real-date]"
-      );
+        }
 
-    const phase =
-      document.querySelector(
-        "[data-game-phase]"
-      );
-
-    const icon =
-      document.querySelector(
-        "[data-game-phase-icon]"
-      );
-
-    clock.textContent =
-      info.time;
-
-    if (date) {
-      date.textContent =
-        info.date;
-    }
-
-    if (phase) {
-      phase.textContent =
-        info.phase;
-    }
-
-    if (icon) {
-      icon.textContent =
-        info.icon;
-    }
-
-  };
-
-  updateClock();
-
-  if (
-    document.querySelector(
-      "[data-game-clock]"
-    )
-  ) {
-
-    window.naijaClockTimer =
-      setInterval(
-        updateClock,
-        1000
-      );
-
-  }
+      },
+      1000
+    );
 
 }
 
 
 /* =========================================================
-   NEEDS
-   ========================================================= */
+NEEDS
+========================================================= */
 
-const needPct = value =>
-  Math.max(
+function needPct(value){
+
+  return Math.max(
     0,
     Math.min(
       100,
@@ -1545,162 +2321,48 @@ const needPct = value =>
     )
   );
 
+}
 
-const needClass = value => {
+function needClass(value){
 
-  const pct =
+  const n =
     needPct(value);
 
-  if (pct <= 20) {
-    return "need-low";
+  if(n <= 30){
+    return "low";
   }
 
-  if (pct <= 50) {
-    return "need-mid";
+  if(n <= 60){
+    return "mid";
   }
 
-  return "need-good";
-
-};
-
-
-function needsHtml(c) {
-
-  const needs = [
-
-    ["🍗", "Hunger", c.hunger],
-    ["🎮", "Fun", c.fun],
-    ["🤝", "Social", c.social],
-    ["🧼", "Hygiene", c.hygiene]
-
-  ];
-
-  return `
-
-    <div class="card needs-card">
-
-      <h2>
-        Needs
-      </h2>
-
-      <p class="mute">
-        Keep yourself in good shape while you hustle.
-      </p>
-
-      ${
-        needs.map(
-          ([icon, name, value]) => {
-
-            const pct =
-              needPct(value);
-
-            return `
-
-              <div class="need-row">
-
-                <div class="need-label">
-
-                  <span class="need-name">
-                    ${icon} ${name}
-                  </span>
-
-                  <span class="need-value">
-                    ${pct}/100
-                  </span>
-
-                </div>
-
-                <div class="need-bar">
-
-                  <i
-                    class="${needClass(pct)}"
-                    style="width:${pct}%"
-                  ></i>
-
-                </div>
-
-              </div>
-
-            `;
-
-          }
-        ).join("")
-      }
-
-      <div class="needs-note">
-        Low needs will matter more as daily life expands.
-      </div>
-
-    </div>
-
-  `;
+  return "high";
 
 }
 
+function needsHtml(c){
 
-/* =========================================================
-   ACTIVITIES
-   ========================================================= */
+  const needs = [
 
-function activitiesHtml() {
+    [
+      "Hunger",
+      c.hunger
+    ],
 
-  const message =
-    S.activityMsg
-      ? `
-        <div
-          class="${S.activityMsg.ok ? "ok" : "err"}"
-          role="alert"
-        >
-          ${esc(S.activityMsg.t)}
-        </div>
-      `
-      : "";
+    [
+      "Fun",
+      c.fun
+    ],
 
-  const activities = [
+    [
+      "Social",
+      c.social
+    ],
 
-    {
-      id: "eat",
-      icon: "🍲",
-      name: "Eat",
-      description:
-        "Grab a proper meal and restore your hunger.",
-      cost: 500,
-      energy: 1,
-      restore: "+30 Hunger"
-    },
-
-    {
-      id: "entertainment",
-      icon: "🎮",
-      name: "Entertainment",
-      description:
-        "Take a break and clear your head.",
-      cost: 300,
-      energy: 2,
-      restore: "+30 Fun"
-    },
-
-    {
-      id: "socialize",
-      icon: "🤝",
-      name: "Socialize",
-      description:
-        "Link up and strengthen your social game.",
-      cost: 200,
-      energy: 1,
-      restore: "+30 Social"
-    },
-
-    {
-      id: "freshen_up",
-      icon: "🧼",
-      name: "Freshen Up",
-      description:
-        "Clean up and get yourself ready.",
-      cost: 100,
-      energy: 1,
-      restore: "+30 Hygiene"
-    }
+    [
+      "Hygiene",
+      c.hygiene
+    ]
 
   ];
 
@@ -1708,169 +2370,57 @@ function activitiesHtml() {
 
     <div class="card">
 
-      <h2>
-        Activities
-      </h2>
+      <div class="profile-card-title">
+        <span>❤️</span>
+        <strong>Needs</strong>
+      </div>
 
-      <p class="mute">
-        Look after yourself so you can keep chasing the bag.
-      </p>
+      <div class="need-grid">
 
-      ${message}
+        ${
+          needs
+            .map(
+              ([name,value]) => {
 
-      ${
-        activities.map(
-          activity => `
+                const pct =
+                  needPct(value);
 
-            <div class="card activity-card">
+                return `
 
-              <div class="row">
-
-                <div style="flex:1">
-
-                  <h2 style="margin:0">
-
-                    <span class="activity-icon">
-                      ${activity.icon}
-                    </span>
-
-                    ${activity.name}
-
-                  </h2>
-
-                  <p
-                    class="mute"
-                    style="
-                      margin:4px 0 0;
-                      font-size:.9rem;
-                    "
+                  <div
+                    class="need ${needClass(value)}"
                   >
-                    ${activity.description}
-                  </p>
 
-                </div>
+                    <div class="need-head">
 
-                <button
-                  class="btn activity-action"
-                  type="button"
-                  data-activity="${activity.id}"
-                >
-                  Do it
-                </button>
+                      <span>
+                        ${name}
+                      </span>
 
-              </div>
+                      <b>
+                        ${pct}
+                      </b>
 
-              <p
-                class="mute"
-                style="
-                  margin:10px 0 0;
-                  font-size:.9rem;
-                "
-              >
-                ${naira(activity.cost)}
-                · ${activity.energy} energy
-                · ${activity.restore}
-              </p>
+                    </div>
 
-            </div>
+                    <div class="bar">
 
-          `
-        ).join("")
-      }
+                      <i
+                        style="
+                          width:${pct}%
+                        "
+                      ></i>
 
-    </div>
+                    </div>
 
-  `;
+                  </div>
 
-}
+                `;
 
-
-/* =========================================================
-   AUTH
-   ========================================================= */
-
-function viewAuth() {
-
-  if (window.naijaClockTimer) {
-
-    clearInterval(
-      window.naijaClockTimer
-    );
-
-    window.naijaClockTimer =
-      null;
-
-  }
-
-  const login =
-    S.mode === "login";
-
-  app.innerHTML = `
-
-    <div class="stripe"></div>
-
-    <div class="wrap">
-
-      <h1>
-        Naija Hustle
-      </h1>
-
-      <p class="mute">
-        Start from the bottom. Own the block.
-      </p>
-
-      <div class="card">
-
-        <h2>
-          ${login ? "Log in" : "Create account"}
-        </h2>
-
-        <label for="em">
-          Email
-        </label>
-
-        <input
-          id="em"
-          type="email"
-          autocomplete="email"
-        >
-
-        <label for="pw">
-          Password
-        </label>
-
-        <input
-          id="pw"
-          type="password"
-          autocomplete="${
-            login
-              ? "current-password"
-              : "new-password"
-          }"
-          placeholder="At least 6 characters"
-        >
-
-        ${msgHtml()}
-
-        <button
-          class="btn"
-          id="go"
-          type="button"
-        >
-          ${login ? "Log in" : "Sign up"}
-        </button>
-
-        <button
-          class="link"
-          id="sw"
-          type="button"
-        >
-          ${
-            login
-              ? "New here? Create an account"
-              : "Have an account? Log in"
-          }
-        </button>
+              }
+            )
+            .join("")
+        }
 
       </div>
 
@@ -1878,148 +2428,480 @@ function viewAuth() {
 
   `;
 
-  document.getElementById("sw").onclick =
-    () => {
-
-      S.mode =
-        login
-          ? "signup"
-          : "login";
-
-      setMsg(null);
-
-      viewAuth();
-
-    };
+}
 
 
-  document.getElementById("go").onclick =
-    async event => {
+/* =========================================================
+ACTIVITIES
+========================================================= */
 
-      const email =
-        document
-          .getElementById("em")
-          .value
-          .trim();
+function activitiesHtml(){
 
-      const password =
-        document
-          .getElementById("pw")
-          .value;
+  const activities = [
 
-      if (
-        !email ||
-        password.length < 6
-      ) {
+    [
+      "eat",
+      "🍲",
+      "Eat",
+      "₦500 · 1 energy",
+      "Restores 30 Hunger"
+    ],
 
-        setMsg(
-          "Enter your email and a password of at least 6 characters."
-        );
+    [
+      "entertainment",
+      "🎮",
+      "Entertainment",
+      "₦300 · 2 energy",
+      "Restores 30 Fun"
+    ],
 
-        return viewAuth();
+    [
+      "socialize",
+      "🤝",
+      "Socialize",
+      "₦200 · 1 energy",
+      "Restores 30 Social"
+    ],
 
+    [
+      "freshen_up",
+      "🚿",
+      "Freshen Up",
+      "₦100 · 1 energy",
+      "Restores 30 Hygiene"
+    ]
+
+  ];
+
+  return `
+
+    <div class="card">
+
+      <div class="profile-card-title">
+        <span>⚡</span>
+        <strong>Activities</strong>
+      </div>
+
+      ${
+        S.activityMsg
+          ? `
+            <div
+              class="${
+                S.activityMsg.ok
+                  ? "ok"
+                  : "err"
+              }"
+            >
+              ${esc(
+                S.activityMsg.t
+              )}
+            </div>
+          `
+          : ""
       }
 
-      event.target.disabled =
-        true;
+      <div class="activity-grid">
 
-      try {
+        ${
+          activities
+            .map(
+              item => `
 
-        if (login) {
+                <div class="activity">
 
-          const {
-            error
-          } =
-            await db.auth.signInWithPassword({
-              email,
-              password
-            });
+                  <strong>
+                    ${item[1]}
+                    ${item[2]}
+                  </strong>
 
-          if (error) {
+                  <small>
+                    ${item[3]}
+                  </small>
+
+                  <small>
+                    ${item[4]}
+                  </small>
+
+                  <button
+                    type="button"
+                    data-activity="${item[0]}"
+                  >
+                    Do it
+                  </button>
+
+                </div>
+
+              `
+            )
+            .join("")
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+AUTH
+========================================================= */
+
+function viewAuth(){
+
+  if(
+    window.naijaClockTimer
+  ){
+
+    clearInterval(
+      window.naijaClockTimer
+    );
+
+  }
+
+  app.innerHTML = `
+
+    <div class="stripe"></div>
+
+    <main class="wrap auth">
+
+      <div class="auth-logo">
+        NAIJA HUSTLE
+      </div>
+
+      ${
+        S.mode === "login"
+          ? `
+
+            <h1>
+              Your hustle starts here.
+            </h1>
+
+            <p class="mute">
+              Earn. Improve. Build.
+              Become the name everyone knows.
+            </p>
+
+            ${msgHtml()}
+
+            <form id="authForm">
+
+              <div class="card">
+
+                <label>
+                  Email
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  placeholder="you@example.com"
+                >
+
+                <label
+                  style="
+                    display:block;
+                    margin-top:12px;
+                  "
+                >
+                  Password
+                </label>
+
+                <input
+                  id="password"
+                  type="password"
+                  autocomplete="current-password"
+                  minlength="6"
+                  required
+                  placeholder="At least 6 characters"
+                >
+
+                <button
+                  class="btn"
+                  type="submit"
+                >
+                  Log in
+                </button>
+
+              </div>
+
+            </form>
+
+            <p class="mute">
+              New hustler?
+              <button
+                class="link"
+                id="switchSignup"
+                type="button"
+              >
+                Create account
+              </button>
+            </p>
+
+          `
+          : `
+
+            <h1>
+              Create your account.
+            </h1>
+
+            <p class="mute">
+              Your account is only the beginning.
+              Next, you'll build your hustler.
+            </p>
+
+            ${msgHtml()}
+
+            <form id="authForm">
+
+              <div class="card">
+
+                <label>
+                  Email
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  placeholder="you@example.com"
+                >
+
+                <label
+                  style="
+                    display:block;
+                    margin-top:12px;
+                  "
+                >
+                  Password
+                </label>
+
+                <input
+                  id="password"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="6"
+                  required
+                  placeholder="At least 6 characters"
+                >
+
+                <button
+                  class="btn"
+                  type="submit"
+                >
+                  Create account
+                </button>
+
+              </div>
+
+            </form>
+
+            <p class="mute">
+              Already registered?
+
+              <button
+                class="link"
+                id="switchLogin"
+                type="button"
+              >
+                Log in
+              </button>
+
+            </p>
+
+          `
+      }
+
+    </main>
+
+  `;
+
+  const form =
+    document.getElementById(
+      "authForm"
+    );
+
+  if(form){
+
+    form.onsubmit =
+      async event => {
+
+        event.preventDefault();
+
+        if(S.busy){
+          return;
+        }
+
+        S.busy = true;
+
+        const email =
+          document
+            .getElementById(
+              "email"
+            )
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById(
+              "password"
+            )
+            .value;
+
+        try{
+
+          let result;
+
+          if(
+            S.mode === "login"
+          ){
+
+            result =
+              await db.auth.signInWithPassword({
+                email,
+                password
+              });
+
+          }else{
+
+            result =
+              await db.auth.signUp({
+                email,
+                password
+              });
+
+          }
+
+          S.busy = false;
+
+          if(
+            result.error
+          ){
 
             setMsg(
-              error.message
+              result.error.message
             );
 
             return viewAuth();
 
           }
 
-          return;
-        }
+          if(
+            S.mode === "signup" &&
+            !result.data?.session
+          ){
 
+            setMsg(
+              "Account created. If email confirmation is enabled, confirm your email before logging in.",
+              true
+            );
 
-        const {
-          data,
-          error
-        } =
-          await db.auth.signUp({
-            email,
-            password
-          });
+            return viewAuth();
 
+          }
 
-        if (error) {
+          S.user =
+            result.data?.user ||
+            result.data?.session?.user ||
+            null;
+
+          setMsg(null);
+
+          await load();
+
+        }catch(error){
+
+          S.busy = false;
 
           setMsg(
-            error.message
+            error?.message ||
+            "Authentication failed."
           );
 
-          return viewAuth();
+          viewAuth();
 
         }
 
+      };
 
-        if (!data.session) {
+  }
 
-          setMsg(
-            "Account created. Check your email to confirm, then log in.",
-            true
-          );
+  const signup =
+    document.getElementById(
+      "switchSignup"
+    );
 
-          return viewAuth();
+  if(signup){
 
-        }
+    signup.onclick =
+      () => {
 
-      } catch (error) {
+        S.mode =
+          "signup";
 
-        setMsg(
-          error?.message ||
-          "Authentication failed."
-        );
+        S.msg =
+          null;
 
         viewAuth();
 
-      }
+      };
 
-    };
+  }
+
+  const login =
+    document.getElementById(
+      "switchLogin"
+    );
+
+  if(login){
+
+    login.onclick =
+      () => {
+
+        S.mode =
+          "login";
+
+        S.msg =
+          null;
+
+        viewAuth();
+
+      };
+
+  }
 
 }
 
 
 /* =========================================================
-   PERSONALITY DATA
-   ========================================================= */
+PERSONALITY
+========================================================= */
 
-async function loadPersonalityTraits() {
-
-  if (S.personalityTraits) {
-    return S.personalityTraits;
-  }
+async function loadPersonalityTraits(){
 
   const {
     data,
     error
   } =
     await db
-      .from("personality_traits")
+      .from(
+        "personality_traits"
+      )
       .select(
         "id,name,description,skill_bonus,skill_bonus_amount,effect_key,effect_amount"
       )
       .order("name");
 
-  if (error) {
+  if(error){
+
     throw error;
+
   }
 
   S.personalityTraits =
@@ -2031,19 +2913,76 @@ async function loadPersonalityTraits() {
 
 
 /* =========================================================
-   CHARACTER CREATION
-   ========================================================= */
+CHARACTER CREATION
+========================================================= */
 
-async function viewCreate() {
+function viewCreate(){
 
-  if (window.naijaClockTimer) {
+  if(
+    !S.personalityTraits
+  ){
 
-    clearInterval(
-      window.naijaClockTimer
-    );
+    loadPersonalityTraits()
+      .then(
+        () => viewCreate()
+      )
+      .catch(
+        error => {
 
-    window.naijaClockTimer =
-      null;
+          console.error(
+            "Personality load failed:",
+            error
+          );
+
+          app.innerHTML = `
+
+            <div class="stripe"></div>
+
+            <main class="wrap">
+
+              <div class="card">
+
+                <h1>
+                  Build your hustler.
+                </h1>
+
+                <div class="err">
+                  ${esc(
+                    error.message
+                  )}
+                </div>
+
+                <button
+                  class="btn"
+                  onclick="location.reload()"
+                >
+                  Retry
+                </button>
+
+              </div>
+
+            </main>
+
+          `;
+
+        }
+      );
+
+    app.innerHTML = `
+
+      <div class="stripe"></div>
+
+      <main class="wrap">
+
+        <div class="loading">
+          Loading character system...
+        </div>
+
+      </main>
+
+    `;
+
+    return;
 
   }
 
@@ -2051,105 +2990,216 @@ async function viewCreate() {
 
     <div class="stripe"></div>
 
-    <div class="wrap">
+    <main class="wrap">
 
-      <h1>
-        Build your hustler.
-      </h1>
+      <div style="padding-top:24px">
 
-      <p class="mute">
-        Your background gives you a starting point.
-        Your personality and look make the character yours.
-      </p>
+        <div class="auth-logo">
+          NAIJA HUSTLE
+        </div>
 
-      <label for="nm">
-        Character name (3 to 20 characters)
-      </label>
-
-      <input
-        id="nm"
-        maxlength="20"
-        autocomplete="off"
-        value="${esc(S.nameDraft)}"
-      >
-
-      <div style="height:14px"></div>
-
-      ${
-        BG.map(
-          bg => `
-
-            <button
-              class="bg"
-              type="button"
-              data-bg="${bg.id}"
-              aria-pressed="${
-                S.picked === bg.id
-              }"
-            >
-
-              <b>
-                ${esc(bg.name)}
-              </b>
-
-              <div class="meta">
-                ${esc(bg.meta)}
-              </div>
-
-              ${esc(bg.d)}
-
-            </button>
-
-          `
-        ).join("")
-      }
-
-
-      <div class="section-head">
-
-        <h2>
-          Personality
-        </h2>
+        <h1>
+          Build your hustler.
+        </h1>
 
         <p class="mute">
-          Pick exactly two traits.
-          They will shape how your character plays.
+          Your background gives you a starting point.
+          Your personality and look make the character yours.
         </p>
 
-        <span class="counter">
-
-          ${
-            [
-              S.personality1,
-              S.personality2
-            ].filter(Boolean).length
-          }
-
-          / 2 selected
-
-        </span>
+        ${msgHtml()}
 
       </div>
 
 
-      <div id="traitsArea">
+      <div class="card">
 
-        <div class="loading">
-          Loading personality traits...
+        <div class="section-head">
+
+          <div>
+            <strong>
+              Character name
+            </strong>
+
+            <div class="counter">
+              3 to 20 characters
+            </div>
+          </div>
+
+        </div>
+
+        <input
+          id="characterName"
+          maxlength="20"
+          minlength="3"
+          value="${esc(S.nameDraft)}"
+          placeholder="Enter your hustler name"
+        >
+
+      </div>
+
+
+      <div class="section-head">
+
+        <div>
+          <h2>
+            Background
+          </h2>
+
+          <div class="counter">
+            Choose one
+          </div>
         </div>
 
       </div>
 
 
+      <div class="grid">
+
+        ${
+          BG.map(
+            bg => `
+
+              <button
+                type="button"
+                class="bg ${
+                  S.picked === bg.id
+                    ? "selected"
+                    : ""
+                }"
+                data-bg="${bg.id}"
+              >
+
+                <h3>
+                  ${esc(bg.name)}
+                </h3>
+
+                <p>
+                  ${esc(bg.meta)}
+                </p>
+
+                <p style="margin-top:7px">
+                  ${esc(bg.d)}
+                </p>
+
+              </button>
+
+            `
+          ).join("")
+        }
+
+      </div>
+
+
       <div class="section-head">
 
-        <h2>
-          Character design
-        </h2>
+        <div>
+          <h2>
+            Personality
+          </h2>
 
-        <p class="mute">
-          Choose how your hustler looks.
-        </p>
+          <div class="counter">
+            Pick exactly two traits.
+          </div>
+        </div>
+
+        <div class="counter">
+          ${
+            [
+              S.personality1,
+              S.personality2
+            ].filter(Boolean).length
+          } / 2 selected
+        </div>
+
+      </div>
+
+
+      <div class="trait-grid">
+
+        ${
+          S.personalityTraits
+            .map(
+              trait => {
+
+                const selected1 =
+                  S.personality1 ===
+                  trait.id;
+
+                const selected2 =
+                  S.personality2 ===
+                  trait.id;
+
+                const selected =
+                  selected1 ||
+                  selected2;
+
+                const number =
+                  selected1
+                    ? 1
+                    : selected2
+                      ? 2
+                      : "";
+
+                return `
+
+                  <button
+                    type="button"
+                    class="trait ${
+                      selected
+                        ? "selected"
+                        : ""
+                    }"
+                    data-trait="${esc(
+                      trait.id
+                    )}"
+                  >
+
+                    ${
+                      selected
+                        ? `
+                          <span class="trait-number">
+                            ${number}
+                          </span>
+                        `
+                        : ""
+                    }
+
+                    <strong>
+                      ${esc(
+                        trait.name
+                      )}
+                    </strong>
+
+                    <small>
+                      ${esc(
+                        trait.description
+                      )}
+                    </small>
+
+                  </button>
+
+                `;
+
+              }
+            )
+            .join("")
+        }
+
+      </div>
+
+
+      <div class="section-head">
+
+        <div>
+          <h2>
+            Character design
+          </h2>
+
+          <div class="counter">
+            Choose how your hustler looks.
+          </div>
+        </div>
 
       </div>
 
@@ -2159,151 +3209,33 @@ async function viewCreate() {
 
       <div class="card">
 
-        <h2>
+        <h3>
           Skin tone
-        </h2>
+        </h3>
 
         <div class="choice-grid">
 
           ${
-            SKIN_TONES.map(
-              ([id, label]) => `
+            SKIN_TONES
+              .map(
+                ([id,label]) => `
 
-                <button
-                  class="choice ${
-                    S.skinTone === id
-                      ? "selected"
-                      : ""
-                  }"
-                  type="button"
-                  data-choice-type="skinTone"
-                  data-choice="${id}"
-                >
-                  <b>${label}</b>
-                </button>
+                  <button
+                    type="button"
+                    class="choice ${
+                      S.skinTone === id
+                        ? "selected"
+                        : ""
+                    }"
+                    data-choice="skinTone"
+                    data-value="${id}"
+                  >
+                    ${label}
+                  </button>
 
-              `
-            ).join("")
-          }
-
-        </div>
-
-
-        <h2 style="margin-top:18px">
-          Hairstyle
-        </h2>
-
-        <div class="choice-grid">
-
-          ${
-            HAIRSTYLES.map(
-              ([id, label]) => `
-
-                <button
-                  class="choice ${
-                    S.hairstyle === id
-                      ? "selected"
-                      : ""
-                  }"
-                  type="button"
-                  data-choice-type="hairstyle"
-                  data-choice="${id}"
-                >
-                  <b>${label}</b>
-                </button>
-
-              `
-            ).join("")
-          }
-
-        </div>
-
-
-        <h2 style="margin-top:18px">
-          Hair colour
-        </h2>
-
-        <div class="choice-grid">
-
-          ${
-            HAIR_COLORS.map(
-              ([id, label]) => `
-
-                <button
-                  class="choice ${
-                    S.hairColor === id
-                      ? "selected"
-                      : ""
-                  }"
-                  type="button"
-                  data-choice-type="hairColor"
-                  data-choice="${id}"
-                >
-                  <b>${label}</b>
-                </button>
-
-              `
-            ).join("")
-          }
-
-        </div>
-
-
-        <h2 style="margin-top:18px">
-          Outfit
-        </h2>
-
-        <div class="choice-grid">
-
-          ${
-            OUTFITS.map(
-              ([id, label]) => `
-
-                <button
-                  class="choice ${
-                    S.outfit === id
-                      ? "selected"
-                      : ""
-                  }"
-                  type="button"
-                  data-choice-type="outfit"
-                  data-choice="${id}"
-                >
-                  <b>${label}</b>
-                </button>
-
-              `
-            ).join("")
-          }
-
-        </div>
-
-
-        <h2 style="margin-top:18px">
-          Accessory
-        </h2>
-
-        <div class="choice-grid">
-
-          ${
-            ACCESSORIES.map(
-              ([id, label]) => `
-
-                <button
-                  class="choice ${
-                    S.accessory === id
-                      ? "selected"
-                      : ""
-                  }"
-                  type="button"
-                  data-choice-type="accessory"
-                  data-choice="${id}"
-                >
-                  <b>${label}</b>
-                </button>
-
-              `
-            ).join("")
+                `
+              )
+              .join("")
           }
 
         </div>
@@ -2311,12 +3243,153 @@ async function viewCreate() {
       </div>
 
 
-      ${msgHtml()}
+      <div class="card">
+
+        <h3>
+          Hairstyle
+        </h3>
+
+        <div class="choice-grid">
+
+          ${
+            HAIRSTYLES
+              .map(
+                ([id,label]) => `
+
+                  <button
+                    type="button"
+                    class="choice ${
+                      S.hairstyle === id
+                        ? "selected"
+                        : ""
+                    }"
+                    data-choice="hairstyle"
+                    data-value="${id}"
+                  >
+                    ${label}
+                  </button>
+
+                `
+              )
+              .join("")
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>
+          Hair colour
+        </h3>
+
+        <div class="choice-grid">
+
+          ${
+            HAIR_COLORS
+              .map(
+                ([id,label]) => `
+
+                  <button
+                    type="button"
+                    class="choice ${
+                      S.hairColor === id
+                        ? "selected"
+                        : ""
+                    }"
+                    data-choice="hairColor"
+                    data-value="${id}"
+                  >
+                    ${label}
+                  </button>
+
+                `
+              )
+              .join("")
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>
+          Outfit
+        </h3>
+
+        <div class="choice-grid">
+
+          ${
+            OUTFITS
+              .map(
+                ([id,label]) => `
+
+                  <button
+                    type="button"
+                    class="choice ${
+                      S.outfit === id
+                        ? "selected"
+                        : ""
+                    }"
+                    data-choice="outfit"
+                    data-value="${id}"
+                  >
+                    ${label}
+                  </button>
+
+                `
+              )
+              .join("")
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>
+          Accessory
+        </h3>
+
+        <div class="choice-grid">
+
+          ${
+            ACCESSORIES
+              .map(
+                ([id,label]) => `
+
+                  <button
+                    type="button"
+                    class="choice ${
+                      S.accessory === id
+                        ? "selected"
+                        : ""
+                    }"
+                    data-choice="accessory"
+                    data-value="${id}"
+                  >
+                    ${label}
+                  </button>
+
+                `
+              )
+              .join("")
+          }
+
+        </div>
+
+      </div>
 
 
       <button
-        class="btn"
-        id="mk"
+        class="btn gold"
+        id="createCharacter"
         type="button"
       >
         Start hustling
@@ -2325,170 +3398,74 @@ async function viewCreate() {
 
       <button
         class="link"
-        id="lo"
+        id="createLogout"
         type="button"
       >
         Log out
       </button>
 
-    </div>
+    </main>
 
   `;
 
 
   const nameInput =
-    document.getElementById("nm");
+    document.getElementById(
+      "characterName"
+    );
 
+  if(nameInput){
 
-  nameInput.oninput =
-    () => {
+    nameInput.oninput =
+      () => {
 
-      S.nameDraft =
-        nameInput.value;
+        S.nameDraft =
+          nameInput.value;
 
-      const name =
-        document.querySelector(
-          ".look-name"
-        );
+        const preview =
+          document.querySelector(
+            ".look-preview"
+          );
 
-      if (name) {
+        if(preview){
 
-        name.textContent =
-          S.nameDraft ||
-          "Your Hustler";
+          preview.outerHTML =
+            characterPreviewHtml();
 
-      }
-
-    };
-
-
-  document
-    .querySelectorAll("[data-bg]")
-    .forEach(button => {
-
-      button.onclick =
-        () => {
-
-          S.nameDraft =
-            nameInput.value;
-
-          S.picked =
-            button.dataset.bg;
-
-          viewCreate();
-
-        };
-
-    });
-
-
-  document
-    .querySelectorAll("[data-choice-type]")
-    .forEach(button => {
-
-      button.onclick =
-        () => {
-
-          const type =
-            button.dataset.choiceType;
-
-          const value =
-            button.dataset.choice;
-
-          S[type] =
-            value;
-
-          viewCreate();
-
-        };
-
-    });
-
-
-  document.getElementById("lo").onclick =
-    () =>
-      db.auth.signOut();
-
-
-  document.getElementById("mk").onclick =
-    createCharacter;
-
-
-  try {
-
-    const traits =
-      await loadPersonalityTraits();
-
-    const area =
-      document.getElementById(
-        "traitsArea"
-      );
-
-    if (!area) {
-      return;
-    }
-
-
-    area.innerHTML = `
-
-      <div class="trait-grid">
-
-        ${
-          traits.map(
-            trait => {
-
-              const selected =
-                trait.id ===
-                  S.personality1 ||
-                trait.id ===
-                  S.personality2;
-
-              const number =
-                trait.id ===
-                  S.personality1
-                    ? "1"
-                    : trait.id ===
-                        S.personality2
-                      ? "2"
-                      : "";
-
-              return `
-
-                <button
-                  class="trait"
-                  type="button"
-                  data-trait="${esc(trait.id)}"
-                  aria-pressed="${selected}"
-                >
-
-                  <span class="trait-number">
-                    ${number}
-                  </span>
-
-                  <b>
-                    ${esc(trait.name)}
-                  </b>
-
-                  <small>
-                    ${esc(trait.description)}
-                  </small>
-
-                </button>
-
-              `;
-
-            }
-          ).join("")
         }
 
-      </div>
+      };
 
-    `;
+  }
 
 
-    document
-      .querySelectorAll("[data-trait]")
-      .forEach(button => {
+  document
+    .querySelectorAll(
+      "[data-bg]"
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          () => {
+
+            S.picked =
+              button.dataset.bg;
+
+            viewCreate();
+
+          };
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      "[data-trait]"
+    )
+    .forEach(
+      button => {
 
         button.onclick =
           () => {
@@ -2496,36 +3473,35 @@ async function viewCreate() {
             const id =
               button.dataset.trait;
 
-
-            if (
+            if(
               S.personality1 === id
-            ) {
+            ){
 
               S.personality1 =
                 null;
 
-            } else if (
+            }else if(
               S.personality2 === id
-            ) {
+            ){
 
               S.personality2 =
                 null;
 
-            } else if (
+            }else if(
               !S.personality1
-            ) {
+            ){
 
               S.personality1 =
                 id;
 
-            } else if (
+            }else if(
               !S.personality2
-            ) {
+            ){
 
               S.personality2 =
                 id;
 
-            } else {
+            }else{
 
               S.personality2 =
                 id;
@@ -2536,33 +3512,63 @@ async function viewCreate() {
 
           };
 
-      });
+      }
+    );
 
 
-  } catch (error) {
+  document
+    .querySelectorAll(
+      "[data-choice]"
+    )
+    .forEach(
+      button => {
 
-    const area =
-      document.getElementById(
-        "traitsArea"
-      );
+        button.onclick =
+          () => {
 
-    if (area) {
+            const field =
+              button.dataset.choice;
 
-      area.innerHTML = `
+            const value =
+              button.dataset.value;
 
-        <div class="err">
+            S[field] =
+              value;
 
-          Could not load personality traits.
+            viewCreate();
 
-          <br><br>
+          };
 
-          ${esc(error.message)}
+      }
+    );
 
-        </div>
 
-      `;
+  const create =
+    document.getElementById(
+      "createCharacter"
+    );
 
-    }
+  if(create){
+
+    create.onclick =
+      createCharacter;
+
+  }
+
+
+  const logout =
+    document.getElementById(
+      "createLogout"
+    );
+
+  if(logout){
+
+    logout.onclick =
+      () => {
+
+        db.auth.signOut();
+
+      };
 
   }
 
@@ -2570,86 +3576,71 @@ async function viewCreate() {
 
 
 /* =========================================================
-   CREATE CHARACTER
-   ========================================================= */
+CREATE CHARACTER
+========================================================= */
 
-async function createCharacter(event) {
+async function createCharacter(){
 
-  if (S.busy) {
+  if(S.busy){
     return;
   }
 
-  const nameInput =
-    document.getElementById("nm");
-
-  if (!nameInput) {
-    return;
-  }
+  const input =
+    document.getElementById(
+      "characterName"
+    );
 
   const name =
-    nameInput.value.trim();
+    (
+      input
+        ? input.value
+        : S.nameDraft
+    ).trim();
 
   S.nameDraft =
     name;
 
-  if (
+  if(
     name.length < 3 ||
     name.length > 20
-  ) {
+  ){
 
     setMsg(
-      "Name must be 3 to 20 characters."
+      "Character name must be between 3 and 20 characters."
     );
 
     return viewCreate();
 
   }
 
-  if (!S.picked) {
+  if(!S.picked){
 
     setMsg(
-      "Pick a background to continue."
+      "Choose a background first."
     );
 
     return viewCreate();
 
   }
 
-  if (
+  if(
     !S.personality1 ||
-    !S.personality2
-  ) {
-
-    setMsg(
-      "Pick exactly two personality traits."
-    );
-
-    return viewCreate();
-
-  }
-
-  if (
+    !S.personality2 ||
     S.personality1 ===
     S.personality2
-  ) {
+  ){
 
     setMsg(
-      "Choose two different personality traits."
+      "Choose exactly two different personality traits."
     );
 
     return viewCreate();
 
   }
 
-  S.busy =
-    true;
+  S.busy = true;
 
-  if (event?.target) {
-    event.target.disabled =
-      true;
-  }
-
-  try {
+  try{
 
     const {
       data,
@@ -2658,9 +3649,7 @@ async function createCharacter(event) {
       await db.rpc(
         "create_character",
         {
-
-          p_name:
-            name,
+          p_name:name,
 
           p_background:
             S.picked,
@@ -2685,40 +3674,33 @@ async function createCharacter(event) {
 
           p_accessory:
             S.accessory
-
         }
       );
 
-    if (error) {
-      throw error;
+    S.busy = false;
+
+    if(error){
+
+      setMsg(
+        error.message
+      );
+
+      return viewCreate();
+
     }
 
-    if (
-      data &&
-      data.id
-    ) {
+    if(data?.id){
 
       S.ch =
         data;
 
     }
 
-    S.busy =
-      false;
-
-    setMsg(null);
-
     await load();
 
-  } catch (error) {
+  }catch(error){
 
-    S.busy =
-      false;
-
-    console.error(
-      "Character creation failed:",
-      error
-    );
+    S.busy = false;
 
     setMsg(
       error?.message ||
@@ -2733,21 +3715,23 @@ async function createCharacter(event) {
 
 
 /* =========================================================
-   CHARACTER PROFILE
-   ========================================================= */
+CHARACTER PROFILE
+========================================================= */
 
-function profileHtml(c) {
+function profileHtml(c){
 
   const trait1 =
     S.personalityTraits?.find(
       trait =>
-        trait.id === c.personality_1
+        trait.id ===
+        c.personality_1
     );
 
   const trait2 =
     S.personalityTraits?.find(
       trait =>
-        trait.id === c.personality_2
+        trait.id ===
+        c.personality_2
     );
 
   const level =
@@ -2790,48 +3774,52 @@ function profileHtml(c) {
   ];
 
   const skillHtml =
-    skillData.map(
-      ([name, value]) => {
+    skillData
+      .map(
+        ([name,value]) => {
 
-        const width =
-          Math.min(
-            100,
-            Math.max(
-              0,
-              value * 10
-            )
-          );
+          const width =
+            Math.min(
+              100,
+              Math.max(
+                0,
+                value * 10
+              )
+            );
 
-        return `
+          return `
 
-          <div class="profile-skill">
+            <div class="profile-skill">
 
-            <div class="profile-skill-head">
+              <div class="profile-skill-head">
 
-              <span>
-                ${name}
-              </span>
+                <span>
+                  ${name}
+                </span>
 
-              <strong>
-                ${value}
-              </strong>
+                <strong>
+                  ${value}
+                </strong>
+
+              </div>
+
+              <div class="profile-skill-bar">
+
+                <i
+                  style="
+                    width:${width}%
+                  "
+                ></i>
+
+              </div>
 
             </div>
 
-            <div class="profile-skill-bar">
+          `;
 
-              <i
-                style="width:${width}%"
-              ></i>
-
-            </div>
-
-          </div>
-
-        `;
-
-      }
-    ).join("");
+        }
+      )
+      .join("");
 
   const businessText =
     S.biz
@@ -2844,13 +3832,12 @@ function profileHtml(c) {
 
       <div class="profile-avatar">
 
-        ${esc(
-          String(
-            c.name || "?"
-          )
-            .charAt(0)
-            .toUpperCase()
-        )}
+        <div class="avatar-mini">
+          ${avatarSvg(
+            c,
+            58
+          )}
+        </div>
 
       </div>
 
@@ -2868,17 +3855,13 @@ function profileHtml(c) {
         </h1>
 
         <p>
-
           ${esc(
             bgName(
               c.background
             )
           )}
-
           ·
-
           Level ${level}
-
         </p>
 
       </div>
@@ -2886,16 +3869,11 @@ function profileHtml(c) {
     </div>
 
 
-    <div class="profile-card">
+    <div class="card">
 
       <div class="profile-card-title">
-
         <span>💰</span>
-
-        <strong>
-          Financial Position
-        </strong>
-
+        <strong>Financial Position</strong>
       </div>
 
       <div class="profile-stat-grid">
@@ -2931,16 +3909,11 @@ function profileHtml(c) {
     </div>
 
 
-    <div class="profile-card">
+    <div class="card">
 
       <div class="profile-card-title">
-
         <span>⭐</span>
-
-        <strong>
-          Level Progress
-        </strong>
-
+        <strong>Level Progress</strong>
       </div>
 
       <div class="row">
@@ -2975,16 +3948,11 @@ function profileHtml(c) {
     </div>
 
 
-    <div class="profile-card">
+    <div class="card">
 
       <div class="profile-card-title">
-
         <span>🧠</span>
-
-        <strong>
-          Personality
-        </strong>
-
+        <strong>Personality</strong>
       </div>
 
       <div class="profile-traits">
@@ -2993,7 +3961,9 @@ function profileHtml(c) {
           trait1
             ? `
               <span class="profile-trait">
-                ${esc(trait1.name)}
+                ${esc(
+                  trait1.name
+                )}
               </span>
             `
             : ""
@@ -3003,7 +3973,9 @@ function profileHtml(c) {
           trait2
             ? `
               <span class="profile-trait">
-                ${esc(trait2.name)}
+                ${esc(
+                  trait2.name
+                )}
               </span>
             `
             : ""
@@ -3025,15 +3997,30 @@ function profileHtml(c) {
     </div>
 
 
-    <div class="profile-card">
+    <div class="card">
 
       <div class="profile-card-title">
-
         <span>🎨</span>
+        <strong>Character Design</strong>
+      </div>
 
-        <strong>
-          Character Design
-        </strong>
+      <div
+        style="
+          display:flex;
+          justify-content:center;
+          background:#F5F7F6;
+          border-radius:18px;
+          padding:10px;
+          margin-bottom:12px;
+        "
+      >
+
+        <div class="avatar-large">
+          ${avatarSvg(
+            c,
+            105
+          )}
+        </div>
 
       </div>
 
@@ -3145,16 +4132,11 @@ function profileHtml(c) {
     </div>
 
 
-    <div class="profile-card">
+    <div class="card">
 
       <div class="profile-card-title">
-
         <span>⚡</span>
-
-        <strong>
-          Skills
-        </strong>
-
+        <strong>Skills</strong>
       </div>
 
       ${skillHtml}
@@ -3162,16 +4144,11 @@ function profileHtml(c) {
     </div>
 
 
-    <div class="profile-card">
+    <div class="card">
 
       <div class="profile-card-title">
-
         <span>❤️</span>
-
-        <strong>
-          Condition
-        </strong>
-
+        <strong>Condition</strong>
       </div>
 
       <div class="profile-details">
@@ -3243,16 +4220,11 @@ function profileHtml(c) {
     </div>
 
 
-    <div class="profile-card">
+    <div class="card">
 
       <div class="profile-card-title">
-
         <span>🏪</span>
-
-        <strong>
-          Hustle Assets
-        </strong>
-
+        <strong>Hustle Assets</strong>
       </div>
 
       <div class="profile-status">
@@ -3272,7 +4244,8 @@ function profileHtml(c) {
               )}
             `
             : `
-              Buy your first business from the Business tab.
+              Buy your first business
+              from the Business tab.
             `
         }
 
@@ -3328,10 +4301,10 @@ function profileHtml(c) {
 
 
 /* =========================================================
-   NAVIGATION
-   ========================================================= */
+NAVIGATION
+========================================================= */
 
-async function go(tab) {
+async function go(tab){
 
   S.tab =
     tab;
@@ -3348,9 +4321,9 @@ async function go(tab) {
   S.mapMsg =
     null;
 
-  if (
+  if(
     tab === "business"
-  ) {
+  ){
 
     S.bizLoaded =
       false;
@@ -3359,15 +4332,15 @@ async function go(tab) {
 
   viewGame();
 
-  if (
+  if(
     tab === "business"
-  ) {
+  ){
 
     return;
 
   }
 
-  try {
+  try{
 
     const {
       data,
@@ -3377,15 +4350,15 @@ async function go(tab) {
         "get_my_character"
       );
 
-    if (error) {
+    if(error){
       throw error;
     }
 
-    if (
+    if(
       data &&
       data.id &&
       S.tab === tab
-    ) {
+    ){
 
       S.ch =
         data;
@@ -3394,7 +4367,7 @@ async function go(tab) {
 
     }
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
       "Navigation refresh failed:",
@@ -3407,22 +4380,26 @@ async function go(tab) {
 
 
 /* =========================================================
-   MAIN GAME VIEW
-   ========================================================= */
+MAIN GAME VIEW
+========================================================= */
 
-function viewGame() {
+function viewGame(){
 
-  if (!S.ch) {
+  if(!S.ch){
 
-    if (S.user) {
+    if(S.user){
+
       return viewCreate();
+
     }
 
     return viewAuth();
 
   }
 
-  if (window.naijaClockTimer) {
+  if(
+    window.naijaClockTimer
+  ){
 
     clearInterval(
       window.naijaClockTimer
@@ -3434,10 +4411,14 @@ function viewGame() {
     S.ch;
 
   const maxEnergy =
-    Number(c.max_energy) || 1;
+    Number(
+      c.max_energy
+    ) || 1;
 
   const energy =
-    Number(c.energy) || 0;
+    Number(
+      c.energy
+    ) || 0;
 
   const pct =
     Math.max(
@@ -3454,16 +4435,22 @@ function viewGame() {
     );
 
   const xpPct =
-    Number(c.xp || 0) % 100;
+    Number(c.xp || 0) %
+    100;
 
   const tabs = [
 
-    ["home", "Home"],
-    ["jobs", "Jobs"],
-    ["business", "Business"],
-    ["map", "Map"],
-    ["board", "Ranks"],
-    ["profile", "Profile"]
+    ["home","Home"],
+
+    ["jobs","Jobs"],
+
+    ["business","Business"],
+
+    ["map","Map"],
+
+    ["board","Ranks"],
+
+    ["profile","Profile"]
 
   ];
 
@@ -3516,7 +4503,9 @@ function viewGame() {
         <div class="bar">
 
           <i
-            style="width:${pct}%"
+            style="
+              width:${pct}%
+            "
           ></i>
 
         </div>
@@ -3537,51 +4526,58 @@ function viewGame() {
     <nav class="nav">
 
       ${
-        tabs.map(
-          ([key, label]) => `
+        tabs
+          .map(
+            ([key,label]) => `
 
-            <button
-              type="button"
-              data-t="${key}"
-              ${
-                S.tab === key
-                  ? 'aria-current="page"'
-                  : ""
-              }
-            >
-              ${label}
-            </button>
+              <button
+                type="button"
+                data-t="${key}"
+                ${
+                  S.tab === key
+                    ? 'aria-current="page"'
+                    : ""
+                }
+              >
+                ${label}
+              </button>
 
-          `
-        ).join("")
+            `
+          )
+          .join("")
       }
 
     </nav>
 
   `;
 
+
   document
     .querySelectorAll(
       ".nav button"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.onclick =
-        () =>
-          go(
-            button.dataset.t
-          );
+        button.onclick =
+          () =>
+            go(
+              button.dataset.t
+            );
 
-    });
+      }
+    );
+
 
   const main =
     document.getElementById(
       "main"
     );
 
-  if (
+
+  if(
     S.tab === "home"
-  ) {
+  ){
 
     main.innerHTML =
       homeHtml(c);
@@ -3590,59 +4586,48 @@ function viewGame() {
       .querySelectorAll(
         "[data-activity]"
       )
-      .forEach(button => {
+      .forEach(
+        button => {
 
-        button.onclick =
-          () =>
-            doActivity(
-              button.dataset.activity
-            );
+          button.onclick =
+            () =>
+              doActivity(
+                button.dataset.activity
+              );
 
-      });
+        }
+      );
 
-  } else if (
+  }else if(
     S.tab === "jobs"
-  ) {
+  ){
 
     jobsView(main);
 
-  } else if (
+  }else if(
     S.tab === "business"
-  ) {
+  ){
 
     bizView(main);
 
-  } else if (
+  }else if(
     S.tab === "map"
-  ) {
+  ){
 
     mapView(main);
 
-  } else if (
+  }else if(
     S.tab === "board"
-  ) {
+  ){
 
     boardView(main);
 
-  } else if (
+  }else if(
     S.tab === "profile"
-  ) {
+  ){
 
     main.innerHTML =
       profileHtml(c);
-
-  }
-
-  const logout =
-    document.getElementById(
-      "lo2"
-    );
-
-  if (logout) {
-
-    logout.onclick =
-      () =>
-        db.auth.signOut();
 
   }
 
@@ -3652,17 +4637,32 @@ function viewGame() {
 
 
 /* =========================================================
-   HOME
-   ========================================================= */
+HOME
+========================================================= */
 
-function homeHtml(c) {
+function homeHtml(c){
 
   const skills = [
 
-    ["hustle", c.skill_hustle],
-    ["edu", c.skill_edu],
-    ["charm", c.skill_charm],
-    ["tech", c.skill_tech]
+    [
+      "hustle",
+      c.skill_hustle
+    ],
+
+    [
+      "edu",
+      c.skill_edu
+    ],
+
+    [
+      "charm",
+      c.skill_charm
+    ],
+
+    [
+      "tech",
+      c.skill_tech
+    ]
 
   ];
 
@@ -3686,30 +4686,48 @@ function homeHtml(c) {
 
     <div class="card">
 
-      <h2>
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          gap:12px;
+        "
+      >
 
-        Welcome to
-        ${cap(c.district)},
-        ${esc(c.name)}
+        <div class="avatar-mini">
+          ${avatarSvg(
+            c,
+            54
+          )}
+        </div>
 
-      </h2>
+        <div>
 
-      <p class="mute">
+          <h2>
+            Welcome to
+            ${cap(c.district)},
+            ${esc(c.name)}
+          </h2>
 
-        ${esc(
-          bgName(
-            c.background
-          )
-        )}
+          <p class="mute">
+            ${esc(
+              bgName(
+                c.background
+              )
+            )}
 
-        ·
+            ·
 
-        ${cap(c.city)}.
+            ${cap(c.city)}.
 
-        Work jobs to earn,
-        then build your empire.
+            Work jobs to earn,
+            then build your empire.
+          </p>
 
-      </p>
+        </div>
+
+      </div>
+
 
       ${
         personality1 ||
@@ -3757,9 +4775,11 @@ function homeHtml(c) {
 
     </div>
 
+
     ${needsHtml(c)}
 
     ${activitiesHtml()}
+
 
     <div class="card">
 
@@ -3768,53 +4788,93 @@ function homeHtml(c) {
       </h2>
 
       ${
-        skills.map(
-          ([key, value]) => {
+        skills
+          .map(
+            ([key,value]) => {
 
-            const skillValue =
-              Number(value) || 0;
+              const skillValue =
+                Number(value) || 0;
 
-            const width =
-              Math.min(
-                skillValue * 10,
-                100
-              );
+              const width =
+                Math.min(
+                  skillValue * 10,
+                  100
+                );
 
-            return `
+              return `
 
-              <div class="sk">
+                <div class="sk">
 
-                <div class="row">
+                  <div class="row">
 
-                  <span>
-                    ${SK[key]}
-                  </span>
+                    <span>
+                      ${SK[key]}
+                    </span>
 
-                  <b>
-                    ${skillValue}
-                  </b>
+                    <b>
+                      ${skillValue}
+                    </b>
+
+                  </div>
+
+                  <div class="bar">
+
+                    <i
+                      style="
+                        width:${width}%
+                      "
+                    ></i>
+
+                  </div>
 
                 </div>
 
-                <div class="bar">
+              `;
 
-                  <i
-                    style="
-                      width:${width}%
-                    "
-                  ></i>
-
-                </div>
-
-              </div>
-
-            `;
-
-          }
-        ).join("")
+            }
+          )
+          .join("")
       }
 
     </div>
+
+
+    <div class="card">
+
+      <div class="profile-card-title">
+        <span>🎨</span>
+        <strong>Your Avatar</strong>
+      </div>
+
+      <div
+        style="
+          display:flex;
+          justify-content:center;
+          background:#F5F7F6;
+          border-radius:18px;
+          padding:5px;
+        "
+      >
+
+        <div class="avatar-large">
+          ${avatarSvg(
+            c,
+            100
+          )}
+        </div>
+
+      </div>
+
+      <button
+        class="btn"
+        type="button"
+        data-go-avatar
+      >
+        View Avatar
+      </button>
+
+    </div>
+
 
     <button
       class="link"
@@ -3830,21 +4890,21 @@ function homeHtml(c) {
 
 
 /* =========================================================
-   ACTIVITIES ACTION
-   ========================================================= */
+ACTIVITY ACTION
+========================================================= */
 
 async function doActivity(
   activity
-) {
+){
 
-  if (S.busy) {
+  if(S.busy){
     return;
   }
 
   S.busy =
     true;
 
-  try {
+  try{
 
     const {
       data,
@@ -3861,15 +4921,14 @@ async function doActivity(
     S.busy =
       false;
 
-    if (error) {
+    if(error){
 
       S.activityMsg = {
 
         t:
           error.message,
 
-        ok:
-          false
+        ok:false
 
       };
 
@@ -3882,8 +4941,7 @@ async function doActivity(
 
     const names = {
 
-      eat:
-        "Meal",
+      eat:"Meal",
 
       entertainment:
         "Entertainment",
@@ -3899,25 +4957,20 @@ async function doActivity(
     S.activityMsg = {
 
       t:
-        `${
-          names[activity] ||
-          "Activity"
-        } completed.` +
-
+        `${names[activity] || "Activity"} completed.` +
         (
           data.last_event
             ? ` ${data.last_event}`
             : ""
         ),
 
-      ok:
-        true
+      ok:true
 
     };
 
     viewGame();
 
-  } catch (error) {
+  }catch(error){
 
     S.busy =
       false;
@@ -3928,8 +4981,7 @@ async function doActivity(
         error?.message ||
         "Activity failed.",
 
-      ok:
-        false
+      ok:false
 
     };
 
@@ -3941,21 +4993,20 @@ async function doActivity(
 
 
 /* =========================================================
-   JOBS
-   ========================================================= */
+JOBS
+========================================================= */
 
 function jobCard(
   job,
   character
-) {
+){
 
-  const needs =
-    [];
+  const needs = [];
 
-  if (
+  if(
     Number(character.level) <
     Number(job.min_level)
-  ) {
+  ){
 
     needs.push(
       "level " +
@@ -3964,7 +5015,7 @@ function jobCard(
 
   }
 
-  if (
+  if(
     job.req_skill &&
     Number(
       character[
@@ -3975,7 +5026,7 @@ function jobCard(
     Number(
       job.req_skill_level
     )
-  ) {
+  ){
 
     needs.push(
 
@@ -4064,9 +5115,9 @@ function jobCard(
 
 async function jobsView(
   main
-) {
+){
 
-  if (!S.jobs) {
+  if(!S.jobs){
 
     main.innerHTML = `
 
@@ -4094,12 +5145,14 @@ async function jobsView(
         .order("min_level")
         .order("pay_min");
 
-    if (error) {
+    if(error){
 
       main.innerHTML = `
 
         <div class="err">
-          ${esc(error.message)}
+          ${esc(
+            error.message
+          )}
         </div>
 
       `;
@@ -4169,22 +5222,24 @@ async function jobsView(
     .querySelectorAll(
       "[data-job]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.onclick =
-        () =>
-          doJob(
-            button.dataset.job
-          );
+        button.onclick =
+          () =>
+            doJob(
+              button.dataset.job
+            );
 
-    });
+      }
+    );
 
 }
 
 
-async function doJob(id) {
+async function doJob(id){
 
-  if (S.busy) {
+  if(S.busy){
     return;
   }
 
@@ -4194,7 +5249,7 @@ async function doJob(id) {
   const before =
     S.ch;
 
-  try {
+  try{
 
     const {
       data,
@@ -4203,23 +5258,20 @@ async function doJob(id) {
       await db.rpc(
         "do_job",
         {
-          p_job_id:
-            id
+          p_job_id:id
         }
       );
 
     S.busy =
       false;
 
-    if (error) {
+    if(error){
 
       S.jobMsg = {
 
-        t:
-          error.message,
+        t:error.message,
 
-        ok:
-          false
+        ok:false
 
       };
 
@@ -4254,17 +5306,19 @@ async function doJob(id) {
         Math.abs(diff)
       )}.`;
 
-    if (
+    if(
       Number(data.level) >
       Number(before.level)
-    ) {
+    ){
 
       message +=
         ` Level up! You're now level ${data.level}.`;
 
     }
 
-    if (data.last_event) {
+    if(
+      data.last_event
+    ){
 
       message +=
         " " +
@@ -4274,17 +5328,15 @@ async function doJob(id) {
 
     S.jobMsg = {
 
-      t:
-        message,
+      t:message,
 
-      ok:
-        true
+      ok:true
 
     };
 
     viewGame();
 
-  } catch (error) {
+  }catch(error){
 
     S.busy =
       false;
@@ -4295,8 +5347,7 @@ async function doJob(id) {
         error?.message ||
         "The job could not be completed.",
 
-      ok:
-        false
+      ok:false
 
     };
 
@@ -4308,17 +5359,17 @@ async function doJob(id) {
 
 
 /* =========================================================
-   BUSINESS
-   ========================================================= */
+BUSINESS
+========================================================= */
 
 async function bizView(
   main
-) {
+){
 
-  if (
+  if(
     !S.bizTypes ||
     !S.bizLoaded
-  ) {
+  ){
 
     main.innerHTML = `
 
@@ -4336,15 +5387,17 @@ async function bizView(
 
     `;
 
-    if (!S.bizTypes) {
+    if(!S.bizTypes){
 
       const result =
         await db
-          .from("business_types")
+          .from(
+            "business_types"
+          )
           .select("*")
           .order("buy_cost");
 
-      if (result.error) {
+      if(result.error){
 
         main.innerHTML = `
 
@@ -4370,7 +5423,7 @@ async function bizView(
         "get_my_business"
       );
 
-    if (result.error) {
+    if(result.error){
 
       main.innerHTML = `
 
@@ -4390,9 +5443,9 @@ async function bizView(
       result.data?.business ||
       null;
 
-    if (
+    if(
       result.data?.character
-    ) {
+    ){
 
       S.ch =
         result.data.character;
@@ -4425,7 +5478,7 @@ async function bizView(
       `
       : "";
 
-  if (!S.biz) {
+  if(!S.biz){
 
     main.innerHTML =
       head +
@@ -4490,27 +5543,30 @@ async function bizView(
             </div>
 
           `
-        ).join("");
+        )
+        .join("");
 
     main
       .querySelectorAll(
         "[data-buy]"
       )
-      .forEach(button => {
+      .forEach(
+        button => {
 
-        button.onclick =
-          () =>
-            bizAct(
-              "buy_business",
-              {
-                p_type:
-                  button.dataset.buy
-              },
-              () =>
-                "Business purchased. Restock it and start earning."
-            );
+          button.onclick =
+            () =>
+              bizAct(
+                "buy_business",
+                {
+                  p_type:
+                    button.dataset.buy
+                },
+                () =>
+                  "Business purchased. Restock it and start earning."
+              );
 
-      });
+        }
+      );
 
     return;
 
@@ -4526,7 +5582,7 @@ async function bizView(
         business.type_id
     );
 
-  if (!type) {
+  if(!type){
 
     main.innerHTML = `
 
@@ -4784,7 +5840,7 @@ async function bizView(
       "collect"
     );
 
-  if (collect) {
+  if(collect){
 
     collect.onclick =
       () =>
@@ -4801,30 +5857,32 @@ async function bizView(
     .querySelectorAll(
       "[data-stock]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.onclick =
-        () =>
-          bizAct(
-            "restock_business",
-            {
-              p_units:
-                Number(
-                  button.dataset.stock
-                )
-            },
-            () =>
-              "Business restocked."
-          );
+        button.onclick =
+          () =>
+            bizAct(
+              "restock_business",
+              {
+                p_units:
+                  Number(
+                    button.dataset.stock
+                  )
+              },
+              () =>
+                "Business restocked."
+            );
 
-    });
+      }
+    );
 
   const upgrade =
     document.getElementById(
       "upgrade"
     );
 
-  if (upgrade) {
+  if(upgrade){
 
     upgrade.onclick =
       () =>
@@ -4833,7 +5891,7 @@ async function bizView(
           {},
           () =>
             "Business upgraded."
-          );
+        );
 
   }
 
@@ -4844,16 +5902,16 @@ async function bizAct(
   functionName,
   args,
   successText
-) {
+){
 
-  if (S.busy) {
+  if(S.busy){
     return;
   }
 
   S.busy =
     true;
 
-  try {
+  try{
 
     const {
       data,
@@ -4867,15 +5925,13 @@ async function bizAct(
     S.busy =
       false;
 
-    if (error) {
+    if(error){
 
       S.bizMsg = {
 
-        t:
-          error.message,
+        t:error.message,
 
-        ok:
-          false
+        ok:false
 
       };
 
@@ -4883,23 +5939,23 @@ async function bizAct(
 
     }
 
-    if (
+    if(
       data?.character
-    ) {
+    ){
 
       S.ch =
         data.character;
 
     }
 
-    if (
+    if(
       Object.prototype
         .hasOwnProperty
         .call(
           data || {},
           "business"
         )
-    ) {
+    ){
 
       S.biz =
         data.business;
@@ -4914,14 +5970,13 @@ async function bizAct(
       t:
         successText(data),
 
-      ok:
-        true
+      ok:true
 
     };
 
     viewGame();
 
-  } catch (error) {
+  }catch(error){
 
     S.busy =
       false;
@@ -4932,8 +5987,7 @@ async function bizAct(
         error?.message ||
         "Business action failed.",
 
-      ok:
-        false
+      ok:false
 
     };
 
@@ -4945,12 +5999,12 @@ async function bizAct(
 
 
 /* =========================================================
-   DISTRICTS
-   ========================================================= */
+DISTRICTS
+========================================================= */
 
-async function loadDistricts() {
+async function loadDistricts(){
 
-  if (S.districts) {
+  if(S.districts){
     return S.districts;
   }
 
@@ -4960,8 +6014,15 @@ async function loadDistricts() {
       .select("*")
       .order("travel_cost");
 
-  if (result.error) {
+  if(result.error){
+
+    console.error(
+      "District load failed:",
+      result.error
+    );
+
     return null;
+
   }
 
   S.districts =
@@ -4973,159 +6034,152 @@ async function loadDistricts() {
 
 
 /* =========================================================
-   MAP
-   ========================================================= */
+MAP
+========================================================= */
 
 function mapSvg(
   currentDistrict
-) {
+){
 
   const positions = {
 
-    ikeja:
-      [68, 42],
+    ikeja:[68,42],
 
-    mushin:
-      [128, 88],
+    mushin:[128,88],
 
-    yaba:
-      [218, 92],
+    yaba:[218,92],
 
-    victoria_island:
-      [195, 175],
+    victoria_island:[195,175],
 
-    lekki:
-      [278, 188]
+    lekki:[278,188]
 
   };
 
   const labels = {
 
-    ikeja:
-      "Ikeja",
+    ikeja:"Ikeja",
 
-    mushin:
-      "Mushin",
+    mushin:"Mushin",
 
-    yaba:
-      "Yaba",
+    yaba:"Yaba",
 
-    victoria_island:
-      "VI",
+    victoria_island:"VI",
 
-    lekki:
-      "Lekki"
+    lekki:"Lekki"
 
   };
 
   const links = [
 
-    ["ikeja", "mushin"],
+    ["ikeja","mushin"],
 
-    ["mushin", "yaba"],
+    ["mushin","yaba"],
 
-    ["yaba", "victoria_island"],
+    ["yaba","victoria_island"],
 
-    ["victoria_island", "lekki"]
+    ["victoria_island","lekki"]
 
   ];
 
   const lines =
-    links.map(
-      ([from, to]) => `
+    links
+      .map(
+        ([from,to]) => `
 
-        <line
+          <line
 
-          x1="${positions[from][0]}"
-          y1="${positions[from][1]}"
+            x1="${positions[from][0]}"
+            y1="${positions[from][1]}"
 
-          x2="${positions[to][0]}"
-          y2="${positions[to][1]}"
+            x2="${positions[to][0]}"
+            y2="${positions[to][1]}"
 
-          stroke="#94A3A2"
-          stroke-width="2.5"
-          stroke-dasharray="6 5"
-          stroke-linecap="round"
+            stroke="#94A3A2"
+            stroke-width="2.5"
+            stroke-dasharray="6 5"
+            stroke-linecap="round"
 
-        />
+          />
 
-      `
-    ).join("");
+        `
+      )
+      .join("");
 
   const dots =
     Object.keys(
       positions
     )
-      .map(
-        id => {
+    .map(
+      id => {
 
-          const [
-            x,
-            y
-          ] =
-            positions[id];
+        const [
+          x,
+          y
+        ] =
+          positions[id];
 
-          const current =
-            id ===
-            currentDistrict;
+        const current =
+          id ===
+          currentDistrict;
 
-          return `
+        return `
 
-            <g
-              class="map-pin"
-              data-id="${id}"
+          <g
+            class="map-pin"
+            data-id="${id}"
+          >
+
+            <circle
+
+              cx="${x}"
+              cy="${y}"
+
+              r="${
+                current
+                  ? 13
+                  : 9
+              }"
+
+              fill="${
+                current
+                  ? "#FFC20E"
+                  : "#fff"
+              }"
+
+              stroke="${
+                current
+                  ? "#14201F"
+                  : "#0F6B6F"
+              }"
+
+              stroke-width="3"
+
+            />
+
+            <text
+
+              x="${x}"
+              y="${y + 28}"
+
+              text-anchor="middle"
+
+              font-size="12"
+
+              font-weight="700"
+
+              fill="#14201F"
+
             >
+              ${labels[id]}
+            </text>
 
-              <circle
+          </g>
 
-                cx="${x}"
-                cy="${y}"
+        `;
 
-                r="${
-                  current
-                    ? 13
-                    : 9
-                }"
-
-                fill="${
-                  current
-                    ? "#FFC20E"
-                    : "#fff"
-                }"
-
-                stroke="${
-                  current
-                    ? "#14201F"
-                    : "#0F6B6F"
-                }"
-
-                stroke-width="3"
-
-              />
-
-              <text
-
-                x="${x}"
-                y="${y + 28}"
-
-                text-anchor="middle"
-
-                font-size="12"
-
-                font-weight="700"
-
-                fill="#14201F"
-
-              >
-                ${labels[id]}
-              </text>
-
-            </g>
-
-          `;
-
-        }
-      ).join("");
+      }
+    )
+    .join("");
 
   return `
 
@@ -5174,6 +6228,7 @@ function mapSvg(
         </text>
 
         ${lines}
+
         ${dots}
 
       </svg>
@@ -5187,9 +6242,9 @@ function mapSvg(
 
 async function mapView(
   main
-) {
+){
 
-  if (!S.districts) {
+  if(!S.districts){
 
     main.innerHTML = `
 
@@ -5211,7 +6266,7 @@ async function mapView(
 
   }
 
-  if (!S.districts) {
+  if(!S.districts){
 
     main.innerHTML = `
 
@@ -5265,103 +6320,105 @@ async function mapView(
     ${mapSvg(current)}
 
     ${
-      S.districts.map(
-        district => {
+      S.districts
+        .map(
+          district => {
 
-          const here =
-            district.id ===
-            current;
+            const here =
+              district.id ===
+              current;
 
-          return `
+            return `
 
-            <div
-              class="card district-card${
-                here
-                  ? " here"
-                  : ""
-              }"
-            >
+              <div
+                class="card district-card${
+                  here
+                    ? " here"
+                    : ""
+                }"
+              >
 
-              <div class="row">
+                <div class="row">
 
-                <h2>
+                  <h2>
+                    ${esc(
+                      district.name
+                    )}
+                  </h2>
+
+                  ${
+                    here
+                      ? `
+
+                        <span class="pill">
+                          You are here
+                        </span>
+
+                      `
+                      : `
+
+                        <span class="pill">
+                          ${naira(
+                            district.travel_cost
+                          )}
+                        </span>
+
+                      `
+                  }
+
+                </div>
+
+                <p class="mute">
                   ${esc(
-                    district.name
+                    district.description
                   )}
-                </h2>
+                </p>
+
+                <div class="bonus">
+
+                  +${district.bonus_pct}%
+                  pay on
+
+                  ${
+                    SK[
+                      district.bonus_skill
+                    ] ||
+                    district.bonus_skill
+                  }
+
+                  jobs
+
+                </div>
 
                 ${
                   here
-                    ? `
-
-                      <span class="pill">
-                        You are here
-                      </span>
-
-                    `
+                    ? ""
                     : `
 
-                      <span class="pill">
-                        ${naira(
-                          district.travel_cost
+                      <button
+                        class="btn"
+                        data-travel="${esc(
+                          district.id
+                        )}"
+                      >
+
+                        Travel to
+                        ${esc(
+                          district.name
                         )}
-                      </span>
+
+                      </button>
 
                     `
                 }
 
               </div>
 
-              <p class="mute">
-                ${esc(
-                  district.description
-                )}
-              </p>
+            `;
 
-              <div class="bonus">
-
-                +${district.bonus_pct}%
-                pay on
-
-                ${
-                  SK[
-                    district.bonus_skill
-                  ] ||
-                  district.bonus_skill
-                }
-
-                jobs
-
-              </div>
-
-              ${
-                here
-                  ? ""
-                  : `
-
-                    <button
-                      class="btn"
-                      data-travel="${esc(
-                        district.id
-                      )}"
-                    >
-
-                      Travel to
-                      ${esc(
-                        district.name
-                      )}
-
-                    </button>
-
-                  `
-              }
-
-            </div>
-
-          `;
-
-        }
-      ).join("")
+          }
+        )
+        .join("")
     }
 
   `;
@@ -5370,46 +6427,50 @@ async function mapView(
     .querySelectorAll(
       ".map-pin"
     )
-    .forEach(pin => {
+    .forEach(
+      pin => {
 
-      pin.onclick =
-        () => {
+        pin.onclick =
+          () => {
 
-          if (
-            pin.dataset.id !==
-            current
-          ) {
+            if(
+              pin.dataset.id !==
+              current
+            ){
 
-            travel(
-              pin.dataset.id
-            );
+              travel(
+                pin.dataset.id
+              );
 
-          }
+            }
 
-        };
+          };
 
-    });
+      }
+    );
 
   main
     .querySelectorAll(
       "[data-travel]"
     )
-    .forEach(button => {
+    .forEach(
+      button => {
 
-      button.onclick =
-        () =>
-          travel(
-            button.dataset.travel
-          );
+        button.onclick =
+          () =>
+            travel(
+              button.dataset.travel
+            );
 
-    });
+      }
+    );
 
 }
 
 
-async function travel(id) {
+async function travel(id){
 
-  if (S.busy) {
+  if(S.busy){
     return;
   }
 
@@ -5419,14 +6480,14 @@ async function travel(id) {
         item.id === id
     );
 
-  if (!district) {
+  if(!district){
     return;
   }
 
   S.busy =
     true;
 
-  try {
+  try{
 
     const {
       data,
@@ -5435,23 +6496,20 @@ async function travel(id) {
       await db.rpc(
         "travel",
         {
-          p_district:
-            id
+          p_district:id
         }
       );
 
     S.busy =
       false;
 
-    if (error) {
+    if(error){
 
       S.mapMsg = {
 
-        t:
-          error.message,
+        t:error.message,
 
-        ok:
-          false
+        ok:false
 
       };
 
@@ -5467,14 +6525,13 @@ async function travel(id) {
       t:
         `You reached ${district.name}.`,
 
-      ok:
-        true
+      ok:true
 
     };
 
     viewGame();
 
-  } catch (error) {
+  }catch(error){
 
     S.busy =
       false;
@@ -5485,8 +6542,7 @@ async function travel(id) {
         error?.message ||
         "Travel failed.",
 
-      ok:
-        false
+      ok:false
 
     };
 
@@ -5498,10 +6554,12 @@ async function travel(id) {
 
 
 /* =========================================================
-   LEADERBOARD
-   ========================================================= */
+LEADERBOARD
+========================================================= */
 
-async function boardView(main) {
+async function boardView(
+  main
+){
 
   main.innerHTML = `
 
@@ -5522,26 +6580,36 @@ async function boardView(main) {
   const {
     data,
     error
-  } = await db
-    .from("characters")
-    .select(
-      "name,background,cash,level"
-    )
-    .order("cash", {
-      ascending: false
-    })
-    .limit(20);
+  } =
+    await db
+      .from("characters")
+      .select(
+        "name,background,cash,level"
+      )
+      .order(
+        "cash",
+        {
+          ascending:false
+        }
+      )
+      .limit(20);
 
-  if (S.tab !== "board") {
+  if(
+    S.tab !== "board"
+  ){
+
     return;
+
   }
 
-  if (error) {
+  if(error){
 
     main.innerHTML = `
 
       <div class="err">
-        ${esc(error.message)}
+        ${esc(
+          error.message
+        )}
       </div>
 
     `;
@@ -5565,14 +6633,19 @@ async function boardView(main) {
         players.length
           ? players
               .map(
-                (player, index) => `
+                (
+                  player,
+                  index
+                ) => `
 
                   <div class="lb">
 
                     <span>
 
                       ${index + 1}.
-                      ${esc(player.name)}
+                      ${esc(
+                        player.name
+                      )}
 
                       <span class="mute">
 
@@ -5592,7 +6665,9 @@ async function boardView(main) {
                     </span>
 
                     <b>
-                      ${naira(player.cash)}
+                      ${naira(
+                        player.cash
+                      )}
                     </b>
 
                   </div>
@@ -5600,7 +6675,6 @@ async function boardView(main) {
                 `
               )
               .join("")
-
           : `
 
               <p class="mute">
@@ -5618,29 +6692,135 @@ async function boardView(main) {
 
 
 /* =========================================================
-   LOAD
-   ========================================================= */
+AVATAR NAVIGATION
+========================================================= */
 
-async function load() {
+function openAvatarStage(){
 
-  if (!S.user) {
+  S.tab =
+    "avatar";
 
-    S.ch = null;
+  if(
+    window.naijaClockTimer
+  ){
+
+    clearInterval(
+      window.naijaClockTimer
+    );
+
+  }
+
+  const main =
+    document.getElementById(
+      "main"
+    );
+
+  if(!main){
+    return;
+  }
+
+  main.innerHTML =
+    avatarStageHtml(
+      S.ch
+    );
+
+  main
+    .querySelectorAll(
+      "[data-avatar-rotate]"
+    )
+    .forEach(
+      button => {
+
+        button.onclick =
+          () => {
+
+            S.avatarRotation +=
+              Number(
+                button.dataset.avatarRotate
+              );
+
+            const stage =
+              main.querySelector(
+                ".avatar-stage"
+              );
+
+            if(stage){
+
+              const svg =
+                stage.querySelector(
+                  "svg"
+                );
+
+              if(svg){
+
+                const amount =
+                  S.avatarRotation *
+                  8;
+
+                svg.style.transform =
+                  `perspective(500px) rotateY(${amount}deg)`;
+
+              }
+
+            }
+
+          };
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+HOME AVATAR BUTTON
+========================================================= */
+
+document.addEventListener(
+  "click",
+  event => {
+
+    const target =
+      event.target.closest(
+        "[data-go-avatar]"
+      );
+
+    if(!target){
+      return;
+    }
+
+    openAvatarStage();
+
+  }
+);
+
+
+/* =========================================================
+LOAD
+========================================================= */
+
+async function load(){
+
+  if(!S.user){
+
+    S.ch =
+      null;
 
     return viewAuth();
 
   }
 
-  try {
+  try{
 
     const {
       data,
       error
-    } = await db.rpc(
-      "get_my_character"
-    );
+    } =
+      await db.rpc(
+        "get_my_character"
+      );
 
-    if (error) {
+    if(error){
 
       console.error(
         "get_my_character failed:",
@@ -5660,13 +6840,15 @@ async function load() {
         ? data
         : null;
 
-    if (S.ch) {
+    if(S.ch){
 
-      try {
+      try{
 
         await loadPersonalityTraits();
 
-      } catch (personalityError) {
+      }catch(
+        personalityError
+      ){
 
         console.error(
           "Personality traits failed to load:",
@@ -5677,20 +6859,20 @@ async function load() {
 
       viewGame();
 
-    } else {
+    }else{
 
       viewCreate();
 
     }
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
       "Load failed:",
       error
     );
 
-    if (S.user) {
+    if(S.user){
 
       setMsg(
         error?.message ||
@@ -5714,8 +6896,8 @@ async function load() {
 
 
 /* =========================================================
-   AUTH STATE
-   ========================================================= */
+AUTH STATE
+========================================================= */
 
 db.auth.onAuthStateChange(
   (
@@ -5728,10 +6910,10 @@ db.auth.onAuthStateChange(
         ? session.user
         : null;
 
-    if (
+    if(
       event ===
       "INITIAL_SESSION"
-    ) {
+    ){
 
       return;
 
@@ -5747,19 +6929,20 @@ db.auth.onAuthStateChange(
 
 
 /* =========================================================
-   STARTUP
-   ========================================================= */
+STARTUP
+========================================================= */
 
-(async function init() {
+(async function init(){
 
-  try {
+  try{
 
     const {
       data,
       error
-    } = await db.auth.getSession();
+    } =
+      await db.auth.getSession();
 
-    if (error) {
+    if(error){
       throw error;
     }
 
@@ -5770,7 +6953,7 @@ db.auth.onAuthStateChange(
 
     await load();
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
       "Naija Hustle startup error:",
