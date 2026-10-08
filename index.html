@@ -5745,9 +5745,7 @@ async function travel(id) {
    LEADERBOARD
    ========================================================= */
 
-async function boardView(
-  main
-) {
+async function boardView(main) {
 
   main.innerHTML = `
 
@@ -5765,53 +5763,35 @@ async function boardView(
 
   `;
 
-
   const {
     data,
     error
-  } =
-    await db
-      .from("characters")
-      .select(
-        "name,background,cash,level"
-      )
-      .order(
-        "cash",
-        {
-          ascending:
-            false
-        }
-      )
-      .limit(20);
+  } = await db
+    .from("characters")
+    .select("name,background,cash,level")
+    .order("cash", {
+      ascending: false
+    })
+    .limit(20);
 
-
-  if (
-    S.tab !== "board"
-  ) {
+  if (S.tab !== "board") {
     return;
   }
-
 
   if (error) {
 
     main.innerHTML = `
 
       <div class="err">
-        ${esc(
-          error.message
-        )}
+        ${esc(error.message)}
       </div>
 
     `;
 
     return;
-
   }
 
-
-  const players =
-    data || [];
-
+  const players = data || [];
 
   main.innerHTML = `
 
@@ -5821,24 +5801,18 @@ async function boardView(
         Richest in Lagos
       </h2>
 
-
       ${
         players.length
           ? players
               .map(
-                (
-                  player,
-                  index
-                ) => `
+                (player, index) => `
 
                   <div class="lb">
 
                     <span>
 
                       ${index + 1}.
-                      ${esc(
-                        player.name
-                      )}
+                      ${esc(player.name)}
 
                       <span class="mute">
 
@@ -5857,11 +5831,8 @@ async function boardView(
 
                     </span>
 
-
                     <b>
-                      ${naira(
-                        player.cash
-                      )}
+                      ${naira(player.cash)}
                     </b>
 
                   </div>
@@ -5894,87 +5865,81 @@ async function load() {
 
   if (!S.user) {
 
-    S.ch =
-      null;
+    S.ch = null;
 
     return viewAuth();
 
   }
-
 
   try {
 
     const {
       data,
       error
-    } =
-      await db.rpc(
-        "get_my_character"
-      );
-
+    } = await db.rpc(
+      "get_my_character"
+    );
 
     if (error) {
-
-      /*
-       * Do not automatically send a logged-in
-       * user to the login page.
-       */
 
       console.error(
         "get_my_character failed:",
         error
       );
 
-
-      setMsg(
-        error.message
-      );
-
+      setMsg(error.message);
 
       /*
-       * If authentication is still valid,
-       * keep the user in the character flow.
+       * User is authenticated.
+       * Keep them inside the character flow
+       * instead of incorrectly sending them
+       * back to login.
        */
 
       return viewCreate();
 
     }
 
-
     S.ch =
       data?.id
         ? data
         : null;
 
-
     if (S.ch) {
+
+      /*
+       * Personality information is needed
+       * by Home and Profile.
+       *
+       * Failure here should not prevent
+       * the game itself from loading.
+       */
 
       try {
 
         await loadPersonalityTraits();
 
-      } catch (_) {
+      } catch (personalityError) {
 
-        /*
-         * Personality display is optional
-         * after character creation.
-         */
+        console.error(
+          "Personality traits failed to load:",
+          personalityError
+        );
 
       }
-
 
       viewGame();
 
     } else {
 
       /*
-       * Authenticated user with no character.
+       * Authenticated account,
+       * but no character yet.
        */
 
       viewCreate();
 
     }
-
 
   } catch (error) {
 
@@ -5982,7 +5947,6 @@ async function load() {
       "Load failed:",
       error
     );
-
 
     if (S.user) {
 
@@ -5995,12 +5959,10 @@ async function load() {
 
     }
 
-
     setMsg(
       error?.message ||
       "Could not load the game."
     );
-
 
     viewAuth();
 
@@ -6024,18 +5986,28 @@ db.auth.onAuthStateChange(
         ? session.user
         : null;
 
+    /*
+     * INITIAL_SESSION is already handled
+     * by the startup function below.
+     */
 
     if (
       event ===
       "INITIAL_SESSION"
     ) {
+
       return;
+
     }
 
+    /*
+     * Prevent auth callbacks from
+     * interfering with Supabase's
+     * internal auth transaction.
+     */
 
     setTimeout(
-      () =>
-        load(),
+      () => load(),
       0
     );
 
@@ -6054,23 +6026,18 @@ db.auth.onAuthStateChange(
     const {
       data,
       error
-    } =
-      await db.auth.getSession();
-
+    } = await db.auth.getSession();
 
     if (error) {
       throw error;
     }
-
 
     S.user =
       data?.session
         ? data.session.user
         : null;
 
-
     await load();
-
 
   } catch (error) {
 
@@ -6078,7 +6045,6 @@ db.auth.onAuthStateChange(
       "Naija Hustle startup error:",
       error
     );
-
 
     app.innerHTML = `
 
@@ -6089,7 +6055,6 @@ db.auth.onAuthStateChange(
         <h1>
           Naija Hustle
         </h1>
-
 
         <div class="err">
 
@@ -6117,4 +6082,4 @@ db.auth.onAuthStateChange(
 </script>
 
 </body>
-  </html>
+</html>
