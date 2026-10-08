@@ -1486,59 +1486,194 @@ async function saveAvatar(){
   toast(error?"Saved locally only.":"Avatar saved to your account");
 }
 
-/* ---------- login (simple local for now) ---------- */
-$("loginBtn").addEventListener("click",async()=>{
-  const email=$("loginEmail").value.trim();
-  const pass=$("loginPassword").value;
-  if(!email||!pass){$("loginMessage").textContent="Enter email and password";return}
-  try{
-    const {data,error}=await db.auth.signInWithPassword({email,password:pass});
-    if(error){$("loginMessage").textContent=error.message;return}
-    $("loginScreen").style.display="none";
-    state.name=email.split("@")[0];
-    loadPlayer();
-  }catch(e){$("loginMessage").textContent="Login failed"}
+/* ---------- Supabase Auth ---------- */
+
+$("loginBtn").addEventListener("click", async () => {
+  const email = $("loginEmail").value.trim();
+  const pass = $("loginPassword").value;
+
+  $("loginMessage").textContent = "";
+
+  if (!email || !pass) {
+    $("loginMessage").textContent =
+      "Enter email and password.";
+    return;
+  }
+
+  $("loginBtn").disabled = true;
+  $("loginBtn").textContent = "Logging in...";
+
+  try {
+    const { data, error } =
+      await db.auth.signInWithPassword({
+        email,
+        password: pass
+      });
+
+    if (error) {
+      console.error("LOGIN ERROR:", error);
+      $("loginMessage").textContent = error.message;
+      return;
+    }
+
+    if (!data.session) {
+      $("loginMessage").textContent =
+        "Login succeeded, but no session was created.";
+      return;
+    }
+
+    console.log("LOGIN SUCCESS:", data.user);
+
+    $("loginScreen").style.display = "none";
+
+    await loadPlayer();
+
+  } catch (e) {
+    console.error("LOGIN EXCEPTION:", e);
+
+    $("loginMessage").textContent =
+      e?.message || "Login failed.";
+  } finally {
+    $("loginBtn").disabled = false;
+    $("loginBtn").textContent = "Login";
+  }
 });
-$("signupBtn").addEventListener("click",async()=>{
-  const email=$("loginEmail").value.trim();
-  const pass=$("loginPassword").value;
-  if(!email||!pass){$("loginMessage").textContent="Enter email and password";return}
-  try{
-    const {data,error}=await db.auth.signUp({email,password:pass});
-    if(error){$("loginMessage").textContent=error.message;return}
-    $("loginMessage").textContent="Account created. You can log in.";
-  }catch(e){$("loginMessage").textContent="Sign up failed"}
+
+
+$("signupBtn").addEventListener("click", async () => {
+  const email = $("loginEmail").value.trim();
+  const pass = $("loginPassword").value;
+
+  $("loginMessage").textContent = "";
+
+  if (!email || !pass) {
+    $("loginMessage").textContent =
+      "Enter email and password.";
+    return;
+  }
+
+  $("signupBtn").disabled = true;
+  $("signupBtn").textContent = "Creating Account...";
+
+  try {
+    const { data, error } =
+      await db.auth.signUp({
+        email,
+        password: pass
+      });
+
+    if (error) {
+      console.error("SIGNUP ERROR:", error);
+      $("loginMessage").textContent = error.message;
+      return;
+    }
+
+    console.log("SIGNUP SUCCESS:", data);
+
+    if (data.session) {
+      $("loginScreen").style.display = "none";
+      await loadPlayer();
+    } else {
+      $("loginMessage").textContent =
+        "Account created. Check your email to confirm your account, then log in.";
+    }
+
+  } catch (e) {
+    console.error("SIGNUP EXCEPTION:", e);
+
+    $("loginMessage").textContent =
+      e?.message || "Sign up failed.";
+  } finally {
+    $("signupBtn").disabled = false;
+    $("signupBtn").textContent = "Create Account";
+  }
 });
+
 
 /* ---------- resize + loop ---------- */
-addEventListener("resize",()=>{
-  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
-  renderer.setPixelRatio(state.quality==="high"?Math.min(devicePixelRatio,2):1);
+
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(
+    innerWidth,
+    innerHeight
+  );
+
+  renderer.setPixelRatio(
+    state.quality === "high"
+      ? Math.min(devicePixelRatio, 2)
+      : 1
+  );
 });
 
-let last=performance.now(),mmTick=0;
-function frame(now){
+
+let last = performance.now();
+let mmTick = 0;
+
+function frame(now) {
   requestAnimationFrame(frame);
-  const dt=Math.min(.05,(now-last)/1000);last=now;
-  if(dt<=0)return;
-  const t=now/1000;
+
+  const dt = Math.min(
+    .05,
+    (now - last) / 1000
+  );
+
+  last = now;
+
+  if (dt <= 0) return;
+
+  const t = now / 1000;
+
   updateDayNight(dt);
-  if(state.mode==="play")updatePlayer(dt);else updateViewerPlayer(dt);
-  updateNPCs(dt);updateTraffic(dt);updatePlaces(dt,t);
+
+  if (state.mode === "play") {
+    updatePlayer(dt);
+  } else {
+    updateViewerPlayer(dt);
+  }
+
+  updateNPCs(dt);
+  updateTraffic(dt);
+  updatePlaces(dt, t);
   updateSocialNpcPrompt();
-  updateCamera(dt);updateSun();
-  $("status").textContent=state.status;
-  if((mmTick++&1)===0&&state.mode==="play")drawMinimap();
-  renderer.render(scene,camera);
+
+  updateCamera(dt);
+  updateSun();
+
+  $("status").textContent =
+    state.status;
+
+  if (
+    (mmTick++ & 1) === 0 &&
+    state.mode === "play"
+  ) {
+    drawMinimap();
+  }
+
+  renderer.render(
+    scene,
+    camera
+  );
 }
 
+
 /* ---------- start ---------- */
-buildWorld();buildTraffic();buildNPCs();buildCustomizer();applyQuality();
-loadPlayer().finally(()=>{
+
+buildWorld();
+buildTraffic();
+buildNPCs();
+buildCustomizer();
+applyQuality();
+
+loadPlayer().finally(() => {
   requestAnimationFrame(frame);
-  setTimeout(()=>$("loading").classList.add("hidden"),450);
+
+  setTimeout(() => {
+    $("loading").classList.add("hidden");
+  }, 450);
 });
 </script>
 </body>
-    </html>
+</html>
