@@ -36,6 +36,75 @@
 #socialBtn{left:auto;right:106px}.#customizeBtn{left:auto;right:16px}.#emoteBtn{left:16px}.#backBtn{left:16px;bottom:162px}.#emoteMenu{left:16px;bottom:205px}.#toast{bottom:170px}.#prompt{bottom:132px}.#joystick{bottom:20px}.#jumpBtn{bottom:105px}.#runBtn{bottom:20px}
 #viewerBar{max-width:94vw;overflow:auto}.viewerBarTitle{display:none}
 }
+  #loginScreen{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(8,8,8,.96);
+}
+
+.loginCard{
+  width:min(380px,88vw);
+  padding:28px;
+  border:1px solid rgba(212,175,55,.35);
+  border-radius:18px;
+  background:#111;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  text-align:center;
+}
+
+.loginCard h1{
+  margin:0 0 8px;
+  color:#d4af37;
+  letter-spacing:2px;
+}
+
+.loginCard p{
+  margin:0 0 24px;
+  color:#aaa;
+}
+
+.loginCard input{
+  width:100%;
+  box-sizing:border-box;
+  margin:6px 0;
+  padding:13px;
+  border:1px solid #333;
+  border-radius:10px;
+  background:#191919;
+  color:#fff;
+  outline:none;
+}
+
+.loginCard button{
+  width:100%;
+  margin-top:10px;
+  padding:13px;
+  border:0;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+#loginBtn{
+  background:#d4af37;
+  color:#111;
+}
+
+#signupBtn{
+  background:#252525;
+  color:#fff;
+}
+
+#loginMessage{
+  min-height:20px;
+  margin-top:12px;
+  color:#d4af37;
+  font-size:13px;
+}
 </style>
 </head>
 <body>
