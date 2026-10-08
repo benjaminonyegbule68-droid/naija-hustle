@@ -522,48 +522,104 @@ function addOutfitDetails(root,cfg,bodyW){
 }
 
 function createCharacter(rawCfg,opts={}){
-  const cfg=sanitize(rawCfg),root=new THREE.Group();
-  const scale=opts.scale??CFG.avatarScale;root.scale.setScalar(scale);
-  const skin=mat(OPTIONS.skinTone.values[cfg.skinTone]||"#855033");
-  const outfitColor=cfg.outfitColor==="default"?"#315d50":OPTIONS.outfitColor.values[cfg.outfitColor];
+function createCharacter(rawCfg,opts={}){
+  const cfg=sanitize(rawCfg);
+  const root=new THREE.Group();
+
+  const scale=opts.scale??CFG.avatarScale;
+  root.scale.setScalar(scale);
+
+  const skin=mat(
+    OPTIONS.skinTone.values[cfg.skinTone]||"#855033"
+  );
+
+  const outfitColor=
+    cfg.outfitColor==="default"
+      ?"#315d50"
+      :OPTIONS.outfitColor.values[cfg.outfitColor];
+
   const outfitMat=mat(outfitColor);
   const dark=mat("#1b1b1b");
-  const bodyW=.72,headR=.36;
-
-  const hips=new THREE.Group();hips.position.y=1.02;root.add(hips);
-  const torso=new THREE.Mesh(capsuleG(.38,.72),outfitMat);torso.scale.set(1,.98,.78);torso.position.y=.42;hips.add(torso);
-  const spine=new THREE.Group();spine.position.y=.35;hips.add(spine);
-
-  const neck=new THREE.Mesh(cylG(.12,.12,.18),skin);neck.position.y=.83;spine.add(neck);
-  const head=new THREE.Group();head.position.y=1.12;spine.add(head);
-  const face=new THREE.Mesh(sphereG(headR),skin);head.add(face);
-
   const eyeMat=mat("#171717");
+
+  const build={
+    compact:{width:.88,shoulder:.92,limb:.92},
+    standard:{width:1,shoulder:1,limb:1},
+    broad:{width:1.12,shoulder:1.12,limb:1.06}
+  }[cfg.bodyBuild]||{width:1,shoulder:1,limb:1};
+
+  const W=build.width;
+  const S=build.shoulder;
+  const L=build.limb;
+
+  const height=
+    cfg.height==="short"?.94:
+    cfg.height==="tall"?1.07:
+    1;
+
+  const hips=new THREE.Group();
+  hips.position.y=1.02*height;
+  root.add(hips);
+
+  const abdomen=new THREE.Mesh(
+    capsuleG(.31*W,.46*height),
+    outfitMat
+  );
+
+  abdomen.scale.set(1.18*W,1,.82*W);
+  abdomen.position.y=.34*height;
+  hips.add(abdomen);
+
+  const chest=new THREE.Mesh(
+    capsuleG(.34*W,.38*height),
+    outfitMat
+  );
+
+  chest.scale.set(1.18*S,1,.86*W);
+  chest.position.y=.66*height;
+  hips.add(chest);
+
+  const spine=new THREE.Group();
+  spine.position.y=.36*height;
+  hips.add(spine);
+
+  const neck=new THREE.Mesh(
+    cylG(.125*W,.14*W,.22*height,16),
+    skin
+  );
+
+  neck.position.y=.84*height;
+  spine.add(neck);
+
+  const head=new THREE.Group();
+  head.position.y=1.12*height;
+  spine.add(head);
+
+  const headR=.36;
+
+  const face=new THREE.Mesh(
+    sphereG(headR),
+    skin
+  );
+
+  face.scale.set(1,1.04,.94);
+  head.add(face);
+
+  const eyes=[];
+
   for(const x of [-.125,.125]){
-    const eye=new THREE.Mesh(sphereG(.035),eyeMat);eye.scale.z=.25;eye.position.set(x,.03,.345);head.add(eye);
+    const eye=new THREE.Mesh(
+      sphereG(.035),
+      eyeMat
+    );
+
+    eye.scale.set(.95,.95,.25);
+    eye.position.set(x,.035,.342);
+    head.add(eye);
+    eyes.push(eye);
   }
 
-  addHair(head,cfg,headR);addBeard(head,cfg,headR);addAccessory(head,cfg,headR);addOutfitDetails(spine,cfg,bodyW);
-
-  const legs=[];
-  for(const x of [-.2,.2]){
-    const leg=new THREE.Group();leg.position.set(x,-.02,0);hips.add(leg);
-    const thigh=new THREE.Mesh(capsuleG(.13,.55),outfitMat);thigh.position.y=-.32;leg.add(thigh);
-    const shoe=new THREE.Mesh(boxG(.27,.13,.48),dark);shoe.position.set(0,-.7,.08);leg.add(shoe);legs.push(leg);
-  }
-
-  const arms=[];
-  for(const x of [-.47,.47]){
-    const arm=new THREE.Group();arm.position.set(x,.54,0);spine.add(arm);
-    const upper=new THREE.Mesh(capsuleG(.12,.52),outfitMat);upper.position.y=-.25;arm.add(upper);
-    const hand=new THREE.Mesh(sphereG(.13),skin);hand.position.y=-.55;arm.add(hand);arms.push(arm);
-  }
-
-  const tag=makeLabel(opts.name||"",opts.tagColor||"#fff",.7);
-  tag.position.y=2.12;root.add(tag);
-
-  return {root,hips,spine,head,legs,arms,eyes:[],cfg,phase:Math.random()*Math.PI*2,time:0,blinkT:1,blink:false,pose:"idle",tag};
-}
+  addHair(head,cfg
 
 function animateCharacter(c,dt,st){
   c.time+=dt;c.phase+=dt*(1+Math.min(2,st.speed*.35));
