@@ -260,6 +260,8 @@ canvas{display:block;width:100%;height:100%}
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
+alert("SCRIPT STARTED");
+
 const SUPABASE_URL = "https://pbqtbwiymlwksdtfsfcb.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
@@ -270,32 +272,162 @@ const damp = (a,b,k,dt) => lerp(a,b,1-Math.exp(-k*dt));
 const has = (o,k) => Object.prototype.hasOwnProperty.call(o,k);
 
 const CFG = {
-  walk:3.2, run:6.4, accel:14, decel:18, turn:12,
-  jump:5.4, gravity:15, world:190, limit:90, road:12,
-  sidewalk:3.2, avatarScale:.82, radius:.42, dayMinutes:8
+  walk:3.2,
+  run:6.4,
+  accel:14,
+  decel:18,
+  turn:12,
+  jump:5.4,
+  gravity:15,
+  world:190,
+  limit:90,
+  road:12,
+  sidewalk:3.2,
+  avatarScale:.82,
+  radius:.42,
+  dayMinutes:8
 };
 
 const OPTIONS = {
-  skinTone:{label:"Skin Tone",kind:"swatch",values:{light:"#f3c7a5",honey:"#d99a6c",tan:"#b9784e",brown:"#855033",deep:"#60351f",dark:"#351d14"}},
-  hairstyle:{label:"Hairstyle",values:{low_cut:"Low Cut",fade:"Fade",high_top:"High Top",afro:"Afro",twists:"Twists",braids:"Braids",locs:"Locs",headwrap:"Headwrap",bald:"Bald"}},
-  hairColor:{label:"Hair Color",kind:"swatch",values:{black:"#151313",darkBrown:"#2c1b14",brown:"#4b2c1e",burgundy:"#541d2c",blonde:"#d6ad65",grey:"#8d8d8d"}},
-  beard:{label:"Beard",values:{none:"None",stubble:"Stubble",goatee:"Goatee",full:"Full"}},
-  outfit:{label:"Outfit",values:{hoodie:"Hoodie",tee:"T-Shirt",jersey:"Jersey",kaftan:"Kaftan",agbada:"Agbada",ankara:"Ankara",suit:"Suit"}},
-  outfitColor:{label:"Outfit Color",kind:"swatch",values:{default:"default",red:"#b72f2f",blue:"#285ca8",green:"#24734b",purple:"#6942a8",black:"#171717",white:"#e8e4da",gold:"#b88718",teal:"#0F6B6F"}},
-  accessory:{label:"Accessory",values:{none:"None",cap:"Cap",glasses:"Glasses",sunglasses:"Sunglasses",chain:"Chain",headphones:"Headphones"}},
-  bodyBuild:{label:"Body Build",values:{compact:"Compact",standard:"Standard",broad:"Broad"}},
-  height:{label:"Height",values:{short:"Short",standard:"Standard",tall:"Tall"}}
+  skinTone:{
+    label:"Skin Tone",
+    kind:"swatch",
+    values:{
+      light:"#f3c7a5",
+      honey:"#d99a6c",
+      tan:"#b9784e",
+      brown:"#855033",
+      deep:"#60351f",
+      dark:"#351d14"
+    }
+  },
+
+  hairstyle:{
+    label:"Hairstyle",
+    values:{
+      low_cut:"Low Cut",
+      fade:"Fade",
+      high_top:"High Top",
+      afro:"Afro",
+      twists:"Twists",
+      braids:"Braids",
+      locs:"Locs",
+      headwrap:"Headwrap",
+      bald:"Bald"
+    }
+  },
+
+  hairColor:{
+    label:"Hair Color",
+    kind:"swatch",
+    values:{
+      black:"#151313",
+      darkBrown:"#2c1b14",
+      brown:"#4b2c1e",
+      burgundy:"#541d2c",
+      blonde:"#d6ad65",
+      grey:"#8d8d8d"
+    }
+  },
+
+  beard:{
+    label:"Beard",
+    values:{
+      none:"None",
+      stubble:"Stubble",
+      goatee:"Goatee",
+      full:"Full"
+    }
+  },
+
+  outfit:{
+    label:"Outfit",
+    values:{
+      hoodie:"Hoodie",
+      tee:"T-Shirt",
+      jersey:"Jersey",
+      kaftan:"Kaftan",
+      agbada:"Agbada",
+      ankara:"Ankara",
+      suit:"Suit"
+    }
+  },
+
+  outfitColor:{
+    label:"Outfit Color",
+    kind:"swatch",
+    values:{
+      default:"default",
+      red:"#b72f2f",
+      blue:"#285ca8",
+      green:"#24734b",
+      purple:"#6942a8",
+      black:"#171717",
+      white:"#e8e4da",
+      gold:"#b88718",
+      teal:"#0F6B6F"
+    }
+  },
+
+  accessory:{
+    label:"Accessory",
+    values:{
+      none:"None",
+      cap:"Cap",
+      glasses:"Glasses",
+      sunglasses:"Sunglasses",
+      chain:"Chain",
+      headphones:"Headphones"
+    }
+  },
+
+  bodyBuild:{
+    label:"Body Build",
+    values:{
+      compact:"Compact",
+      standard:"Standard",
+      broad:"Broad"
+    }
+  },
+
+  height:{
+    label:"Height",
+    values:{
+      short:"Short",
+      standard:"Standard",
+      tall:"Tall"
+    }
+  }
 };
 
 const DEFAULT_CFG = {
-  skinTone:"brown", hairstyle:"fade", hairColor:"black", beard:"none",
-  outfit:"hoodie", outfitColor:"default", accessory:"none", bodyBuild:"standard", height:"standard"
+  skinTone:"brown",
+  hairstyle:"fade",
+  hairColor:"black",
+  beard:"none",
+  outfit:"hoodie",
+  outfitColor:"default",
+  accessory:"none",
+  bodyBuild:"standard",
+  height:"standard"
 };
 
 const HOUSING = [
-  {id:"room", name:"Basic Room / Face-me", rent:8000, cost:0, desc:"Shared corridor, one room, generator sometimes works."},
-  {id:"self", name:"Self-contained", rent:18000, cost:45000, desc:"Your own toilet & kitchenette. Still in a busy compound."},
-  {id:"flat", name:"Mini Flat", rent:35000, cost:120000, desc:"One bedroom, small sitting room. Better area."},
+  {
+    id:"room",
+    name:"Basic Room / Face-me",
+    rent:8000,
+    cost:0,
+    desc:"Shared corridor, one room, generator sometimes works."
+  },
+  {
+    id:"self",
+    name:"Self-contained",
+    rent:18000,
+    cost:45000,
+    desc:"Your own toilet & kitchenette. Still in a busy compound."
+  }
+];  {id:"flat", name:"Mini Flat", rent:35000, cost:120000, desc:"One bedroom, small sitting room. Better area."},
   {id:"two_bed", name:"2-Bedroom Flat", rent:65000, cost:280000, desc:"Proper flat, more space, higher expectations."},
   {id:"apartment", name:"Better Apartment", rent:110000, cost:550000, desc:"Serviced, safer, closer to the action."},
   {id:"condo", name:"Condo / High-end", rent:220000, cost:1200000, desc:"Lekki / VI level. Status unlocked."}
