@@ -767,7 +767,6 @@ function addOutfitDetails(root,cfg,bodyW){
 }
 
 function createCharacter(rawCfg,opts={}){
-function createCharacter(rawCfg,opts={}){
   const cfg=sanitize(rawCfg);
   const root=new THREE.Group();
 
@@ -784,14 +783,19 @@ function createCharacter(rawCfg,opts={}){
       :OPTIONS.outfitColor.values[cfg.outfitColor];
 
   const outfitMat=mat(outfitColor);
-  const dark=mat("#1b1b1b");
+  const dark=mat("#171717");
+  const shoeMat=mat("#141414");
   const eyeMat=mat("#171717");
 
   const build={
     compact:{width:.88,shoulder:.92,limb:.92},
     standard:{width:1,shoulder:1,limb:1},
     broad:{width:1.12,shoulder:1.12,limb:1.06}
-  }[cfg.bodyBuild]||{width:1,shoulder:1,limb:1};
+  }[cfg.bodyBuild]||{
+    width:1,
+    shoulder:1,
+    limb:1
+  };
 
   const W=build.width;
   const S=build.shoulder;
@@ -810,7 +814,6 @@ function createCharacter(rawCfg,opts={}){
     capsuleG(.31*W,.46*height),
     outfitMat
   );
-
   abdomen.scale.set(1.18*W,1,.82*W);
   abdomen.position.y=.34*height;
   hips.add(abdomen);
@@ -819,7 +822,6 @@ function createCharacter(rawCfg,opts={}){
     capsuleG(.34*W,.38*height),
     outfitMat
   );
-
   chest.scale.set(1.18*S,1,.86*W);
   chest.position.y=.66*height;
   hips.add(chest);
@@ -832,248 +834,302 @@ function createCharacter(rawCfg,opts={}){
     cylG(.125*W,.14*W,.22*height,16),
     skin
   );
-
   neck.position.y=.84*height;
   spine.add(neck);
 
   const head=new THREE.Group();
-head.position.y=1.12*height;
-spine.add(head);
+  head.position.y=1.12*height;
+  spine.add(head);
 
-const headR=.36;
+  const headR=.36;
 
-/* FACE */
-const face=new THREE.Mesh(
-  sphereG(headR),
-  skin
-);
-
-face.scale.set(1,.99,.93);
-head.add(face);
-
-/* CHEEKS */
-for(const x of [-.19,.19]){
-  const cheek=new THREE.Mesh(
-    sphereG(.16),
+  /* FACE */
+  const face=new THREE.Mesh(
+    sphereG(headR),
     skin
   );
+  face.scale.set(1,.99,.93);
+  head.add(face);
 
-  cheek.scale.set(.95,.82,.72);
-  cheek.position.set(x,-.055,.255);
-  head.add(cheek);
-}
+  /* CHEEKS */
+  for(const x of [-.19,.19]){
+    const cheek=new THREE.Mesh(
+      sphereG(.16),
+      skin
+    );
+    cheek.scale.set(.95,.82,.72);
+    cheek.position.set(x,-.055,.255);
+    head.add(cheek);
+  }
 
-/* EARS */
-for(const x of [-.345,.345]){
-  const ear=new THREE.Mesh(
-    sphereG(.085),
+  /* EARS */
+  for(const x of [-.345,.345]){
+    const ear=new THREE.Mesh(
+      sphereG(.085),
+      skin
+    );
+    ear.scale.set(.62,1,.55);
+    ear.position.set(x,0,.01);
+    head.add(ear);
+  }
+
+  /* EYES */
+  const eyes=[];
+
+  for(const x of [-.125,.125]){
+    const white=new THREE.Mesh(
+      sphereG(.085),
+      mat("#f4f1ea")
+    );
+
+    white.scale.set(1.05,.88,.48);
+    white.position.set(x,.045,.325);
+    head.add(white);
+
+    const pupil=new THREE.Mesh(
+      sphereG(.043),
+      eyeMat
+    );
+
+    pupil.scale.set(.9,.95,.42);
+    pupil.position.set(x,.045,.365);
+    head.add(pupil);
+
+    eyes.push(white);
+  }
+
+  /* EYEBROWS */
+  const browMat=mat(
+    OPTIONS.hairColor.values[cfg.hairColor]||"#151313"
+  );
+
+  for(const x of [-.125,.125]){
+    const brow=new THREE.Mesh(
+      capsuleG(.025,.13),
+      browMat
+    );
+
+    brow.rotation.z=x<0?.08:-.08;
+    brow.position.set(x,.145,.335);
+    head.add(brow);
+  }
+
+  /* NOSE */
+  const nose=new THREE.Mesh(
+    sphereG(.075),
     skin
   );
+  nose.scale.set(.72,.95,1.25);
+  nose.position.set(0,-.035,.355);
+  head.add(nose);
 
-  ear.scale.set(.62,1,.55);
-  ear.position.set(x,0,.01);
-  head.add(ear);
-}
+  const noseTip=new THREE.Mesh(
+    sphereG(.055),
+    skin
+  );
+  noseTip.scale.set(1,.72,.95);
+  noseTip.position.set(0,-.09,.385);
+  head.add(noseTip);
 
-/* EYES */
-const eyes=[];
+  /* MOUTH */
+  const mouth=new THREE.Mesh(
+    capsuleG(.035,.13),
+    mat("#5a2925")
+  );
+  mouth.rotation.z=Math.PI/2;
+  mouth.scale.set(1,.65,.55);
+  mouth.position.set(0,-.165,.345);
+  head.add(mouth);
 
-for(const x of [-.125,.125]){
-  const white=new THREE.Mesh(
-    sphereG(.085),
-    mat("#f4f1ea")
+  const lip=new THREE.Mesh(
+    sphereG(.045),
+    mat("#8b5148")
+  );
+  lip.scale.set(1.45,.48,.55);
+  lip.position.set(0,-.205,.35);
+  head.add(lip);
+
+  addHair(head,cfg,headR);
+  addBeard(head,cfg,headR);
+  addAccessory(head,cfg,headR);
+
+  addOutfitDetails(
+    spine,
+    cfg,
+    .72*S
   );
 
-  white.scale.set(1.05,.88,.48);
-  white.position.set(x,.045,.325);
-  head.add(white);
+  /* PELVIS */
+  const pelvis=new THREE.Mesh(
+    capsuleG(.30*W,.25*height),
+    outfitMat
+  );
+  pelvis.scale.set(1.18*W,1,.82*W);
+  pelvis.position.y=.05*height;
+  hips.add(pelvis);
 
-  const pupil=new THREE.Mesh(
-    sphereG(.043),
-    eyeMat
+  /* LEGS */
+  const legs=[];
+
+  for(const x of [-.20*W,.20*W]){
+    const leg=new THREE.Group();
+
+    leg.position.set(
+      x,
+      -.08*height,
+      0
+    );
+
+    hips.add(leg);
+
+    const thigh=new THREE.Mesh(
+      capsuleG(.145*L,.42*height),
+      outfitMat
+    );
+    thigh.scale.set(1,1.12,.92);
+    thigh.position.y=-.29*height;
+    leg.add(thigh);
+
+    const knee=new THREE.Mesh(
+      sphereG(.145*L),
+      outfitMat
+    );
+    knee.scale.set(1,.92,.9);
+    knee.position.y=-.54*height;
+    leg.add(knee);
+
+    const shin=new THREE.Mesh(
+      capsuleG(.125*L,.40*height),
+      outfitMat
+    );
+    shin.position.y=-.77*height;
+    leg.add(shin);
+
+    const shoe=new THREE.Mesh(
+      boxG(.30*L,.16*height,.50*L),
+      shoeMat
+    );
+    shoe.position.set(
+      0,
+      -1.01*height,
+      .10
+    );
+    leg.add(shoe);
+
+    const sole=new THREE.Mesh(
+      boxG(.31*L,.045*height,.52*L),
+      dark
+    );
+    sole.position.set(
+      0,
+      -1.09*height,
+      .105
+    );
+    leg.add(sole);
+
+    legs.push(leg);
+  }
+
+  /* ARMS */
+  const arms=[];
+
+  for(const x of [-.49*S,.49*S]){
+    const arm=new THREE.Group();
+
+    arm.position.set(
+      x,
+      .62*height,
+      0
+    );
+
+    spine.add(arm);
+
+    const shoulder=new THREE.Mesh(
+      sphereG(.18*S),
+      outfitMat
+    );
+    shoulder.scale.set(1,.92,.9);
+    shoulder.position.y=.01;
+    arm.add(shoulder);
+
+    const upper=new THREE.Mesh(
+      capsuleG(.125*L,.36*height),
+      outfitMat
+    );
+    upper.position.y=-.20*height;
+    arm.add(upper);
+
+    const elbow=new THREE.Mesh(
+      sphereG(.125*L),
+      outfitMat
+    );
+    elbow.position.y=-.41*height;
+    arm.add(elbow);
+
+    const forearm=new THREE.Mesh(
+      capsuleG(.11*L,.32*height),
+      skin
+    );
+    forearm.position.y=-.57*height;
+    arm.add(forearm);
+
+    const wrist=new THREE.Mesh(
+      sphereG(.105*L),
+      skin
+    );
+    wrist.scale.set(.95,.8,.9);
+    wrist.position.y=-.72*height;
+    arm.add(wrist);
+
+    const hand=new THREE.Mesh(
+      sphereG(.13*L),
+      skin
+    );
+    hand.scale.set(.88,1.08,.78);
+    hand.position.y=-.80*height;
+    arm.add(hand);
+
+    const thumb=new THREE.Mesh(
+      sphereG(.065*L),
+      skin
+    );
+    thumb.scale.set(.8,1.15,.8);
+    thumb.position.set(
+      x<0?-.105*L:.105*L,
+      -.78*height,
+      .055
+    );
+    arm.add(thumb);
+
+    arms.push(arm);
+  }
+
+  /* NAME TAG */
+  const tag=makeLabel(
+    opts.name||"",
+    opts.tagColor||"#fff",
+    .7
   );
 
-  pupil.scale.set(.9,.95,.42);
-  pupil.position.set(x,.045,.365);
-  head.add(pupil);
+  tag.position.y=2.12*height;
+  root.add(tag);
 
-  eyes.push(white);
-}
-
-/* EYEBROWS */
-const browMat=mat(
-  OPTIONS.hairColor.values[cfg.hairColor]||"#151313"
-);
-
-for(const x of [-.125,.125]){
-  const brow=new THREE.Mesh(
-    capsuleG(.025,.13),
-    browMat
-  );
-
-  brow.rotation.z=x<0?.08:-.08;
-  brow.position.set(x,.145,.335);
-  head.add(brow);
-}
-
-/* NOSE */
-const nose=new THREE.Mesh(
-  sphereG(.075),
-  skin
-);
-
-nose.scale.set(.72,.95,1.25);
-nose.position.set(0,-.035,.355);
-head.add(nose);
-
-const noseTip=new THREE.Mesh(
-  sphereG(.055),
-  skin
-);
-
-noseTip.scale.set(1,.72,.95);
-noseTip.position.set(0,-.09,.385);
-head.add(noseTip);
-
-/* MOUTH */
-const mouth=new THREE.Mesh(
-  capsuleG(.035,.13),
-  mat("#5a2925")
-);
-
-mouth.rotation.z=Math.PI/2;
-mouth.scale.set(1,.65,.55);
-mouth.position.set(0,-.165,.345);
-head.add(mouth);
-
-/* LOWER LIP */
-const lip=new THREE.Mesh(
-  sphereG(.045),
-  mat("#8b5148")
-);
-
-lip.scale.set(1.45,.48,.55);
-lip.position.set(0,-.205,.35);
-head.add(lip);
-
-addHair(head,cfg,headR);
-
-function animateCharacter(c,dt,st){
-  c.time+=dt;
-  c.phase+=dt*(1+Math.min(2,st.speed*.35));
-
-  const moving=st.speed>.15;
-  const run=st.speed>4.6;
-
-  /* WALK / RUN */
-  let stride=
-    moving
-      ?Math.sin(c.phase*(run?1.8:1.4))*.65
-      :0;
-
-  if(st.air)stride*=.25;
-
-  c.legs[0].rotation.x=stride;
-  c.legs[1].rotation.x=-stride;
-
-  c.arms[0].rotation.x=-stride*.72;
-  c.arms[1].rotation.x=stride*.72;
-
-  /* BODY MOTION */
-  c.spine.rotation.z=
-    moving
-      ?Math.sin(c.phase)*.035
-      :Math.sin(c.time*1.4)*.008;
-
-  c.spine.rotation.y=
-    moving
-      ?Math.sin(c.phase*.5)*.025
-      :Math.sin(c.time*.8)*.012;
-
-  c.hips.position.y=
-    1.02+
-    (moving
-      ?Math.abs(Math.sin(c.phase*1.4))*.025
-      :Math.sin(c.time*1.6)*.008);
-
-  /* HEAD MOVEMENT */
-  if(c.head){
-    c.head.rotation.y=
-      moving
-        ?Math.sin(c.phase*.55)*.035
-        :Math.sin(c.time*.7)*.025;
-
-    c.head.rotation.z=
-      Math.sin(c.time*.9)*.012;
-  }
-
-  /* BLINK */
-  c.blinkT-=dt;
-
-  if(c.blinkT<=0){
-    c.blink=true;
-    c.blinkT=2.5+Math.random()*3;
-  }
-
-  if(c.eyes&&c.eyes.length){
-    if(c.blink){
-      for(const eye of c.eyes){
-        eye.scale.y=damp(eye.scale.y,.08,35,dt);
-      }
-
-      if(c.eyes[0].scale.y<.11){
-        c.blink=false;
-      }
-    }else{
-      for(const eye of c.eyes){
-        eye.scale.y=damp(eye.scale.y,.88,28,dt);
-      }
-    }
-  }
-
-  /* EMOTES */
-  if(st.emote==="wave"){
-
-    c.arms[1].rotation.z=-1.25;
-    c.arms[1].rotation.x=
-      -.5+Math.sin(c.time*8)*.18;
-
-  }else if(st.emote==="dance"){
-
-    c.spine.rotation.y=
-      Math.sin(c.time*5)*.22;
-
-    c.arms[0].rotation.z=
-      -.8+Math.sin(c.time*6)*.3;
-
-    c.arms[1].rotation.z=
-      .8+Math.sin(c.time*6+1)*.3;
-
-  }else if(st.emote==="cheer"){
-
-    c.arms[0].rotation.z=-1.35;
-    c.arms[1].rotation.z=1.35;
-
-    c.arms[0].rotation.x=-.35;
-    c.arms[1].rotation.x=-.35;
-  }
-                                        }
-
-function rebuildPlayer(){
-  if(player.char)scene.remove(player.char.root);
-  player.char=createCharacter(state.cfg,{name:state.name||"Guest",tagColor:"#f2b705"});
-  scene.add(player.char.root);
-  player.char.root.position.copy(player.pos);
-  player.char.root.rotation.y=player.yaw;
-  player.char.root.visible=cam.mode!=="first";
-  player.tag=player.char.tag;
-}
-
-function refreshTag(){
-  if(player.char&&player.char.tag){
-    player.char.tag.material.map=labelTexture(state.name||"Guest","#f2b705");
-    player.char.tag.material.needsUpdate=true;
-  }
+  return {
+    root,
+    hips,
+    spine,
+    head,
+    legs,
+    arms,
+    eyes,
+    cfg,
+    phase:Math.random()*Math.PI*2,
+    time:0,
+    blinkT:1,
+    blink:false,
+    pose:"idle",
+    tag
+  };
 }
 
 /* ---------- world ---------- */
