@@ -1,2260 +1,2535 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <title>Naija Hustle — 3D Avatar</title>
+<title>Naija Hustle — 3D Avatar</title>
 
-  <!-- =========================================================
-       SUPABASE
-  ========================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#111;
+  font-family:Arial,sans-serif;
+}
 
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #111;
-      font-family: Arial, sans-serif;
-    }
+#game{
+  position:fixed;
+  inset:0;
+}
 
-    #game {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
+#loading{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:10px;
+  background:#111;
+  color:#fff;
+  font-size:18px;
+  text-align:center;
+  padding:20px;
+}
 
-    #loading {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 10px;
-      background: #111;
-      color: white;
-      font-size: 18px;
-    }
+#loading small{
+  opacity:.65;
+  font-size:13px;
+}
 
-    #loading small {
-      opacity: 0.65;
-      font-size: 13px;
-    }
+#info{
+  position:fixed;
+  top:15px;
+  left:15px;
+  z-index:10;
+  min-width:205px;
+  padding:13px 15px;
+  border-radius:13px;
+  background:rgba(0,0,0,.58);
+  color:#fff;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.12);
+}
 
-    #info {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 10;
-      min-width: 190px;
-      padding: 12px 15px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.55);
-      color: white;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+#info strong{
+  display:block;
+  margin-bottom:5px;
+  font-size:16px;
+}
 
-    #info strong {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 16px;
-    }
+#playerName{
+  display:block;
+  font-size:14px;
+  font-weight:600;
+}
 
-    #playerName {
-      font-size: 14px;
-      font-weight: 600;
-    }
+#playerDetails{
+  display:block;
+  margin-top:4px;
+  font-size:12px;
+  opacity:.7;
+}
 
-    #playerDetails {
-      display: block;
-      margin-top: 4px;
-      font-size: 12px;
-      opacity: 0.7;
-    }
+#status{
+  display:block;
+  margin-top:7px;
+  font-size:12px;
+  color:#ffd66b;
+}
 
-    #status {
-      display: block;
-      margin-top: 7px;
-      font-size: 12px;
-      color: #ffd66b;
-    }
+#backButton{
+  position:fixed;
+  top:15px;
+  right:15px;
+  z-index:15;
+  border:0;
+  border-radius:10px;
+  padding:10px 14px;
+  background:rgba(0,0,0,.58);
+  color:#fff;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+}
 
-    #controls {
-      position: fixed;
-      bottom: 25px;
-      left: 25px;
-      z-index: 10;
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.12);
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      touch-action: none;
-    }
+#backButton:hover{
+  background:rgba(0,0,0,.8);
+}
 
-    #stick {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      left: 40px;
-      top: 40px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.55);
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-    }
+#controls{
+  position:fixed;
+  bottom:25px;
+  left:25px;
+  z-index:10;
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  border:2px solid rgba(255,255,255,.2);
+  touch-action:none;
+}
 
-    #backButton {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      z-index: 15;
-      border: 0;
-      border-radius: 10px;
-      padding: 10px 14px;
-      background: rgba(0, 0, 0, 0.55);
-      color: white;
-      cursor: pointer;
-      backdrop-filter: blur(8px);
-    }
+#stick{
+  position:absolute;
+  width:60px;
+  height:60px;
+  left:40px;
+  top:40px;
+  border-radius:50%;
+  background:rgba(255,255,255,.55);
+  box-shadow:0 5px 20px rgba(0,0,0,.3);
+}
 
-    #backButton:hover {
-      background: rgba(0, 0, 0, 0.75);
-    }
+#desktopControls{
+  position:fixed;
+  right:15px;
+  bottom:15px;
+  z-index:10;
+  padding:10px 14px;
+  border-radius:10px;
+  background:rgba(0,0,0,.55);
+  color:#fff;
+  font-size:13px;
+}
 
-    #desktopControls {
-      position: fixed;
-      right: 15px;
-      bottom: 15px;
-      z-index: 10;
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: rgba(0, 0, 0, 0.55);
-      color: #fff;
-      font-size: 13px;
-    }
+@media(max-width:600px){
+  #desktopControls{
+    display:none;
+  }
 
-    @media (max-width: 600px) {
+  #info{
+    min-width:170px;
+    padding:10px 12px;
+  }
 
-      #desktopControls {
-        display: none;
-      }
+  #backButton{
+    font-size:12px;
+  }
 
-      #info {
-        font-size: 13px;
-        min-width: 165px;
-      }
+  #controls{
+    width:125px;
+    height:125px;
+    bottom:20px;
+    left:20px;
+  }
 
-      #backButton {
-        font-size: 12px;
-      }
-    }
-  </style>
+  #stick{
+    width:54px;
+    height:54px;
+    left:35px;
+    top:35px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <div id="loading">
-    <div>Loading 3D Avatar...</div>
-    <small>Loading your Naija Hustle character</small>
-  </div>
+<div id="loading">
+  <div>Loading 3D Avatar...</div>
+  <small>Loading your Naija Hustle character</small>
+</div>
 
-  <div id="game"></div>
+<div id="game"></div>
 
-  <div id="info">
-    <strong>Naija Hustle</strong>
-    <span id="playerName">Loading player...</span>
-    <span id="playerDetails"></span>
-    <span id="status">Loading...</span>
-  </div>
+<div id="info">
+  <strong>Naija Hustle</strong>
+  <span id="playerName">Loading player...</span>
+  <span id="playerDetails"></span>
+  <span id="status">Loading...</span>
+</div>
 
-  <button id="backButton" type="button">
-    ← Back
-  </button>
+<button id="backButton">← Back</button>
 
-  <div id="controls">
-    <div id="stick"></div>
-  </div>
+<div id="controls">
+  <div id="stick"></div>
+</div>
 
-  <div id="desktopControls">
-    WASD / Arrow Keys — Move
-  </div>
+<div id="desktopControls">
+  WASD / Arrow Keys — Move
+</div>
 
 
-  <script type="module">
+<script type="module">
 
-    /* =========================================================
-       SUPABASE CONFIG
-    ========================================================== */
+/* =========================================================
+   SUPABASE
+========================================================= */
 
-    const SUPABASE_URL =
-      "https://pbqtbwiymlwksdtfsfcb.supabase.co";
+const SUPABASE_URL =
+  "https://pbqtbwiymlwksdtfsfcb.supabase.co";
 
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
+const SUPABASE_ANON_KEY =
+  "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
-    const db =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
-
-
-    /* =========================================================
-       THREE.JS
-    ========================================================== */
-
-    import * as THREE from
-      "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+const db =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
 
-    /* =========================================================
-       SCENE
-    ========================================================== */
+/* =========================================================
+   THREE
+========================================================= */
 
-    const scene =
-      new THREE.Scene();
-
-    scene.background =
-      new THREE.Color(0x87ceeb);
-
-    scene.fog =
-      new THREE.Fog(
-        0x87ceeb,
-        25,
-        100
-      );
+import * as THREE from
+  "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
 
-    /* =========================================================
-       CAMERA
-    ========================================================== */
+/* =========================================================
+   SCENE
+========================================================= */
 
-    const camera =
-      new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth /
-          window.innerHeight,
-        0.1,
-        500
-      );
+const scene =
+  new THREE.Scene();
 
-    camera.position.set(
+scene.background =
+  new THREE.Color(0x87ceeb);
+
+scene.fog =
+  new THREE.Fog(
+    0x87ceeb,
+    30,
+    110
+  );
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+const camera =
+  new THREE.PerspectiveCamera(
+    58,
+    window.innerWidth /
+    window.innerHeight,
+    .1,
+    500
+  );
+
+camera.position.set(
+  0,
+  3.8,
+  7
+);
+
+
+/* =========================================================
+   RENDERER
+========================================================= */
+
+const renderer =
+  new THREE.WebGLRenderer({
+    antialias:true
+  });
+
+renderer.setPixelRatio(
+  Math.min(
+    window.devicePixelRatio,
+    2
+  )
+);
+
+renderer.setSize(
+  window.innerWidth,
+  window.innerHeight
+);
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type =
+  THREE.PCFSoftShadowMap;
+
+renderer.outputColorSpace =
+  THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+  THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure = 1.05;
+
+document
+  .getElementById("game")
+  .appendChild(renderer.domElement);
+
+
+/* =========================================================
+   LIGHTING
+========================================================= */
+
+scene.add(
+  new THREE.HemisphereLight(
+    0xffffff,
+    0x526344,
+    2.2
+  )
+);
+
+const sun =
+  new THREE.DirectionalLight(
+    0xffffff,
+    3
+  );
+
+sun.position.set(
+  12,
+  22,
+  10
+);
+
+sun.castShadow = true;
+
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
+
+sun.shadow.camera.left = -30;
+sun.shadow.camera.right = 30;
+sun.shadow.camera.top = 30;
+sun.shadow.camera.bottom = -30;
+
+scene.add(sun);
+
+
+/* =========================================================
+   WORLD
+========================================================= */
+
+const ground =
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      200,
+      200
+    ),
+    new THREE.MeshStandardMaterial({
+      color:0x4d7c3f,
+      roughness:1
+    })
+  );
+
+ground.rotation.x =
+  -Math.PI / 2;
+
+ground.receiveShadow = true;
+
+scene.add(ground);
+
+
+const road =
+  new THREE.Mesh(
+    new THREE.PlaneGeometry(
+      12,
+      200
+    ),
+    new THREE.MeshStandardMaterial({
+      color:0x303030,
+      roughness:.9
+    })
+  );
+
+road.rotation.x =
+  -Math.PI / 2;
+
+road.position.y=.01;
+
+scene.add(road);
+
+
+for(
+  let z=-95;
+  z<100;
+  z+=8
+){
+
+  const line =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        .3,
+        .025,
+        4
+      ),
+      new THREE.MeshStandardMaterial({
+        color:0xffffff
+      })
+    );
+
+  line.position.set(
+    0,
+    .035,
+    z
+  );
+
+  scene.add(line);
+}
+
+
+/* =========================================================
+   AVATAR ROOT
+========================================================= */
+
+const avatar =
+  new THREE.Group();
+
+avatar.position.set(
+  0,
+  0,
+  0
+);
+
+scene.add(avatar);
+
+
+/* =========================================================
+   MATERIALS
+========================================================= */
+
+const skinMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x8d5524,
+    roughness:.78
+  });
+
+const skinDarkMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x63391f,
+    roughness:.82
+  });
+
+const shirtMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x222222,
+    roughness:.72
+  });
+
+const pantsMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x222222,
+    roughness:.8
+  });
+
+const shoeMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x111111,
+    roughness:.55
+  });
+
+const soleMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x050505,
+    roughness:.7
+  });
+
+const hairMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x151515,
+    roughness:1
+  });
+
+const whiteMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0xf4f4f4,
+    roughness:.45
+  });
+
+const eyeMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x17100b,
+    roughness:.35
+  });
+
+const mouthMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0x351516,
+    roughness:.65
+  });
+
+const goldMaterial =
+  new THREE.MeshStandardMaterial({
+    color:0xd4af37,
+    metalness:.75,
+    roughness:.25
+  });
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function mesh(
+  geometry,
+  material
+){
+
+  const m =
+    new THREE.Mesh(
+      geometry,
+      material
+    );
+
+  m.castShadow = true;
+  m.receiveShadow = true;
+
+  return m;
+}
+
+function capsule(
+  radius,
+  length,
+  material
+){
+
+  return mesh(
+    new THREE.CapsuleGeometry(
+      radius,
+      length,
+      8,
+      16
+    ),
+    material
+  );
+}
+
+function sphere(
+  radius,
+  material,
+  segments=24
+){
+
+  return mesh(
+    new THREE.SphereGeometry(
+      radius,
+      segments,
+      segments
+    ),
+    material
+  );
+}
+
+function box(
+  x,
+  y,
+  z,
+  material,
+  bevel=.03
+){
+
+  const geometry =
+    new THREE.BoxGeometry(
+      x,
+      y,
+      z
+    );
+
+  const object =
+    mesh(
+      geometry,
+      material
+    );
+
+  return object;
+}
+
+function normalize(value){
+
+  return String(
+    value || ""
+  )
+  .trim()
+  .toLowerCase()
+  .replace(/[\s-]+/g,"_");
+}
+
+
+/* =========================================================
+   BODY GROUPS
+========================================================= */
+
+const bodyRoot =
+  new THREE.Group();
+
+avatar.add(bodyRoot);
+
+
+/* =========================================================
+   FEET
+========================================================= */
+
+function createFoot(side){
+
+  const foot =
+    box(
+      .34,
+      .18,
+      .62,
+      shoeMaterial
+    );
+
+  foot.position.set(
+    side*.23,
+    .14,
+    -.08
+  );
+
+  bodyRoot.add(foot);
+
+  const sole =
+    box(
+      .36,
+      .055,
+      .65,
+      soleMaterial
+    );
+
+  sole.position.set(
+    side*.23,
+    .045,
+    -.08
+  );
+
+  bodyRoot.add(sole);
+
+  const toe =
+    sphere(
+      .17,
+      shoeMaterial,
+      16
+    );
+
+  toe.scale.set(
+    1,
+    .55,
+    1.25
+  );
+
+  toe.position.set(
+    side*.23,
+    .15,
+    -.36
+  );
+
+  bodyRoot.add(toe);
+
+  return {
+    foot,
+    sole,
+    toe
+  };
+}
+
+const leftFoot =
+  createFoot(-1);
+
+const rightFoot =
+  createFoot(1);
+
+
+/* =========================================================
+   LEG STRUCTURE
+========================================================= */
+
+function createLeg(side){
+
+  const legRoot =
+    new THREE.Group();
+
+  legRoot.position.set(
+    side*.23,
+    .98,
+    0
+  );
+
+  bodyRoot.add(legRoot);
+
+  const upper =
+    capsule(
+      .155,
+      .63,
+      pantsMaterial
+    );
+
+  upper.position.y=-.28;
+
+  legRoot.add(upper);
+
+  const knee =
+    sphere(
+      .17,
+      pantsMaterial,
+      16
+    );
+
+  knee.position.y=-.65;
+
+  knee.scale.set(
+    .9,
+    .8,
+    .9
+  );
+
+  legRoot.add(knee);
+
+  const lower =
+    capsule(
+      .14,
+      .55,
+      pantsMaterial
+    );
+
+  lower.position.y=-.98;
+
+  legRoot.add(lower);
+
+  return {
+    root:legRoot,
+    upper,
+    knee,
+    lower
+  };
+}
+
+const leftLeg =
+  createLeg(-1);
+
+const rightLeg =
+  createLeg(1);
+
+
+/* =========================================================
+   TORSO
+========================================================= */
+
+const torso =
+  new THREE.Group();
+
+torso.position.y=1.65;
+
+bodyRoot.add(torso);
+
+
+/* shirt torso */
+
+const torsoMesh =
+  capsule(
+    .47,
+    .75,
+    shirtMaterial
+  );
+
+torsoMesh.scale.set(
+  1,
+  1,
+  .72
+);
+
+torso.add(torsoMesh);
+
+
+/* waist */
+
+const waist =
+  box(
+    .78,
+    .18,
+    .48,
+    pantsMaterial
+  );
+
+waist.position.y=-.48;
+
+torso.add(waist);
+
+
+/* shirt collar */
+
+const collar =
+  new THREE.Mesh(
+    new THREE.TorusGeometry(
+      .16,
+      .035,
+      8,
+      24,
+      Math.PI*1.65
+    ),
+    whiteMaterial
+  );
+
+collar.rotation.x =
+  Math.PI/2;
+
+collar.position.set(
+  0,
+  .34,
+  -.31
+);
+
+torso.add(collar);
+
+
+/* =========================================================
+   NECK
+========================================================= */
+
+const neck =
+  capsule(
+    .16,
+    .14,
+    skinMaterial
+  );
+
+neck.position.y=2.18;
+
+bodyRoot.add(neck);
+
+
+/* =========================================================
+   HEAD
+========================================================= */
+
+const headGroup =
+  new THREE.Group();
+
+headGroup.position.y=2.62;
+
+bodyRoot.add(headGroup);
+
+
+/* face */
+
+const head =
+  sphere(
+    .43,
+    skinMaterial,
+    32
+  );
+
+head.scale.set(
+  .92,
+  1.05,
+  .88
+);
+
+headGroup.add(head);
+
+
+/* ears */
+
+const leftEar =
+  sphere(
+    .105,
+    skinMaterial,
+    16
+  );
+
+leftEar.scale.set(
+  .55,
+  1,
+  .7
+);
+
+leftEar.position.set(
+  -.405,
+  0,
+  0
+);
+
+headGroup.add(leftEar);
+
+
+const rightEar =
+  leftEar.clone();
+
+rightEar.position.x=.405;
+
+headGroup.add(rightEar);
+
+
+/* =========================================================
+   FACE
+========================================================= */
+
+function createEye(side){
+
+  const eyeWhite =
+    sphere(
+      .072,
+      whiteMaterial,
+      16
+    );
+
+  eyeWhite.scale.set(
+    1,
+    .78,
+    .5
+  );
+
+  eyeWhite.position.set(
+    side*.16,
+    .075,
+    -.382
+  );
+
+  headGroup.add(eyeWhite);
+
+
+  const pupil =
+    sphere(
+      .036,
+      eyeMaterial,
+      12
+    );
+
+  pupil.position.set(
+    side*.16,
+    .075,
+    -.413
+  );
+
+  headGroup.add(pupil);
+}
+
+createEye(-1);
+createEye(1);
+
+
+/* eyebrows */
+
+function createBrow(side){
+
+  const brow =
+    box(
+      .13,
+      .035,
+      .035,
+      hairMaterial
+    );
+
+  brow.position.set(
+    side*.16,
+    .185,
+    -.398
+  );
+
+  brow.rotation.z =
+    side*.08;
+
+  headGroup.add(brow);
+}
+
+createBrow(-1);
+createBrow(1);
+
+
+/* nose */
+
+const nose =
+  new THREE.Mesh(
+    new THREE.ConeGeometry(
+      .065,
+      .16,
+      12
+    ),
+    skinDarkMaterial
+  );
+
+nose.rotation.x=
+  -Math.PI/2;
+
+nose.position.set(
+  0,
+  -.005,
+  -.42
+);
+
+headGroup.add(nose);
+
+
+/* mouth */
+
+const mouth =
+  new THREE.Mesh(
+    new THREE.TorusGeometry(
+      .105,
+      .018,
+      6,
+      24,
+      Math.PI
+    ),
+    mouthMaterial
+  );
+
+mouth.rotation.x=
+  Math.PI/2;
+
+mouth.position.set(
+  0,
+  -.16,
+  -.407
+);
+
+headGroup.add(mouth);
+
+
+/* =========================================================
+   HAIR
+========================================================= */
+
+const hair =
+  new THREE.Mesh(
+    new THREE.SphereGeometry(
+      .45,
+      32,
+      20,
       0,
-      4,
-      7
+      Math.PI*2,
+      0,
+      Math.PI*.56
+    ),
+    hairMaterial
+  );
+
+hair.scale.set(
+  1,
+  .78,
+  1
+);
+
+hair.position.y=.17;
+
+hair.castShadow=true;
+
+headGroup.add(hair);
+
+
+const hairExtras =
+  new THREE.Group();
+
+headGroup.add(
+  hairExtras
+);
+
+
+/* =========================================================
+   ARMS
+========================================================= */
+
+function createArm(side){
+
+  const shoulder =
+    new THREE.Group();
+
+  shoulder.position.set(
+    side*.52,
+    1.95,
+    0
+  );
+
+  bodyRoot.add(shoulder);
+
+
+  const shoulderBall =
+    sphere(
+      .16,
+      shirtMaterial,
+      18
+    );
+
+  shoulder.add(
+    shoulderBall
+  );
+
+
+  const upper =
+    capsule(
+      .13,
+      .43,
+      shirtMaterial
+    );
+
+  upper.position.y=-.26;
+
+  shoulder.add(
+    upper
+  );
+
+
+  const elbow =
+    sphere(
+      .135,
+      shirtMaterial,
+      16
+    );
+
+  elbow.position.y=-.58;
+
+  shoulder.add(
+    elbow
+  );
+
+
+  const forearm =
+    capsule(
+      .105,
+      .42,
+      skinMaterial
+    );
+
+  forearm.position.y=-.86;
+
+  shoulder.add(
+    forearm
+  );
+
+
+  const hand =
+    sphere(
+      .125,
+      skinMaterial,
+      18
+    );
+
+  hand.scale.set(
+    .85,
+    1.1,
+    .75
+  );
+
+  hand.position.y=-1.16;
+
+  shoulder.add(
+    hand
+  );
+
+
+  /* fingers */
+
+  for(
+    let i=-1;
+    i<=1;
+    i++
+  ){
+
+    const finger =
+      capsule(
+        .025,
+        .07,
+        skinMaterial
+      );
+
+    finger.position.set(
+      i*.035,
+      -1.25,
+      -.015
+    );
+
+    shoulder.add(
+      finger
+    );
+  }
+
+
+  return {
+    shoulder,
+    upper,
+    elbow,
+    forearm,
+    hand
+  };
+}
+
+const leftArm =
+  createArm(-1);
+
+const rightArm =
+  createArm(1);
+
+
+/* =========================================================
+   CLOTHING DETAILS
+========================================================= */
+
+const shirtStripe =
+  box(
+    .5,
+    .035,
+    .02,
+    whiteMaterial
+  );
+
+shirtStripe.position.set(
+  0,
+  1.7,
+  -.345
+);
+
+bodyRoot.add(
+  shirtStripe
+);
+
+
+/* =========================================================
+   HAIR HELPERS
+========================================================= */
+
+function clearHairExtras(){
+
+  while(
+    hairExtras.children.length
+  ){
+
+    const child =
+      hairExtras.children.pop();
+
+    child.traverse(
+      obj=>{
+        if(obj.geometry)
+          obj.geometry.dispose();
+      }
+    );
+  }
+}
+
+
+function hairPiece(
+  x,
+  y,
+  z,
+  sx,
+  sy,
+  sz
+){
+
+  const p =
+    sphere(
+      .13,
+      hairMaterial,
+      14
+    );
+
+  p.position.set(
+    x,
+    y,
+    z
+  );
+
+  p.scale.set(
+    sx,
+    sy,
+    sz
+  );
+
+  hairExtras.add(p);
+
+  return p;
+}
+
+
+function applyHairstyle(value){
+
+  const style =
+    normalize(value);
+
+  clearHairExtras();
+
+  hair.visible=true;
+
+  hair.scale.set(
+    1,
+    .75,
+    1
+  );
+
+
+  if(style==="low_cut" ||
+     style==="lowcut"){
+
+    hair.scale.set(
+      1,
+      .45,
+      1
+    );
+
+    return;
+  }
+
+
+  if(style==="fade"){
+
+    hair.scale.set(
+      1,
+      .58,
+      1
+    );
+
+    hairPiece(
+      0,
+      .42,
+      -.01,
+      .7,
+      .25,
+      .7
+    );
+
+    return;
+  }
+
+
+  if(style==="afro"){
+
+    hair.scale.set(
+      1.35,
+      1.25,
+      1.3
+    );
+
+    return;
+  }
+
+
+  if(style==="braids"){
+
+    hair.scale.set(
+      1.03,
+      .82,
+      1.03
+    );
+
+    for(
+      let i=-3;
+      i<=3;
+      i++
+    ){
+
+      hairPiece(
+        i*.105,
+        -.02,
+        -.03,
+        .34,
+        1.9,
+        .34
+      );
+    }
+
+    return;
+  }
+
+
+  if(style==="dreads"){
+
+    hair.scale.set(
+      1.08,
+      .9,
+      1.08
+    );
+
+    for(
+      let i=-3;
+      i<=3;
+      i++
+    ){
+
+      hairPiece(
+        i*.12,
+        -.18,
+        0,
+        .38,
+        2.1,
+        .38
+      );
+    }
+
+    return;
+  }
+
+
+  if(style==="natural"){
+
+    hair.scale.set(
+      1.15,
+      1,
+      1.15
+    );
+
+    return;
+  }
+
+
+  if(style==="long"){
+
+    hair.scale.set(
+      1.08,
+      1.1,
+      1.08
+    );
+
+    hairPiece(
+      -.31,
+      -.22,
+      0,
+      .32,
+      1.7,
+      .4
+    );
+
+    hairPiece(
+      .31,
+      -.22,
+      0,
+      .32,
+      1.7,
+      .4
+    );
+
+    return;
+  }
+
+
+  if(style==="short"){
+
+    hair.scale.set(
+      1,
+      .7,
+      1
+    );
+
+    return;
+  }
+}
+
+
+/* =========================================================
+   ACCESSORIES
+========================================================= */
+
+const accessoryGroup =
+  new THREE.Group();
+
+avatar.add(
+  accessoryGroup
+);
+
+
+function clearAccessories(){
+
+  while(
+    accessoryGroup.children.length
+  ){
+
+    const child =
+      accessoryGroup.children.pop();
+
+    child.traverse(
+      obj=>{
+        if(obj.geometry)
+          obj.geometry.dispose();
+      }
+    );
+  }
+}
+
+
+function createCap(){
+
+  const cap =
+    new THREE.Mesh(
+      new THREE.SphereGeometry(
+        .46,
+        24,
+        14,
+        0,
+        Math.PI*2,
+        0,
+        Math.PI/2
+      ),
+      new THREE.MeshStandardMaterial({
+        color:0x111111,
+        roughness:.7
+      })
+    );
+
+  cap.scale.set(
+    1.05,
+    .55,
+    1.05
+  );
+
+  cap.position.set(
+    0,
+    2.99,
+    0
+  );
+
+  accessoryGroup.add(cap);
+
+
+  const visor =
+    box(
+      .55,
+      .045,
+      .28,
+      cap.material
+    );
+
+  visor.position.set(
+    0,
+    2.91,
+    -.39
+  );
+
+  accessoryGroup.add(
+    visor
+  );
+}
+
+
+function createGlasses(){
+
+  const frame =
+    new THREE.MeshStandardMaterial({
+      color:0x111111,
+      roughness:.35
+    });
+
+  for(
+    const side of [-1,1]
+  ){
+
+    const lens =
+      new THREE.Mesh(
+        new THREE.TorusGeometry(
+          .105,
+          .018,
+          8,
+          20
+        ),
+        frame
+      );
+
+    lens.position.set(
+      side*.16,
+      2.69,
+      -.405
+    );
+
+    accessoryGroup.add(lens);
+  }
+
+
+  const bridge =
+    box(
+      .13,
+      .025,
+      .025,
+      frame
+    );
+
+  bridge.position.set(
+    0,
+    2.69,
+    -.405
+  );
+
+  accessoryGroup.add(
+    bridge
+  );
+}
+
+
+function createChain(){
+
+  const chain =
+    new THREE.Mesh(
+      new THREE.TorusGeometry(
+        .29,
+        .022,
+        8,
+        32,
+        Math.PI
+      ),
+      goldMaterial
+    );
+
+  chain.rotation.x=
+    Math.PI;
+
+  chain.position.set(
+    0,
+    1.73,
+    -.37
+  );
+
+  accessoryGroup.add(
+    chain
+  );
+
+
+  const pendant =
+    new THREE.Mesh(
+      new THREE.OctahedronGeometry(
+        .07
+      ),
+      goldMaterial
+    );
+
+  pendant.position.set(
+    0,
+    1.57,
+    -.4
+  );
+
+  accessoryGroup.add(
+    pendant
+  );
+}
+
+
+function createWatch(){
+
+  const watch =
+    box(
+      .15,
+      .18,
+      .07,
+      goldMaterial
+    );
+
+  watch.position.set(
+    .63,
+    1.22,
+    -.05
+  );
+
+  accessoryGroup.add(
+    watch
+  );
+}
+
+
+function createEarrings(){
+
+  for(
+    const side of [-1,1]
+  ){
+
+    const earring =
+      new THREE.Mesh(
+        new THREE.TorusGeometry(
+          .06,
+          .015,
+          8,
+          16
+        ),
+        goldMaterial
+      );
+
+    earring.position.set(
+      side*.43,
+      2.59,
+      0
+    );
+
+    accessoryGroup.add(
+      earring
+    );
+  }
+}
+
+
+function createHeadphones(){
+
+  const material =
+    new THREE.MeshStandardMaterial({
+      color:0x111111,
+      roughness:.55
+    });
+
+  const band =
+    new THREE.Mesh(
+      new THREE.TorusGeometry(
+        .46,
+        .04,
+        8,
+        32,
+        Math.PI
+      ),
+      material
+    );
+
+  band.rotation.x=
+    Math.PI/2;
+
+  band.position.set(
+    0,
+    2.83,
+    0
+  );
+
+  accessoryGroup.add(
+    band
+  );
+
+
+  for(
+    const side of [-1,1]
+  ){
+
+    const ear =
+      new THREE.Mesh(
+        new THREE.CylinderGeometry(
+          .105,
+          .105,
+          .13,
+          16
+        ),
+        material
+      );
+
+    ear.rotation.z=
+      Math.PI/2;
+
+    ear.position.set(
+      side*.44,
+      2.61,
+      0
+    );
+
+    accessoryGroup.add(ear);
+  }
+}
+
+
+function applyAccessory(value){
+
+  clearAccessories();
+
+  const accessory =
+    normalize(value);
+
+  if(
+    !accessory ||
+    accessory==="none"
+  ) return;
+
+  if(accessory==="cap"){
+    createCap();
+    return;
+  }
+
+  if(accessory==="glasses"){
+    createGlasses();
+    return;
+  }
+
+  if(accessory==="chain"){
+    createChain();
+    return;
+  }
+
+  if(accessory==="watch"){
+    createWatch();
+    return;
+  }
+
+  if(accessory==="earrings"){
+    createEarrings();
+    return;
+  }
+
+  if(accessory==="headphones"){
+    createHeadphones();
+    return;
+  }
+}
+
+
+/* =========================================================
+   SKIN
+========================================================= */
+
+function applySkinTone(value){
+
+  const colors={
+    light:0xc68662,
+    medium:0x9f6948,
+    deep:0x6b3f24,
+    dark:0x542f1c,
+    brown:0x8d5524
+  };
+
+  const color =
+    colors[
+      normalize(value)
+    ] ||
+    colors.medium;
+
+  skinMaterial.color.set(color);
+
+  skinDarkMaterial.color.set(
+    new THREE.Color(color)
+      .multiplyScalar(.72)
+  );
+}
+
+
+/* =========================================================
+   HAIR COLOR
+========================================================= */
+
+function applyHairColor(value){
+
+  const colors={
+    black:0x151515,
+    brown:0x4b2e1f,
+    blonde:0xd4af37,
+    red:0x7a2e1e
+  };
+
+  hairMaterial.color.set(
+    colors[
+      normalize(value)
+    ] ||
+    colors.black
+  );
+}
+
+
+/* =========================================================
+   OUTFITS
+========================================================= */
+
+function applyOutfit(value){
+
+  const outfits={
+
+    casual:{
+      shirt:0x222222,
+      pants:0x343434
+    },
+
+    streetwear:{
+      shirt:0x111111,
+      pants:0x181818
+    },
+
+    formal:{
+      shirt:0x101010,
+      pants:0x090909
+    },
+
+    traditional:{
+      shirt:0x8b5a2b,
+      pants:0x6f451f
+    },
+
+    sport:{
+      shirt:0x174a72,
+      pants:0x202020
+    },
+
+    business:{
+      shirt:0x1a1a1a,
+      pants:0x111111
+    }
+  };
+
+  const outfit =
+    outfits[
+      normalize(value)
+    ] ||
+    outfits.casual;
+
+  shirtMaterial.color.set(
+    outfit.shirt
+  );
+
+  pantsMaterial.color.set(
+    outfit.pants
+  );
+}
+
+
+/* =========================================================
+   COMPLETE APPEARANCE
+========================================================= */
+
+function applyCharacterAppearance(character){
+
+  applySkinTone(
+    character.skin_tone
+  );
+
+  applyHairColor(
+    character.hair_color
+  );
+
+  applyHairstyle(
+    character.hairstyle
+  );
+
+  applyOutfit(
+    character.outfit
+  );
+
+  applyAccessory(
+    character.accessory
+  );
+}
+
+
+/* =========================================================
+   LOAD CHARACTER
+========================================================= */
+
+let currentCharacter=null;
+
+async function loadCharacter(){
+
+  try{
+
+    const {
+      data:sessionData,
+      error:sessionError
+    } =
+      await db.auth.getSession();
+
+    if(sessionError)
+      throw sessionError;
+
+    const session =
+      sessionData?.session;
+
+    if(!session){
+
+      throw new Error(
+        "You are not logged in."
+      );
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await db.rpc(
+        "get_my_character"
+      );
+
+    if(error)
+      throw error;
+
+    if(!data)
+      throw new Error(
+        "No Naija Hustle character was found."
+      );
+
+    currentCharacter =
+      Array.isArray(data)
+        ? data[0]
+        : data;
+
+    if(!currentCharacter)
+      throw new Error(
+        "Character data is empty."
+      );
+
+
+    applyCharacterAppearance(
+      currentCharacter
     );
 
 
-    /* =========================================================
-       RENDERER
-    ========================================================== */
+    document
+      .getElementById("playerName")
+      .textContent =
+        currentCharacter.name ||
+        "Player";
 
-    const renderer =
-      new THREE.WebGLRenderer({
-        antialias: true
-      });
 
-    renderer.setPixelRatio(
-      Math.min(
-        window.devicePixelRatio,
-        2
+    const district =
+      currentCharacter.district ||
+      currentCharacter.current_district ||
+      "";
+
+
+    const level =
+      currentCharacter.level;
+
+
+    const details=[];
+
+    if(district)
+      details.push(district);
+
+    if(
+      level!==undefined &&
+      level!==null
+    )
+      details.push(
+        `Level ${level}`
+      );
+
+
+    document
+      .getElementById(
+        "playerDetails"
       )
+      .textContent =
+        details.join(" • ");
+
+
+    document
+      .getElementById("status")
+      .textContent="Idle";
+
+
+    document
+      .getElementById("loading")
+      .style.display="none";
+
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "3D character load error:",
+      error
     );
+
+    document
+      .getElementById("loading")
+      .innerHTML=`
+        <div>Unable to load your character.</div>
+        <small>${escapeHtml(
+          error?.message ||
+          "Unknown error"
+        )}</small>
+      `;
+
+    return false;
+  }
+}
+
+
+function escapeHtml(value){
+
+  return String(value||"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+const keys={};
+
+window.addEventListener(
+  "keydown",
+  e=>{
+    keys[
+      e.key.toLowerCase()
+    ]=true;
+  }
+);
+
+window.addEventListener(
+  "keyup",
+  e=>{
+    keys[
+      e.key.toLowerCase()
+    ]=false;
+  }
+);
+
+
+/* =========================================================
+   JOYSTICK
+========================================================= */
+
+const joystick =
+  document.getElementById(
+    "controls"
+  );
+
+const stick =
+  document.getElementById(
+    "stick"
+  );
+
+let joystickX=0;
+let joystickY=0;
+let dragging=false;
+
+
+function updateJoystick(
+  clientX,
+  clientY
+){
+
+  const rect =
+    joystick.getBoundingClientRect();
+
+  const centerX =
+    rect.left+
+    rect.width/2;
+
+  const centerY =
+    rect.top+
+    rect.height/2;
+
+  let dx =
+    clientX-centerX;
+
+  let dy =
+    clientY-centerY;
+
+  const maxDistance=43;
+
+  const distance =
+    Math.sqrt(
+      dx*dx+
+      dy*dy
+    );
+
+  if(distance>maxDistance){
+
+    dx=
+      dx/distance*
+      maxDistance;
+
+    dy=
+      dy/distance*
+      maxDistance;
+  }
+
+  stick.style.transform=
+    `translate(${dx}px,${dy}px)`;
+
+  joystickX=
+    dx/maxDistance;
+
+  joystickY=
+    dy/maxDistance;
+}
+
+
+joystick.addEventListener(
+  "pointerdown",
+  e=>{
+
+    dragging=true;
+
+    joystick.setPointerCapture(
+      e.pointerId
+    );
+
+    updateJoystick(
+      e.clientX,
+      e.clientY
+    );
+  }
+);
+
+
+joystick.addEventListener(
+  "pointermove",
+  e=>{
+
+    if(!dragging)return;
+
+    updateJoystick(
+      e.clientX,
+      e.clientY
+    );
+  }
+);
+
+
+function resetJoystick(){
+
+  dragging=false;
+
+  joystickX=0;
+  joystickY=0;
+
+  stick.style.transform=
+    "translate(0,0)";
+}
+
+
+joystick.addEventListener(
+  "pointerup",
+  resetJoystick
+);
+
+joystick.addEventListener(
+  "pointercancel",
+  resetJoystick
+);
+
+
+/* =========================================================
+   MOVEMENT
+========================================================= */
+
+const clock =
+  new THREE.Clock();
+
+const status =
+  document.getElementById(
+    "status"
+  );
+
+
+function updateMovement(delta){
+
+  let x=0;
+  let z=0;
+
+  if(
+    keys["w"] ||
+    keys["arrowup"]
+  ) z-=1;
+
+  if(
+    keys["s"] ||
+    keys["arrowdown"]
+  ) z+=1;
+
+  if(
+    keys["a"] ||
+    keys["arrowleft"]
+  ) x-=1;
+
+  if(
+    keys["d"] ||
+    keys["arrowright"]
+  ) x+=1;
+
+  x+=joystickX;
+  z+=joystickY;
+
+
+  const moving =
+    Math.abs(x)>.05 ||
+    Math.abs(z)>.05;
+
+
+  if(moving){
+
+    const length =
+      Math.sqrt(
+        x*x+
+        z*z
+      );
+
+    if(length>0){
+
+      x/=length;
+      z/=length;
+    }
+
+
+    const speed=
+      4*delta;
+
+    avatar.position.x+=
+      x*speed;
+
+    avatar.position.z+=
+      z*speed;
+
+
+    const targetRotation=
+      Math.atan2(
+        x,
+        z
+      );
+
+    avatar.rotation.y=
+      THREE.MathUtils.lerp(
+        avatar.rotation.y,
+        targetRotation,
+        .15
+      );
+
+
+    status.textContent=
+      "Walking";
+
+
+    const time=
+      performance.now()*.009;
+
+
+    const swing=
+      Math.sin(time)*.65;
+
+
+    /* legs */
+
+    leftLeg.root.rotation.x=
+      swing;
+
+    rightLeg.root.rotation.x=
+      -swing;
+
+
+    /* arms */
+
+    leftArm.shoulder.rotation.x=
+      -swing*.65;
+
+    rightArm.shoulder.rotation.x=
+      swing*.65;
+
+
+    /* slight body bounce */
+
+    bodyRoot.position.y=
+      Math.abs(
+        Math.sin(time)
+      )*.025;
+
+
+  }else{
+
+    status.textContent=
+      "Idle";
+
+
+    leftLeg.root.rotation.x=
+      THREE.MathUtils.lerp(
+        leftLeg.root.rotation.x,
+        0,
+        .15
+      );
+
+    rightLeg.root.rotation.x=
+      THREE.MathUtils.lerp(
+        rightLeg.root.rotation.x,
+        0,
+        .15
+      );
+
+    leftArm.shoulder.rotation.x=
+      THREE.MathUtils.lerp(
+        leftArm.shoulder.rotation.x,
+        0,
+        .15
+      );
+
+    rightArm.shoulder.rotation.x=
+      THREE.MathUtils.lerp(
+        rightArm.shoulder.rotation.x,
+        0,
+        .15
+      );
+
+
+    bodyRoot.position.y=
+      THREE.MathUtils.lerp(
+        bodyRoot.position.y,
+        0,
+        .15
+      );
+  }
+
+
+  avatar.position.x=
+    THREE.MathUtils.clamp(
+      avatar.position.x,
+      -5,
+      5
+    );
+
+  avatar.position.z=
+    THREE.MathUtils.clamp(
+      avatar.position.z,
+      -95,
+      95
+    );
+}
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+const cameraTarget =
+  new THREE.Vector3();
+
+const cameraDesired =
+  new THREE.Vector3();
+
+
+function updateCamera(){
+
+  cameraTarget.set(
+    avatar.position.x,
+    avatar.position.y+1.45,
+    avatar.position.z
+  );
+
+
+  cameraDesired.set(
+    avatar.position.x,
+    avatar.position.y+3.65,
+    avatar.position.z+6.7
+  );
+
+
+  camera.position.lerp(
+    cameraDesired,
+    .075
+  );
+
+
+  camera.lookAt(
+    cameraTarget
+  );
+}
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+  "resize",
+  ()=>{
+
+    camera.aspect=
+      window.innerWidth/
+      window.innerHeight;
+
+    camera.updateProjectionMatrix();
 
     renderer.setSize(
       window.innerWidth,
       window.innerHeight
     );
-
-    renderer.shadowMap.enabled = true;
-
-    renderer.shadowMap.type =
-      THREE.PCFSoftShadowMap;
-
-    document
-      .getElementById("game")
-      .appendChild(
-        renderer.domElement
-      );
+  }
+);
 
 
-    /* =========================================================
-       LIGHTING
-    ========================================================== */
+/* =========================================================
+   BACK
+========================================================= */
 
-    const ambientLight =
-      new THREE.HemisphereLight(
-        0xffffff,
-        0x555555,
-        2
-      );
+document
+  .getElementById("backButton")
+  .addEventListener(
+    "click",
+    ()=>{
 
-    scene.add(
-      ambientLight
+      if(
+        window.history.length>1
+      ){
+
+        window.history.back();
+
+      }else{
+
+        window.location.href=
+          "index.html";
+      }
+    }
+  );
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+function animate(){
+
+  requestAnimationFrame(
+    animate
+  );
+
+  const delta=
+    Math.min(
+      clock.getDelta(),
+      .05
     );
 
+  updateMovement(delta);
 
-    const sun =
-      new THREE.DirectionalLight(
-        0xffffff,
-        3
-      );
+  updateCamera();
 
-    sun.position.set(
-      10,
-      20,
-      10
-    );
+  renderer.render(
+    scene,
+    camera
+  );
+}
 
-    sun.castShadow = true;
 
-    sun.shadow.mapSize.width =
-      2048;
+/* =========================================================
+   START
+========================================================= */
 
-    sun.shadow.mapSize.height =
-      2048;
+const characterLoaded=
+  await loadCharacter();
 
-    scene.add(sun);
+if(characterLoaded)
+  animate();
 
-
-    /* =========================================================
-       GROUND
-    ========================================================== */
-
-    const groundGeometry =
-      new THREE.PlaneGeometry(
-        200,
-        200
-      );
-
-    const groundMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x4d7c3f
-      });
-
-    const ground =
-      new THREE.Mesh(
-        groundGeometry,
-        groundMaterial
-      );
-
-    ground.rotation.x =
-      -Math.PI / 2;
-
-    ground.receiveShadow = true;
-
-    scene.add(ground);
-
-
-    /* =========================================================
-       ROAD
-    ========================================================== */
-
-    const roadGeometry =
-      new THREE.PlaneGeometry(
-        12,
-        200
-      );
-
-    const roadMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x333333
-      });
-
-    const road =
-      new THREE.Mesh(
-        roadGeometry,
-        roadMaterial
-      );
-
-    road.rotation.x =
-      -Math.PI / 2;
-
-    road.position.y =
-      0.01;
-
-    scene.add(road);
-
-
-    /* =========================================================
-       ROAD MARKINGS
-    ========================================================== */
-
-    for (
-      let z = -95;
-      z < 100;
-      z += 8
-    ) {
-
-      const markingGeometry =
-        new THREE.BoxGeometry(
-          0.3,
-          0.02,
-          4
-        );
-
-      const markingMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0xffffff
-        });
-
-      const marking =
-        new THREE.Mesh(
-          markingGeometry,
-          markingMaterial
-        );
-
-      marking.position.set(
-        0,
-        0.03,
-        z
-      );
-
-      scene.add(marking);
-    }
-
-
-    /* =========================================================
-       AVATAR
-    ========================================================== */
-
-    const avatar =
-      new THREE.Group();
-
-    avatar.position.set(
-      0,
-      0,
-      0
-    );
-
-    scene.add(avatar);
-
-
-    /* =========================================================
-       DEFAULT MATERIALS
-    ========================================================== */
-
-    const skinMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x8d5524,
-        roughness: 0.8
-      });
-
-    const shirtMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x111111,
-        roughness: 0.7
-      });
-
-    const pantsMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x222222,
-        roughness: 0.8
-      });
-
-    const shoeMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x111111,
-        roughness: 0.6
-      });
-
-    const hairMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x151515,
-        roughness: 1
-      });
-
-
-    /* =========================================================
-       BODY
-    ========================================================== */
-
-    const body =
-      new THREE.Mesh(
-        new THREE.CapsuleGeometry(
-          0.48,
-          1.0,
-          8,
-          16
-        ),
-        shirtMaterial
-      );
-
-    body.position.y =
-      1.65;
-
-    body.castShadow = true;
-
-    avatar.add(body);
-
-
-    /* =========================================================
-       HEAD
-    ========================================================== */
-
-    const head =
-      new THREE.Mesh(
-        new THREE.SphereGeometry(
-          0.42,
-          24,
-          24
-        ),
-        skinMaterial
-      );
-
-    head.position.y =
-      2.65;
-
-    head.castShadow = true;
-
-    avatar.add(head);
-
-
-    /* =========================================================
-       HAIR
-    ========================================================== */
-
-    const hair =
-      new THREE.Mesh(
-        new THREE.SphereGeometry(
-          0.44,
-          24,
-          16,
-          0,
-          Math.PI * 2,
-          0,
-          Math.PI * 0.55
-        ),
-        hairMaterial
-      );
-
-    hair.position.y =
-      2.78;
-
-    hair.castShadow = true;
-
-    avatar.add(hair);
-
-
-    /* =========================================================
-       EXTRA HAIR GROUPS
-    ========================================================== */
-
-    const hairExtras =
-      new THREE.Group();
-
-    avatar.add(
-      hairExtras
-    );
-
-
-    /* =========================================================
-       ARMS
-    ========================================================== */
-
-    function createArm(side) {
-
-      const arm =
-        new THREE.Mesh(
-          new THREE.CapsuleGeometry(
-            0.13,
-            0.75,
-            6,
-            12
-          ),
-          shirtMaterial
-        );
-
-      arm.position.set(
-        side * 0.62,
-        1.72,
-        0
-      );
-
-      arm.rotation.z =
-        side * -0.12;
-
-      arm.castShadow = true;
-
-      avatar.add(arm);
-
-      return arm;
-    }
-
-    const leftArm =
-      createArm(-1);
-
-    const rightArm =
-      createArm(1);
-
-
-    /* =========================================================
-       LEGS
-    ========================================================== */
-
-    function createLeg(side) {
-
-      const leg =
-        new THREE.Mesh(
-          new THREE.CapsuleGeometry(
-            0.16,
-            0.8,
-            6,
-            12
-          ),
-          pantsMaterial
-        );
-
-      leg.position.set(
-        side * 0.25,
-        0.72,
-        0
-      );
-
-      leg.castShadow = true;
-
-      avatar.add(leg);
-
-      return leg;
-    }
-
-    const leftLeg =
-      createLeg(-1);
-
-    const rightLeg =
-      createLeg(1);
-
-
-    /* =========================================================
-       SHOES
-    ========================================================== */
-
-    function createShoe(side) {
-
-      const shoe =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.34,
-            0.18,
-            0.55
-          ),
-          shoeMaterial
-        );
-
-      shoe.position.set(
-        side * 0.25,
-        0.17,
-        -0.08
-      );
-
-      shoe.castShadow = true;
-
-      avatar.add(shoe);
-
-      return shoe;
-    }
-
-    const leftShoe =
-      createShoe(-1);
-
-    const rightShoe =
-      createShoe(1);
-
-
-    /* =========================================================
-       ACCESSORY GROUP
-    ========================================================== */
-
-    const accessoryGroup =
-      new THREE.Group();
-
-    avatar.add(
-      accessoryGroup
-    );
-
-
-    /* =========================================================
-       APPEARANCE HELPERS
-    ========================================================== */
-
-    function normalize(value) {
-
-      return String(
-        value || ""
-      )
-        .trim()
-        .toLowerCase()
-        .replace(/[\s-]+/g, "_");
-    }
-
-
-    function setMaterialColor(
-      material,
-      color
-    ) {
-
-      material.color.set(
-        color
-      );
-    }
-
-
-    /* =========================================================
-       SKIN TONE
-    ========================================================== */
-
-    function applySkinTone(
-      value
-    ) {
-
-      const tone =
-        normalize(value);
-
-      const colors = {
-
-        light:
-          0xc68662,
-
-        medium:
-          0x9f6948,
-
-        deep:
-          0x6b3f24,
-
-        dark:
-          0x542f1c,
-
-        brown:
-          0x8d5524
-
-      };
-
-      const color =
-        colors[tone] ||
-        colors.medium;
-
-      setMaterialColor(
-        skinMaterial,
-        color
-      );
-    }
-
-
-    /* =========================================================
-       HAIR COLOR
-    ========================================================== */
-
-    function applyHairColor(
-      value
-    ) {
-
-      const colorMap = {
-
-        black:
-          0x151515,
-
-        brown:
-          0x4b2e1f,
-
-        blonde:
-          0xd4af37,
-
-        red:
-          0x7a2e1e
-
-      };
-
-      const color =
-        colorMap[
-          normalize(value)
-        ] ||
-        colorMap.black;
-
-      setMaterialColor(
-        hairMaterial,
-        color
-      );
-    }
-
-
-    /* =========================================================
-       OUTFIT
-    ========================================================== */
-
-    function applyOutfit(
-      value
-    ) {
-
-      const outfit =
-        normalize(value);
-
-      const outfits = {
-
-        casual: {
-          shirt: 0x222222,
-          pants: 0x333333
-        },
-
-        streetwear: {
-          shirt: 0x111111,
-          pants: 0x181818
-        },
-
-        formal: {
-          shirt: 0x101010,
-          pants: 0x090909
-        },
-
-        traditional: {
-          shirt: 0x8b5a2b,
-          pants: 0x6f451f
-        },
-
-        sport: {
-          shirt: 0x174a72,
-          pants: 0x202020
-        },
-
-        business: {
-          shirt: 0x1a1a1a,
-          pants: 0x111111
-        }
-
-      };
-
-      const selected =
-        outfits[outfit] ||
-        outfits.casual;
-
-      setMaterialColor(
-        shirtMaterial,
-        selected.shirt
-      );
-
-      setMaterialColor(
-        pantsMaterial,
-        selected.pants
-      );
-    }
-
-
-    /* =========================================================
-       HAIRSTYLE
-    ========================================================== */
-
-    function clearHairExtras() {
-
-      while (
-        hairExtras.children.length
-      ) {
-
-        const child =
-          hairExtras.children.pop();
-
-        child.traverse(
-          object => {
-
-            if (
-              object.geometry
-            ) {
-
-              object.geometry.dispose();
-            }
-          }
-        );
-      }
-    }
-
-
-    function createHairPiece(
-      x,
-      y,
-      z,
-      scaleX,
-      scaleY,
-      scaleZ
-    ) {
-
-      const piece =
-        new THREE.Mesh(
-          new THREE.SphereGeometry(
-            0.16,
-            12,
-            10
-          ),
-          hairMaterial
-        );
-
-      piece.position.set(
-        x,
-        y,
-        z
-      );
-
-      piece.scale.set(
-        scaleX,
-        scaleY,
-        scaleZ
-      );
-
-      piece.castShadow = true;
-
-      hairExtras.add(
-        piece
-      );
-
-      return piece;
-    }
-
-
-    function applyHairstyle(
-      value
-    ) {
-
-      const style =
-        normalize(value);
-
-      clearHairExtras();
-
-      hair.visible = true;
-
-      if (
-        style === "short"
-      ) {
-
-        hair.scale.set(
-          1,
-          0.75,
-          1
-        );
-
-        return;
-      }
-
-
-      if (
-        style === "low_cut" ||
-        style === "lowcut"
-      ) {
-
-        hair.scale.set(
-          1,
-          0.48,
-          1
-        );
-
-        return;
-      }
-
-
-      if (
-        style === "fade"
-      ) {
-
-        hair.scale.set(
-          1,
-          0.58,
-          1
-        );
-
-        createHairPiece(
-          0,
-          2.93,
-          0,
-          0.7,
-          0.25,
-          0.7
-        );
-
-        return;
-      }
-
-
-      if (
-        style === "afro"
-      ) {
-
-        hair.scale.set(
-          1.3,
-          1.15,
-          1.3
-        );
-
-        return;
-      }
-
-
-      if (
-        style === "braids"
-      ) {
-
-        hair.scale.set(
-          1.05,
-          0.9,
-          1.05
-        );
-
-        for (
-          let i = -2;
-          i <= 2;
-          i++
-        ) {
-
-          createHairPiece(
-            i * 0.13,
-            2.72,
-            -0.02,
-            0.45,
-            1.25,
-            0.45
-          );
-        }
-
-        return;
-      }
-
-
-      if (
-        style === "dreads"
-      ) {
-
-        hair.scale.set(
-          1.1,
-          0.95,
-          1.1
-        );
-
-        for (
-          let i = -2;
-          i <= 2;
-          i++
-        ) {
-
-          createHairPiece(
-            i * 0.14,
-            2.62,
-            0,
-            0.42,
-            1.5,
-            0.42
-          );
-        }
-
-        return;
-      }
-
-
-      if (
-        style === "natural"
-      ) {
-
-        hair.scale.set(
-          1.15,
-          1,
-          1.15
-        );
-
-        return;
-      }
-
-
-      if (
-        style === "long"
-      ) {
-
-        hair.scale.set(
-          1.1,
-          1.15,
-          1.1
-        );
-
-        createHairPiece(
-          -0.3,
-          2.48,
-          0,
-          0.35,
-          1.6,
-          0.4
-        );
-
-        createHairPiece(
-          0.3,
-          2.48,
-          0,
-          0.35,
-          1.6,
-          0.4
-        );
-
-        return;
-      }
-
-
-      /* DEFAULT */
-
-      hair.scale.set(
-        1,
-        0.75,
-        1
-      );
-    }
-
-
-    /* =========================================================
-       ACCESSORIES
-    ========================================================== */
-
-    function clearAccessories() {
-
-      while (
-        accessoryGroup.children.length
-      ) {
-
-        const child =
-          accessoryGroup.children.pop();
-
-        child.traverse(
-          object => {
-
-            if (
-              object.geometry
-            ) {
-
-              object.geometry.dispose();
-            }
-          }
-        );
-      }
-    }
-
-
-    function createGlasses() {
-
-      const frameMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0x111111,
-          roughness: 0.4
-        });
-
-      const left =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.18,
-            0.08,
-            0.03
-          ),
-          frameMaterial
-        );
-
-      const right =
-        left.clone();
-
-      left.position.set(
-        -0.18,
-        2.67,
-        -0.39
-      );
-
-      right.position.set(
-        0.18,
-        2.67,
-        -0.39
-      );
-
-      accessoryGroup.add(
-        left,
-        right
-      );
-    }
-
-
-    function createCap() {
-
-      const capMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0x111111,
-          roughness: 0.7
-        });
-
-      const cap =
-        new THREE.Mesh(
-          new THREE.SphereGeometry(
-            0.46,
-            24,
-            12,
-            0,
-            Math.PI * 2,
-            0,
-            Math.PI / 2
-          ),
-          capMaterial
-        );
-
-      cap.position.set(
-        0,
-        2.91,
-        0
-      );
-
-      cap.scale.set(
-        1.05,
-        0.5,
-        1.05
-      );
-
-      accessoryGroup.add(
-        cap
-      );
-
-
-      const visor =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.55,
-            0.05,
-            0.3
-          ),
-          capMaterial
-        );
-
-      visor.position.set(
-        0,
-        2.86,
-        -0.38
-      );
-
-      accessoryGroup.add(
-        visor
-      );
-    }
-
-
-    function createChain() {
-
-      const chainMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0xd4af37,
-          metalness: 0.7,
-          roughness: 0.3
-        });
-
-      const chain =
-        new THREE.Mesh(
-          new THREE.TorusGeometry(
-            0.27,
-            0.025,
-            8,
-            32,
-            Math.PI
-          ),
-          chainMaterial
-        );
-
-      chain.rotation.x =
-        Math.PI;
-
-      chain.position.set(
-        0,
-        1.83,
-        -0.42
-      );
-
-      accessoryGroup.add(
-        chain
-      );
-    }
-
-
-    function createWatch() {
-
-      const watchMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0xd4af37,
-          metalness: 0.7,
-          roughness: 0.3
-        });
-
-      const watch =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.16,
-            0.18,
-            0.08
-          ),
-          watchMaterial
-        );
-
-      watch.position.set(
-        0.7,
-        1.35,
-        -0.02
-      );
-
-      watch.rotation.z =
-        0.15;
-
-      accessoryGroup.add(
-        watch
-      );
-    }
-
-
-    function createEarrings() {
-
-      const material =
-        new THREE.MeshStandardMaterial({
-          color: 0xd4af37,
-          metalness: 0.8,
-          roughness: 0.2
-        });
-
-      const left =
-        new THREE.Mesh(
-          new THREE.TorusGeometry(
-            0.07,
-            0.018,
-            8,
-            16
-          ),
-          material
-        );
-
-      const right =
-        left.clone();
-
-      left.position.set(
-        -0.43,
-        2.58,
-        0
-      );
-
-      right.position.set(
-        0.43,
-        2.58,
-        0
-      );
-
-      accessoryGroup.add(
-        left,
-        right
-      );
-    }
-
-
-    function createHeadphones() {
-
-      const material =
-        new THREE.MeshStandardMaterial({
-          color: 0x111111,
-          roughness: 0.6
-        });
-
-      const band =
-        new THREE.Mesh(
-          new THREE.TorusGeometry(
-            0.45,
-            0.045,
-            8,
-            32,
-            Math.PI
-          ),
-          material
-        );
-
-      band.rotation.x =
-        Math.PI / 2;
-
-      band.position.y =
-        2.78;
-
-      accessoryGroup.add(
-        band
-      );
-
-
-      const left =
-        new THREE.Mesh(
-          new THREE.CylinderGeometry(
-            0.11,
-            0.11,
-            0.12,
-            16
-          ),
-          material
-        );
-
-      const right =
-        left.clone();
-
-      left.rotation.z =
-        Math.PI / 2;
-
-      right.rotation.z =
-        Math.PI / 2;
-
-      left.position.set(
-        -0.45,
-        2.62,
-        0
-      );
-
-      right.position.set(
-        0.45,
-        2.62,
-        0
-      );
-
-      accessoryGroup.add(
-        left,
-        right
-      );
-    }
-
-
-    function applyAccessory(
-      value
-    ) {
-
-      clearAccessories();
-
-      const accessory =
-        normalize(value);
-
-      if (
-        !accessory ||
-        accessory === "none"
-      ) {
-
-        return;
-      }
-
-      if (
-        accessory === "cap"
-      ) {
-
-        createCap();
-        return;
-      }
-
-      if (
-        accessory === "glasses"
-      ) {
-
-        createGlasses();
-        return;
-      }
-
-      if (
-        accessory === "chain"
-      ) {
-
-        createChain();
-        return;
-      }
-
-      if (
-        accessory === "watch"
-      ) {
-
-        createWatch();
-        return;
-      }
-
-      if (
-        accessory === "earrings"
-      ) {
-
-        createEarrings();
-        return;
-      }
-
-      if (
-        accessory === "headphones"
-      ) {
-
-        createHeadphones();
-        return;
-      }
-    }
-
-
-    /* =========================================================
-       APPLY COMPLETE CHARACTER
-    ========================================================== */
-
-    function applyCharacterAppearance(
-      character
-    ) {
-
-      applySkinTone(
-        character.skin_tone
-      );
-
-      applyHairColor(
-        character.hair_color
-      );
-
-      applyHairstyle(
-        character.hairstyle
-      );
-
-      applyOutfit(
-        character.outfit
-      );
-
-      applyAccessory(
-        character.accessory
-      );
-    }
-
-
-    /* =========================================================
-       CHARACTER DATA
-    ========================================================== */
-
-    let currentCharacter =
-      null;
-
-
-    async function loadCharacter() {
-
-      try {
-
-        const {
-          data: sessionData,
-          error: sessionError
-        } =
-          await db.auth.getSession();
-
-
-        if (
-          sessionError
-        ) {
-
-          throw sessionError;
-        }
-
-
-        const session =
-          sessionData?.session;
-
-
-        if (
-          !session
-        ) {
-
-          throw new Error(
-            "You are not logged in."
-          );
-        }
-
-
-        const {
-          data,
-          error
-        } =
-          await db.rpc(
-            "get_my_character"
-          );
-
-
-        if (
-          error
-        ) {
-
-          throw error;
-        }
-
-
-        if (
-          !data
-        ) {
-
-          throw new Error(
-            "No Naija Hustle character was found for this account."
-          );
-        }
-
-
-        /*
-         * Some Supabase RPCs return an object,
-         * while others can return a single-row array.
-         */
-
-        currentCharacter =
-          Array.isArray(data)
-            ? data[0]
-            : data;
-
-
-        if (
-          !currentCharacter
-        ) {
-
-          throw new Error(
-            "Character data is empty."
-          );
-        }
-
-
-        applyCharacterAppearance(
-          currentCharacter
-        );
-
-
-        /* PLAYER INFO */
-
-        document
-          .getElementById(
-            "playerName"
-          )
-          .textContent =
-            currentCharacter.name ||
-            "Player";
-
-
-        const district =
-          currentCharacter.district ||
-          currentCharacter.current_district ||
-          "";
-
-
-        const level =
-          currentCharacter.level;
-
-
-        const details = [];
-
-
-        if (
-          district
-        ) {
-
-          details.push(
-            district
-          );
-        }
-
-
-        if (
-          level !== undefined &&
-          level !== null
-        ) {
-
-          details.push(
-            `Level ${level}`
-          );
-        }
-
-
-        document
-          .getElementById(
-            "playerDetails"
-          )
-          .textContent =
-            details.join(
-              " • "
-            );
-
-
-        document
-          .getElementById(
-            "status"
-          )
-          .textContent =
-            "Idle";
-
-
-        document
-          .getElementById(
-            "loading"
-          )
-          .style.display =
-            "none";
-
-
-        return true;
-
-      } catch (
-        error
-      ) {
-
-        console.error(
-          "3D character load error:",
-          error
-        );
-
-
-        document
-          .getElementById(
-            "loading"
-          )
-          .innerHTML = `
-            <div>Unable to load your character.</div>
-            <small>${escapeHtml(
-              error?.message ||
-              "Unknown error"
-            )}</small>
-          `;
-
-
-        return false;
-      }
-    }
-
-
-    function escapeHtml(
-      value
-    ) {
-
-      return String(
-        value || ""
-      )
-        .replace(
-          /&/g,
-          "&amp;"
-        )
-        .replace(
-          /</g,
-          "&lt;"
-        )
-        .replace(
-          />/g,
-          "&gt;"
-        )
-        .replace(
-          /"/g,
-          "&quot;"
-        )
-        .replace(
-          /'/g,
-          "&#039;"
-        );
-    }
-
-
-    /* =========================================================
-       CONTROLS
-    ========================================================== */
-
-    const keys = {};
-
-
-    window.addEventListener(
-      "keydown",
-      event => {
-
-        keys[
-          event.key.toLowerCase()
-        ] = true;
-
-      }
-    );
-
-
-    window.addEventListener(
-      "keyup",
-      event => {
-
-        keys[
-          event.key.toLowerCase()
-        ] = false;
-
-      }
-    );
-
-
-    /* =========================================================
-       MOBILE JOYSTICK
-    ========================================================== */
-
-    const joystick =
-      document.getElementById(
-        "controls"
-      );
-
-    const stick =
-      document.getElementById(
-        "stick"
-      );
-
-    let joystickX = 0;
-    let joystickY = 0;
-
-    let dragging = false;
-
-
-    function updateJoystick(
-      clientX,
-      clientY
-    ) {
-
-      const rect =
-        joystick.getBoundingClientRect();
-
-
-      const centerX =
-        rect.left +
-        rect.width / 2;
-
-
-      const centerY =
-        rect.top +
-        rect.height / 2;
-
-
-      let dx =
-        clientX -
-        centerX;
-
-
-      let dy =
-        clientY -
-        centerY;
-
-
-      const maxDistance =
-        45;
-
-
-      const distance =
-        Math.sqrt(
-          dx * dx +
-          dy * dy
-        );
-
-
-      if (
-        distance >
-        maxDistance
-      ) {
-
-        dx =
-          dx /
-          distance *
-          maxDistance;
-
-        dy =
-          dy /
-          distance *
-          maxDistance;
-      }
-
-
-      stick.style.transform =
-        `translate(${dx}px, ${dy}px)`;
-
-
-      joystickX =
-        dx /
-        maxDistance;
-
-
-      joystickY =
-        dy /
-        maxDistance;
-    }
-
-
-    joystick.addEventListener(
-      "pointerdown",
-      event => {
-
-        dragging = true;
-
-        joystick.setPointerCapture(
-          event.pointerId
-        );
-
-        updateJoystick(
-          event.clientX,
-          event.clientY
-        );
-      }
-    );
-
-
-    joystick.addEventListener(
-      "pointermove",
-      event => {
-
-        if (
-          !dragging
-        ) return;
-
-        updateJoystick(
-          event.clientX,
-          event.clientY
-        );
-      }
-    );
-
-
-    function resetJoystick() {
-
-      dragging = false;
-
-      joystickX = 0;
-      joystickY = 0;
-
-      stick.style.transform =
-        "translate(0, 0)";
-    }
-
-
-    joystick.addEventListener(
-      "pointerup",
-      resetJoystick
-    );
-
-    joystick.addEventListener(
-      "pointercancel",
-      resetJoystick
-    );
-
-
-    /* =========================================================
-       MOVEMENT
-    ========================================================== */
-
-    const clock =
-      new THREE.Clock();
-
-
-    const status =
-      document.getElementById(
-        "status"
-      );
-
-
-    function updateMovement(
-      delta
-    ) {
-
-      let x = 0;
-      let z = 0;
-
-
-      if (
-        keys["w"] ||
-        keys["arrowup"]
-      ) {
-
-        z -= 1;
-      }
-
-
-      if (
-        keys["s"] ||
-        keys["arrowdown"]
-      ) {
-
-        z += 1;
-      }
-
-
-      if (
-        keys["a"] ||
-        keys["arrowleft"]
-      ) {
-
-        x -= 1;
-      }
-
-
-      if (
-        keys["d"] ||
-        keys["arrowright"]
-      ) {
-
-        x += 1;
-      }
-
-
-      x += joystickX;
-      z += joystickY;
-
-
-      const moving =
-        Math.abs(x) > 0.05 ||
-        Math.abs(z) > 0.05;
-
-
-      if (
-        moving
-      ) {
-
-        const length =
-          Math.sqrt(
-            x * x +
-            z * z
-          );
-
-
-        if (
-          length > 0
-        ) {
-
-          x /= length;
-          z /= length;
-        }
-
-
-        const speed =
-          4 * delta;
-
-
-        avatar.position.x +=
-          x * speed;
-
-
-        avatar.position.z +=
-          z * speed;
-
-
-        const targetRotation =
-          Math.atan2(
-            x,
-            z
-          );
-
-
-        avatar.rotation.y =
-          THREE.MathUtils.lerp(
-            avatar.rotation.y,
-            targetRotation,
-            0.15
-          );
-
-
-        status.textContent =
-          "Walking";
-
-
-        const time =
-          performance.now() *
-          0.012;
-
-
-        leftLeg.rotation.x =
-          Math.sin(time) *
-          0.65;
-
-
-        rightLeg.rotation.x =
-          Math.sin(
-            time + Math.PI
-          ) *
-          0.65;
-
-
-        leftArm.rotation.x =
-          Math.sin(
-            time + Math.PI
-          ) *
-          0.45;
-
-
-        rightArm.rotation.x =
-          Math.sin(time) *
-          0.45;
-
-      } else {
-
-        status.textContent =
-          "Idle";
-
-
-        leftLeg.rotation.x *=
-          0.85;
-
-
-        rightLeg.rotation.x *=
-          0.85;
-
-
-        leftArm.rotation.x *=
-          0.85;
-
-
-        rightArm.rotation.x *=
-          0.85;
-      }
-
-
-      /* MAP BOUNDS */
-
-      avatar.position.x =
-        THREE.MathUtils.clamp(
-          avatar.position.x,
-          -5,
-          5
-        );
-
-
-      avatar.position.z =
-        THREE.MathUtils.clamp(
-          avatar.position.z,
-          -95,
-          95
-        );
-    }
-
-
-    /* =========================================================
-       CAMERA FOLLOW
-    ========================================================== */
-
-    function updateCamera() {
-
-      const target =
-        new THREE.Vector3(
-          avatar.position.x,
-          avatar.position.y + 1.5,
-          avatar.position.z
-        );
-
-
-      const desired =
-        new THREE.Vector3(
-          avatar.position.x,
-          avatar.position.y + 4,
-          avatar.position.z + 7
-        );
-
-
-      camera.position.lerp(
-        desired,
-        0.08
-      );
-
-
-      camera.lookAt(
-        target
-      );
-    }
-
-
-    /* =========================================================
-       RESIZE
-    ========================================================== */
-
-    window.addEventListener(
-      "resize",
-      () => {
-
-        camera.aspect =
-          window.innerWidth /
-          window.innerHeight;
-
-
-        camera.updateProjectionMatrix();
-
-
-        renderer.setSize(
-          window.innerWidth,
-          window.innerHeight
-        );
-      }
-    );
-
-
-    /* =========================================================
-       BACK BUTTON
-    ========================================================== */
-
-    document
-      .getElementById(
-        "backButton"
-      )
-      .addEventListener(
-        "click",
-        () => {
-
-          /*
-           * If this page was opened from
-           * the main game, return there.
-           */
-
-          if (
-            window.history.length > 1
-          ) {
-
-            window.history.back();
-
-          } else {
-
-            window.location.href =
-              "index.html";
-          }
-        }
-      );
-
-
-    /* =========================================================
-       ANIMATION LOOP
-    ========================================================== */
-
-    function animate() {
-
-      requestAnimationFrame(
-        animate
-      );
-
-
-      const delta =
-        Math.min(
-          clock.getDelta(),
-          0.05
-        );
-
-
-      updateMovement(
-        delta
-      );
-
-
-      updateCamera();
-
-
-      renderer.render(
-        scene,
-        camera
-      );
-    }
-
-
-    /* =========================================================
-       START
-    ========================================================== */
-
-    const characterLoaded =
-      await loadCharacter();
-
-
-    if (
-      characterLoaded
-    ) {
-
-      animate();
-
-    }
-
-  </script>
+</script>
 
 </body>
-  </html>
+</html>
