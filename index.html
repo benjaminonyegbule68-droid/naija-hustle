@@ -3,161 +3,197 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#111716">
+<meta name="theme-color" content="#14201F">
 <title>Naija Hustle — Open World</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111716'/%3E%3Cpath d='M32 10 51 42 32 54 13 42Z' fill='%23f2b705'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2314201F'/%3E%3Cpath d='M32 10 51 42 32 54 13 42Z' fill='%23FFC20E'/%3E%3C/svg%3E">
 <style>
-:root{--bg:#0f1413;--panel:rgba(13,18,17,.92);--panel2:rgba(20,27,25,.96);--gold:#f2b705;--gold2:#ffc20e;--text:#f7f7f4;--muted:#aeb9b5;--line:rgba(255,255,255,.12);--good:#39c36e;--danger:#ef6666;}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0f0e;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}body{touch-action:none}button,input,textarea{font:inherit}
-#game{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
+:root{
+  --bg:#0f1413;
+  --panel:rgba(13,18,17,.94);
+  --panel2:rgba(20,27,25,.97);
+  --teal:#0F6B6F;
+  --yellow:#FFC20E;
+  --charcoal:#14201F;
+  --text:#f7f7f4;
+  --muted:#aeb9b5;
+  --line:rgba(255,255,255,.12);
+  --good:#39c36e;
+  --danger:#ef6666;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0f0e;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{touch-action:none}
+button,input,textarea{font:inherit}
+#game{position:fixed;inset:0}
+canvas{display:block;width:100%;height:100%}
 #hud{position:fixed;inset:0;pointer-events:none;z-index:20}
 .hudLeft,.hudRight{position:absolute;top:max(12px,env(safe-area-inset-top));display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.hudLeft{left:max(12px,env(safe-area-inset-left));max-width:56vw}.hudRight{right:max(12px,env(safe-area-inset-right));justify-content:flex-end;max-width:50vw}
-.pill{background:rgba(10,14,13,.74);border:1px solid var(--line);backdrop-filter:blur(12px);border-radius:999px;padding:7px 11px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
-.pill strong{color:var(--gold2);font-weight:800}.miniBtn{pointer-events:auto;background:rgba(14,20,18,.82);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;font-weight:750}.miniBtn.on{border-color:var(--gold2);box-shadow:0 0 0 1px rgba(242,183,5,.25) inset}
-#minimapWrap{position:absolute;right:14px;top:68px;width:220px;height:220px;border-radius:50%;overflow:hidden;border:2px solid rgba(242,183,5,.45);box-shadow:0 18px 50px rgba(0,0,0,.32);background:#1b241f}.viewer #minimapWrap{display:none}#minimap{display:block;width:220px;height:220px}
-#toast{position:absolute;left:50%;bottom:104px;transform:translateX(-50%) translateY(15px);background:rgba(14,20,18,.94);border:1px solid var(--line);padding:10px 14px;border-radius:12px;color:var(--text);font-size:13px;opacity:0;transition:.2s;pointer-events:none;max-width:min(90vw,620px);text-align:center}.#toast{}
+.hudLeft{left:max(12px,env(safe-area-inset-left));max-width:62vw}
+.hudRight{right:max(12px,env(safe-area-inset-right));justify-content:flex-end;max-width:50vw}
+.pill{background:rgba(10,14,13,.78);border:1px solid var(--line);backdrop-filter:blur(12px);border-radius:999px;padding:7px 11px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.pill strong{color:var(--yellow);font-weight:800}
+.miniBtn{pointer-events:auto;background:rgba(14,20,18,.85);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:8px 10px;cursor:pointer;font-weight:750}
+.miniBtn.on{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(255,194,14,.25) inset}
+#minimapWrap{position:absolute;right:14px;top:68px;width:200px;height:200px;border-radius:50%;overflow:hidden;border:2px solid rgba(15,107,111,.65);box-shadow:0 18px 50px rgba(0,0,0,.32);background:#1b241f}
+.viewer #minimapWrap{display:none}
+#minimap{display:block;width:200px;height:200px}
+#toast{position:absolute;left:50%;bottom:104px;transform:translateX(-50%) translateY(15px);background:rgba(14,20,18,.95);border:1px solid var(--line);padding:10px 14px;border-radius:12px;color:var(--text);font-size:13px;opacity:0;transition:.2s;pointer-events:none;max-width:min(90vw,620px);text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#prompt{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);background:var(--gold2);color:#15130a;border:0;border-radius:14px;padding:12px 18px;font-weight:900;display:none;pointer-events:auto;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.24)}#prompt.show{display:block}.viewer #prompt{display:none}
-#backBtn,#emoteBtn,#customizeBtn,#socialBtn{position:absolute;bottom:16px;pointer-events:auto;background:rgba(15,20,19,.9);color:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 13px;font-weight:800;cursor:pointer}.#backBtn{}
+#prompt{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);background:var(--yellow);color:#15130a;border:0;border-radius:14px;padding:12px 18px;font-weight:900;display:none;pointer-events:auto;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.24)}
+#prompt.show{display:block}
+.viewer #prompt{display:none}
+#backBtn,#emoteBtn,#customizeBtn,#socialBtn{position:absolute;bottom:16px;pointer-events:auto;background:rgba(15,20,19,.92);color:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 13px;font-weight:800;cursor:pointer}
 #backBtn{left:16px}#emoteBtn{left:98px}#customizeBtn{left:190px}#socialBtn{left:306px}
-#emoteMenu{position:absolute;left:98px;bottom:60px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px;display:none;pointer-events:auto;box-shadow:0 20px 50px rgba(0,0,0,.35)}#emoteMenu.open{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.emote{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}.emote:hover{border-color:rgba(242,183,5,.5)}
-#joystick{position:absolute;left:18px;bottom:88px;width:128px;height:128px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);pointer-events:auto;touch-action:none}.#stick{}
-#stick{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(242,183,5,.86);border:3px solid rgba(255,255,255,.55);box-shadow:0 8px 20px rgba(0,0,0,.25)}
-#jumpBtn,#runBtn{position:absolute;right:20px;width:72px;height:72px;border-radius:50%;border:1px solid var(--line);background:rgba(15,20,19,.84);color:#fff;font-weight:900;pointer-events:auto;touch-action:none}#jumpBtn{bottom:102px}#runBtn{bottom:20px}#runBtn.active{background:var(--gold2);color:#18150a}
-#viewerBar{position:absolute;left:50%;top:58px;transform:translateX(-50%);display:none;pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px;gap:6px;align-items:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}.viewer #viewerBar{display:flex}.viewerBarTitle{font-size:11px;color:var(--muted);padding:0 5px;text-transform:uppercase;letter-spacing:.08em}.viewerToggle{background:rgba(255,255,255,.04);color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}.viewerToggle.on{border-color:var(--gold2);color:var(--gold2)}
+#emoteMenu{position:absolute;left:98px;bottom:60px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px;display:none;pointer-events:auto;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+#emoteMenu.open{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.emote{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
+.emote:hover{border-color:rgba(255,194,14,.5)}
+#joystick{position:absolute;left:18px;bottom:88px;width:128px;height:128px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);pointer-events:auto;touch-action:none}
+#stick{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(255,194,14,.88);border:3px solid rgba(255,255,255,.55);box-shadow:0 8px 20px rgba(0,0,0,.25)}
+#jumpBtn,#runBtn{position:absolute;right:20px;width:72px;height:72px;border-radius:50%;border:1px solid var(--line);background:rgba(15,20,19,.86);color:#fff;font-weight:900;pointer-events:auto;touch-action:none}
+#jumpBtn{bottom:102px}#runBtn{bottom:20px}
+#runBtn.active{background:var(--yellow);color:#18150a}
+#viewerBar{position:absolute;left:50%;top:58px;transform:translateX(-50%);display:none;pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px;gap:6px;align-items:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.viewer #viewerBar{display:flex}
+.viewerBarTitle{font-size:11px;color:var(--muted);padding:0 5px;text-transform:uppercase;letter-spacing:.08em}
+.viewerToggle{background:rgba(255,255,255,.04);color:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}
+.viewerToggle.on{border-color:var(--yellow);color:var(--yellow)}
 #viewerClose{background:transparent;color:#fff;border:0;cursor:pointer;font-size:18px;padding:5px 7px}
-#customizer{position:fixed;right:0;top:0;bottom:0;width:min(420px,92vw);z-index:40;background:rgba(12,17,16,.97);border-left:1px solid var(--line);transform:translateX(100%);transition:.28s;overflow:auto;box-shadow:-20px 0 60px rgba(0,0,0,.35)}#customizer.open{transform:translateX(0)}
-.custHead{position:sticky;top:0;background:rgba(12,17,16,.96);backdrop-filter:blur(12px);padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.custHead b{font-size:16px}.closeBtn{background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer}.custBody{padding:16px}.section{margin-bottom:18px}.sectionTitle{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}.options{display:flex;gap:7px;flex-wrap:wrap}.option,.swatch{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}.option:hover{border-color:rgba(242,183,5,.45)}.option.selected{border-color:var(--gold2);box-shadow:0 0 0 1px rgba(242,183,5,.2) inset;color:var(--gold2)}.swatch{width:38px;height:30px;padding:0}.swatch.selected{outline:2px solid var(--gold2);outline-offset:2px}.custActions{position:sticky;bottom:0;background:rgba(12,17,16,.96);padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px}.custAction{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px;background:rgba(255,255,255,.04);color:#fff;font-weight:850;cursor:pointer}.custAction.primary{background:var(--gold2);color:#16140d;border-color:transparent}
-#socialPanel{position:fixed;z-index:50;left:50%;top:50%;width:min(610px,94vw);height:min(650px,82vh);transform:translate(-50%,-48%) scale(.98);background:rgba(12,17,16,.98);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.48);display:none;overflow:hidden}#socialPanel.open{display:flex;flex-direction:column;animation:pop .18s ease}@keyframes pop{to{transform:translate(-50%,-50%) scale(1)}}
-.socialHead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}.socialTitle{display:flex;gap:10px;align-items:center}.socialTitleDot{width:10px;height:10px;background:var(--gold2);border-radius:50%;box-shadow:0 0 15px rgba(242,183,5,.5)}.socialTabs{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}.socialTab{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:#fff;padding:9px;cursor:pointer}.socialTab.active{color:#17130a;background:var(--gold2);border-color:transparent;font-weight:900}.socialBody{flex:1;overflow:auto;padding:14px}.chatHistory{display:flex;flex-direction:column;gap:9px}.msg{max-width:84%;padding:9px 11px;border-radius:13px;background:rgba(255,255,255,.06);border:1px solid var(--line)}.msg.me{margin-left:auto;background:rgba(242,183,5,.12);border-color:rgba(242,183,5,.25)}.msg .who{font-size:11px;color:var(--muted);margin-bottom:3px}.msg .text{font-size:13px;line-height:1.45}.chatComposer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}.chatComposer input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;border-radius:11px;padding:10px 12px;outline:none}.chatComposer button{background:var(--gold2);color:#17130a;border:0;border-radius:11px;padding:10px 14px;font-weight:900;cursor:pointer}.dialogueIntro{padding:11px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);margin-bottom:12px}.dialogueName{font-weight:900;color:var(--gold2)}.dialogueChoices{display:grid;gap:8px}.choice{padding:11px 12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;border-radius:12px;text-align:left;cursor:pointer}.choice:hover{border-color:rgba(242,183,5,.55);transform:translateY(-1px)}.smallNote{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}
-#loading{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:#0c1110;transition:.35s}.loadingCard{width:min(420px,88vw);padding:28px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.03);text-align:center}.loadingTitle{font-weight:950;letter-spacing:.04em;font-size:22px}.loadingSub{color:var(--muted);margin-top:8px;font-size:13px}.loader{margin:20px auto 0;width:170px;height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.loader::after{content:"";display:block;width:45%;height:100%;background:var(--gold2);animation:load 1.1s infinite ease-in-out}@keyframes load{from{transform:translateX(-120%)}to{transform:translateX(420%)}}#loading.hidden{opacity:0;pointer-events:none}
-@media(max-width:799px){#minimapWrap{transform:scale(.78);transform-origin:top right;top:58px;right:8px}.hudRight{top:8px}.hudLeft{top:8px}.pill{padding:6px 9px}.miniBtn{padding:7px 8px}.#socialBtn{}
-#socialBtn{left:auto;right:106px}.#customizeBtn{left:auto;right:16px}.#emoteBtn{left:16px}.#backBtn{left:16px;bottom:162px}.#emoteMenu{left:16px;bottom:205px}.#toast{bottom:170px}.#prompt{bottom:132px}.#joystick{bottom:20px}.#jumpBtn{bottom:105px}.#runBtn{bottom:20px}
-#viewerBar{max-width:94vw;overflow:auto}.viewerBarTitle{display:none}
-}
-  #loginScreen{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(8,8,8,.96);
-}
-
-.loginCard{
-  width:min(380px,88vw);
-  padding:28px;
-  border:1px solid rgba(212,175,55,.35);
-  border-radius:18px;
-  background:#111;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
-  text-align:center;
-}
-
-.loginCard h1{
-  margin:0 0 8px;
-  color:#d4af37;
-  letter-spacing:2px;
-}
-
-.loginCard p{
-  margin:0 0 24px;
-  color:#aaa;
-}
-
-.loginCard input{
-  width:100%;
-  box-sizing:border-box;
-  margin:6px 0;
-  padding:13px;
-  border:1px solid #333;
-  border-radius:10px;
-  background:#191919;
-  color:#fff;
-  outline:none;
-}
-
-.loginCard button{
-  width:100%;
-  margin-top:10px;
-  padding:13px;
-  border:0;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-#loginBtn{
-  background:#d4af37;
-  color:#111;
-}
-
-#signupBtn{
-  background:#252525;
-  color:#fff;
-}
-
-#loginMessage{
-  min-height:20px;
-  margin-top:12px;
-  color:#d4af37;
-  font-size:13px;
+#customizer{position:fixed;right:0;top:0;bottom:0;width:min(420px,92vw);z-index:40;background:rgba(12,17,16,.97);border-left:1px solid var(--line);transform:translateX(100%);transition:.28s;overflow:auto;box-shadow:-20px 0 60px rgba(0,0,0,.35)}
+#customizer.open{transform:translateX(0)}
+.custHead{position:sticky;top:0;background:rgba(12,17,16,.96);backdrop-filter:blur(12px);padding:16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.custHead b{font-size:16px}
+.closeBtn{background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer}
+.custBody{padding:16px}
+.section{margin-bottom:18px}
+.sectionTitle{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.options{display:flex;gap:7px;flex-wrap:wrap}
+.option,.swatch{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
+.option:hover{border-color:rgba(255,194,14,.45)}
+.option.selected{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(255,194,14,.2) inset;color:var(--yellow)}
+.swatch{width:38px;height:30px;padding:0}
+.swatch.selected{outline:2px solid var(--yellow);outline-offset:2px}
+.custActions{position:sticky;bottom:0;background:rgba(12,17,16,.96);padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px}
+.custAction{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px;background:rgba(255,255,255,.04);color:#fff;font-weight:850;cursor:pointer}
+.custAction.primary{background:var(--yellow);color:#16140d;border-color:transparent}
+#socialPanel{position:fixed;z-index:50;left:50%;top:50%;width:min(610px,94vw);height:min(650px,82vh);transform:translate(-50%,-48%) scale(.98);background:rgba(12,17,16,.98);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 90px rgba(0,0,0,.48);display:none;overflow:hidden}
+#socialPanel.open{display:flex;flex-direction:column;animation:pop .18s ease}
+@keyframes pop{to{transform:translate(-50%,-50%) scale(1)}}
+.socialHead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.socialTitle{display:flex;gap:10px;align-items:center}
+.socialTitleDot{width:10px;height:10px;background:var(--yellow);border-radius:50%;box-shadow:0 0 15px rgba(255,194,14,.5)}
+.socialTabs{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.socialTab{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:#fff;padding:9px;cursor:pointer}
+.socialTab.active{color:#17130a;background:var(--yellow);border-color:transparent;font-weight:900}
+.socialBody{flex:1;overflow:auto;padding:14px}
+.chatHistory{display:flex;flex-direction:column;gap:9px}
+.msg{max-width:84%;padding:9px 11px;border-radius:13px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.msg.me{margin-left:auto;background:rgba(255,194,14,.12);border-color:rgba(255,194,14,.25)}
+.msg .who{font-size:11px;color:var(--muted);margin-bottom:3px}
+.msg .text{font-size:13px;line-height:1.45}
+.chatComposer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.chatComposer input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;border-radius:11px;padding:10px 12px;outline:none}
+.chatComposer button{background:var(--yellow);color:#17130a;border:0;border-radius:11px;padding:10px 14px;font-weight:900;cursor:pointer}
+.dialogueIntro{padding:11px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);margin-bottom:12px}
+.dialogueName{font-weight:900;color:var(--yellow)}
+.dialogueChoices{display:grid;gap:8px}
+.choice{padding:11px 12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;border-radius:12px;text-align:left;cursor:pointer}
+.choice:hover{border-color:rgba(255,194,14,.55);transform:translateY(-1px)}
+.smallNote{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}
+#loading{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:#0c1110;transition:.35s}
+.loadingCard{width:min(420px,88vw);padding:28px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.03);text-align:center}
+.loadingTitle{font-weight:950;letter-spacing:.04em;font-size:22px;color:var(--yellow)}
+.loadingSub{color:var(--muted);margin-top:8px;font-size:13px}
+.loader{margin:20px auto 0;width:170px;height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.loader::after{content:"";display:block;width:45%;height:100%;background:var(--teal);animation:load 1.1s infinite ease-in-out}
+@keyframes load{from{transform:translateX(-120%)}to{transform:translateX(420%)}}
+#loading.hidden{opacity:0;pointer-events:none}
+#loginScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(8,12,11,.97)}
+.loginCard{width:min(380px,88vw);padding:28px;border:1px solid rgba(15,107,111,.45);border-radius:18px;background:#111816;box-shadow:0 20px 60px rgba(0,0,0,.6);text-align:center}
+.loginCard h1{margin:0 0 6px;color:var(--yellow);letter-spacing:2px;font-size:22px}
+.loginCard .tagline{margin:0 0 22px;color:var(--muted);font-size:13px}
+.loginCard input{width:100%;box-sizing:border-box;margin:6px 0;padding:13px;border:1px solid #2a3533;border-radius:10px;background:#191f1e;color:#fff;outline:none}
+.loginCard button{width:100%;margin-top:10px;padding:13px;border:0;border-radius:10px;cursor:pointer;font-weight:700}
+#loginBtn{background:var(--teal);color:#fff}
+#signupBtn{background:#252d2b;color:#fff}
+#loginMessage{min-height:20px;margin-top:12px;color:var(--yellow);font-size:13px}
+#housingPanel{position:fixed;z-index:55;left:50%;top:50%;width:min(420px,92vw);transform:translate(-50%,-50%);background:rgba(12,17,16,.98);border:1px solid var(--line);border-radius:18px;padding:20px;display:none;box-shadow:0 28px 80px rgba(0,0,0,.5)}
+#housingPanel.open{display:block}
+.housingTitle{font-weight:900;font-size:18px;margin-bottom:6px;color:var(--yellow)}
+.housingDesc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.45}
+.housingLevels{display:grid;gap:8px;margin-bottom:14px}
+.housingLevel{padding:12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);cursor:pointer}
+.housingLevel.current{border-color:var(--teal)}
+.housingLevel.locked{opacity:.55;cursor:default}
+.housingLevel b{display:block;margin-bottom:2px}
+.housingActions{display:flex;gap:8px}
+.housingActions button{flex:1;padding:11px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#fff;font-weight:800;cursor:pointer}
+.housingActions .primary{background:var(--yellow);color:#16140d;border-color:transparent}
+@media(max-width:799px){
+  #minimapWrap{transform:scale(.72);transform-origin:top right;top:58px;right:8px}
+  .hudRight{top:8px}.hudLeft{top:8px}
+  .pill{padding:6px 9px}.miniBtn{padding:7px 8px}
+  #socialBtn{left:auto;right:106px}
+  #customizeBtn{left:auto;right:16px}
+  #emoteBtn{left:16px}
+  #backBtn{left:16px;bottom:162px}
+  #emoteMenu{left:16px;bottom:205px}
+  #toast{bottom:170px}
+  #prompt{bottom:132px}
+  #joystick{bottom:20px}
+  #jumpBtn{bottom:105px}
+  #runBtn{bottom:20px}
+  #viewerBar{max-width:94vw;overflow:auto}
+  .viewerBarTitle{display:none}
 }
 </style>
 </head>
 <body>
-  <div id="loginScreen">
+<div id="loginScreen">
   <div class="loginCard">
     <h1>NAIJA HUSTLE</h1>
-    <p>Build your life. Build your hustle.</p>
-
+    <p class="tagline">Build your life. Build your hustle.</p>
     <input id="loginEmail" type="email" placeholder="Email">
     <input id="loginPassword" type="password" placeholder="Password">
-
     <button id="loginBtn">Login</button>
     <button id="signupBtn">Create Account</button>
-
     <div id="loginMessage"></div>
   </div>
-  </div>
+</div>
+
 <div id="game"></div>
 
 <div id="hud">
   <div class="hudLeft">
     <div class="pill"><strong id="name">Guest</strong></div>
     <div class="pill" id="sub">Lagos</div>
+    <div class="pill" id="moneyPill">₦ <span id="money">0</span></div>
+    <div class="pill" id="housingPill">Room</div>
     <div class="pill" id="status">Idle</div>
-    <div class="pill" id="clock">12:00 PM</div>
+    <div class="pill" id="clock">8:00 AM</div>
   </div>
-
   <div class="hudRight">
     <button class="miniBtn" id="cameraBtn">3rd</button>
     <button class="miniBtn" id="qualityBtn">High</button>
     <button class="miniBtn" id="viewBtn">View</button>
+    <button class="miniBtn" id="housingBtn">Home</button>
   </div>
-
   <div id="minimapWrap"><canvas id="minimap"></canvas></div>
   <div id="toast"></div>
   <button id="prompt">Enter</button>
-
   <button id="backBtn">Back</button>
   <button id="emoteBtn">Emotes</button>
   <button id="customizeBtn">Avatar</button>
   <button id="socialBtn">Chat</button>
-
   <div id="emoteMenu">
     <button class="emote" data-emote="wave">Wave</button>
     <button class="emote" data-emote="dance">Dance</button>
     <button class="emote" data-emote="cheer">Cheer</button>
     <button class="emote" data-emote="none">Stop</button>
   </div>
-
   <div id="joystick"><div id="stick"></div></div>
   <button id="jumpBtn">JUMP</button>
   <button id="runBtn">RUN</button>
-
   <div id="viewerBar">
     <span class="viewerBarTitle">Viewer</span>
     <button class="viewerToggle" data-preset="full">Full</button>
@@ -202,10 +238,20 @@
   </div>
 </div>
 
+<div id="housingPanel">
+  <div class="housingTitle">Your Housing</div>
+  <div class="housingDesc" id="housingDesc">You start in a basic room. Upgrade when you have the money and keep up with rent every 14 days.</div>
+  <div class="housingLevels" id="housingLevels"></div>
+  <div class="housingActions">
+    <button id="housingClose">Close</button>
+    <button class="primary" id="housingUpgrade">Upgrade</button>
+  </div>
+</div>
+
 <div id="loading">
   <div class="loadingCard">
     <div class="loadingTitle">NAIJA HUSTLE</div>
-    <div class="loadingSub">Loading your open world...</div>
+    <div class="loadingSub">Loading your Lagos hustle...</div>
     <div class="loader"></div>
   </div>
 </div>
@@ -221,10 +267,7 @@ const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
 const lerp = (a,b,t) => a+(b-a)*t;
 const damp = (a,b,k,dt) => lerp(a,b,1-Math.exp(-k*dt));
-const smoothstep = (a,b,x) => { const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
-const angDiff = (a,b) => Math.atan2(Math.sin(b-a),Math.cos(b-a));
 const has = (o,k) => Object.prototype.hasOwnProperty.call(o,k);
-const rng = seed => { let s=seed>>>0; return () => { s=(s*1664525+1013904223)>>>0; return s/4294967296; }; };
 
 const CFG = {
   walk:3.2, run:6.4, accel:14, decel:18, turn:12,
@@ -238,96 +281,55 @@ const OPTIONS = {
   hairColor:{label:"Hair Color",kind:"swatch",values:{black:"#151313",darkBrown:"#2c1b14",brown:"#4b2c1e",burgundy:"#541d2c",blonde:"#d6ad65",grey:"#8d8d8d"}},
   beard:{label:"Beard",values:{none:"None",stubble:"Stubble",goatee:"Goatee",full:"Full"}},
   outfit:{label:"Outfit",values:{hoodie:"Hoodie",tee:"T-Shirt",jersey:"Jersey",kaftan:"Kaftan",agbada:"Agbada",ankara:"Ankara",suit:"Suit"}},
-  outfitColor:{label:"Outfit Color",kind:"swatch",values:{default:"default",red:"#b72f2f",blue:"#285ca8",green:"#24734b",purple:"#6942a8",black:"#171717",white:"#e8e4da",gold:"#b88718"}},
-  accessory:{
-  label:"Accessory",
-  values:{
-    none:"None",
-    cap:"Cap",
-    glasses:"Glasses",
-    sunglasses:"Sunglasses",
-    chain:"Chain",
-    headphones:"Headphones"
-  }
-},
-
-bodyBuild:{
-  label:"Body Build",
-  values:{
-    compact:"Compact",
-    standard:"Standard",
-    broad:"Broad"
-  }
-},
-
-height:{
-  label:"Height",
-  values:{
-    short:"Short",
-    standard:"Standard",
-    tall:"Tall"
-  }
-}
+  outfitColor:{label:"Outfit Color",kind:"swatch",values:{default:"default",red:"#b72f2f",blue:"#285ca8",green:"#24734b",purple:"#6942a8",black:"#171717",white:"#e8e4da",gold:"#b88718",teal:"#0F6B6F"}},
+  accessory:{label:"Accessory",values:{none:"None",cap:"Cap",glasses:"Glasses",sunglasses:"Sunglasses",chain:"Chain",headphones:"Headphones"}},
+  bodyBuild:{label:"Body Build",values:{compact:"Compact",standard:"Standard",broad:"Broad"}},
+  height:{label:"Height",values:{short:"Short",standard:"Standard",tall:"Tall"}}
 };
 
 const DEFAULT_CFG = {
-  skinTone:"brown",
-  hairstyle:"fade",
-  hairColor:"black",
-  beard:"none",
-  outfit:"hoodie",
-  outfitColor:"default",
-  accessory:"none",
-  bodyBuild:"standard",
-  height:"standard"
+  skinTone:"brown", hairstyle:"fade", hairColor:"black", beard:"none",
+  outfit:"hoodie", outfitColor:"default", accessory:"none", bodyBuild:"standard", height:"standard"
 };
 
-const OUTFITS = {
-  hoodie:{top:1.02,bottom:0.52,arm:.19},
-  tee:{top:.92,bottom:.52,arm:.17},
-  jersey:{top:1,bottom:.54,arm:.18},
-  kaftan:{top:1.08,bottom:.62,arm:.18},
-  agbada:{top:1.18,bottom:.68,arm:.25},
-  ankara:{top:1.03,bottom:.56,arm:.19},
-  suit:{top:1.02,bottom:.52,arm:.19}
-};
+const HOUSING = [
+  {id:"room", name:"Basic Room / Face-me", rent:8000, cost:0, desc:"Shared corridor, one room, generator sometimes works."},
+  {id:"self", name:"Self-contained", rent:18000, cost:45000, desc:"Your own toilet & kitchenette. Still in a busy compound."},
+  {id:"flat", name:"Mini Flat", rent:35000, cost:120000, desc:"One bedroom, small sitting room. Better area."},
+  {id:"two_bed", name:"2-Bedroom Flat", rent:65000, cost:280000, desc:"Proper flat, more space, higher expectations."},
+  {id:"apartment", name:"Better Apartment", rent:110000, cost:550000, desc:"Serviced, safer, closer to the action."},
+  {id:"condo", name:"Condo / High-end", rent:220000, cost:1200000, desc:"Lekki / VI level. Status unlocked."}
+];
 
-function sanitize(raw){
-  const out={...DEFAULT_CFG};
-  if(!raw||typeof raw!=="object") return out;
-  for(const k of Object.keys(DEFAULT_CFG)){
-    if(has(OPTIONS,k)&&has(OPTIONS[k].values,raw[k])) out[k]=raw[k];
-  }
-  return out;
-}
-
-/* ---------- world / player state ---------- */
 const PLACES = [
-  {name:"Job Centre",tab:"jobs",sx:1,sz:-1,color:"#49b7ff",kind:"career"},
-  {name:"Market Plaza",tab:"business",sx:-1,sz:-1,color:"#ff8b3d",kind:"market"},
-  {name:"Hall of Fame",tab:"board",sx:1,sz:1,color:"#c76cff",kind:"board"},
-  {name:"Home",tab:"home",sx:-1,sz:1,color:"#57d98b",kind:"home"}
+  {name:"Job Centre", tab:"jobs", sx:1, sz:-1, color:"#49b7ff", kind:"career"},
+  {name:"Computer Village", tab:"business", sx:-1, sz:-1, color:"#ff8b3d", kind:"market"},
+  {name:"Hall of Fame", tab:"board", sx:1, sz:1, color:"#c76cff", kind:"board"},
+  {name:"Your Home", tab:"home", sx:-1, sz:1, color:"#57d98b", kind:"home"}
 ];
 
 const SOCIAL_PLACES = [
-  {name:"Mama's Kitchen",kind:"restaurant",sx:0,sz:-2,color:"#f08a42"},
-  {name:"Pulse Club",kind:"club",sx:2,sz:0,color:"#bb62e8"},
-  {name:"City View Hotel",kind:"hotel",sx:-2,sz:0,color:"#55a8ff"},
-  {name:"Glow Spa",kind:"spa",sx:0,sz:2,color:"#e56ba9"},
-  {name:"Aunty Ada's House",kind:"house",sx:-2,sz:2,color:"#67c98b"},
-  {name:"Corner Shop",kind:"shop",sx:2,sz:2,color:"#e7b83e"},
-  {name:"Onyx Office",kind:"office",sx:2,sz:-2,color:"#8e9cff"},
-  {name:"FitLife Gym",kind:"gym",sx:-2,sz:-2,color:"#55d1c7"}
+  {name:"Mama's Kitchen", kind:"restaurant", sx:0, sz:-2, color:"#f08a42"},
+  {name:"Pulse Club", kind:"club", sx:2, sz:0, color:"#bb62e8"},
+  {name:"City View Hotel", kind:"hotel", sx:-2, sz:0, color:"#55a8ff"},
+  {name:"Glow Spa", kind:"spa", sx:0, sz:2, color:"#e56ba9"},
+  {name:"Aunty Ada's House", kind:"house", sx:-2, sz:2, color:"#67c98b"},
+  {name:"Corner Shop", kind:"shop", sx:2, sz:2, color:"#e7b83e"},
+  {name:"Onyx Office", kind:"office", sx:2, sz:-2, color:"#8e9cff"},
+  {name:"FitLife Gym", kind:"gym", sx:-2, sz:-2, color:"#55d1c7"}
 ];
 
-const ALL_PLACES = [...PLACES,...SOCIAL_PLACES];
+const ALL_PLACES = [...PLACES, ...SOCIAL_PLACES];
 
 const state = {
   mode:"play",
   cfg:{...DEFAULT_CFG},
   name:"Guest",
-  sub:"Lagos",
+  sub:"Lagos · Starting Out",
   user:null,
+  money:25000,
+  housingLevel:0,
+  rentDueIn:14,
   keys:{up:false,down:false,left:false,right:false,shift:false},
   joy:{active:false,x:0,y:0},
   runToggle:false,
@@ -342,7 +344,7 @@ const state = {
 };
 
 const cam = {mode:"chase",yaw:Math.PI,pitch:.28,dist:5.5};
-const viewer = {preset:"full",pose:"idle",yaw:0,pitch:.08,dist:4.6,userDist:undefined,spin:false,lastDrag:0,shiftX:0,shiftY:0};
+const viewer = {preset:"full",pose:"idle",yaw:0,pitch:.08,dist:4.6,userDist:undefined,spin:false,lastDrag:0};
 
 const player = {
   pos:new THREE.Vector3(7.8,0,14),
@@ -353,27 +355,27 @@ const player = {
   tag:null
 };
 
-let renderer,scene,camera,sun,stars;
+let renderer, scene, camera, sun, stars, hemi;
 const sunDir = new THREE.Vector3(-.35,.9,.25).normalize();
-const colliders=[],buildingRects=[],markers=[],poiList=[],npcs=[],buses=[];
-const wish=new THREE.Vector3(),fwd=new THREE.Vector3(),right=new THREE.Vector3();
+const colliders=[], buildingRects=[], markers=[], poiList=[], npcs=[], buses=[];
+const wish=new THREE.Vector3(), fwd=new THREE.Vector3(), right=new THREE.Vector3();
 
-const geoCache=new Map(),matCache=new Map(),labelCache=new Map();
+const geoCache=new Map(), matCache=new Map(), labelCache=new Map();
 function geo(key,make){if(!geoCache.has(key))geoCache.set(key,make());return geoCache.get(key)}
 function mat(color,rough=.72,metal=0,opts={}){
-  const k=`${color}|${rough}|${metal}|${opts?JSON.stringify(opts):""}`;
+  const k=`\( {color}| \){rough}|\( {metal}| \){JSON.stringify(opts)}`;
   if(matCache.has(k))return matCache.get(k);
   const m=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,...opts});
   matCache.set(k,m);return m;
 }
 function sphereG(r){return geo(`s${r}`,()=>new THREE.SphereGeometry(r,18,14))}
-function capsuleG(r,l){return geo(`c${r}_${l}`,()=>new THREE.CapsuleGeometry(r,l,8,12))}
-function cylG(rt,rb,h,s=12){return geo(`y${rt}_${rb}_${h}_${s}`,()=>new THREE.CylinderGeometry(rt,rb,h,s))}
-function boxG(x,y,z){return geo(`b${x}_${y}_${z}`,()=>new THREE.BoxGeometry(x,y,z))}
-function torusG(r,t,rs=10,ts=20,arc=Math.PI*2){return geo(`t${r}_${t}_${rs}_${ts}_${arc}`,()=>new THREE.TorusGeometry(r,t,rs,ts,arc))}
+function capsuleG(r,l){return geo(`c\( {r}_ \){l}`,()=>new THREE.CapsuleGeometry(r,l,8,12))}
+function cylG(rt,rb,h,s=12){return geo(`y\( {rt}_ \){rb}_\( {h}_ \){s}`,()=>new THREE.CylinderGeometry(rt,rb,h,s))}
+function boxG(x,y,z){return geo(`b\( {x}_ \){y}_${z}`,()=>new THREE.BoxGeometry(x,y,z))}
+function torusG(r,t,rs=10,ts=20,arc=Math.PI*2){return geo(`t\( {r}_ \){t}_\( {rs}_ \){ts}_${arc}`,()=>new THREE.TorusGeometry(r,t,rs,ts,arc))}
 
 function labelTexture(text,color="#ffffff"){
-  const key=`${text}|${color}`;
+  const key=`\( {text}| \){color}`;
   if(labelCache.has(key))return labelCache.get(key);
   const c=document.createElement("canvas");c.width=512;c.height=128;
   const x=c.getContext("2d");x.clearRect(0,0,c.width,c.height);
@@ -383,10 +385,18 @@ function labelTexture(text,color="#ffffff"){
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
   labelCache.set(key,tex);return tex;
 }
-
 function makeLabel(text,color="#fff",scale=1){
   const m=new THREE.SpriteMaterial({map:labelTexture(text,color),transparent:true,depthWrite:false});
   const s=new THREE.Sprite(m);s.scale.set(3.5*scale,.88*scale,1);return s;
+}
+
+function sanitize(raw){
+  const out={...DEFAULT_CFG};
+  if(!raw||typeof raw!=="object") return out;
+  for(const k of Object.keys(DEFAULT_CFG)){
+    if(has(OPTIONS,k)&&has(OPTIONS[k].values,raw[k])) out[k]=raw[k];
+  }
+  return out;
 }
 
 /* ---------- renderer ---------- */
@@ -411,7 +421,7 @@ scene.fog=new THREE.Fog("#78a9b8",75,185);
 
 camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.05,260);
 
-const hemi=new THREE.HemisphereLight("#dbeeff","#26352b",1.55);
+hemi=new THREE.HemisphereLight("#dbeeff","#26352b",1.55);
 scene.add(hemi);
 
 sun=new THREE.DirectionalLight("#fff1cf",2.5);
@@ -442,312 +452,100 @@ function applyQuality(){
   $("qualityBtn").textContent=high?"High":"Low";
 }
 
-/* ---------- character system ---------- */
+/* ---------- character (improved proportions for clearer face) ---------- */
 function addHair(root,cfg,headRadius){
-  const hairColors={
-    black:"#151313",
-    darkBrown:"#2c1b14",
-    brown:"#4b2c1e",
-    burgundy:"#541d2c",
-    blonde:"#d6ad65",
-    grey:"#8d8d8d"
-  };
-
-  const hc=mat(
-    hairColors[cfg.hairColor]||hairColors.black,
-    .9
-  );
-
+  const hairColors={black:"#151313",darkBrown:"#2c1b14",brown:"#4b2c1e",burgundy:"#541d2c",blonde:"#d6ad65",grey:"#8d8d8d"};
+  const hc=mat(hairColors[cfg.hairColor]||hairColors.black,.9);
   const style=cfg.hairstyle;
-
   if(style==="bald")return;
-
   if(style==="headwrap"){
-    const wrap=new THREE.Mesh(
-      sphereG(headRadius*1.05),
-      mat("#d6ad65")
-    );
-
-    wrap.scale.set(1.02,.48,1.02);
-    wrap.position.y=.20;
-    root.add(wrap);
-
-    const band=new THREE.Mesh(
-      torusG(headRadius*.91,.065,10,28),
-      mat("#8f641b")
-    );
-
-    band.rotation.x=Math.PI/2;
-    band.position.y=.13;
-    root.add(band);
-    return;
+    const wrap=new THREE.Mesh(sphereG(headRadius*1.05),mat("#d6ad65"));
+    wrap.scale.set(1.02,.48,1.02);wrap.position.y=.20;root.add(wrap);
+    const band=new THREE.Mesh(torusG(headRadius*.91,.065,10,28),mat("#8f641b"));
+    band.rotation.x=Math.PI/2;band.position.y=.13;root.add(band);return;
   }
-
   if(style==="afro"){
-    const hair=new THREE.Mesh(
-      sphereG(headRadius*1.18),
-      hc
-    );
-
-    hair.scale.set(1.04,.86,1.04);
-    hair.position.y=.16;
-    root.add(hair);
-
-    const front=new THREE.Mesh(
-      sphereG(headRadius*.72),
-      hc
-    );
-
-    front.scale.set(1.05,.55,.72);
-    front.position.set(0,.34,.20);
-    root.add(front);
-    return;
+    const hair=new THREE.Mesh(sphereG(headRadius*1.18),hc);
+    hair.scale.set(1.04,.86,1.04);hair.position.y=.16;root.add(hair);
+    const front=new THREE.Mesh(sphereG(headRadius*.72),hc);
+    front.scale.set(1.05,.55,.72);front.position.set(0,.34,.20);root.add(front);return;
   }
-
   if(style==="high_top"){
-    const sides=new THREE.Mesh(
-      sphereG(headRadius*.98),
-      hc
-    );
-
-    sides.scale.set(1,.55,.98);
-    sides.position.y=.16;
-    root.add(sides);
-
-    const top=new THREE.Mesh(
-      capsuleG(headRadius*.52,.34),
-      hc
-    );
-
-    top.scale.set(1.12,1,.95);
-    top.position.y=.40;
-    root.add(top);
-    return;
+    const sides=new THREE.Mesh(sphereG(headRadius*.98),hc);
+    sides.scale.set(1,.55,.98);sides.position.y=.16;root.add(sides);
+    const top=new THREE.Mesh(capsuleG(headRadius*.52,.34),hc);
+    top.scale.set(1.12,1,.95);top.position.y=.40;root.add(top);return;
   }
-
-  if(
-    style==="twists"||
-    style==="locs"||
-    style==="braids"
-  ){
-    const count=
-      style==="braids"?12:
-      style==="locs"?14:
-      10;
-
-    const length=
-      style==="braids"?.30:
-      style==="locs"?.34:
-      .26;
-
-    const cap=new THREE.Mesh(
-      sphereG(headRadius*.98),
-      hc
-    );
-
-    cap.scale.set(1,.62,1);
-    cap.position.y=.17;
-    root.add(cap);
-
+  if(style==="twists"||style==="locs"||style==="braids"){
+    const count=style==="braids"?12:style==="locs"?14:10;
+    const length=style==="braids"?.30:style==="locs"?.34:.26;
+    const cap=new THREE.Mesh(sphereG(headRadius*.98),hc);
+    cap.scale.set(1,.62,1);cap.position.y=.17;root.add(cap);
     for(let i=0;i<count;i++){
       const a=i/count*Math.PI*2;
-
-      const strand=new THREE.Mesh(
-        capsuleG(.055,length),
-        hc
-      );
-
-      strand.position.set(
-        Math.cos(a)*headRadius*.78,
-        .18,
-        Math.sin(a)*headRadius*.78
-      );
-
-      strand.rotation.z=Math.cos(a)*.28;
-      strand.rotation.x=-Math.sin(a)*.28;
-
+      const strand=new THREE.Mesh(capsuleG(.055,length),hc);
+      strand.position.set(Math.cos(a)*headRadius*.78,.18,Math.sin(a)*headRadius*.78);
+      strand.rotation.z=Math.cos(a)*.28;strand.rotation.x=-Math.sin(a)*.28;
       root.add(strand);
     }
-
     return;
   }
-
-  /*
-    Fade / low cut.
-  */
-  const cap=new THREE.Mesh(
-    sphereG(headRadius*1.015),
-    hc
-  );
-
-  cap.scale.set(
-    1,
-    style==="fade"?.54:.64,
-    1
-  );
-
-  cap.position.y=.20;
-  root.add(cap);
-
+  const cap=new THREE.Mesh(sphereG(headRadius*1.015),hc);
+  cap.scale.set(1,style==="fade"?.54:.64,1);cap.position.y=.20;root.add(cap);
   if(style==="fade"){
-    const hairline=new THREE.Mesh(
-      torusG(headRadius*.91,.035,8,28),
-      hc
-    );
-
-    hairline.rotation.x=Math.PI/2;
-    hairline.position.y=.08;
-    root.add(hairline);
+    const hairline=new THREE.Mesh(torusG(headRadius*.91,.035,8,28),hc);
+    hairline.rotation.x=Math.PI/2;hairline.position.y=.08;root.add(hairline);
   }
-  
+}
+
 function addBeard(root,cfg,headRadius){
   if(cfg.beard==="none")return;
-
-  const hairColors={
-    black:"#151313",
-    darkBrown:"#2c1b14",
-    brown:"#4b2c1e",
-    burgundy:"#541d2c",
-    blonde:"#d6ad65",
-    grey:"#777"
-  };
-
-  const bc=mat(
-    hairColors[cfg.hairColor]||hairColors.black,
-    .92
-  );
-
+  const hairColors={black:"#151313",darkBrown:"#2c1b14",brown:"#4b2c1e",burgundy:"#541d2c",blonde:"#d6ad65",grey:"#777"};
+  const bc=mat(hairColors[cfg.hairColor]||hairColors.black,.92);
   if(cfg.beard==="stubble"){
-    const beard=new THREE.Mesh(
-      sphereG(headRadius*.53),
-      bc
-    );
-
-    beard.scale.set(.78,.40,.24);
-    beard.position.set(0,-.15,.36);
-    root.add(beard);
-    return;
+    const beard=new THREE.Mesh(sphereG(headRadius*.53),bc);
+    beard.scale.set(.78,.40,.24);beard.position.set(0,-.15,.36);root.add(beard);return;
   }
-
   if(cfg.beard==="goatee"){
-    const chin=new THREE.Mesh(
-      sphereG(headRadius*.28),
-      bc
-    );
-
-    chin.scale.set(.8,1.15,.65);
-    chin.position.set(0,-.25,.38);
-    root.add(chin);
-
-    const moustache=new THREE.Mesh(
-      capsuleG(.055,.16),
-      bc
-    );
-
-    moustache.rotation.z=Math.PI/2;
-    moustache.position.set(0,-.08,.40);
-    root.add(moustache);
-    return;
+    const chin=new THREE.Mesh(sphereG(headRadius*.28),bc);
+    chin.scale.set(.8,1.15,.65);chin.position.set(0,-.25,.38);root.add(chin);
+    const moustache=new THREE.Mesh(capsuleG(.055,.16),bc);
+    moustache.rotation.z=Math.PI/2;moustache.position.set(0,-.08,.40);root.add(moustache);return;
   }
-
-  const beard=new THREE.Mesh(
-    sphereG(headRadius*.60),
-    bc
-  );
-
-  beard.scale.set(.82,.60,.32);
-  beard.position.set(0,-.15,.36);
-  root.add(beard);
+  const beard=new THREE.Mesh(sphereG(headRadius*.60),bc);
+  beard.scale.set(.82,.60,.32);beard.position.set(0,-.15,.36);root.add(beard);
 }
 
 function addAccessory(root,cfg,headRadius){
   if(cfg.accessory==="none")return;
-
   if(cfg.accessory==="cap"){
-    const cap=new THREE.Mesh(
-      sphereG(headRadius*1.04),
-      mat("#171717")
-    );
-
-    cap.scale.set(1,.46,1);
-    cap.position.y=.29;
-    root.add(cap);
-
-    const brim=new THREE.Mesh(
-      boxG(.66,.045,.28),
-      mat("#171717")
-    );
-
-    brim.position.set(0,.22,.45);
-    root.add(brim);
-    return;
+    const cap=new THREE.Mesh(sphereG(headRadius*1.04),mat("#171717"));
+    cap.scale.set(1,.46,1);cap.position.y=.29;root.add(cap);
+    const brim=new THREE.Mesh(boxG(.66,.045,.28),mat("#171717"));
+    brim.position.set(0,.22,.45);root.add(brim);return;
   }
-
-  if(
-    cfg.accessory==="glasses"||
-    cfg.accessory==="sunglasses"
-  ){
-    const frame=mat(
-      cfg.accessory==="sunglasses"
-        ?"#101010"
-        :"#333"
-    );
-
+  if(cfg.accessory==="glasses"||cfg.accessory==="sunglasses"){
+    const frame=mat(cfg.accessory==="sunglasses"?"#101010":"#333");
     for(const x of [-.16,.16]){
-      const lens=new THREE.Mesh(
-        boxG(.19,.105,.035),
-        frame
-      );
-
-      lens.position.set(x,.035,.445);
-      root.add(lens);
+      const lens=new THREE.Mesh(boxG(.19,.105,.035),frame);
+      lens.position.set(x,.035,.445);root.add(lens);
     }
-
-    const bridge=new THREE.Mesh(
-      boxG(.12,.032,.035),
-      frame
-    );
-
-    bridge.position.set(0,.035,.445);
-    root.add(bridge);
-
-    return;
+    const bridge=new THREE.Mesh(boxG(.12,.032,.035),frame);
+    bridge.position.set(0,.035,.445);root.add(bridge);return;
   }
-
   if(cfg.accessory==="chain"){
-    const chain=new THREE.Mesh(
-      torusG(.25,.022,8,24),
-      mat("#d7a928",.3,.75)
-    );
-
-    chain.rotation.x=Math.PI/2;
-    chain.position.set(0,-.50,.40);
-    root.add(chain);
-    return;
+    const chain=new THREE.Mesh(torusG(.25,.022,8,24),mat("#d7a928",.3,.75));
+    chain.rotation.x=Math.PI/2;chain.position.set(0,-.50,.40);root.add(chain);return;
   }
-
   if(cfg.accessory==="headphones"){
-    const band=new THREE.Mesh(
-      torusG(headRadius*1.03,.05,8,28,Math.PI),
-      mat("#151515")
-    );
-
-    band.rotation.z=Math.PI;
-    band.position.y=.12;
-    root.add(band);
-
+    const band=new THREE.Mesh(torusG(headRadius*1.03,.05,8,28,Math.PI),mat("#151515"));
+    band.rotation.z=Math.PI;band.position.y=.12;root.add(band);
     for(const x of [-.36,.36]){
-      const cup=new THREE.Mesh(
-        cylG(.105,.105,.10),
-        mat("#222")
-      );
-
-      cup.rotation.z=Math.PI/2;
-      cup.position.set(x,.02,0);
-      root.add(cup);
+      const cup=new THREE.Mesh(cylG(.105,.105,.10),mat("#222"));
+      cup.rotation.z=Math.PI/2;cup.position.set(x,.02,0);root.add(cup);
     }
   }
-    }
+}
 
 function addOutfitDetails(root,cfg,bodyW){
   const color=cfg.outfitColor==="default"?"#315d50":OPTIONS.outfitColor.values[cfg.outfitColor];
@@ -769,367 +567,138 @@ function addOutfitDetails(root,cfg,bodyW){
 function createCharacter(rawCfg,opts={}){
   const cfg=sanitize(rawCfg);
   const root=new THREE.Group();
-
   const scale=opts.scale??CFG.avatarScale;
   root.scale.setScalar(scale);
 
-  const skin=mat(
-    OPTIONS.skinTone.values[cfg.skinTone]||"#855033"
-  );
-
-  const outfitColor=
-    cfg.outfitColor==="default"
-      ?"#315d50"
-      :OPTIONS.outfitColor.values[cfg.outfitColor];
-
+  const skin=mat(OPTIONS.skinTone.values[cfg.skinTone]||"#855033");
+  const outfitColor=cfg.outfitColor==="default"?"#315d50":OPTIONS.outfitColor.values[cfg.outfitColor];
   const outfitMat=mat(outfitColor);
   const dark=mat("#171717");
   const shoeMat=mat("#141414");
   const eyeMat=mat("#171717");
 
-  const build={
-    compact:{width:.88,shoulder:.92,limb:.92},
-    standard:{width:1,shoulder:1,limb:1},
-    broad:{width:1.12,shoulder:1.12,limb:1.06}
-  }[cfg.bodyBuild]||{
-    width:1,
-    shoulder:1,
-    limb:1
-  };
+  const build={compact:{width:.88,shoulder:.92,limb:.92},standard:{width:1,shoulder:1,limb:1},broad:{width:1.12,shoulder:1.12,limb:1.06}}[cfg.bodyBuild]||{width:1,shoulder:1,limb:1};
+  const W=build.width,S=build.shoulder,L=build.limb;
+  const height=cfg.height==="short"?.94:cfg.height==="tall"?1.07:1;
 
-  const W=build.width;
-  const S=build.shoulder;
-  const L=build.limb;
-
-  const height=
-    cfg.height==="short"?.94:
-    cfg.height==="tall"?1.07:
-    1;
-
-  const hips=new THREE.Group();
-  hips.position.y=1.02*height;
-  root.add(hips);
-
-  const abdomen=new THREE.Mesh(
-    capsuleG(.31*W,.46*height),
-    outfitMat
-  );
-  abdomen.scale.set(1.18*W,1,.82*W);
-  abdomen.position.y=.34*height;
-  hips.add(abdomen);
-
-  const chest=new THREE.Mesh(
-    capsuleG(.34*W,.38*height),
-    outfitMat
-  );
-  chest.scale.set(1.18*S,1,.86*W);
-  chest.position.y=.66*height;
-  hips.add(chest);
-
-  const spine=new THREE.Group();
-  spine.position.y=.36*height;
-  hips.add(spine);
-
-  const neck=new THREE.Mesh(
-    cylG(.125*W,.14*W,.22*height,16),
-    skin
-  );
-  neck.position.y=.84*height;
-  spine.add(neck);
-
-  const head=new THREE.Group();
-  head.position.y=1.12*height;
-  spine.add(head);
-
+  const hips=new THREE.Group();hips.position.y=1.02*height;root.add(hips);
+  const abdomen=new THREE.Mesh(capsuleG(.31*W,.46*height),outfitMat);
+  abdomen.scale.set(1.18*W,1,.82*W);abdomen.position.y=.34*height;hips.add(abdomen);
+  const chest=new THREE.Mesh(capsuleG(.34*W,.38*height),outfitMat);
+  chest.scale.set(1.18*S,1,.86*W);chest.position.y=.66*height;hips.add(chest);
+  const spine=new THREE.Group();spine.position.y=.36*height;hips.add(spine);
+  const neck=new THREE.Mesh(cylG(.125*W,.14*W,.22*height,16),skin);neck.position.y=.84*height;spine.add(neck);
+  const head=new THREE.Group();head.position.y=1.12*height;spine.add(head);
   const headR=.36;
 
-  /* FACE */
-  const face=new THREE.Mesh(
-    sphereG(headR),
-    skin
-  );
-  face.scale.set(1,.99,.93);
-  head.add(face);
-
-  /* CHEEKS */
+  const face=new THREE.Mesh(sphereG(headR),skin);face.scale.set(1,.99,.93);head.add(face);
   for(const x of [-.19,.19]){
-    const cheek=new THREE.Mesh(
-      sphereG(.16),
-      skin
-    );
-    cheek.scale.set(.95,.82,.72);
-    cheek.position.set(x,-.055,.255);
-    head.add(cheek);
+    const cheek=new THREE.Mesh(sphereG(.16),skin);cheek.scale.set(.95,.82,.72);cheek.position.set(x,-.055,.255);head.add(cheek);
   }
-
-  /* EARS */
   for(const x of [-.345,.345]){
-    const ear=new THREE.Mesh(
-      sphereG(.085),
-      skin
-    );
-    ear.scale.set(.62,1,.55);
-    ear.position.set(x,0,.01);
-    head.add(ear);
+    const ear=new THREE.Mesh(sphereG(.085),skin);ear.scale.set(.62,1,.55);ear.position.set(x,0,.01);head.add(ear);
   }
-
-  /* EYES */
-  const eyes=[];
-
   for(const x of [-.125,.125]){
-    const white=new THREE.Mesh(
-      sphereG(.085),
-      mat("#f4f1ea")
-    );
-
-    white.scale.set(1.05,.88,.48);
-    white.position.set(x,.045,.325);
-    head.add(white);
-
-    const pupil=new THREE.Mesh(
-      sphereG(.043),
-      eyeMat
-    );
-
-    pupil.scale.set(.9,.95,.42);
-    pupil.position.set(x,.045,.365);
-    head.add(pupil);
-
-    eyes.push(white);
+    const white=new THREE.Mesh(sphereG(.085),mat("#f4f1ea"));white.scale.set(1.05,.88,.48);white.position.set(x,.045,.325);head.add(white);
+    const pupil=new THREE.Mesh(sphereG(.043),eyeMat);pupil.scale.set(.9,.95,.42);pupil.position.set(x,.045,.365);head.add(pupil);
   }
-
-  /* EYEBROWS */
-  const browMat=mat(
-    OPTIONS.hairColor.values[cfg.hairColor]||"#151313"
-  );
-
+  const browMat=mat(OPTIONS.hairColor.values[cfg.hairColor]||"#151313");
   for(const x of [-.125,.125]){
-    const brow=new THREE.Mesh(
-      capsuleG(.025,.13),
-      browMat
-    );
-
-    brow.rotation.z=x<0?.08:-.08;
-    brow.position.set(x,.145,.335);
-    head.add(brow);
+    const brow=new THREE.Mesh(capsuleG(.025,.13),browMat);brow.rotation.z=x<0?.08:-.08;brow.position.set(x,.145,.335);head.add(brow);
   }
-
-  /* NOSE */
-  const nose=new THREE.Mesh(
-    sphereG(.075),
-    skin
-  );
-  nose.scale.set(.72,.95,1.25);
-  nose.position.set(0,-.035,.355);
-  head.add(nose);
-
-  const noseTip=new THREE.Mesh(
-    sphereG(.055),
-    skin
-  );
-  noseTip.scale.set(1,.72,.95);
-  noseTip.position.set(0,-.09,.385);
-  head.add(noseTip);
-
-  /* MOUTH */
-  const mouth=new THREE.Mesh(
-    capsuleG(.035,.13),
-    mat("#5a2925")
-  );
-  mouth.rotation.z=Math.PI/2;
-  mouth.scale.set(1,.65,.55);
-  mouth.position.set(0,-.165,.345);
-  head.add(mouth);
-
-  const lip=new THREE.Mesh(
-    sphereG(.045),
-    mat("#8b5148")
-  );
-  lip.scale.set(1.45,.48,.55);
-  lip.position.set(0,-.205,.35);
-  head.add(lip);
+  const nose=new THREE.Mesh(sphereG(.075),skin);nose.scale.set(.72,.95,1.25);nose.position.set(0,-.035,.355);head.add(nose);
+  const noseTip=new THREE.Mesh(sphereG(.055),skin);noseTip.scale.set(1,.72,.95);noseTip.position.set(0,-.09,.385);head.add(noseTip);
+  const mouth=new THREE.Mesh(capsuleG(.035,.13),mat("#5a2925"));mouth.rotation.z=Math.PI/2;mouth.scale.set(1,.65,.55);mouth.position.set(0,-.165,.345);head.add(mouth);
+  const lip=new THREE.Mesh(sphereG(.045),mat("#8b5148"));lip.scale.set(1.45,.48,.55);lip.position.set(0,-.205,.35);head.add(lip);
 
   addHair(head,cfg,headR);
   addBeard(head,cfg,headR);
   addAccessory(head,cfg,headR);
+  addOutfitDetails(spine,cfg,.72*S);
 
-  addOutfitDetails(
-    spine,
-    cfg,
-    .72*S
-  );
+  const pelvis=new THREE.Mesh(capsuleG(.30*W,.25*height),outfitMat);
+  pelvis.scale.set(1.18*W,1,.82*W);pelvis.position.y=.05*height;hips.add(pelvis);
 
-  /* PELVIS */
-  const pelvis=new THREE.Mesh(
-    capsuleG(.30*W,.25*height),
-    outfitMat
-  );
-  pelvis.scale.set(1.18*W,1,.82*W);
-  pelvis.position.y=.05*height;
-  hips.add(pelvis);
-
-  /* LEGS */
   const legs=[];
-
   for(const x of [-.20*W,.20*W]){
-    const leg=new THREE.Group();
-
-    leg.position.set(
-      x,
-      -.08*height,
-      0
-    );
-
-    hips.add(leg);
-
-    const thigh=new THREE.Mesh(
-      capsuleG(.145*L,.42*height),
-      outfitMat
-    );
-    thigh.scale.set(1,1.12,.92);
-    thigh.position.y=-.29*height;
-    leg.add(thigh);
-
-    const knee=new THREE.Mesh(
-      sphereG(.145*L),
-      outfitMat
-    );
-    knee.scale.set(1,.92,.9);
-    knee.position.y=-.54*height;
-    leg.add(knee);
-
-    const shin=new THREE.Mesh(
-      capsuleG(.125*L,.40*height),
-      outfitMat
-    );
-    shin.position.y=-.77*height;
-    leg.add(shin);
-
-    const shoe=new THREE.Mesh(
-      boxG(.30*L,.16*height,.50*L),
-      shoeMat
-    );
-    shoe.position.set(
-      0,
-      -1.01*height,
-      .10
-    );
-    leg.add(shoe);
-
-    const sole=new THREE.Mesh(
-      boxG(.31*L,.045*height,.52*L),
-      dark
-    );
-    sole.position.set(
-      0,
-      -1.09*height,
-      .105
-    );
-    leg.add(sole);
-
+    const leg=new THREE.Group();leg.position.set(x,-.08*height,0);hips.add(leg);
+    const thigh=new THREE.Mesh(capsuleG(.145*L,.42*height),outfitMat);thigh.scale.set(1,1.12,.92);thigh.position.y=-.29*height;leg.add(thigh);
+    const knee=new THREE.Mesh(sphereG(.145*L),outfitMat);knee.scale.set(1,.92,.9);knee.position.y=-.54*height;leg.add(knee);
+    const shin=new THREE.Mesh(capsuleG(.125*L,.40*height),outfitMat);shin.position.y=-.77*height;leg.add(shin);
+    const shoe=new THREE.Mesh(boxG(.30*L,.16*height,.50*L),shoeMat);shoe.position.set(0,-1.01*height,.10);leg.add(shoe);
+    const sole=new THREE.Mesh(boxG(.31*L,.045*height,.52*L),dark);sole.position.set(0,-1.09*height,.105);leg.add(sole);
     legs.push(leg);
   }
 
-  /* ARMS */
   const arms=[];
-
   for(const x of [-.49*S,.49*S]){
-    const arm=new THREE.Group();
-
-    arm.position.set(
-      x,
-      .62*height,
-      0
-    );
-
-    spine.add(arm);
-
-    const shoulder=new THREE.Mesh(
-      sphereG(.18*S),
-      outfitMat
-    );
-    shoulder.scale.set(1,.92,.9);
-    shoulder.position.y=.01;
-    arm.add(shoulder);
-
-    const upper=new THREE.Mesh(
-      capsuleG(.125*L,.36*height),
-      outfitMat
-    );
-    upper.position.y=-.20*height;
-    arm.add(upper);
-
-    const elbow=new THREE.Mesh(
-      sphereG(.125*L),
-      outfitMat
-    );
-    elbow.position.y=-.41*height;
-    arm.add(elbow);
-
-    const forearm=new THREE.Mesh(
-      capsuleG(.11*L,.32*height),
-      skin
-    );
-    forearm.position.y=-.57*height;
-    arm.add(forearm);
-
-    const wrist=new THREE.Mesh(
-      sphereG(.105*L),
-      skin
-    );
-    wrist.scale.set(.95,.8,.9);
-    wrist.position.y=-.72*height;
-    arm.add(wrist);
-
-    const hand=new THREE.Mesh(
-      sphereG(.13*L),
-      skin
-    );
-    hand.scale.set(.88,1.08,.78);
-    hand.position.y=-.80*height;
-    arm.add(hand);
-
-    const thumb=new THREE.Mesh(
-      sphereG(.065*L),
-      skin
-    );
-    thumb.scale.set(.8,1.15,.8);
-    thumb.position.set(
-      x<0?-.105*L:.105*L,
-      -.78*height,
-      .055
-    );
-    arm.add(thumb);
-
+    const arm=new THREE.Group();arm.position.set(x,.62*height,0);spine.add(arm);
+    const shoulder=new THREE.Mesh(sphereG(.18*S),outfitMat);shoulder.scale.set(1,.92,.9);shoulder.position.y=.01;arm.add(shoulder);
+    const upper=new THREE.Mesh(capsuleG(.125*L,.36*height),outfitMat);upper.position.y=-.20*height;arm.add(upper);
+    const elbow=new THREE.Mesh(sphereG(.125*L),outfitMat);elbow.position.y=-.41*height;arm.add(elbow);
+    const forearm=new THREE.Mesh(capsuleG(.11*L,.32*height),skin);forearm.position.y=-.57*height;arm.add(forearm);
+    const wrist=new THREE.Mesh(sphereG(.105*L),skin);wrist.scale.set(.95,.8,.9);wrist.position.y=-.72*height;arm.add(wrist);
+    const hand=new THREE.Mesh(sphereG(.13*L),skin);hand.scale.set(.88,1.08,.78);hand.position.y=-.80*height;arm.add(hand);
+    const thumb=new THREE.Mesh(sphereG(.065*L),skin);thumb.scale.set(.8,1.15,.8);thumb.position.set(x<0?-.105*L:.105*L,-.78*height,.055);arm.add(thumb);
     arms.push(arm);
   }
 
-  /* NAME TAG */
-  const tag=makeLabel(
-    opts.name||"",
-    opts.tagColor||"#fff",
-    .7
-  );
+  const tag=makeLabel(opts.name||"",opts.tagColor||"#fff",.7);
+  tag.position.y=2.12*height;root.add(tag);
 
-  tag.position.y=2.12*height;
-  root.add(tag);
+  return {root,hips,spine,head,legs,arms,cfg,phase:Math.random()*Math.PI*2,time:0,blinkT:1,blink:false,pose:"idle",tag};
+}
 
-  return {
-    root,
-    hips,
-    spine,
-    head,
-    legs,
-    arms,
-    eyes,
-    cfg,
-    phase:Math.random()*Math.PI*2,
-    time:0,
-    blinkT:1,
-    blink:false,
-    pose:"idle",
-    tag
-  };
+function animateCharacter(char,dt,opts){
+  if(!char)return;
+  char.time+=dt;
+  const speed=opts.speed||0;
+  const air=opts.air||false;
+  const emote=opts.emote||null;
+  const t=char.time;
+  let legSwing=0,armSwing=0;
+  if(speed>0.1&&!air){
+    const freq=speed>4?10:7;
+    legSwing=Math.sin(t*freq)*0.45;
+    armSwing=Math.sin(t*freq+Math.PI)*0.35;
+    char.pose="walk";
+  }else if(emote==="wave"){
+    char.arms[1].rotation.z=-1.2+Math.sin(t*6)*0.4;
+    char.pose="wave";
+  }else if(emote==="dance"){
+    char.hips.position.y=1.02+Math.sin(t*8)*0.06;
+    char.arms[0].rotation.z=0.6+Math.sin(t*6)*0.3;
+    char.arms[1].rotation.z=-0.6-Math.sin(t*6)*0.3;
+    char.pose="dance";
+  }else if(emote==="cheer"){
+    char.arms[0].rotation.z=-1.4;char.arms[1].rotation.z=1.4;
+    char.pose="cheer";
+  }else{
+    char.pose="idle";
+    char.hips.position.y=1.02+Math.sin(t*1.5)*0.015;
+  }
+  if(char.legs[0]&&char.legs[1]){
+    char.legs[0].rotation.x=legSwing;char.legs[1].rotation.x=-legSwing;
+  }
+  if(char.arms[0]&&char.arms[1]&&!emote){
+    char.arms[0].rotation.x=armSwing;char.arms[1].rotation.x=-armSwing;
+  }
+}
+
+function rebuildPlayer(){
+  if(player.char){scene.remove(player.char.root);player.char=null}
+  player.char=createCharacter(state.cfg,{name:state.name,scale:CFG.avatarScale,tagColor:"#FFC20E"});
+  player.char.root.position.copy(player.pos);
+  player.char.root.rotation.y=player.yaw;
+  scene.add(player.char.root);
+  refreshTag();
+}
+
+function refreshTag(){
+  if(player.char&&player.char.tag){
+    player.char.tag.material.map=labelTexture(state.name||"Guest","#FFC20E");
+    player.char.tag.material.needsUpdate=true;
+  }
 }
 
 /* ---------- world ---------- */
@@ -1137,14 +706,12 @@ function addCollider(x0,z0,x1,z1,y1=5,building=true){
   const b={x0,z0,x1,z1,y1,building};colliders.push(b);
   if(building)buildingRects.push(b);return b;
 }
-
 function buildBuilding(x,z,w,d,h,color="#c2b49a"){
   const m=new THREE.Mesh(boxG(w,h,d),mat(color,.9,0));
   m.position.set(x,h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);
   addCollider(x-w/2,z-d/2,x+w/2,z+d/2,h,true);
   return m;
 }
-
 function addRoad(x,z,w,d){
   const m=new THREE.Mesh(boxG(w,.06,d),mat("#2b2e30",.95,0));
   m.position.set(x,.02,z);m.receiveShadow=true;scene.add(m);
@@ -1159,47 +726,36 @@ function addRoad(x,z,w,d){
     }
   }
 }
-
 function buildPlace(p){
   const size=10,cell=32;
   const x=p.sx*cell,z=p.sz*cell;
   const h=p.kind==="career"?8:p.kind==="board"?11:p.kind==="market"?6:p.kind==="home"?5:6+Math.random()*5;
-  const color=p.color;
-  const building=buildBuilding(x,z,size,size,h,color);
+  const building=buildBuilding(x,z,size,size,h,p.color);
   building.userData.place=p;
-
-  const ring=new THREE.Mesh(torusG(2.1,.08,8,32),mat("#f2b705",.5,.2));
+  const ring=new THREE.Mesh(torusG(2.1,.08,8,32),mat("#FFC20E",.5,.2));
   ring.rotation.x=Math.PI/2;ring.position.set(x,.08,z);scene.add(ring);
-  const beam=new THREE.Mesh(cylG(.08,.28,3),new THREE.MeshBasicMaterial({color:"#f2b705",transparent:true,opacity:.16}));
+  const beam=new THREE.Mesh(cylG(.08,.28,3),new THREE.MeshBasicMaterial({color:"#FFC20E",transparent:true,opacity:.16}));
   beam.position.set(x,h+.4,z);scene.add(beam);
-
   const label=makeLabel(p.name,p.color,.8);label.position.set(x,h+.9,z);scene.add(label);
   markers.push({ring,label,base:h+.9});
   poiList.push({name:p.name,tab:p.tab||"social",kind:p.kind,x,z,color:p.color,building});
 }
-
-function buildSocialPlace(p){
-  buildPlace({...p,tab:"social"});
-}
+function buildSocialPlace(p){buildPlace({...p,tab:"social"})}
 
 function buildWorld(){
   const ground=new THREE.Mesh(boxG(CFG.world*2,.4,CFG.world*2),mat("#355b43"));
   ground.position.y=-.22;ground.receiveShadow=true;scene.add(ground);
-
   const water=new THREE.Mesh(boxG(38,.08,CFG.world*2),mat("#397c8b",.25,.05));
   water.position.set(-78,-.02,0);scene.add(water);
-
   addRoad(0,0,CFG.world*2,CFG.road);
   addRoad(0,0,CFG.road,CFG.world*2);
-
   for(let sx=-2;sx<=2;sx++){
     for(let sz=-2;sz<=2;sz++){
       if(sx===0&&sz===0)continue;
       const px=sx*32,pz=sz*32;
-      const key=`${sx}_${sz}`;
-      const poi=ALL_PLACES.find(p=>`${p.sx}_${p.sz}`===key);
-      if(poi) continue;
-
+      const key=`\( {sx}_ \){sz}`;
+      const poi=ALL_PLACES.find(p=>`\( {p.sx}_ \){p.sz}`===key);
+      if(poi)continue;
       for(let i=0;i<3;i++){
         const ox=(i-1)*8,oz=((i%2)?-5:5);
         const w=6+Math.random()*3,d=6+Math.random()*3,h=4+Math.random()*7;
@@ -1207,10 +763,8 @@ function buildWorld(){
       }
     }
   }
-
   for(const p of PLACES)buildPlace(p);
   for(const p of SOCIAL_PLACES)buildSocialPlace(p);
-
   for(let i=0;i<42;i++){
     const x=(Math.random()-.5)*170,z=(Math.random()-.5)*170;
     if(Math.abs(x)<10||Math.abs(z)<10)continue;
@@ -1219,7 +773,6 @@ function buildWorld(){
     const leaf=new THREE.Mesh(sphereG(1.25),mat("#2d7349"));
     leaf.position.set(x,2.1,z);leaf.scale.y=1.15;leaf.castShadow=true;scene.add(leaf);
   }
-
   for(let i=-80;i<=80;i+=10){
     for(const z of [-7,7]){
       const pole=new THREE.Mesh(cylG(.06,.07,3.2),mat("#343434",.65,.25));
@@ -1228,7 +781,6 @@ function buildWorld(){
       lamp.position.set(i,3.15,z);scene.add(lamp);
     }
   }
-
   const skyline=new THREE.Group();
   for(let i=0;i<32;i++){
     const x=(Math.random()-.5)*180,z=(Math.random()-.5)*180;
@@ -1240,11 +792,13 @@ function buildWorld(){
   scene.add(skyline);
 }
 
-/* ---------- traffic ---------- */
+/* ---------- traffic (danfo style) ---------- */
 function buildBus(x,z,rot=0){
   const root=new THREE.Group();
-  const body=new THREE.Mesh(boxG(2.2,1.25,4.6),mat("#d4a321"));
+  const body=new THREE.Mesh(boxG(2.2,1.25,4.6),mat("#FFC20E")); // danfo yellow
   body.position.y=.75;body.castShadow=true;root.add(body);
+  const stripe=new THREE.Mesh(boxG(2.25,.18,4.65),mat("#111"));
+  stripe.position.y=1.15;root.add(stripe);
   const roof=new THREE.Mesh(boxG(2.05,.16,4.2),mat("#ece6cf"));roof.position.y=1.42;root.add(roof);
   for(const sx of [-1.13,1.13])for(const sz of [-1.35,1.35]){
     const wh=new THREE.Mesh(cylG(.36,.36,.22),mat("#171717"));wh.rotation.z=Math.PI/2;wh.position.set(sx,.38,sz);root.add(wh);
@@ -1284,7 +838,6 @@ function randomCfg(){
   }
   return c;
 }
-
 function buildNPCs(){
   for(let i=0;i<12;i++){
     const a=Math.random()*Math.PI*2,r=18+Math.random()*58;
@@ -1303,7 +856,6 @@ function buildNPCs(){
     npcs.push(npc);
   }
 }
-
 function chooseNpcTarget(n){
   const a=Math.random()*Math.PI*2,r=8+Math.random()*30;
   n.target.set(clamp(n.pos.x+Math.cos(a)*r,-78,78),0,clamp(n.pos.z+Math.sin(a)*r,-78,78));
@@ -1322,16 +874,29 @@ function updateNPCs(dt){
   }
 }
 
-/* ---------- day / night ---------- */
-let gameHour=8;
-const SKY={day:"#78a9b8",dusk:"#d18b67",night:"#11182b"};
+/* ---------- day / night + rent ---------- */
+let gameHour=8, gameDay=1;
 function updateDayNight(dt){
   gameHour=(gameHour+dt*(24/(CFG.dayMinutes*60)))%24;
+  if(gameHour<0.05&&dt>0){ // new day roughly
+    gameDay++;
+    state.rentDueIn=Math.max(0,state.rentDueIn-1);
+    if(state.rentDueIn<=0){
+      const rent=HOUSING[state.housingLevel].rent;
+      if(state.money>=rent){
+        state.money-=rent;
+        state.rentDueIn=14;
+        toast(`Rent paid: ₦${rent.toLocaleString()}. Next due in 14 days.`);
+        updateHUD();
+      }else{
+        toast("Rent overdue! Find work or you'll lose housing.");
+      }
+    }
+  }
   const h=gameHour;
-  let sky=SKY.day;
-  if(h<6||h>20)sky=SKY.night;
-  else if(h<8)sky=SKY.dusk;
-  else if(h>18)sky=SKY.dusk;
+  let sky="#78a9b8";
+  if(h<6||h>20)sky="#11182b";
+  else if(h<8||h>18)sky="#d18b67";
   scene.background.lerp(new THREE.Color(sky),.04);
   scene.fog.color.copy(scene.background);
   const daylight=clamp(Math.sin((h-6)/12*Math.PI),0,1);
@@ -1339,219 +904,200 @@ function updateDayNight(dt){
   hemi.intensity=.45+daylight*1.2;
   moon.intensity=.12+(1-daylight)*.55;
   sunDir.set(Math.cos((h-12)/24*Math.PI*2),Math.sin((h-6)/12*Math.PI),.25).normalize();
-  $("clock").textContent=`${((Math.floor(h)+11)%12)+1}:${String(Math.floor((h%1)*60)).padStart(2,"0")} ${h<12?"AM":"PM"}`;
+  \( ("clock").textContent=` \){((Math.floor(h)+11)%12)+1}:${String(Math.floor((h%1)*60)).padStart(2,"0")} ${h<12?"AM":"PM"}`;
   stars.visible=daylight<.3;
 }
 
 /* ---------- movement ---------- */
 function resolveCollisions(pos,r){
   for(const b of colliders){
-    if(!b.building||pos.y>b.y1)return;
-    const cx=clamp(pos.x,b.x0,b.x1),cz=clamp(pos.z,b.z0,b.z1);
-    let dx=pos.x-cx,dz=pos.z-cz,d=Math.hypot(dx,dz);
-    if(d<r){
-      if(d<.0001){const dl=Math.abs(pos.x-b.x0),dr=Math.abs(pos.x-b.x1),dt=Math.abs(pos.z-b.z0),db=Math.abs(pos.z-b.z1);const m=Math.min(dl,dr,dt,db);if(m===dl)pos.x=b.x0-r;else if(m===dr)pos.x=b.x1+r;else if(m===dt)pos.z=b.z0-r;else pos.z=b.z1+r}
-      else{pos.x+=dx/d*(r-d);pos.z+=dz/d*(r-d)}
+    if(!b.building||pos.y>b.y1)continue;
+    const cx=clamp(pos.x,b.x0,b.x1);
+    const cz=clamp(pos.z,b.z0,b.z1);
+    const dx=pos.x-cx,dz=pos.z-cz;
+    const dist=Math.hypot(dx,dz);
+    if(dist<r&&dist>0){
+      const push=(r-dist)/dist;
+      pos.x+=dx*push;pos.z+=dz*push;
     }
   }
 }
-
-function getInput(){
-  let x=0,z=0;
-  if(state.keys.left)x-=1;if(state.keys.right)x+=1;
-  if(state.keys.up)z+=1;if(state.keys.down)z-=1;
-  if(state.joy.active){x=state.joy.x;z=-state.joy.y}
-  const mag=clamp(Math.hypot(x,z),0,1);
-  return {x,z,mag};
-}
-
 function updatePlayer(dt){
-  const inp=getInput(),hasInput=inp.mag>.08;
-  if(hasInput||state.jumpQueued)state.emote=null;
-  const wantRun=state.keys.shift||state.runToggle||(state.joy.active&&inp.mag>.92);
-  const top=wantRun?CFG.run:CFG.walk;
-  const sp=hasInput?top*(state.joy.active?clamp(inp.mag*1.15,.35,1):1):0;
-
-  fwd.set(-Math.sin(cam.yaw),0,-Math.cos(cam.yaw));
-  right.set(Math.cos(cam.yaw),0,-Math.sin(cam.yaw));
-  wish.set(0,0,0).addScaledVector(right,inp.x).addScaledVector(fwd,-inp.z);
-  if(wish.lengthSq()>0)wish.normalize().multiplyScalar(sp);
-
-  const k=hasInput?CFG.accel:CFG.decel;
-  player.vel.x=damp(player.vel.x,wish.x,k,dt);
-  player.vel.z=damp(player.vel.z,wish.z,k,dt);
-  player.pos.x+=player.vel.x*dt;player.pos.z+=player.vel.z*dt;
-  player.pos.x=clamp(player.pos.x,-CFG.limit,CFG.limit);player.pos.z=clamp(player.pos.z,-CFG.limit,CFG.limit);
-  resolveCollisions(player.pos,CFG.radius);pushOutOfBuses(player.pos,CFG.radius);
-
-  if(player.pos.y<=.001&&state.jumpQueued)player.vy=CFG.jump;
-  state.jumpQueued=false;
-  player.vy-=CFG.gravity*dt;player.pos.y+=player.vy*dt;
+  const run=state.keys.shift||state.runToggle;
+  const speed=run?CFG.run:CFG.walk;
+  wish.set(0,0,0);
+  if(state.keys.up||state.joy.y<-.2)wish.z-=1;
+  if(state.keys.down||state.joy.y>.2)wish.z+=1;
+  if(state.keys.left||state.joy.x<-.2)wish.x-=1;
+  if(state.keys.right||state.joy.x>.2)wish.x+=1;
+  if(wish.lengthSq()>0)wish.normalize();
+  const camYaw=cam.yaw;
+  fwd.set(-Math.sin(camYaw),0,-Math.cos(camYaw));
+  right.set(Math.cos(camYaw),0,-Math.sin(camYaw));
+  const dir=new THREE.Vector3();
+  dir.addScaledVector(fwd,-wish.z);
+  dir.addScaledVector(right,wish.x);
+  if(dir.lengthSq()>0){
+    dir.normalize();
+    player.vel.x=damp(player.vel.x,dir.x*speed,CFG.accel,dt);
+    player.vel.z=damp(player.vel.z,dir.z*speed,CFG.accel,dt);
+    player.yaw=Math.atan2(dir.x,dir.z);
+  }else{
+    player.vel.x=damp(player.vel.x,0,CFG.decel,dt);
+    player.vel.z=damp(player.vel.z,0,CFG.decel,dt);
+  }
+  if(state.jumpQueued&&player.pos.y<=0.05){
+    player.vy=CFG.jump;state.jumpQueued=false;
+  }
+  player.vy-=CFG.gravity*dt;
+  player.pos.x+=player.vel.x*dt;
+  player.pos.z+=player.vel.z*dt;
+  player.pos.y+=player.vy*dt;
   if(player.pos.y<0){player.pos.y=0;player.vy=0}
-
-  const spd=Math.hypot(player.vel.x,player.vel.z);
-  if(spd>.4)player.yaw+=angDiff(player.yaw,Math.atan2(player.vel.x,player.vel.z))*Math.min(1,CFG.turn*dt);
-
-  const air=player.pos.y>.04;
-  state.status=air?"Jumping":state.emote?"Emote":spd>4.6?"Running":spd>.4?"Walking":"Idle";
-  player.char.root.position.copy(player.pos);player.char.root.rotation.y=player.yaw;
-  animateCharacter(player.char,dt,{speed:spd,air,emote:state.emote});
+  player.pos.x=clamp(player.pos.x,-CFG.limit,CFG.limit);
+  player.pos.z=clamp(player.pos.z,-CFG.limit,CFG.limit);
+  resolveCollisions(player.pos,CFG.radius);
+  pushOutOfBuses(player.pos);
+  if(player.char){
+    player.char.root.position.copy(player.pos);
+    player.char.root.rotation.y=player.yaw;
+    const spd=Math.hypot(player.vel.x,player.vel.z);
+    animateCharacter(player.char,dt,{speed:spd,air:player.pos.y>0.1,emote:state.emote});
+    state.status=spd>4?"Running":spd>0.3?"Walking":state.emote||"Idle";
+  }
 }
 
 function updateViewerPlayer(dt){
-  player.vel.set(0,0,0);
-  const pose=viewer.pose,speed=pose==="walk"?2.6:pose==="run"?6.2:0;
-  const emote=pose==="wave"||pose==="dance"||pose==="cheer"?pose:null;
-  player.char.root.position.copy(player.pos);player.char.root.rotation.y=player.yaw;
-  animateCharacter(player.char,dt,{speed,emote});
-  state.status="Viewing";
-}
-
-/* ---------- interaction / social ---------- */
-let nearPlace=null;
-
-function distanceToPlace(p){
-  return Math.hypot(p.x-player.pos.x,p.z-player.pos.z);
-}
-function findNearestSocialNpc(){
-  let best=null,bd=4.4;
-  for(const n of npcs){
-    const d=Math.hypot(n.pos.x-player.pos.x,n.pos.z-player.pos.z);
-    if(d<bd){bd=d;best=n}
-  }
-  return best;
-}
-
-function updatePlaces(dt,t){
-  for(const m of markers){
-    m.ring.scale.setScalar(1+Math.sin(t*3)*.07);
-    m.ring.rotation.z=t*.6;
-    m.label.position.y=m.base+Math.sin(t*2)*.12;
-  }
-
-  nearPlace=null;
-  let nearNpc=null;
-
-  if(state.mode==="play"){
-    for(const p of poiList){
-      if(distanceToPlace(p)<3.4){nearPlace=p;break}
-    }
-
-    if(nearPlace&&SOCIAL_PLACES.some(p=>p.name===nearPlace.name)){
-      nearNpc=findNearestSocialNpc();
-    }
-  }
-
-  const btn=$("prompt");
-  if(nearNpc){
-    btn.textContent=`Talk to ${nearNpc.name}`;
-    btn.classList.add("show");
-    btn.dataset.action="npc";
-    state.activeNpc=nearNpc;
-  }else if(nearPlace){
-    btn.textContent=`Enter ${nearPlace.name}`;
-    btn.classList.add("show");
-    btn.dataset.action="place";
-    state.activeNpc=null;
-  }else{
-    btn.classList.remove("show");
-    state.activeNpc=null;
-  }
-}
-
-function enterPlace(){
-  if(state.activeNpc){openConversation(state.activeNpc);return}
-  if(!nearPlace)return;
-  if(SOCIAL_PLACES.some(p=>p.name===nearPlace.name)){
-    const npc=findNearestSocialNpc();
-    if(npc){openConversation(npc);return}
-  }
-  toast(`Opening ${nearPlace.name}...`);
-  setTimeout(()=>{location.href=`index.html#${nearPlace.tab}`},350);
-}
-
-/* ---------- camera ---------- */
-const camTarget=new THREE.Vector3(),camDesired=new THREE.Vector3(),camDir=new THREE.Vector3();
-const camSmoothTarget=new THREE.Vector3(0,1.5,0),camPos=new THREE.Vector3(0,3,8);
-let camInit=false;
-
-function rayHit(ox,oy,oz,dx,dy,dz,maxT,margin){
-  let best=maxT;
-  for(const b of colliders){
-    if(!b.building)continue;
-    let tmin=0,tmax=maxT,ok=true;
-    for(const ax of [0,1]){
-      const o=ax?oz:ox,d=ax?dz:dx,lo=(ax?b.z0:b.x0)-margin,hi=(ax?b.z1:b.x1)+margin;
-      if(Math.abs(d)<1e-6){if(o<lo||o>hi){ok=false;break}}
-      else{let t1=(lo-o)/d,t2=(hi-o)/d;if(t1>t2){const s=t1;t1=t2;t2=s}tmin=Math.max(tmin,t1);tmax=Math.min(tmax,t2);if(tmin>tmax){ok=false;break}}
-    }
-    if(!ok)continue;
-    if(oy+dy*tmin>b.y1+margin)continue;
-    if(tmin<best)best=tmin;
-  }
-  return best;
-}
-
-function placeOrbitCamera(target,yaw,pitch,dist,dt,followK){
-  const cp=Math.cos(pitch);
-  camDir.set(Math.sin(yaw)*cp,Math.sin(pitch),Math.cos(yaw)*cp);
-  const hit=rayHit(target.x,target.y,target.z,camDir.x,camDir.y,camDir.z,dist,.35);
-  const d=Math.max(.9,Math.min(dist,hit-.2));
-  camDesired.copy(target).addScaledVector(camDir,d);camDesired.y=Math.max(camDesired.y,.35);
-  camPos.lerp(camDesired,1-Math.exp(-followK*dt));
-  camSmoothTarget.lerp(target,1-Math.exp(-(followK+4)*dt));
-  camera.position.copy(camPos);camera.lookAt(camSmoothTarget);
+  if(!player.char)return;
+  animateCharacter(player.char,dt,{speed:viewer.pose==="walk"?2:viewer.pose==="run"?5:0,air:false,emote:viewer.pose==="wave"||viewer.pose==="dance"?viewer.pose:null});
+  if(viewer.spin)viewer.yaw+=dt*0.8;
 }
 
 function updateCamera(dt){
-  if(!camInit){camPos.set(player.pos.x,3.5,player.pos.z+7);camSmoothTarget.set(player.pos.x,1.5,player.pos.z);camInit=true}
   if(state.mode==="viewer"){
-    if(viewer.spin&&performance.now()/1000-viewer.lastDrag>1.5)viewer.yaw+=dt*.55;
-    const pr=viewer.preset,wantDist=pr==="face"?1.7:4.6,wantTy=pr==="face"?1.58:1;
-    viewer.dist=damp(viewer.dist,viewer.userDist??wantDist,6,dt);viewer.ty=damp(viewer.ty??wantTy,wantTy,6,dt);
-    camTarget.set(player.pos.x,player.pos.y+viewer.ty,player.pos.z);
-    placeOrbitCamera(camTarget,viewer.yaw,viewer.pitch,viewer.dist,dt,9);
-  }else if(cam.mode==="first"){
-    const hy=player.pos.y+1.62,cp=Math.cos(cam.pitch);
-    camera.position.set(player.pos.x-Math.sin(cam.yaw)*.1,hy,player.pos.z-Math.cos(cam.yaw)*.1);
-    camDir.set(-Math.sin(cam.yaw)*cp,-Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp);
-    camera.lookAt(camera.position.x+camDir.x,camera.position.y+camDir.y,camera.position.z+camDir.z);
-    camPos.copy(camera.position);camSmoothTarget.set(camera.position.x+camDir.x,camera.position.y+camDir.y,camera.position.z+camDir.z);
-  }else{
-    camTarget.set(player.pos.x,player.pos.y+1.45,player.pos.z);
-    const d=cam.mode==="far"?cam.dist*1.8:cam.dist;
-    placeOrbitCamera(camTarget,cam.yaw,cam.pitch,d,dt,10);
+    const dist=viewer.userDist??viewer.dist;
+    const target=player.pos.clone().add(new THREE.Vector3(0,1.4,0));
+    const ox=Math.sin(viewer.yaw)*dist;
+    const oz=Math.cos(viewer.yaw)*dist;
+    const oy=Math.sin(viewer.pitch)*dist*0.6+1.2;
+    camera.position.lerp(target.clone().add(new THREE.Vector3(ox,oy,oz)),1-Math.exp(-8*dt));
+    camera.lookAt(target);
+    return;
   }
-
-  const open=$("customizer").classList.contains("open"),wide=innerWidth>=800;
-  viewer.shiftY=damp(viewer.shiftY,open&&!wide?innerHeight*.2:0,8,dt);
-  viewer.shiftX=damp(viewer.shiftX,open&&wide?innerWidth*.15:0,8,dt);
-  if(Math.abs(viewer.shiftY)+Math.abs(viewer.shiftX)>.5)camera.setViewOffset(innerWidth,innerHeight,viewer.shiftX,viewer.shiftY,innerWidth,innerHeight);
-  else if(camera.view&&camera.view.enabled)camera.clearViewOffset();
+  const dist=cam.mode==="far"?8.5:cam.mode==="first"?0.15:cam.dist;
+  const target=player.pos.clone().add(new THREE.Vector3(0,cam.mode==="first"?1.55:1.35,0));
+  if(cam.mode==="first"){
+    camera.position.copy(target);
+    camera.rotation.order="YXZ";
+    camera.rotation.y=player.yaw+Math.PI;
+    camera.rotation.x=cam.pitch;
+  }else{
+    const ox=Math.sin(cam.yaw)*dist;
+    const oz=Math.cos(cam.yaw)*dist;
+    const oy=Math.sin(cam.pitch)*dist*0.7+1.5;
+    camera.position.lerp(target.clone().add(new THREE.Vector3(ox,oy,oz)),1-Math.exp(-6*dt));
+    camera.lookAt(target);
+  }
 }
 
 function updateSun(){
-  sun.position.set(player.pos.x+sunDir.x*45,player.pos.y+sunDir.y*45,player.pos.z+sunDir.z*45);
-  sun.target.position.copy(player.pos);sun.target.updateMatrixWorld();stars.position.copy(camera.position);
+  sun.position.copy(player.pos).add(sunDir.clone().multiplyScalar(40));
+  sun.target.position.copy(player.pos);
+  sun.target.updateMatrixWorld();
+}
+
+function updatePlaces(dt,t){
+  let nearest=null,nd=8;
+  for(const p of poiList){
+    const d=Math.hypot(p.x-player.pos.x,p.z-player.pos.z);
+    if(d<nd){nd=d;nearest=p}
+  }
+  const prompt=$("prompt");
+  if(nearest&&state.mode==="play"&&!$("socialPanel").classList.contains("open")){
+    prompt.textContent=nearest.kind==="home"?"Enter Home":`Enter ${nearest.name}`;
+    prompt.classList.add("show");
+    prompt.onclick=()=>enterPlace(nearest);
+  }else if(!nearbySocialNpc){
+    prompt.classList.remove("show");
+  }
+  for(const m of markers){
+    m.ring.rotation.z=t*0.6;
+    m.label.position.y=m.base+Math.sin(t*2)*0.08;
+  }
+}
+
+function enterPlace(p){
+  if(!p)return;
+  if(p.kind==="home"){
+    toast("You're home. Rest, plan, or upgrade your housing.");
+    openHousingPanel();
+  }else if(p.kind==="career"){
+    const pay=1500+Math.floor(Math.random()*2500);
+    state.money+=pay;
+    updateHUD();
+    toast(`You worked a shift. Earned ₦${pay.toLocaleString()}`);
+  }else if(p.kind==="market"){
+    toast("Market Plaza — buy clothes, food, or hustle supplies here soon.");
+  }else{
+    toast(`Entered ${p.name}`);
+  }
+}
+
+/* ---------- HUD + housing ---------- */
+function updateHUD(){
+  $("money").textContent=state.money.toLocaleString();
+  $("housingPill").textContent=HOUSING[state.housingLevel].name.split(" ")[0];
+  $("name").textContent=state.name;
+  $("sub").textContent=state.sub;
+}
+
+function openHousingPanel(){
+  const levels=$("housingLevels");
+  levels.innerHTML="";
+  HOUSING.forEach((h,i)=>{
+    const div=document.createElement("div");
+    div.className="housingLevel"+(i===state.housingLevel?" current":"")+(i>state.housingLevel+1?" locked":"");
+    div.innerHTML=`<b>\( {h.name}</b><span style="font-size:12px;color:var(--muted)">Rent ₦ \){h.rent.toLocaleString()}/14 days · Upgrade ₦${h.cost.toLocaleString()}</span>`;
+    levels.appendChild(div);
+  });
+  $("housingDesc").textContent=`Current: ${HOUSING[state.housingLevel].name}. Rent due in ${state.rentDueIn} days. ${HOUSING[state.housingLevel].desc}`;
+  $("housingPanel").classList.add("open");
+}
+
+function tryUpgradeHousing(){
+  const next=state.housingLevel+1;
+  if(next>=HOUSING.length){toast("You already have the best housing.");return}
+  const cost=HOUSING[next].cost;
+  if(state.money<cost){toast(`Need ₦${cost.toLocaleString()} to upgrade.`);return}
+  state.money-=cost;
+  state.housingLevel=next;
+  state.rentDueIn=14;
+  updateHUD();
+  toast(`Upgraded to ${HOUSING[next].name}!`);
+  openHousingPanel();
+  saveLocalProgress();
 }
 
 /* ---------- minimap ---------- */
-const mm=$("minimap"),mx=mm.getContext("2d");mm.width=mm.height=220;
 function drawMinimap(){
-  const S=2.6,M=220;mx.clearRect(0,0,M,M);mx.save();
-  mx.beginPath();mx.arc(M/2,M/2,M/2,0,Math.PI*2);mx.clip();
-  mx.fillStyle="#2f5a45";mx.fillRect(0,0,M,M);
-  const theta=-Math.PI/2-Math.atan2(-Math.cos(cam.yaw),-Math.sin(cam.yaw));
-  mx.save();mx.translate(M/2,M/2);mx.rotate(theta);mx.scale(S,S);mx.translate(-player.pos.x,-player.pos.z);
-  mx.fillStyle="#2c3033";mx.fillRect(-6,-100,12,200);mx.fillRect(-100,-6,200,12);
-  mx.fillStyle="#b9ab8d";for(const b of buildingRects)mx.fillRect(b.x0,b.z0,b.x1-b.x0,b.z1-b.z0);
-  for(const p of poiList){mx.fillStyle=p.color;mx.beginPath();mx.arc(p.x,p.z,2.6,0,7);mx.fill();mx.strokeStyle="#FFC20E";mx.lineWidth=.7;mx.stroke()}
-  mx.fillStyle="#fff";for(const n of npcs){mx.beginPath();mx.arc(n.pos.x,n.pos.z,.9,0,7);mx.fill()}
-  mx.fillStyle="#f2b705";for(const b of buses)mx.fillRect(b.mesh.position.x-1,b.mesh.position.z-1,2,2);
+  const c=$("minimap");
+  const mx=c.getContext("2d");
+  const M=200;
+  c.width=M;c.height=M;
+  mx.fillStyle="#1b241f";mx.fillRect(0,0,M,M);
+  mx.strokeStyle="rgba(255,255,255,.08)";
+  for(let i=0;i<M;i+=20){mx.beginPath();mx.moveTo(i,0);mx.lineTo(i,M);mx.stroke();mx.beginPath();mx.moveTo(0,i);mx.lineTo(M,i);mx.stroke()}
+  const scale=M/(CFG.world*1.1);
+  const ox=M/2-player.pos.x*scale,oy=M/2-player.pos.z*scale;
+  for(const p of poiList){
+    mx.fillStyle=p.color;
+    mx.beginPath();mx.arc(ox+p.x*scale,oy+p.z*scale,5,0,Math.PI*2);mx.fill();
+  }
+  mx.save();
+  mx.translate(M/2,M/2);mx.rotate(player.yaw);
+  mx.fillStyle="#FFC20E";mx.strokeStyle="#14201F";mx.lineWidth=2;
+  mx.beginPath();mx.moveTo(10,0);mx.lineTo(-7,7);mx.lineTo(-3,0);mx.lineTo(-7,-7);mx.closePath();mx.fill();mx.stroke();
   mx.restore();
-  const ang=Math.atan2(Math.cos(player.yaw),Math.sin(player.yaw))+theta;
-  mx.translate(M/2,M/2);mx.rotate(ang);mx.fillStyle="#FFC20E";mx.strokeStyle="#14201F";mx.lineWidth=3;
-  mx.beginPath();mx.moveTo(12,0);mx.lineTo(-8,8);mx.lineTo(-4,0);mx.lineTo(-8,-8);mx.closePath();mx.fill();mx.stroke();mx.restore();
 }
 
 /* ---------- UI helpers ---------- */
@@ -1560,11 +1106,9 @@ function toast(msg){
   const t=$("toast");t.textContent=msg;t.classList.add("show");
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2600);
 }
-
 function refreshSelected(){
   document.querySelectorAll("#sections [data-key]").forEach(b=>b.classList.toggle("selected",state.cfg[b.dataset.key]===b.dataset.val));
 }
-
 function buildCustomizer(){
   const host=$("sections");host.innerHTML="";
   for(const [key,def] of Object.entries(OPTIONS)){
@@ -1585,66 +1129,35 @@ function buildCustomizer(){
   refreshSelected();
 }
 
-/* ---------- social conversations ---------- */
+/* ---------- social (simplified but functional) ---------- */
 const DIALOGUES={
-  friendly:{
-    intro:n=>`${n.name} smiles. "You look like someone with plans. What are you working on?"`,
-    choices:[
-      {text:"I'm trying to build something.",reply:"That's the spirit. Start small, stay consistent.",rel:2,opp:"Starter Project"},
-      {text:"I'm looking for work.",reply:"I hear there is an opening nearby. Check the Job Centre.",rel:1,opp:"Job Lead"},
-      {text:"Just exploring the city.",reply:"Then keep your eyes open. Opportunities hide in ordinary places.",rel:1}
-    ]
-  },
-  ambitious:{
-    intro:n=>`${n.name} looks you over. "Everybody wants success. The question is what you're willing to build for it."`,
-    choices:[
-      {text:"I want to start a business.",reply:"Then learn the market before spending money.",rel:2,opp:"Business Lead"},
+  friendly:{intro:n=>`${n.name} smiles. "You look like someone with plans. What are you working on?"`,
+    choices:[{text:"I'm trying to build something.",reply:"That's the spirit. Start small, stay consistent.",rel:2,opp:"Starter Project"},
+      {text:"I'm looking for work.",reply:"Check the Job Centre nearby.",rel:1,opp:"Job Lead"},
+      {text:"Just exploring Lagos.",reply:"Keep your eyes open. Opportunities hide in ordinary places.",rel:1}]},
+  ambitious:{intro:n=>`${n.name} looks you over. "Everybody wants success. What are you building for it?"`,
+    choices:[{text:"I want to start a business.",reply:"Learn the market before spending money.",rel:2,opp:"Business Lead"},
       {text:"I want a better career.",reply:"Build a useful skill and prove you can deliver.",rel:1,opp:"Career Lead"},
-      {text:"I need a quick hustle.",reply:"Quick money is not always good money. Think long-term.",rel:1}
-    ]
-  },
-  streetwise:{
-    intro:n=>`${n.name} nods. "This city moves fast. You have to know who to trust."`,
-    choices:[
-      {text:"Any good opportunities around?",reply:"Check the Market Plaza. People there always know something.",rel:2,opp:"Market Lead"},
-      {text:"How do I avoid bad deals?",reply:"Ask questions, verify people and never rush because someone pressures you.",rel:2},
-      {text:"Know any jobs?",reply:"The Job Centre is your safest starting point.",rel:1,opp:"Job Lead"}
-    ]
-  },
-  creative:{
-    intro:n=>`${n.name} grins. "Ideas are everywhere. The hard part is turning one into something useful."`,
-    choices:[
-      {text:"I have an idea for a service.",reply:"Test it with real people before building too much.",rel:2,opp:"Creative Lead"},
-      {text:"I want to design websites.",reply:"Small businesses always need better ways to present themselves.",rel:2,opp:"Web Design Lead"},
-      {text:"I want to meet more people.",reply:"Then social places are your best classroom.",rel:1}
-    ]
-  },
-  business:{
-    intro:n=>`${n.name} says, "Business is simple in theory: solve a problem people actually pay to have solved."`,
-    choices:[
-      {text:"How do I find customers?",reply:"Go where the customers already are. Listen before you sell.",rel:2,opp:"Customer Lead"},
-      {text:"Should I start big?",reply:"No. Prove demand first, then expand.",rel:2},
-      {text:"Know any suppliers?",reply:"Ask around Market Plaza. Relationships matter.",rel:1,opp:"Supplier Lead"}
-    ]
-  },
-  career:{
-    intro:n=>`${n.name} says, "A strong career is built one useful skill at a time."`,
-    choices:[
-      {text:"Which skills matter?",reply:"Communication, digital skills and reliability are valuable almost everywhere.",rel:2,opp:"Skill Lead"},
-      {text:"I need experience.",reply:"Volunteer, freelance or take small jobs. Evidence beats promises.",rel:2},
-      {text:"I want a mentor.",reply:"Build relationships first. People mentor people they trust.",rel:1}
-    ]
-  }
+      {text:"I need a quick hustle.",reply:"Quick money is not always good money.",rel:1}]},
+  streetwise:{intro:n=>`${n.name} nods. "This city moves fast. You have to know who to trust."`,
+    choices:[{text:"Any good opportunities?",reply:"Check Computer Village. People there always know something.",rel:2,opp:"Market Lead"},
+      {text:"How do I avoid bad deals?",reply:"Ask questions, verify people, never rush.",rel:2},
+      {text:"Know any jobs?",reply:"Job Centre is your safest start.",rel:1,opp:"Job Lead"}]},
+  creative:{intro:n=>`${n.name} grins. "Ideas are everywhere. Turning one into something useful is the hard part."`,
+    choices:[{text:"I have an idea for a service.",reply:"Test it with real people first.",rel:2,opp:"Creative Lead"},
+      {text:"I want to design websites.",reply:"Small businesses always need better presentation.",rel:2,opp:"Web Design Lead"},
+      {text:"I want to meet more people.",reply:"Social places are your best classroom.",rel:1}]},
+  business:{intro:n=>`${n.name} says, "Business is simple: solve a problem people pay to have solved."`,
+    choices:[{text:"How do I find customers?",reply:"Go where they already are. Listen before you sell.",rel:2,opp:"Customer Lead"},
+      {text:"Should I start big?",reply:"Prove demand first, then expand.",rel:2},
+      {text:"Know any suppliers?",reply:"Ask around the market. Relationships matter.",rel:1,opp:"Supplier Lead"}]},
+  career:{intro:n=>`${n.name} says, "A strong career is built one useful skill at a time."`,
+    choices:[{text:"Which skills matter?",reply:"Communication, digital skills and reliability.",rel:2,opp:"Skill Lead"},
+      {text:"I need experience.",reply:"Take small jobs. Evidence beats promises.",rel:2},
+      {text:"I want a mentor.",reply:"Build relationships first.",rel:1}]}
 };
-
-function relationLevel(id){
-  return state.relationships[id]||0;
-}
-
-function addRelationship(n,amount){
-  state.relationships[n.id]=clamp(relationLevel(n.id)+amount,0,100);
-}
-
+function relationLevel(id){return state.relationships[id]||0}
+function addRelationship(n,amount){state.relationships[n.id]=clamp(relationLevel(n.id)+amount,0,100)}
 function addOpportunity(name){
   if(!name)return;
   if(!state.opportunities.some(o=>o.name===name)){
@@ -1653,7 +1166,6 @@ function addOpportunity(name){
     toast(`New opportunity: ${name}`);
   }
 }
-
 function openConversation(npc){
   if(!npc)return;
   state.activeNpc=npc;
@@ -1661,14 +1173,13 @@ function openConversation(npc){
   setSocialTab("conversation");
   renderConversation(npc);
 }
-
 function renderConversation(npc){
   const body=$("socialBody");
   const d=DIALOGUES[npc.personality]||DIALOGUES.friendly;
   const level=relationLevel(npc.id);
   body.innerHTML="";
   const intro=document.createElement("div");intro.className="dialogueIntro";
-  intro.innerHTML=`<div class="dialogueName">${npc.name}</div><div>${d.intro(npc)}</div><div class="smallNote">Relationship: ${level}/100 · Personality: ${npc.personality}</div>`;
+  intro.innerHTML=`<div class="dialogueName">\( {npc.name}</div><div> \){d.intro(npc)}</div><div class="smallNote">Relationship: ${level}/100 · ${npc.personality}</div>`;
   body.appendChild(intro);
   const choices=document.createElement("div");choices.className="dialogueChoices";
   d.choices.forEach(c=>{
@@ -1677,23 +1188,18 @@ function renderConversation(npc){
       addRelationship(npc,c.rel||1);if(c.opp)addOpportunity(c.opp);
       body.innerHTML="";
       const response=document.createElement("div");response.className="dialogueIntro";
-      response.innerHTML=`<div class="dialogueName">${npc.name}</div><div>${c.reply}</div><div class="smallNote">Relationship: ${relationLevel(npc.id)}/100</div>`;
+      response.innerHTML=`<div class="dialogueName">\( {npc.name}</div><div> \){c.reply}</div><div class="smallNote">Relationship: ${relationLevel(npc.id)}/100</div>`;
       body.appendChild(response);
       const again=document.createElement("button");again.className="choice";again.textContent="Continue talking";
-      again.addEventListener("click",()=>renderConversation(npc));
-      body.appendChild(again);
+      again.addEventListener("click",()=>renderConversation(npc));body.appendChild(again);
       const done=document.createElement("button");done.className="choice";done.textContent="End conversation";
-      done.addEventListener("click",()=>setSocialTab("chat"));
-      body.appendChild(done);
+      done.addEventListener("click",()=>setSocialTab("chat"));body.appendChild(done);
       saveLocalState();
     });
     choices.appendChild(b);
   });
   body.appendChild(choices);
-  const note=document.createElement("div");note.className="smallNote";note.textContent="Conversations can improve relationships and unlock opportunities. Different personalities respond differently.";body.appendChild(note);
 }
-
-let activeConversation=null;
 function setSocialTab(tab){
   document.querySelectorAll(".socialTab").forEach(b=>b.classList.toggle("active",b.dataset.socialTab===tab));
   $("chatComposer").style.display=tab==="chat"?"flex":"none";
@@ -1701,26 +1207,26 @@ function setSocialTab(tab){
   else if(tab==="opportunities")renderOpportunities();
   else renderHustleChat();
 }
-
 function renderHustleChat(){
   const body=$("socialBody");body.innerHTML="";
   const history=document.createElement("div");history.className="chatHistory";
   if(!state.socialMessages.length){
-    const empty=document.createElement("div");empty.className="smallNote";empty.textContent="Your Hustle Chat is empty. Messages here are saved locally on this device for now.";history.appendChild(empty);
+    const empty=document.createElement("div");empty.className="smallNote";empty.textContent="Hustle Chat is empty. Messages are saved locally for now.";history.appendChild(empty);
   }else{
     for(const m of state.socialMessages){
       const row=document.createElement("div");row.className=`msg ${m.who===(state.name||"Guest")?"me":""}`;
-      row.innerHTML=`<div class="who">${m.who}</div><div class="text">${escapeHtml(m.text)}</div>`;
+      row.innerHTML=`<div class="who">\( {m.who}</div><div class="text"> \){escapeHtml(m.text)}</div>`;
       history.appendChild(row);
     }
   }
   body.appendChild(history);body.scrollTop=body.scrollHeight;
 }
-
 function renderOpportunities(){
   const body=$("socialBody");body.innerHTML="";
   if(!state.opportunities.length){
-    const empty=document.createElement("div");empty.className="dialogueIntro";empty.innerHTML="<b>No opportunities yet.</b><div class='smallNote'>Talk to people around social buildings. Good conversations can uncover jobs, customers, suppliers and business leads.</div>";body.appendChild(empty);return;
+    const empty=document.createElement("div");empty.className="dialogueIntro";
+    empty.innerHTML="<b>No opportunities yet.</b><div class='smallNote'>Talk to people near social buildings.</div>";
+    body.appendChild(empty);return;
   }
   for(const o of state.opportunities){
     const item=document.createElement("div");item.className="dialogueIntro";
@@ -1728,17 +1234,12 @@ function renderOpportunities(){
     body.appendChild(item);
   }
 }
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function closeSocial(){
   $("socialPanel").classList.remove("open");
   state.activeNpc=null;
   $("prompt").classList.remove("show");
 }
-
 function saveLocalState(){
   try{
     localStorage.setItem("nh_relationships",JSON.stringify(state.relationships));
@@ -1746,12 +1247,25 @@ function saveLocalState(){
     localStorage.setItem("nh_social_messages",JSON.stringify(state.socialMessages));
   }catch{}
 }
-
 function loadLocalState(){
   try{
     const r=localStorage.getItem("nh_relationships");if(r)state.relationships=JSON.parse(r)||{};
     const o=localStorage.getItem("nh_opportunities");if(o)state.opportunities=JSON.parse(o)||[];
     const m=localStorage.getItem("nh_social_messages");if(m)state.socialMessages=JSON.parse(m)||[];
+  }catch{}
+}
+function saveLocalProgress(){
+  try{
+    localStorage.setItem("nh_money",String(state.money));
+    localStorage.setItem("nh_housing",String(state.housingLevel));
+    localStorage.setItem("nh_rent",String(state.rentDueIn));
+  }catch{}
+}
+function loadLocalProgress(){
+  try{
+    const m=localStorage.getItem("nh_money");if(m)state.money=Number(m)||25000;
+    const h=localStorage.getItem("nh_housing");if(h)state.housingLevel=clamp(Number(h)||0,0,HOUSING.length-1);
+    const r=localStorage.getItem("nh_rent");if(r)state.rentDueIn=Number(r)||14;
   }catch{}
 }
 
@@ -1763,1864 +1277,268 @@ function enterViewer(preset="full"){
   player.yaw=0;player.vel.set(0,0,0);viewer.yaw=0;viewer.pitch=.08;
   viewer.lastDrag=performance.now()/1000-10;player.char.root.visible=true;syncViewerButtons();
 }
-
 function exitViewer(){
   state.mode="play";document.body.classList.remove("viewer");$("customizer").classList.remove("open");
   cam.yaw=player.yaw+Math.PI;player.char.root.visible=cam.mode!=="first";
 }
-
 function syncViewerButtons(){
   document.querySelectorAll("#viewerBar [data-preset]").forEach(b=>b.classList.toggle("on",b.dataset.preset===viewer.preset));
   document.querySelectorAll("#viewerBar [data-pose]").forEach(b=>b.classList.toggle("on",b.dataset.pose===viewer.pose));
-  $("spinBtn").classL
-    ist.toggle("on",viewer.spin);
+  $("spinBtn").classList.toggle("on",viewer.spin);
 }
-  $("viewBtn").addEventListener("click",()=>enterViewer("full"));
+
+$("viewBtn").addEventListener("click",()=>enterViewer("full"));
 $("viewerClose").addEventListener("click",exitViewer);
 $("spinBtn").addEventListener("click",()=>{viewer.spin=!viewer.spin;syncViewerButtons()});
-
 document.querySelectorAll("#viewerBar [data-preset]").forEach(b=>b.addEventListener("click",()=>{
-  viewer.preset=b.dataset.preset;
-  viewer.userDist=undefined;
-
-  if(viewer.preset==="back"){
-    viewer.preset="full";
-    viewer.yaw=Math.PI;
-    viewer.lastDrag=performance.now()/1000;
-  }else if(viewer.preset==="full"||viewer.preset==="face"){
-    viewer.yaw=0;
-    viewer.lastDrag=performance.now()/1000;
-  }
-
+  viewer.preset=b.dataset.preset;viewer.userDist=undefined;
+  if(viewer.preset==="back"){viewer.preset="full";viewer.yaw=Math.PI;viewer.lastDrag=performance.now()/1000}
+  else if(viewer.preset==="full"||viewer.preset==="face"){viewer.yaw=0;viewer.lastDrag=performance.now()/1000}
   syncViewerButtons();
 }));
+document.querySelectorAll("#viewerBar [data-pose]").forEach(b=>b.addEventListener("click",()=>{viewer.pose=b.dataset.pose;syncViewerButtons()}));
 
-document.querySelectorAll("#viewerBar [data-pose]").forEach(b=>b.addEventListener("click",()=>{
-  viewer.pose=b.dataset.pose;
-  syncViewerButtons();
-}));
-
-$("customizeBtn").addEventListener("click",()=>{
-  enterViewer("full");
-  $("customizer").classList.add("open");
-});
-
-$("closeCustomizer").addEventListener("click",()=>{
-  $("customizer").classList.remove("open");
-});
-
+\( ("customizeBtn").addEventListener("click",()=>{enterViewer("full"); \)("customizer").classList.add("open")});
+\( ("closeCustomizer").addEventListener("click",()=> \)("customizer").classList.remove("open"));
 $("randomBtn").addEventListener("click",()=>{
   for(const key of Object.keys(DEFAULT_CFG)){
     const ks=Object.keys(OPTIONS[key].values);
     state.cfg[key]=ks[Math.floor(Math.random()*ks.length)];
   }
-  refreshSelected();
-  rebuildPlayer();
+  refreshSelected();rebuildPlayer();
 });
-
 $("saveConfig").addEventListener("click",saveAvatar);
 
 $("cameraBtn").addEventListener("click",()=>{
   const order=["chase","far","first"];
   const labels={chase:"3rd",far:"Far",first:"1st"};
-
   cam.mode=order[(order.indexOf(cam.mode)+1)%3];
   $("cameraBtn").textContent=labels[cam.mode];
-
-  if(cam.mode==="first")cam.pitch=.05;
-  else if(cam.pitch<.15)cam.pitch=.28;
-
+  if(cam.mode==="first")cam.pitch=.05;else if(cam.pitch<.15)cam.pitch=.28;
   player.char.root.visible=cam.mode!=="first";
-
-  toast(
-    cam.mode==="chase"
-      ?"Third-person view"
-      :cam.mode==="far"
-        ?"Wide third-person view"
-        :"First-person view"
-  );
+  toast(cam.mode==="chase"?"Third-person view":cam.mode==="far"?"Wide third-person":"First-person view");
 });
-
 $("qualityBtn").addEventListener("click",()=>{
   state.quality=state.quality==="high"?"low":"high";
   localStorage.setItem("nh_quality",state.quality);
   applyQuality();
-
-  toast(
-    state.quality==="high"
-      ?"Graphics: High"
-      :"Graphics: Low (faster)"
-  );
+  toast(state.quality==="high"?"Graphics: High":"Graphics: Low (faster)");
 });
+$("backBtn").addEventListener("click",()=>{location.href="index.html"});
+$("housingBtn").addEventListener("click",openHousingPanel);
+\( ("housingClose").addEventListener("click",()=> \)("housingPanel").classList.remove("open"));
+$("housingUpgrade").addEventListener("click",tryUpgradeHousing);
 
-$("backBtn").addEventListener("click",()=>{
-  location.href="index.html";
-});
-
-$("prompt").addEventListener("click",enterPlace);
-
-$("emoteBtn").addEventListener("click",()=>{
-  $("emoteMenu").classList.toggle("open");
-});
-
+\( ("emoteBtn").addEventListener("click",()=> \)("emoteMenu").classList.toggle("open"));
 document.querySelectorAll("#emoteMenu [data-emote]").forEach(b=>{
-  b.addEventListener("click",()=>{
-    state.emote=b.dataset.emote==="none"?null:b.dataset.emote;
-    $("emoteMenu").classList.remove("open");
-  });
+  b.addEventListener("click",()=>{state.emote=b.dataset.emote==="none"?null:b.dataset.emote;$("emoteMenu").classList.remove("open")});
 });
-
-/* =========================================================
-SOCIAL UI
-========================================================= */
 
 $("socialBtn").addEventListener("click",()=>{
   $("socialPanel").classList.add("open");
-
-  if(state.activeNpc){
-    setSocialTab("conversation");
-  }else{
-    setSocialTab("chat");
-  }
+  if(state.activeNpc)setSocialTab("conversation");else setSocialTab("chat");
 });
-
 $("socialClose").addEventListener("click",closeSocial);
-
-document.querySelectorAll(".socialTab").forEach(b=>{
-  b.addEventListener("click",()=>{
-    setSocialTab(b.dataset.socialTab);
-  });
-});
+document.querySelectorAll(".socialTab").forEach(b=>b.addEventListener("click",()=>setSocialTab(b.dataset.socialTab)));
 
 function sendChat(){
   const input=$("chatInput");
   const text=input.value.trim();
-
   if(!text)return;
-
-  state.socialMessages.push({
-    who:state.name||"Guest",
-    text,
-    time:Date.now()
-  });
-
-  /*
-   * Local NPC/system response.
-   * This keeps the current build functional without inventing
-   * a Supabase chat table that does not exist in the supplied code.
-   */
+  state.socialMessages.push({who:state.name||"Guest",text,time:Date.now()});
   const lower=text.toLowerCase();
-
   let reply=null;
-
-  if(
-    lower.includes("job")||
-    lower.includes("work")||
-    lower.includes("hire")
-  ){
-    reply="System: Check the Job Centre for available career opportunities.";
-  }else if(
-    lower.includes("business")||
-    lower.includes("money")||
-    lower.includes("customer")
-  ){
-    reply="System: Talk to people around Market Plaza and business areas. Relationships can reveal useful leads.";
-  }else if(
-    lower.includes("hello")||
-    lower.includes("hi")||
-    lower.includes("hey")
-  ){
-    reply="Chinedu: Welcome to Naija Hustle. Keep moving and keep building.";
-  }else{
-    reply="System: Keep exploring. Social conversations can unlock jobs, business leads and other opportunities.";
-  }
-
+  if(lower.includes("job")||lower.includes("work"))reply="System: Check the Job Centre for career opportunities.";
+  else if(lower.includes("business")||lower.includes("money"))reply="System: Talk to people around Computer Village.";
+  else if(lower.includes("hello")||lower.includes("hi"))reply="Chinedu: Welcome to Naija Hustle. Keep moving.";
+  else reply="System: Keep exploring. Conversations unlock leads.";
   if(reply){
     setTimeout(()=>{
-      state.socialMessages.push({
-        who:"Hustle System",
-        text:reply,
-        time:Date.now()
-      });
-
+      state.socialMessages.push({who:"Hustle System",text:reply,time:Date.now()});
       saveLocalState();
-
-      if(
-        $("socialPanel").classList.contains("open")&&
-        document.querySelector(".socialTab.active")?.dataset.socialTab==="chat"
-      ){
-        renderHustleChat();
-      }
+      if($("socialPanel").classList.contains("open")&&document.querySelector(".socialTab.active")?.dataset.socialTab==="chat")renderHustleChat();
     },500);
   }
-
-  input.value="";
-  saveLocalState();
-  renderHustleChat();
+  input.value="";saveLocalState();renderHustleChat();
 }
-
 $("chatSend").addEventListener("click",sendChat);
+$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();sendChat()}});
 
-$("chatInput").addEventListener("keydown",e=>{
-  if(e.key==="Enter"){
-    e.preventDefault();
-    sendChat();
-  }
-});
-
-/* ---------- joystick + buttons ---------- */
-
-const joy=$("joystick");
-const stick=$("stick");
-
+/* ---------- joystick ---------- */
+const joy=\( ("joystick"),stick= \)("stick");
 let joyId=null;
-
 function setJoy(cx,cy){
   const r=joy.getBoundingClientRect();
-  const ox=r.left+r.width/2;
-  const oy=r.top+r.height/2;
-
-  let x=cx-ox;
-  let y=cy-oy;
-
-  const rad=r.width*.34;
-  const d=Math.hypot(x,y);
-
-  if(d>rad){
-    x=x/d*rad;
-    y=y/d*rad;
-  }
-
-  state.joy.x=x/rad;
-  state.joy.y=y/rad;
-
-  stick.style.transform=`translate(${x}px,${y}px)`;
+  const ox=r.left+r.width/2,oy=r.top+r.height/2;
+  let x=cx-ox,y=cy-oy;
+  const rad=r.width*.34,d=Math.hypot(x,y);
+  if(d>rad){x=x/d*rad;y=y/d*rad}
+  state.joy.x=x/rad;state.joy.y=y/rad;
+  stick.style.transform=`translate(\( {x}px, \){y}px)`;
 }
+function resetJoy(){joyId=null;state.joy.active=false;state.joy.x=0;state.joy.y=0;stick.style.transform="translate(0,0)"}
+joy.addEventListener("pointerdown",e=>{e.preventDefault();joyId=e.pointerId;try{joy.setPointerCapture(e.pointerId)}catch{}state.joy.active=true;setJoy(e.clientX,e.clientY)});
+joy.addEventListener("pointermove",e=>{if(e.pointerId===joyId)setJoy(e.clientX,e.clientY)});
+joy.addEventListener("pointerup",resetJoy);joy.addEventListener("pointercancel",resetJoy);
+$("jumpBtn").addEventListener("pointerdown",e=>{e.preventDefault();state.jumpQueued=true});
+\( ("runBtn").addEventListener("pointerdown",e=>{e.preventDefault();state.runToggle=!state.runToggle; \)("runBtn").classList.toggle("active",state.runToggle)});
 
-function resetJoy(){
-  joyId=null;
-  state.joy.active=false;
-  state.joy.x=0;
-  state.joy.y=0;
-  stick.style.transform="translate(0,0)";
-}
-
-joy.addEventListener("pointerdown",e=>{
-  e.preventDefault();
-
-  joyId=e.pointerId;
-
-  try{
-    joy.setPointerCapture(e.pointerId);
-  }catch{}
-
-  state.joy.active=true;
-
-  setJoy(e.clientX,e.clientY);
-});
-
-joy.addEventListener("pointermove",e=>{
-  if(e.pointerId===joyId){
-    setJoy(e.clientX,e.clientY);
-  }
-});
-
-joy.addEventListener("pointerup",resetJoy);
-joy.addEventListener("pointercancel",resetJoy);
-
-$("jumpBtn").addEventListener("pointerdown",e=>{
-  e.preventDefault();
-  state.jumpQueued=true;
-});
-
-$("runBtn").addEventListener("pointerdown",e=>{
-  e.preventDefault();
-
-  state.runToggle=!state.runToggle;
-
-  $("runBtn").classList.toggle(
-    "active",
-    state.runToggle
-  );
-});
-
-/* ---------- camera drag / pinch / wheel ---------- */
-
+/* ---------- camera drag ---------- */
 const cv=renderer.domElement;
 const pointers=new Map();
-
 let pinch=0;
-
 function zoom(d){
   if(state.mode==="viewer"){
-    viewer.userDist=clamp(
-      (viewer.userDist??viewer.dist)+d,
-      1.2,
-      8
-    );
-
+    viewer.userDist=clamp((viewer.userDist??viewer.dist)+d,1.2,8);
     viewer.lastDrag=performance.now()/1000;
-  }else{
-    cam.dist=clamp(
-      cam.dist+d,
-      2.8,
-      10
-    );
-  }
+  }else cam.dist=clamp(cam.dist+d,2.8,10);
 }
-
 cv.addEventListener("pointerdown",e=>{
-  try{
-    cv.setPointerCapture(e.pointerId);
-  }catch{}
-
-  pointers.set(e.pointerId,{
-    x:e.clientX,
-    y:e.clientY
-  });
-
-  if(pointers.size===2){
-    const [a,b]=[...pointers.values()];
-    pinch=Math.hypot(
-      a.x-b.x,
-      a.y-b.y
-    );
-  }
+  try{cv.setPointerCapture(e.pointerId)}catch{}
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size===2){const [a,b]=[...pointers.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y)}
 });
-
 cv.addEventListener("pointermove",e=>{
-  const p=pointers.get(e.pointerId);
-
-  if(!p)return;
-
-  const dx=e.clientX-p.x;
-  const dy=e.clientY-p.y;
-
-  p.x=e.clientX;
-  p.y=e.clientY;
-
+  const p=pointers.get(e.pointerId);if(!p)return;
+  const dx=e.clientX-p.x,dy=e.clientY-p.y;
+  p.x=e.clientX;p.y=e.clientY;
   if(pointers.size===2){
     const [a,b]=[...pointers.values()];
-    const d=Math.hypot(
-      a.x-b.x,
-      a.y-b.y
-    );
-
-    zoom(-(d-pinch)*.02);
-    pinch=d;
-
-    return;
+    const d=Math.hypot(a.x-b.x,a.y-b.y);
+    zoom(-(d-pinch)*.02);pinch=d;return;
   }
-
   if(state.mode==="viewer"){
-    viewer.yaw-=dx*.01;
-
-    viewer.pitch=clamp(
-      viewer.pitch+dy*.005,
-      -.25,
-      1
-    );
-
-    viewer.lastDrag=performance.now()/1000;
+    viewer.yaw-=dx*.01;viewer.pitch=clamp(viewer.pitch+dy*.005,-.25,1);viewer.lastDrag=performance.now()/1000;
   }else{
-    cam.yaw-=dx*.006;
-
-    cam.pitch=clamp(
-      cam.pitch+dy*.004,
-      cam.mode==="first"?-1.2:-.05,
-      cam.mode==="first"?1.2:1.15
-    );
+    cam.yaw-=dx*.006;cam.pitch=clamp(cam.pitch+dy*.004,cam.mode==="first"?-1.2:-.05,cam.mode==="first"?1.2:1.15);
   }
 });
-
-const endPointer=e=>{
-  pointers.delete(e.pointerId);
-};
-
-cv.addEventListener("pointerup",endPointer);
-cv.addEventListener("pointercancel",endPointer);
-
-cv.addEventListener(
-  "wheel",
-  e=>{
-    e.preventDefault();
-    zoom(e.deltaY*.005);
-  },
-  {passive:false}
-);
-
-cv.addEventListener(
-  "contextmenu",
-  e=>e.preventDefault()
-);
+const endPointer=e=>pointers.delete(e.pointerId);
+cv.addEventListener("pointerup",endPointer);cv.addEventListener("pointercancel",endPointer);
+cv.addEventListener("wheel",e=>{e.preventDefault();zoom(e.deltaY*.005)},{passive:false});
+cv.addEventListener("contextmenu",e=>e.preventDefault());
 
 /* ---------- keyboard ---------- */
-
-const KEYMAP={
-  w:"up",
-  arrowup:"up",
-  s:"down",
-  arrowdown:"down",
-  a:"left",
-  arrowleft:"left",
-  d:"right",
-  arrowright:"right",
-  shift:"shift"
-};
-
+const KEYMAP={w:"up",arrowup:"up",s:"down",arrowdown:"down",a:"left",arrowleft:"left",d:"right",arrowright:"right",shift:"shift"};
 addEventListener("keydown",e=>{
   const k=e.key.toLowerCase();
-
-  if(has(KEYMAP,k)){
-    state.keys[KEYMAP[k]]=true;
-    e.preventDefault();
-  }
-
-  if(k===" "){
-    state.jumpQueued=true;
-    e.preventDefault();
-  }
-
-  if(k==="e"){
-    enterPlace();
-  }
-
-  if(k==="c"){
-    $("cameraBtn").click();
-  }
-
-  if(k==="v"){
-    if(state.mode==="viewer"){
-      exitViewer();
-    }else{
-      enterViewer("full");
-    }
-  }
-
+  if(has(KEYMAP,k)){state.keys[KEYMAP[k]]=true;e.preventDefault()}
+  if(k===" "){state.jumpQueued=true;e.preventDefault()}
+  if(k==="e")enterPlace(poiList.find(p=>Math.hypot(p.x-player.pos.x,p.z-player.pos.z)<8));
+  if(k==="c")$("cameraBtn").click();
+  if(k==="v"){if(state.mode==="viewer")exitViewer();else enterViewer("full")}
   if(k==="escape"){
-    if($("socialPanel").classList.contains("open")){
-      closeSocial();
-    }else if($("customizer").classList.contains("open")){
-      $("customizer").classList.remove("open");
-    }else if(state.mode==="viewer"){
-      exitViewer();
-    }
+    if($("socialPanel").classList.contains("open"))closeSocial();
+    else if(\( ("customizer").classList.contains("open")) \)("customizer").classList.remove("open");
+    else if(\( ("housingPanel").classList.contains("open")) \)("housingPanel").classList.remove("open");
+    else if(state.mode==="viewer")exitViewer();
   }
 });
+addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(has(KEYMAP,k))state.keys[KEYMAP[k]]=false});
+addEventListener("blur",()=>{for(const k in state.keys)state.keys[k]=false});
 
-addEventListener("keyup",e=>{
-  const k=e.key.toLowerCase();
-
-  if(has(KEYMAP,k)){
-    state.keys[KEYMAP[k]]=false;
-  }
-});
-
-addEventListener("blur",()=>{
-  for(const k in state.keys){
-    state.keys[k]=false;
-  }
-});
-
-/* =========================================================
-C — NPC SOCIAL LIFE SYSTEM
-Works with existing B social/chat system
-========================================================= */
-
-const NH_SOCIAL_KEY = "nh_social_v1";
-
-const NH_SOCIAL_DEFAULTS = {
-  reputation: 0,
-  relationships: {},
-  contacts: {},
-  jobs: [],
-  missions: [],
-  businessLeads: [],
-  conversationCount: 0
-};
-
-function cloneSocialDefaults(){
-  return JSON.parse(
-    JSON.stringify(NH_SOCIAL_DEFAULTS)
-  );
-}
-
-function loadSocialState(){
-  try{
-    const raw=localStorage.getItem(NH_SOCIAL_KEY);
-
-    if(!raw){
-      return cloneSocialDefaults();
-    }
-
-    const data=JSON.parse(raw);
-
-    return {
-      ...cloneSocialDefaults(),
-      ...data,
-      relationships:data.relationships||{},
-      contacts:data.contacts||{},
-      jobs:Array.isArray(data.jobs)?data.jobs:[],
-      missions:Array.isArray(data.missions)?data.missions:[],
-      businessLeads:Array.isArray(data.businessLeads)
-        ?data.businessLeads
-        :[]
-    };
-  }catch{
-    return cloneSocialDefaults();
-  }
-}
-
-state.socialData=loadSocialState();
-
-function saveSocialState(){
-  try{
-    localStorage.setItem(
-      NH_SOCIAL_KEY,
-      JSON.stringify(state.socialData)
-    );
-  }catch{}
-}
-
-/* =========================================================
-NPC PROFILE
-========================================================= */
-
-const SOCIAL_PERSONALITIES=[
-  {
-    key:"friendly",
-    greetings:[
-      "Hey, good to see you.",
-      "How far? You look like you're on a mission.",
-      "What's happening?"
-    ]
-  },
-  {
-    key:"hustler",
-    greetings:[
-      "Everybody dey hustle one way or another.",
-      "You dey chase money too?",
-      "This city get opportunities if you know where to look."
-    ]
-  },
-  {
-    key:"professional",
-    greetings:[
-      "Good day. How is business treating you?",
-      "You look like someone building something.",
-      "Interesting seeing you around here."
-    ]
-  },
-  {
-    key:"streetwise",
-    greetings:[
-      "You need to know the right people in this city.",
-      "Keep your eyes open. Opportunities move fast.",
-      "You look like you're trying to make something happen."
-    ]
-  }
-];
-
-const SOCIAL_NAMES=[
-  "Chinedu",
-  "Amaka",
-  "Emeka",
-  "Ada",
-  "Kelechi",
-  "Chioma",
-  "Ifeanyi",
-  "Tobi",
-  "Daniel",
-  "Blessing",
-  "Michael",
-  "David"
-];
-
-const SOCIAL_ROLES=[
-  "Entrepreneur",
-  "Shop owner",
-  "Freelancer",
-  "Designer",
-  "Sales representative",
-  "Restaurant worker",
-  "Office worker",
-  "Driver",
-  "Fitness trainer",
-  "Creative",
-  "Business assistant",
-  "Student"
-];
-
-function socialHash(value){
-  let h=0;
-
-  const text=String(value||"");
-
-  for(let i=0;i<text.length;i++){
-    h=(h*31+text.charCodeAt(i))>>>0;
-  }
-
-  return h;
-}
-
-function getNpcSocialId(npc,index){
-  return String(
-    npc?.id||
-    npc?.npcId||
-    npc?.name||
-    `npc_${index}`
-  )
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]/g,"_");
-}
-
-function getNpcProfile(npc,index){
-  const id=getNpcSocialId(npc,index);
-  const seed=socialHash(id);
-
-  const personality=
-    SOCIAL_PERSONALITIES[
-      seed%SOCIAL_PERSONALITIES.length
-    ];
-
-  return {
-    id,
-    name:
-      npc?.name||
-      SOCIAL_NAMES[
-        seed%SOCIAL_NAMES.length
-      ],
-    role:
-      npc?.role||
-      npc?.job||
-      SOCIAL_ROLES[
-        seed%SOCIAL_ROLES.length
-      ],
-    personality
-  };
-}
-
-/* =========================================================
-RELATIONSHIPS
-========================================================= */
-
-function getRelationship(id){
-  return clamp(
-    Number(
-      state.socialData.relationships[id]||0
-    ),
-    -100,
-    100
-  );
-}
-
-function relationshipLabel(score){
-  if(score>=75)return "Close Friend";
-  if(score>=45)return "Friend";
-  if(score>=20)return "Friendly";
-  if(score>-20)return "Neutral";
-  if(score>-50)return "Cold";
-  return "Hostile";
-}
-
-function changeRelationship(id,amount){
-  const old=getRelationship(id);
-
-  const next=clamp(
-    old+Number(amount||0),
-    -100,
-    100
-  );
-
-  state.socialData.relationships[id]=next;
-
-  state.socialData.reputation=clamp(
-    Number(
-      state.socialData.reputation||0
-    )+(Number(amount||0)*0.35),
-    -100,
-    100
-  );
-
-  saveSocialState();
-
-  return next;
-}
-
-function getReputation(){
-  return Number(
-    state.socialData.reputation||0
-  );
-}
-
-/* =========================================================
-SOCIAL LOCATION CHECK
-========================================================= */
-
-const SOCIAL_LOCATION_WORDS=[
-  "restaurant",
-  "food",
-  "hotel",
-  "spa",
-  "house",
-  "home",
-  "shop",
-  "store",
-  "market",
-  "office",
-  "gym",
-  "fitness",
-  "club",
-  "lounge",
-  "salon",
-  "cafe",
-  "business"
-];
-
-function isSocialLocation(obj){
-  if(!obj)return false;
-
-  if(
-    obj.social===true||
-    obj.isSocial===true||
-    obj.socialZone===true
-  ){
-    return true;
-  }
-
-  const text=[
-    obj.name,
-    obj.label,
-    obj.type,
-    obj.kind,
-    obj.category,
-    obj.tab
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return SOCIAL_LOCATION_WORDS.some(
-    word=>text.includes(word)
-  );
-}
-
-function getNearbySocialLocation(){
-  if(
-    typeof poiList==="undefined"||
-    !Array.isArray(poiList)||
-    !player?.pos
-  ){
-    return null;
-  }
-
-  let closest=null;
-  let closestDistance=Infinity;
-
-  for(const p of poiList){
-    if(!p||!isSocialLocation(p))continue;
-
-    const d=Math.hypot(
-      (p.x||0)-player.pos.x,
-      (p.z||0)-player.pos.z
-    );
-
-    if(d<8&&d<closestDistance){
-      closest=p;
-      closestDistance=d;
-    }
-  }
-
-  return closest;
-}
-
-/* =========================================================
-NEAREST NPC
-========================================================= */
-
+/* ---------- nearby NPC talk ---------- */
+let nearbySocialNpc=null;
 function getNearbySocialNpc(maxDistance=3.4){
-  if(
-    typeof npcs==="undefined"||
-    !Array.isArray(npcs)||
-    !player?.pos
-  ){
-    return null;
-  }
-
-  let result=null;
-  let distance=maxDistance;
-
+  let result=null,distance=maxDistance;
   npcs.forEach((npc,index)=>{
     if(!npc?.pos)return;
-
-    const d=Math.hypot(
-      (npc.pos.x||0)-player.pos.x,
-      (npc.pos.z||0)-player.pos.z
-    );
-
-    if(d<distance){
-      distance=d;
-
-      result={
-        npc,
-        index,
-        distance,
-        profile:getNpcProfile(
-          npc,
-          index
-        )
-      };
-    }
+    const d=Math.hypot((npc.pos.x||0)-player.pos.x,(npc.pos.z||0)-player.pos.z);
+    if(d<distance){distance=d;result={npc,index,distance}}
   });
-
   return result;
 }
-
-/* =========================================================
-TALK PROMPT
-========================================================= */
-
-let nearbySocialNpc=null;
-let nearbySocialLocation=null;
-
 function updateSocialNpcPrompt(){
-  if(
-    state.mode!=="play"||
-    state.activeNpc||
-    $("socialPanel").classList.contains("open")
-  ){
-    return;
-  }
-
-  nearbySocialLocation=
-    getNearbySocialLocation();
-
-  nearbySocialNpc=
-    getNearbySocialNpc();
-
-  /*
-   * NPC conversations only become available
-   * when the player is near both:
-   * 1. a social location
-   * 2. an NPC
-   */
-
-  if(
-    !nearbySocialLocation||
-    !nearbySocialNpc
-  ){
-    return;
-  }
-
-  const profile=
-    nearbySocialNpc.profile;
-
-  /*
-   * Reuse the existing prompt.
-   * We do not create another social button.
-   */
-
+  if(state.mode!=="play"||state.activeNpc||$("socialPanel").classList.contains("open"))return;
+  nearbySocialNpc=getNearbySocialNpc();
+  if(!nearbySocialNpc)return;
   const prompt=$("prompt");
-
-  if(!prompt)return;
-
-  prompt.textContent=
-    `Talk to ${profile.name}`;
-
+  prompt.textContent=`Talk to ${nearbySocialNpc.npc.name}`;
   prompt.classList.add("show");
-
-  prompt.onclick=()=>{
-    openNpcConversation(
-      nearbySocialNpc
-    );
-  };
+  prompt.onclick=()=>openConversation(nearbySocialNpc.npc);
 }
 
-/* =========================================================
-CONVERSATION DATA
-========================================================= */
-
-function getConversationGreeting(profile){
-  const relationship=
-    getRelationship(profile.id);
-
-  if(relationship>=45){
-    return `Good to see you again. How's the hustle going?`;
-  }
-
-  if(relationship<=-30){
-    return `I didn't expect to see you here.`;
-  }
-
-  const greetings=
-    profile.personality.greetings;
-
-  return greetings[
-    socialHash(
-      profile.id+
-      state.socialData.conversationCount
-    )%greetings.length
-  ];
-}
-
-function getConversationChoices(profile){
-  const relationship=
-    getRelationship(profile.id);
-
-  const choices=[
-    {
-      id:"friendly",
-      text:"Ask how things are going",
-      change:3
-    },
-    {
-      id:"work",
-      text:"Ask about work opportunities",
-      change:4
-    },
-    {
-      id:"business",
-      text:"Ask about business",
-      change:5
-    }
-  ];
-
-  if(relationship>=20){
-    choices.push({
-      id:"life",
-      text:"Talk about life",
-      change:6
-    });
-  }
-
-  if(relationship>=35){
-    choices.push({
-      id:"connection",
-      text:"Ask if they know anyone useful",
-      change:8
-    });
-  }
-
-  choices.push({
-    id:"rude",
-    text:"Be disrespectful",
-    change:-10
-  });
-
-  choices.push({
-    id:"leave",
-    text:"End the conversation",
-    change:0
-  });
-
-  return choices;
-}
-
-function getConversationReply(profile,choice){
-  switch(choice.id){
-
-    case"friendly":
-      return {
-        player:"How are things going with you?",
-        npc:
-          "Things dey alright. Just keeping things moving."
-      };
-
-    case"work":
-      return {
-        player:"Do you know anywhere looking for workers?",
-        npc:
-          "I hear about opportunities from time to time. Build your reputation and keep talking to people."
-      };
-
-    case"business":
-      return {
-        player:"I'm interested in building something of my own.",
-        npc:
-          "That's good. Business is mostly about solving problems and knowing the right people."
-      };
-
-    case"life":
-      return {
-        player:"How's life treating you?",
-        npc:
-          "Life no easy, but you learn plenty when you keep moving. Don't forget why you're hustling."
-      };
-
-    case"connection":
-      return {
-        player:"Do you know anyone who could help me grow?",
-        npc:
-          "Maybe. Keep proving yourself and I can introduce you to somebody."
-      };
-
-    case"rude":
-      return {
-        player:"I don't have time for all this.",
-        npc:
-          "Then you shouldn't have started the conversation."
-      };
-
-    default:
-      return {
-        player:"",
-        npc:"Alright. Take care."
-      };
-  }
-}
-
-/* =========================================================
-SOCIAL PANEL RENDERING
-========================================================= */
-
-function renderNpcConversation(profile){
-  const messages=$("socialMessages");
-
-  if(!messages)return;
-
-  messages.innerHTML="";
-
-  const relationship=
-    getRelationship(profile.id);
-
-  const greeting=
-    getConversationGreeting(profile);
-
-  messages.innerHTML+=`
-    <div class="chatBubble npc">
-      <b>${escapeHtml(profile.name)}</b>
-      <div>${escapeHtml(greeting)}</div>
-    </div>
-  `;
-
-  const choices=
-    getConversationChoices(profile);
-
-  const choiceBox=
-    $("socialChoices");
-
-  if(!choiceBox)return;
-
-  choiceBox.innerHTML="";
-
-  for(const choice of choices){
-
-    const button=
-      document.createElement("button");
-
-    button.type="button";
-
-    button.className=
-      "socialChoice";
-
-    button.textContent=
-      choice.text;
-
-    button.addEventListener(
-      "click",
-      ()=>{
-        chooseNpcResponse(
-          profile,
-          choice
-        );
-      }
-    );
-
-    choiceBox.appendChild(button);
-  }
-
-  const relationText=
-    relationshipLabel(
-      relationship
-    );
-
-  const relationEl=
-    $("socialRelationship");
-
-  if(relationEl){
-    relationEl.textContent=
-      relationText;
-  }
-
-  const scoreEl=
-    $("socialRelationshipScore");
-
-  if(scoreEl){
-    scoreEl.textContent=
-      relationship>0
-        ?`+${relationship}`
-        :String(relationship);
-  }
-}
-
-/* =========================================================
-CONVERSATION OPEN
-========================================================= */
-
-function openNpcConversation(target){
-  if(!target?.profile)return;
-
-  state.activeNpc={
-    npc:target.npc,
-    index:target.index,
-    profile:target.profile
-  };
-
-  state.socialData.conversationCount++;
-
-  saveSocialState();
-
-  $("socialPanel").classList.add("open");
-
-  setSocialTab("conversation");
-
-  renderNpcConversation(
-    target.profile
-  );
-
-  /*
-   * Stop movement while talking.
-   */
-
-  if(player?.vel){
-    player.vel.set(0,0,0);
-  }
-
-  if(state.joy){
-    state.joy.active=false;
-    state.joy.x=0;
-    state.joy.y=0;
-  }
-}
-
-/* =========================================================
-CONVERSATION CHOICE
-========================================================= */
-
-function chooseNpcResponse(profile,choice){
-
-  const reply=
-    getConversationReply(
-      profile,
-      choice
-    );
-
-  const messages=
-    $("socialMessages");
-
-  if(!messages)return;
-
-  if(reply.player){
-    messages.innerHTML+=`
-      <div class="chatBubble player">
-        ${escapeHtml(reply.player)}
-      </div>
-    `;
-  }
-
-  messages.innerHTML+=`
-    <div class="chatBubble npc">
-      <b>${escapeHtml(profile.name)}</b>
-      <div>${escapeHtml(reply.npc)}</div>
-    </div>
-  `;
-
-  messages.scrollTop=
-    messages.scrollHeight;
-
-  /*
-   * Leave conversation.
-   */
-
-  if(choice.id==="leave"){
-    setTimeout(()=>{
-      closeSocial();
-    },350);
-
-    return;
-  }
-
-  const newScore=
-    changeRelationship(
-      profile.id,
-      choice.change
-    );
-
-  /*
-   * Save contact once relationship
-   * becomes meaningful.
-   */
-
-  if(newScore>=20){
-    state.socialData.contacts[
-      profile.id
-    ]={
-      name:profile.name,
-      role:profile.role,
-      relationship:newScore,
-      updatedAt:Date.now()
-    };
-
-    saveSocialState();
-  }
-
-  /*
-   * Unlock opportunities.
-   */
-
-  if(
-    choice.id==="work"&&
-    newScore>=15
-  ){
-    createSocialJob(profile);
-  }
-
-  if(
-    choice.id==="business"&&
-    newScore>=20
-  ){
-    createBusinessLead(profile);
-  }
-
-  if(
-    choice.id==="connection"&&
-    newScore>=30
-  ){
-    createSocialMission(profile);
-  }
-
-  renderNpcConversation(
-    profile
-  );
-}
-
-/* =========================================================
-JOBS
-========================================================= */
-
-function createSocialJob(profile){
-
-  const existing=
-    state.socialData.jobs.find(
-      job=>
-        job.sourceNpc===profile.id&&
-        job.status==="available"
-    );
-
-  if(existing)return;
-
-  const jobs=[
-    {
-      title:"Business Assistant",
-      description:
-        "Help a local business with basic tasks.",
-      reward:2000
-    },
-    {
-      title:"Quick Delivery",
-      description:
-        "Handle a short delivery for a local contact.",
-      reward:1500
-    },
-    {
-      title:"Customer Support Shift",
-      description:
-        "Help a small business deal with customers.",
-      reward:1800
-    }
-  ];
-
-  const job=
-    jobs[
-      socialHash(
-        profile.id+
-        Date.now()
-      )%jobs.length
-    ];
-
-  const record={
-    id:
-      `social_job_${Date.now()}`,
-    sourceNpc:profile.id,
-    title:job.title,
-    description:job.description,
-    reward:job.reward,
-    status:"available",
-    createdAt:Date.now()
-  };
-
-  state.socialData.jobs.push(
-    record
-  );
-
-  saveSocialState();
-
-  showSocialOpportunity(
-    "JOB OPPORTUNITY",
-    job.title,
-    job.description,
-    `₦${job.reward.toLocaleString()}`
-  );
-}
-
-/* =========================================================
-MISSIONS
-========================================================= */
-
-function createSocialMission(profile){
-
-  const existing=
-    state.socialData.missions.find(
-      mission=>
-        mission.sourceNpc===profile.id&&
-        mission.status==="available"
-    );
-
-  if(existing)return;
-
-  const missions=[
-    {
-      title:"Build Your Network",
-      description:
-        "Talk to more people around the city."
-    },
-    {
-      title:"Find a Useful Contact",
-      description:
-        "Use your growing network to discover someone who can help your hustle."
-    },
-    {
-      title:"Make Yourself Known",
-      description:
-        "Build your reputation by interacting positively with people."
-    }
-  ];
-
-  const mission=
-    missions[
-      socialHash(
-        profile.id+
-        getReputation()
-      )%missions.length
-    ];
-
-  state.socialData.missions.push({
-    id:
-      `social_mission_${Date.now()}`,
-    sourceNpc:profile.id,
-    title:mission.title,
-    description:mission.description,
-    status:"available",
-    progress:0,
-    createdAt:Date.now()
-  });
-
-  saveSocialState();
-
-  showSocialOpportunity(
-    "NEW MISSION",
-    mission.title,
-    mission.description,
-    "Build your reputation"
-  );
-}
-
-/* =========================================================
-BUSINESS LEADS
-========================================================= */
-
-function createBusinessLead(profile){
-
-  const existing=
-    state.socialData.businessLeads.find(
-      lead=>
-        lead.sourceNpc===profile.id&&
-        lead.status==="available"
-    );
-
-  if(existing)return;
-
-  const lead={
-    id:
-      `business_lead_${Date.now()}`,
-    sourceNpc:profile.id,
-    title:"Business Connection",
-    description:
-      `${profile.name} has become a useful business contact.`,
-    status:"available",
-    createdAt:Date.now()
-  };
-
-  state.socialData.businessLeads.push(
-    lead
-  );
-
-  saveSocialState();
-
-  showSocialOpportunity(
-    "BUSINESS LEAD",
-    lead.title,
-    lead.description,
-    "Potential business connection"
-  );
-}
-
-/* =========================================================
-OPPORTUNITY NOTIFICATION
-========================================================= */
-
-let socialOpportunityTimer=null;
-
-function showSocialOpportunity(
-  type,
-  title,
-  description,
-  reward
-){
-
-  /*
-   * Use existing toast when available.
-   * This avoids creating another notification
-   * system in B.
-   */
-
-  if(typeof toast==="function"){
-    toast(
-      `${type}: ${title}`
-    );
-  }
-
-  /*
-   * Also store a readable notification
-   * in the existing chat system.
-   */
-
-  if(Array.isArray(state.socialMessages)){
-    state.socialMessages.push({
-      who:"Hustle System",
-      text:
-        `${type}: ${title}. ${description}`+
-        (reward?` Reward: ${reward}`:""),
-      time:Date.now()
-    });
-
-    saveLocalState();
-  }
-
-  /*
-   * Keep the player's attention without
-   * permanently covering the screen.
-   */
-
-  clearTimeout(
-    socialOpportunityTimer
-  );
-
-  socialOpportunityTimer=
-    setTimeout(()=>{
-      if(
-        $("socialPanel")?.classList.contains("open")&&
-        document.querySelector(
-          ".socialTab.active"
-        )?.dataset.socialTab==="chat"
-      ){
-        renderHustleChat();
-      }
-    },250);
-}
-
-/* =========================================================
-ESCAPE HTML
-========================================================= */
-
-function escapeHtml(value){
-  return String(value??"")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
-
-/* =========================================================
-SOCIAL UPDATE LOOP
-========================================================= */
-
-let socialUpdateTick=0;
-
-function updateSocialSystem(){
-
-  if(
-    state.mode!=="play"||
-    state.activeNpc
-  ){
-    return;
-  }
-
-  socialUpdateTick++;
-
-  /*
-   * We don't need to calculate every frame.
-   */
-
-  if(
-    socialUpdateTick%5!==0
-  ){
-    return;
-  }
-
-  updateSocialNpcPrompt();
-}
-
-/* =========================================================
-KEYBOARD TALK
-========================================================= */
-
-addEventListener(
-  "keydown",
-  e=>{
-
-    if(
-      e.repeat||
-      state.mode!=="play"
-    ){
-      return;
-    }
-
-    const key=
-      e.key.toLowerCase();
-
-    if(key==="t"){
-
-      if(state.activeNpc){
-        return;
-      }
-
-      const target=
-        getNearbySocialNpc();
-
-      const location=
-        getNearbySocialLocation();
-
-      if(
-        target&&
-        location
-      ){
-        openNpcConversation(
-          target
-        );
-
-        e.preventDefault();
-      }
-    }
-  }
-);
-
-/* =========================================================
-SOCIAL CLOSE SAFETY
-========================================================= */
-
-const originalCloseSocial=
-  typeof closeSocial==="function"
-    ?closeSocial
-    :null;
-
-function closeSocial(){
-
-  state.activeNpc=null;
-
-  if(
-    originalCloseSocial
-  ){
-    originalCloseSocial();
-  }else{
-    $("socialPanel")?.classList.remove(
-      "open"
-    );
-  }
-
-  nearbySocialNpc=null;
-  nearbySocialLocation=null;
-
-  /*
-   * Restore normal place prompt.
-   */
-
-  if(typeof updatePlaces==="function"){
-    try{
-      updatePlaces(
-        0,
-        performance.now()/1000
-      );
-    }catch{}
-  }
-}
-
-/* =========================================================
-EXPOSE SOCIAL API
-========================================================= */
-
-window.NaijaHustleSocial={
-
-  getReputation,
-  getRelationship,
-  changeRelationship,
-
-  getJobs(){
-    return state.socialData.jobs;
-  },
-
-  getMissions(){
-    return state.socialData.missions;
-  },
-
-  getBusinessLeads(){
-    return state.socialData.businessLeads;
-  },
-
-  getContacts(){
-    return state.socialData.contacts;
-  },
-
-  talk(){
-    const target=
-      getNearbySocialNpc();
-
-    const location=
-      getNearbySocialLocation();
-
-    if(
-      target&&
-      location
-    ){
-      openNpcConversation(
-        target
-      );
-    }
-  }
-
-};
-
-console.log(
-  "Naija Hustle C Social System loaded."
-);
-  
-/* =========================================================
-PERSISTENCE
-========================================================= */
-
-const db=createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-const BG_NAMES={
-  street_boy:"Street Boy",
-  graduate:"Graduate",
-  nepo_baby:"Nepo Baby",
-  returnee:"Returnee"
-};
-
-const cap1=s=>
-  s
-    ?s.charAt(0).toUpperCase()+s.slice(1).replace(/_/g," ")
-    :s;
-
-function setPlayerInfo(){
-  $("name").textContent=state.name;
-  $("sub").textContent=state.sub;
-  refreshTag();
-}
-
+/* ---------- persistence ---------- */
+const db=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+function setPlayerInfo(){updateHUD();refreshTag()}
 async function loadPlayer(){
-  loadLocalState();
-
+  loadLocalState();loadLocalProgress();
   try{
     const l=localStorage.getItem("nh_avatar");
-
-    if(l){
-      state.cfg=sanitize(
-        JSON.parse(l)
-      );
-    }
+    if(l)state.cfg=sanitize(JSON.parse(l));
   }catch{}
-
-  rebuildPlayer();
-  refreshSelected();
-
+  rebuildPlayer();refreshSelected();
   try{
-    /*
-     * If the supplied Supabase anon key has been restored,
-     * the existing character RPC can load the player's account.
-     */
-    const {
-      data:{session}
-    }=await db.auth.getSession();
-
-    if(!session){
-      setPlayerInfo();
-      return;
-    }
-
-    const {
-      data,
-      error
-    }=await db.rpc("get_my_character");
-
-    if(
-      error||
-      !data||
-      !data.id
-    ){
-      setPlayerInfo();
-      return;
-    }
-
-    state.user=data;
-    state.name=data.name;
-    state.sub=
-      `${cap1(data.district)} · ${BG_NAMES[data.background]||""}`;
-
+    const {data:{session}}=await db.auth.getSession();
+    if(!session){setPlayerInfo();return}
+    const {data,error}=await db.rpc("get_my_character");
+    if(error||!data||!data.id){setPlayerInfo();return}
+    state.user=data;state.name=data.name;
+    state.sub=`${(data.district||"Lagos")} · ${(data.background||"Hustler")}`;
+    if(data.avatar){state.cfg=sanitize(data.avatar);localStorage.setItem("nh_avatar",JSON.stringify(state.cfg));rebuildPlayer();refreshSelected()}
     setPlayerInfo();
-
-    if(data.avatar){
-      state.cfg=sanitize(data.avatar);
-
-      localStorage.setItem(
-        "nh_avatar",
-        JSON.stringify(state.cfg)
-      );
-
-      rebuildPlayer();
-      refreshSelected();
-    }
-  }catch{
-    setPlayerInfo();
-  }
+  }catch{setPlayerInfo()}
 }
-
 async function saveAvatar(){
-  localStorage.setItem(
-    "nh_avatar",
-    JSON.stringify(state.cfg)
-  );
-
-  if(!state.user){
-    toast(
-      "Saved on this device. Log in to save it to your account."
-    );
-
-    return;
-  }
-
-  const {error}=await db.rpc(
-    "save_avatar",
-    {
-      p_avatar:state.cfg
-    }
-  );
-
-  toast(
-    error
-      ?"Saved on this device only. Run the avatar SQL in Supabase to save online."
-      :"Avatar saved to your account"
-  );
-
-  if(error){
-    console.warn(error.message);
-  }
+  localStorage.setItem("nh_avatar",JSON.stringify(state.cfg));
+  if(!state.user){toast("Saved on this device. Log in to save to your account.");return}
+  const {error}=await db.rpc("save_avatar",{p_avatar:state.cfg});
+  toast(error?"Saved locally only.":"Avatar saved to your account");
 }
 
-/* =========================================================
-RESIZE
-========================================================= */
-
-addEventListener("resize",()=>{
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-
-  renderer.setPixelRatio(
-    state.quality==="high"
-      ?Math.min(devicePixelRatio,2)
-      :1
-  );
+/* ---------- login (simple local for now) ---------- */
+$("loginBtn").addEventListener("click",async()=>{
+  const email=$("loginEmail").value.trim();
+  const pass=$("loginPassword").value;
+  if(!email||!pass){$("loginMessage").textContent="Enter email and password";return}
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email,password:pass});
+    if(error){$("loginMessage").textContent=error.message;return}
+    $("loginScreen").style.display="none";
+    state.name=email.split("@")[0];
+    loadPlayer();
+  }catch(e){$("loginMessage").textContent="Login failed"}
+});
+$("signupBtn").addEventListener("click",async()=>{
+  const email=$("loginEmail").value.trim();
+  const pass=$("loginPassword").value;
+  if(!email||!pass){$("loginMessage").textContent="Enter email and password";return}
+  try{
+    const {data,error}=await db.auth.signUp({email,password:pass});
+    if(error){$("loginMessage").textContent=error.message;return}
+    $("loginMessage").textContent="Account created. You can log in.";
+  }catch(e){$("loginMessage").textContent="Sign up failed"}
 });
 
-/* =========================================================
-MAIN LOOP
-========================================================= */
+/* ---------- resize + loop ---------- */
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(state.quality==="high"?Math.min(devicePixelRatio,2):1);
+});
 
-let last=performance.now();
-let mmTick=0;
-
+let last=performance.now(),mmTick=0;
 function frame(now){
   requestAnimationFrame(frame);
-
-  const dt=Math.min(
-    .05,
-    (now-last)/1000
-  );
-
-  last=now;
-
+  const dt=Math.min(.05,(now-last)/1000);last=now;
   if(dt<=0)return;
-
   const t=now/1000;
-
   updateDayNight(dt);
-
-  if(state.mode==="play"){
-    updatePlayer(dt);
-  }else{
-    updateViewerPlayer(dt);
-  }
-
-  updateNPCs(dt);
-  updateTraffic(dt);
-  updatePlaces(dt,t);
-updateSocialSystem();
-updateCamera(dt);
-  updateSun();
-
+  if(state.mode==="play")updatePlayer(dt);else updateViewerPlayer(dt);
+  updateNPCs(dt);updateTraffic(dt);updatePlaces(dt,t);
+  updateSocialNpcPrompt();
+  updateCamera(dt);updateSun();
   $("status").textContent=state.status;
-
-  if(
-    (mmTick++&1)===0&&
-    state.mode==="play"
-  ){
-    drawMinimap();
-  }
-
-  renderer.render(
-    scene,
-    camera
-  );
+  if((mmTick++&1)===0&&state.mode==="play")drawMinimap();
+  renderer.render(scene,camera);
 }
 
-/* =========================================================
-START
-========================================================= */
-
-buildWorld();
-buildTraffic();
-buildNPCs();
-buildCustomizer();
-applyQuality();
-
+/* ---------- start ---------- */
+buildWorld();buildTraffic();buildNPCs();buildCustomizer();applyQuality();
 loadPlayer().finally(()=>{
   requestAnimationFrame(frame);
-
-  setTimeout(()=>{
-    $("loading").classList.add("hidden");
-  },450);
+  setTimeout(()=>$("loading").classList.add("hidden"),450);
 });
-
 </script>
-
 </body>
-</html>
+    </html>
