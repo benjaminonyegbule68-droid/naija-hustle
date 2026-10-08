@@ -239,12 +239,47 @@ const OPTIONS = {
   beard:{label:"Beard",values:{none:"None",stubble:"Stubble",goatee:"Goatee",full:"Full"}},
   outfit:{label:"Outfit",values:{hoodie:"Hoodie",tee:"T-Shirt",jersey:"Jersey",kaftan:"Kaftan",agbada:"Agbada",ankara:"Ankara",suit:"Suit"}},
   outfitColor:{label:"Outfit Color",kind:"swatch",values:{default:"default",red:"#b72f2f",blue:"#285ca8",green:"#24734b",purple:"#6942a8",black:"#171717",white:"#e8e4da",gold:"#b88718"}},
-  accessory:{label:"Accessory",values:{none:"None",cap:"Cap",glasses:"Glasses",sunglasses:"Sunglasses",chain:"Chain",headphones:"Headphones"}}
+  accessory:{
+  label:"Accessory",
+  values:{
+    none:"None",
+    cap:"Cap",
+    glasses:"Glasses",
+    sunglasses:"Sunglasses",
+    chain:"Chain",
+    headphones:"Headphones"
+  }
+},
+
+bodyBuild:{
+  label:"Body Build",
+  values:{
+    compact:"Compact",
+    standard:"Standard",
+    broad:"Broad"
+  }
+},
+
+height:{
+  label:"Height",
+  values:{
+    short:"Short",
+    standard:"Standard",
+    tall:"Tall"
+  }
+}
 };
 
 const DEFAULT_CFG = {
-  skinTone:"brown",hairstyle:"fade",hairColor:"black",beard:"none",
-  outfit:"hoodie",outfitColor:"default",accessory:"none"
+  skinTone:"brown",
+  hairstyle:"fade",
+  hairColor:"black",
+  beard:"none",
+  outfit:"hoodie",
+  outfitColor:"default",
+  accessory:"none",
+  bodyBuild:"standard",
+  height:"standard"
 };
 
 const OUTFITS = {
