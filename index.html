@@ -731,7 +731,21 @@ function addOutfitDetails(root,cfg,bodyW){
     const lapel2=lapel.clone();lapel2.position.x=.14;lapel2.rotation.z=.35;root.add(lapel2);
   }
 }
+function sanitize(raw){
+  const out={...DEFAULT_CFG};
 
+  if(!raw||typeof raw!=="object"){
+    return out;
+  }
+
+  for(const k of Object.keys(DEFAULT_CFG)){
+    if(has(OPTIONS,k)&&has(OPTIONS[k].values,raw[k])){
+      out[k]=raw[k];
+    }
+  }
+
+  return out;
+}
 function createCharacter(rawCfg,opts={}){
   const cfg=sanitize(rawCfg);
   const root=new THREE.Group();
