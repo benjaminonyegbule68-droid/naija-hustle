@@ -959,23 +959,105 @@ head.add(lip);
 addHair(head,cfg,headR);
 
 function animateCharacter(c,dt,st){
-  c.time+=dt;c.phase+=dt*(1+Math.min(2,st.speed*.35));
-  const moving=st.speed>.15,run=st.speed>4.6;
-  let stride=moving?Math.sin(c.phase*(run?1.8:1.4))*.65:0;
-  if(st.air)stride*=.25;
-  c.legs[0].rotation.x=stride;c.legs[1].rotation.x=-stride;
-  c.arms[0].rotation.x=-stride*.72;c.arms[1].rotation.x=stride*.72;
-  c.spine.rotation.z=moving?Math.sin(c.phase)*.035:0;
-  c.hips.position.y=1.02+(moving?Math.abs(Math.sin(c.phase*1.4))*.025:0);
+  c.time+=dt;
+  c.phase+=dt*(1+Math.min(2,st.speed*.35));
 
-  if(st.emote==="wave"){
-    c.arms[1].rotation.z=-1.25;c.arms[1].rotation.x=-.5+Math.sin(c.time*8)*.18;
-  }else if(st.emote==="dance"){
-    c.spine.rotation.y=Math.sin(c.time*5)*.22;c.arms[0].rotation.z=-.8+Math.sin(c.time*6)*.3;c.arms[1].rotation.z=.8+Math.sin(c.time*6+1)*.3;
-  }else if(st.emote==="cheer"){
-    c.arms[0].rotation.z=-1.35;c.arms[1].rotation.z=1.35;c.arms[0].rotation.x=-.35;c.arms[1].rotation.x=-.35;
+  const moving=st.speed>.15;
+  const run=st.speed>4.6;
+
+  /* WALK / RUN */
+  let stride=
+    moving
+      ?Math.sin(c.phase*(run?1.8:1.4))*.65
+      :0;
+
+  if(st.air)stride*=.25;
+
+  c.legs[0].rotation.x=stride;
+  c.legs[1].rotation.x=-stride;
+
+  c.arms[0].rotation.x=-stride*.72;
+  c.arms[1].rotation.x=stride*.72;
+
+  /* BODY MOTION */
+  c.spine.rotation.z=
+    moving
+      ?Math.sin(c.phase)*.035
+      :Math.sin(c.time*1.4)*.008;
+
+  c.spine.rotation.y=
+    moving
+      ?Math.sin(c.phase*.5)*.025
+      :Math.sin(c.time*.8)*.012;
+
+  c.hips.position.y=
+    1.02+
+    (moving
+      ?Math.abs(Math.sin(c.phase*1.4))*.025
+      :Math.sin(c.time*1.6)*.008);
+
+  /* HEAD MOVEMENT */
+  if(c.head){
+    c.head.rotation.y=
+      moving
+        ?Math.sin(c.phase*.55)*.035
+        :Math.sin(c.time*.7)*.025;
+
+    c.head.rotation.z=
+      Math.sin(c.time*.9)*.012;
   }
-}
+
+  /* BLINK */
+  c.blinkT-=dt;
+
+  if(c.blinkT<=0){
+    c.blink=true;
+    c.blinkT=2.5+Math.random()*3;
+  }
+
+  if(c.eyes&&c.eyes.length){
+    if(c.blink){
+      for(const eye of c.eyes){
+        eye.scale.y=damp(eye.scale.y,.08,35,dt);
+      }
+
+      if(c.eyes[0].scale.y<.11){
+        c.blink=false;
+      }
+    }else{
+      for(const eye of c.eyes){
+        eye.scale.y=damp(eye.scale.y,.88,28,dt);
+      }
+    }
+  }
+
+  /* EMOTES */
+  if(st.emote==="wave"){
+
+    c.arms[1].rotation.z=-1.25;
+    c.arms[1].rotation.x=
+      -.5+Math.sin(c.time*8)*.18;
+
+  }else if(st.emote==="dance"){
+
+    c.spine.rotation.y=
+      Math.sin(c.time*5)*.22;
+
+    c.arms[0].rotation.z=
+      -.8+Math.sin(c.time*6)*.3;
+
+    c.arms[1].rotation.z=
+      .8+Math.sin(c.time*6+1)*.3;
+
+  }else if(st.emote==="cheer"){
+
+    c.arms[0].rotation.z=-1.35;
+    c.arms[1].rotation.z=1.35;
+
+    c.arms[0].rotation.x=-.35;
+    c.arms[1].rotation.x=-.35;
+  }
+                                        }
 
 function rebuildPlayer(){
   if(player.char)scene.remove(player.char.root);
