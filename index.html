@@ -1,908 +1,792 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#14201F">
-
-<title>Naija Hustle</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
-
-<style>
-
-:root{
-  --bg:#EEF1F0;
-  --ink:#14201F;
-  --lagoon:#0F6B6F;
-  --danfo:#FFC20E;
-  --brick:#C2410C;
-  --card:#fff;
-  --mute:#5C6B6A;
-  --line:#D5DCDA;
-  --good:#087443;
-  --danger:#B42318;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:"Bricolage Grotesque",sans-serif;
-}
-
-button,
-input,
-select{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-input,
-select{
-  width:100%;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:13px 14px;
-  background:#fff;
-  color:var(--ink);
-  outline:none;
-}
-
-input:focus,
-select:focus{
-  border-color:var(--lagoon);
-  box-shadow:0 0 0 3px rgba(15,107,111,.1);
-}
-
-.wrap{
-  width:min(100% - 24px,480px);
-  margin:0 auto;
-  padding-bottom:100px;
-}
-
-h1,
-h2,
-h3,
-p{
-  margin-top:0;
-}
-
-h1{
-  font-size:2rem;
-  line-height:1.05;
-}
-
-h2{
-  font-size:1.25rem;
-  line-height:1.15;
-}
-
-p{
-  line-height:1.5;
-}
-
-.mute{
-  color:var(--mute);
-}
-
-.row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.grid{
-  display:grid;
-  gap:12px;
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.grid3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:16px;
-  margin:12px 0;
-  box-shadow:0 5px 18px rgba(20,32,31,.04);
-}
-
-.btn{
-  width:100%;
-  border:0;
-  border-radius:14px;
-  background:var(--lagoon);
-  color:#fff;
-  padding:13px 15px;
-  font-weight:800;
-  margin-top:10px;
-}
-
-.btn:hover{
-  filter:brightness(.96);
-}
-
-.btn.alt{
-  background:#fff;
-  color:var(--ink);
-  border:1px solid var(--line);
-}
-
-.btn.gold{
-  background:var(--danfo);
-  color:var(--ink);
-}
-
-.link{
-  border:0;
-  background:none;
-  color:var(--lagoon);
-  font-weight:800;
-  padding:10px 0;
-}
-
-.err,
-.ok{
-  border-radius:14px;
-  padding:12px 14px;
-  margin:10px 0;
-  line-height:1.4;
-}
-
-.err{
-  background:#FDECEC;
-  color:var(--danger);
-  border:1px solid #F4C7C4;
-}
-
-.ok{
-  background:#EAF8F0;
-  color:var(--good);
-  border:1px solid #BEE6CE;
-}
-
-.stripe{
-  height:7px;
-  background:linear-gradient(
-    90deg,
-    var(--brick) 0 33%,
-    #fff 33% 66%,
-    var(--good) 66%
-  );
-}
-
-.top{
-  background:var(--ink);
-  color:#fff;
-  position:sticky;
-  top:0;
-  z-index:20;
-}
-
-.top .in{
-  width:min(100% - 24px,480px);
-  margin:auto;
-  padding:13px 0;
-}
-
-.cash{
-  color:var(--danfo);
-  font-size:1.7rem;
-  font-weight:800;
-  margin:6px 0;
-}
-
-.pill{
-  display:inline-flex;
-  align-items:center;
-  border-radius:999px;
-  padding:5px 9px;
-  background:#E9F0EF;
-  color:var(--ink);
-  font-size:.78rem;
-  font-weight:800;
-}
-
-.top .pill{
-  background:rgba(255,255,255,.12);
-  color:#fff;
-}
-
-.bar{
-  height:9px;
-  background:var(--line);
-  border-radius:999px;
-  overflow:hidden;
-  margin-top:7px;
-}
-
-.bar i{
-  display:block;
-  height:100%;
-  background:var(--lagoon);
-  border-radius:inherit;
-}
-
-.nav{
-  position:fixed;
-  z-index:30;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#fff;
-  border-top:1px solid var(--line);
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  padding:7px 4px calc(7px + env(safe-area-inset-bottom));
-}
-
-.nav button{
-  border:0;
-  background:none;
-  color:var(--mute);
-  font-size:.68rem;
-  font-weight:800;
-  padding:8px 2px;
-}
-
-.nav button[aria-current="page"]{
-  color:var(--lagoon);
-}
-
-.auth{
-  padding-top:45px;
-}
-
-.auth-logo{
-  display:inline-flex;
-  background:var(--ink);
-  color:#fff;
-  border-radius:14px;
-  padding:8px 12px;
-  font-weight:800;
-  margin-bottom:12px;
-}
-
-.section-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  gap:10px;
-  margin:18px 0 10px;
-}
-
-.counter{
-  color:var(--mute);
-  font-size:.8rem;
-  font-weight:800;
-}
-
-.bg{
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:14px;
-  background:#fff;
-  text-align:left;
-  width:100%;
-}
-
-.bg.selected{
-  border:2px solid var(--lagoon);
-  background:#F1FAF9;
-}
-
-.bg h3{
-  margin:0 0 5px;
-}
-
-.bg p{
-  margin:0;
-  color:var(--mute);
-  font-size:.86rem;
-}
-
-.trait-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.trait{
-  position:relative;
-  border:1px solid var(--line);
-  border-radius:17px;
-  padding:13px;
-  background:#fff;
-  text-align:left;
-}
-
-.trait.selected{
-  border:2px solid var(--lagoon);
-  background:#F1FAF9;
-}
-
-.trait-number{
-  position:absolute;
-  right:9px;
-  top:9px;
-  width:22px;
-  height:22px;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  background:var(--danfo);
-  font-size:.7rem;
-  font-weight:800;
-}
-
-.trait strong{
-  display:block;
-  padding-right:24px;
-  margin-bottom:5px;
-}
-
-.trait small{
-  color:var(--mute);
-  line-height:1.35;
-}
-
-.look-preview{
-  background:linear-gradient(
-    145deg,
-    #14201F,
-    #0F6B6F
-  );
-  color:#fff;
-  border-radius:22px;
-  padding:18px;
-  margin:12px 0;
-  text-align:center;
-}
-
-.look-name{
-  font-size:1.25rem;
-  font-weight:800;
-  margin-top:8px;
-}
-
-.look-meta{
-  color:rgba(255,255,255,.72);
-  font-size:.82rem;
-  margin-top:4px;
-}
-
-.look-traits{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-top:10px;
-}
-
-.look-traits .pill{
-  background:rgba(255,255,255,.13);
-  color:#fff;
-}
-
-.choice-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-}
-
-.choice{
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:13px;
-  padding:10px;
-  font-weight:700;
-}
-
-.choice.selected{
-  background:#E7F5F4;
-  border:2px solid var(--lagoon);
-  color:var(--lagoon);
-}
-
-.profile-hero{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:16px;
-  margin:12px 0;
-  border-radius:22px;
-  background:var(--ink);
-  color:#fff;
-}
-
-.profile-avatar{
-  width:72px;
-  height:72px;
-  flex:0 0 72px;
-  border-radius:20px;
-  display:grid;
-  place-items:center;
-  background:#fff;
-  overflow:hidden;
-}
-
-.profile-identity h1{
-  margin:2px 0 4px;
-  font-size:1.55rem;
-}
-
-.profile-identity p{
-  margin:0;
-  color:rgba(255,255,255,.7);
-}
-
-.eyebrow{
-  color:var(--danfo);
-  font-size:.68rem;
-  font-weight:800;
-  letter-spacing:.08em;
-}
-
-.profile-card-title{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  margin-bottom:13px;
-}
-
-.profile-stat-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.profile-stat{
-  background:#F5F7F6;
-  border-radius:14px;
-  padding:12px;
-}
-
-.profile-stat span{
-  display:block;
-  color:var(--mute);
-  font-size:.75rem;
-}
-
-.profile-stat strong{
-  display:block;
-  margin-top:3px;
-}
-
-.profile-traits{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-}
-
-.profile-trait{
-  background:#E7F5F4;
-  color:var(--lagoon);
-  padding:7px 10px;
-  border-radius:999px;
-  font-size:.8rem;
-  font-weight:800;
-}
-
-.profile-details{
-  display:grid;
-  gap:9px;
-}
-
-.profile-detail{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  border-bottom:1px solid var(--line);
-  padding-bottom:8px;
-}
-
-.profile-detail:last-child{
-  border-bottom:0;
-  padding-bottom:0;
-}
-
-.profile-detail span{
-  color:var(--mute);
-}
-
-.profile-detail strong{
-  text-align:right;
-}
-
-.profile-skill{
-  margin:13px 0;
-}
-
-.profile-skill-head{
-  display:flex;
-  justify-content:space-between;
-  font-size:.9rem;
-  margin-bottom:6px;
-}
-
-.profile-skill-bar{
-  height:8px;
-  border-radius:999px;
-  background:var(--line);
-  overflow:hidden;
-}
-
-.profile-skill-bar i{
-  display:block;
-  height:100%;
-  background:var(--lagoon);
-}
-
-.profile-status{
-  padding:12px;
-  border-radius:14px;
-  background:#F5F7F6;
-}
-
-.need-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px;
-}
-
-.need{
-  background:#F5F7F6;
-  border-radius:15px;
-  padding:11px;
-}
-
-.need-head{
-  display:flex;
-  justify-content:space-between;
-  font-size:.8rem;
-  margin-bottom:6px;
-}
-
-.need .bar{
-  height:7px;
-  margin:0;
-}
-
-.need.low .bar i{
-  background:var(--brick);
-}
-
-.need.mid .bar i{
-  background:var(--danfo);
-}
-
-.need.high .bar i{
-  background:var(--good);
-}
-
-.activity-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px;
-}
-
-.activity{
-  border:1px solid var(--line);
-  border-radius:15px;
-  background:#fff;
-  padding:12px;
-  text-align:left;
-}
-
-.activity strong{
-  display:block;
-}
-
-.activity small{
-  color:var(--mute);
-  display:block;
-  margin:4px 0;
-}
-
-.activity button{
-  width:100%;
-  border:0;
-  border-radius:11px;
-  background:var(--lagoon);
-  color:#fff;
-  padding:9px;
-  font-weight:800;
-  margin-top:6px;
-}
-
-.clock{
-  border-radius:18px;
-  background:#fff;
-  border:1px solid var(--line);
-  padding:14px;
-  margin:12px 0;
-}
-
-.clock-time{
-  font-size:1.7rem;
-  font-weight:800;
-}
-
-.clock-phase{
-  color:var(--lagoon);
-  font-weight:800;
-}
-
-.sk{
-  margin:13px 0;
-}
-
-.lb{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding:13px 0;
-  border-bottom:1px solid var(--line);
-}
-
-.lb:last-child{
-  border-bottom:0;
-}
-
-.lock{
-  background:#FFF5D7;
-  color:#785500;
-  padding:10px;
-  border-radius:12px;
-  font-size:.84rem;
-  margin-top:9px;
-}
-
-.bonus{
-  display:inline-block;
-  background:#E7F5F4;
-  color:var(--lagoon);
-  border-radius:999px;
-  padding:6px 9px;
-  font-size:.75rem;
-  font-weight:800;
-  margin:6px 0;
-}
-
-.big{
-  font-size:2rem;
-  font-weight:800;
-  margin:6px 0 12px;
-}
-
-.map-card{
-  padding:8px;
-  overflow:hidden;
-}
-
-.map-svg{
-  display:block;
-  width:100%;
-}
-
-.map-pin{
-  cursor:pointer;
-}
-
-.district-card.here{
-  border-color:var(--lagoon);
-  background:#F2FAF9;
-}
-
-/* =========================================================
-AVATAR
-========================================================= */
-
-.avatar-stage{
-  background:
-    radial-gradient(
-      circle at 50% 35%,
-      #FFFFFF 0%,
-      #E6ECEB 58%,
-      #CCD7D5 100%
-    );
-  border:1px solid var(--line);
-  border-radius:24px;
-  min-height:310px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  overflow:hidden;
-  position:relative;
-}
-
-.avatar-stage:after{
-  content:"";
-  position:absolute;
-  bottom:15px;
-  width:145px;
-  height:24px;
-  background:rgba(20,32,31,.12);
-  border-radius:50%;
-  filter:blur(8px);
-}
-
-.avatar-stage svg{
-  width:245px;
-  height:275px;
-  position:relative;
-  z-index:2;
-  filter:drop-shadow(0 12px 12px rgba(20,32,31,.12));
-}
-
-.avatar-mini svg{
-  width:60px;
-  height:72px;
-}
-
-.avatar-large svg{
-  width:110px;
-  height:125px;
-}
-
-.avatar-controls{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin-top:10px;
-}
-
-.avatar-control{
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:13px;
-  padding:9px 4px;
-  font-size:.72rem;
-  font-weight:800;
-}
-
-.avatar-control.active{
-  background:var(--ink);
-  color:#fff;
-}
-
-.avatar-spin{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  margin-top:9px;
-}
-
-.avatar-spin button{
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:999px;
-  padding:8px 14px;
-  font-weight:800;
-}
-
-.avatar-spin button:hover{
-  background:#F5F7F6;
-}
-
-.avatar-note{
-  text-align:center;
-  color:var(--mute);
-  font-size:.75rem;
-  margin:8px 0 0;
-}
-
-.loading{
-  text-align:center;
-  padding:35px 10px;
-  color:var(--mute);
-}
-
-@media(max-width:380px){
-
-  .wrap{
-    width:min(100% - 18px,480px);
-  }
-
-  .nav button{
-    font-size:.6rem;
-  }
-
-  .trait-grid{
-    grid-template-columns:1fr;
-  }
-
-  .avatar-controls{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-}
-
-</style>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#14201F"
+  >
+
+  <meta
+    name="description"
+    content="Naija Hustle — hustle, earn, improve, build."
+  >
+
+  <title>Naija Hustle</title>
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@10..48,400;10..48,500;10..48,600;10..48,700;10..48,800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    :root{
+      --bg:#EEF1F0;
+      --ink:#14201F;
+      --lagoon:#0F6B6F;
+      --danfo:#FFC20E;
+      --brick:#C2410C;
+      --white:#fff;
+      --muted:#667472;
+      --line:#D7DFDD;
+      --soft:#F5F7F6;
+      --success:#087443;
+      --danger:#B42318;
+      --shadow:0 8px 30px rgba(20,32,31,.08);
+      --radius:18px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--ink);
+      font-family:"Bricolage Grotesque",system-ui,sans-serif;
+      line-height:1.45;
+    }
+
+    button,
+    input,
+    select{
+      font:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    button:disabled{
+      cursor:not-allowed;
+      opacity:.55;
+    }
+
+    h1,
+    h2,
+    h3,
+    p{
+      margin-top:0;
+    }
+
+    h1,
+    h2,
+    h3{
+      line-height:1.1;
+    }
+
+    .app{
+      min-height:100vh;
+    }
+
+    .wrap{
+      width:min(100% - 28px, 720px);
+      margin:0 auto;
+      padding:18px 0 110px;
+    }
+
+    .top{
+      background:var(--white);
+      position:sticky;
+      top:0;
+      z-index:20;
+      box-shadow:0 2px 12px rgba(20,32,31,.08);
+    }
+
+    .top .in{
+      width:min(100% - 28px, 720px);
+      margin:auto;
+      padding:13px 0 10px;
+    }
+
+    .stripe{
+      height:5px;
+      background:linear-gradient(
+        90deg,
+        var(--lagoon) 0 45%,
+        var(--danfo) 45% 72%,
+        var(--brick) 72% 100%
+      );
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .cash{
+      font-size:1.7rem;
+      font-weight:800;
+      margin:3px 0;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      width:max-content;
+      padding:5px 9px;
+      border-radius:999px;
+      background:#E7F2F1;
+      color:var(--lagoon);
+      font-size:.75rem;
+      font-weight:800;
+    }
+
+    .bar{
+      height:8px;
+      width:100%;
+      overflow:hidden;
+      background:#DDE5E3;
+      border-radius:999px;
+    }
+
+    .bar i{
+      display:block;
+      height:100%;
+      width:0;
+      background:var(--lagoon);
+      border-radius:inherit;
+      transition:width .25s ease;
+    }
+
+    .card{
+      background:var(--white);
+      border:1px solid rgba(20,32,31,.06);
+      border-radius:var(--radius);
+      padding:17px;
+      margin-bottom:14px;
+      box-shadow:var(--shadow);
+    }
+
+    .card h2{
+      font-size:1.08rem;
+      margin-bottom:8px;
+    }
+
+    .mute{
+      color:var(--muted);
+    }
+
+    .err,
+    .ok,
+    .lock{
+      padding:12px 14px;
+      border-radius:13px;
+      margin-bottom:12px;
+      font-size:.9rem;
+      font-weight:600;
+    }
+
+    .err{
+      color:var(--danger);
+      background:#FEECEC;
+      border:1px solid #F8C8C8;
+    }
+
+    .ok{
+      color:var(--success);
+      background:#EAF8F1;
+      border:1px solid #BFE8D2;
+    }
+
+    .lock{
+      color:#8A5B00;
+      background:#FFF7D6;
+      border:1px solid #F2D66B;
+    }
+
+    .btn{
+      width:100%;
+      border:0;
+      border-radius:14px;
+      padding:13px 15px;
+      margin-top:12px;
+      background:var(--lagoon);
+      color:white;
+      font-weight:800;
+      transition:.15s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .btn.alt{
+      background:#E8EFEE;
+      color:var(--ink);
+    }
+
+    .btn.yellow{
+      background:var(--danfo);
+      color:var(--ink);
+    }
+
+    .link{
+      display:block;
+      width:100%;
+      border:0;
+      background:none;
+      color:var(--lagoon);
+      font-weight:800;
+      padding:12px;
+      margin-top:8px;
+    }
+
+    input,
+    select{
+      width:100%;
+      border:1px solid var(--line);
+      background:white;
+      color:var(--ink);
+      border-radius:13px;
+      padding:12px;
+      outline:none;
+    }
+
+    input:focus,
+    select:focus{
+      border-color:var(--lagoon);
+      box-shadow:0 0 0 3px rgba(15,107,111,.1);
+    }
+
+    label{
+      display:block;
+      font-size:.82rem;
+      font-weight:800;
+      margin:0 0 7px;
+    }
+
+    .field{
+      margin-bottom:13px;
+    }
+
+    .nav{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:50;
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      background:white;
+      border-top:1px solid var(--line);
+      padding:7px 5px calc(7px + env(safe-area-inset-bottom));
+    }
+
+    .nav button{
+      border:0;
+      background:none;
+      color:#65716F;
+      padding:8px 2px;
+      font-size:.68rem;
+      font-weight:800;
+      border-radius:10px;
+    }
+
+    .nav button[aria-current="page"]{
+      background:#E7F2F1;
+      color:var(--lagoon);
+    }
+
+    .auth{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:25px 14px;
+    }
+
+    .auth-box{
+      width:min(100%,440px);
+    }
+
+    .brand{
+      font-size:2.4rem;
+      font-weight:800;
+      letter-spacing:-.06em;
+      margin-bottom:4px;
+    }
+
+    .brand span{
+      color:var(--lagoon);
+    }
+
+    .eyebrow{
+      color:var(--lagoon);
+      font-size:.72rem;
+      font-weight:800;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+
+    .bg-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .bg-choice{
+      border:2px solid var(--line);
+      border-radius:15px;
+      background:white;
+      padding:13px;
+      text-align:left;
+    }
+
+    .bg-choice.selected{
+      border-color:var(--lagoon);
+      background:#EDF8F7;
+    }
+
+    .bg-choice strong{
+      display:block;
+      margin-bottom:3px;
+    }
+
+    .bg-choice small{
+      color:var(--muted);
+      display:block;
+    }
+
+    .trait-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+    }
+
+    .trait{
+      border:2px solid var(--line);
+      border-radius:14px;
+      background:white;
+      padding:12px;
+      text-align:left;
+    }
+
+    .trait.selected{
+      border-color:var(--lagoon);
+      background:#EDF8F7;
+    }
+
+    .trait strong{
+      display:block;
+      margin-bottom:4px;
+    }
+
+    .trait small{
+      color:var(--muted);
+      display:block;
+      font-size:.75rem;
+    }
+
+    .appearance-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .avatar-stage{
+      background:#F5F7F6;
+      border-radius:22px;
+      padding:18px;
+      text-align:center;
+      overflow:hidden;
+    }
+
+    .avatar-large{
+      width:120px;
+      height:120px;
+      margin:auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .avatar-large svg{
+      max-width:100%;
+      max-height:100%;
+    }
+
+    .avatar-mini{
+      width:58px;
+      height:58px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:none;
+    }
+
+    .avatar-mini svg{
+      width:100%;
+      height:100%;
+    }
+
+    .profile-avatar{
+      width:72px;
+      height:72px;
+      border-radius:20px;
+      background:#F5F7F6;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      flex:none;
+    }
+
+    .profile-avatar svg{
+      width:100%;
+      height:100%;
+    }
+
+    .profile-hero{
+      display:flex;
+      gap:13px;
+      align-items:center;
+      margin-bottom:14px;
+    }
+
+    .profile-identity h1{
+      margin:2px 0 3px;
+      font-size:1.55rem;
+    }
+
+    .profile-identity p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .profile-card-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:13px;
+    }
+
+    .profile-card-title strong{
+      font-size:1rem;
+    }
+
+    .profile-stat-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .profile-stat{
+      background:var(--soft);
+      border-radius:14px;
+      padding:13px;
+    }
+
+    .profile-stat span{
+      display:block;
+      color:var(--muted);
+      font-size:.78rem;
+    }
+
+    .profile-stat strong{
+      display:block;
+      font-size:1.1rem;
+      margin-top:4px;
+    }
+
+    .profile-traits{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+
+    .profile-trait{
+      padding:7px 10px;
+      background:#E7F2F1;
+      color:var(--lagoon);
+      border-radius:999px;
+      font-size:.78rem;
+      font-weight:800;
+    }
+
+    .profile-details{
+      display:grid;
+      gap:9px;
+    }
+
+    .profile-detail{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid var(--line);
+      padding-bottom:8px;
+    }
+
+    .profile-detail:last-child{
+      border-bottom:0;
+      padding-bottom:0;
+    }
+
+    .profile-detail span{
+      color:var(--muted);
+    }
+
+    .profile-detail strong{
+      text-align:right;
+    }
+
+    .profile-skill{
+      margin-bottom:13px;
+    }
+
+    .profile-skill:last-child{
+      margin-bottom:0;
+    }
+
+    .profile-skill-head{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:5px;
+      font-size:.86rem;
+    }
+
+    .profile-skill-bar{
+      height:8px;
+      background:#E0E7E5;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .profile-skill-bar i{
+      display:block;
+      height:100%;
+      background:var(--lagoon);
+      border-radius:inherit;
+    }
+
+    .need{
+      margin-bottom:11px;
+    }
+
+    .need-head{
+      display:flex;
+      justify-content:space-between;
+      font-size:.8rem;
+      margin-bottom:4px;
+    }
+
+    .need-bar{
+      height:8px;
+      border-radius:999px;
+      overflow:hidden;
+      background:#E0E7E5;
+    }
+
+    .need-bar i{
+      display:block;
+      height:100%;
+      background:var(--lagoon);
+    }
+
+    .activity-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+    }
+
+    .activity{
+      border:1px solid var(--line);
+      background:white;
+      border-radius:14px;
+      padding:12px;
+      text-align:left;
+    }
+
+    .activity strong{
+      display:block;
+    }
+
+    .activity small{
+      color:var(--muted);
+      display:block;
+      margin-top:3px;
+    }
+
+    .sk{
+      margin-bottom:12px;
+    }
+
+    .sk:last-child{
+      margin-bottom:0;
+    }
+
+    .grid3{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+    }
+
+    .grid3 .btn{
+      margin-top:0;
+      padding:11px 5px;
+    }
+
+    .big{
+      font-size:2rem;
+      font-weight:800;
+      margin:3px 0 8px;
+    }
+
+    .bonus{
+      display:inline-block;
+      background:#FFF7D6;
+      color:#765300;
+      padding:7px 9px;
+      border-radius:9px;
+      font-size:.78rem;
+      font-weight:800;
+    }
+
+    .map-card{
+      padding:8px;
+      overflow:hidden;
+    }
+
+    .map-svg{
+      width:100%;
+      display:block;
+    }
+
+    .map-pin{
+      cursor:pointer;
+    }
+
+    .district-card.here{
+      border:2px solid var(--lagoon);
+    }
+
+    .lb{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:13px 0;
+      border-bottom:1px solid var(--line);
+    }
+
+    .lb:last-child{
+      border-bottom:0;
+    }
+
+    .clock{
+      background:var(--ink);
+      color:white;
+      border-radius:17px;
+      padding:14px;
+      margin-bottom:14px;
+    }
+
+    .clock-time{
+      font-size:1.5rem;
+      font-weight:800;
+    }
+
+    .clock-date{
+      color:rgba(255,255,255,.7);
+      font-size:.78rem;
+    }
+
+    .avatar-controls{
+      display:flex;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .avatar-control{
+      flex:1;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      background:white;
+      font-weight:800;
+    }
+
+    .avatar-note{
+      color:var(--muted);
+      font-size:.8rem;
+      margin-top:10px;
+    }
+
+    @media(max-width:430px){
+
+      .trait-grid,
+      .appearance-grid{
+        grid-template-columns:1fr;
+      }
+
+      .bg-grid{
+        grid-template-columns:1fr;
+      }
+
+    }
+
+  </style>
+
 </head>
 
 <body>
 
-<div id="app"></div>
+<div
+  id="app"
+  class="app"
+></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
+"use strict";
+
+
 /* =========================================================
 SUPABASE
 ========================================================= */
 
-const app =
-  document.getElementById("app");
-
 const SUPABASE_URL =
   "https://pbqtbwiymlwksdtfsfcb.supabase.co";
 
-const SUPABASE_ANON_KEY =
+const SUPABASE_KEY =
   "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
 
-if (
-  !window.supabase ||
-  !window.supabase.createClient
-) {
-
-  app.innerHTML = `
-    <div class="wrap">
-      <div class="stripe"></div>
-
-      <div class="card">
-        <h1>Naija Hustle</h1>
-
-        <div class="err">
-          Supabase could not be loaded.
-          Check your internet connection and refresh.
-        </div>
-      </div>
-    </div>
-  `;
-
-  throw new Error(
-    "Supabase JS unavailable"
-  );
-
-}
-
 const db =
-  window.supabase.createClient(
+  supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_ANON_KEY
+    SUPABASE_KEY
   );
+
+const app =
+  document.getElementById("app");
 
 
 /* =========================================================
@@ -927,7 +811,7 @@ const S = {
 
   nameDraft:"",
 
-  personalityTraits:null,
+  personalityTraits:[],
 
   personality1:null,
 
@@ -967,40 +851,45 @@ const S = {
 
 
 /* =========================================================
-GAME DATA
+DATA
 ========================================================= */
 
-const BG = [
+const BACKGROUNDS = [
 
   {
     id:"street_boy",
     name:"Street Boy",
-    meta:"Starts in Mushin · ₦5,000",
-    d:"No capital, no connections, plenty of hustle. Your only collateral is gist."
+    district:"Mushin",
+    cash:5000,
+    description:"Start small, hustle hard and build your way up."
   },
 
   {
     id:"graduate",
     name:"Graduate",
-    meta:"Starts in Yaba · ₦20,000",
-    d:"First class degree, zero job offers. The CV is strong, the NYSC is done."
+    district:"Yaba",
+    cash:20000,
+    description:"Education gives you a stronger starting position."
   },
 
   {
     id:"nepo_baby",
     name:"Nepo Baby",
-    meta:"Starts in Lekki · ₦500,000",
-    d:"Daddy's name opens doors. Now prove the doors were worth opening."
+    district:"Lekki",
+    cash:500000,
+    description:"You started ahead. Now prove you can stay ahead."
   },
 
   {
     id:"returnee",
     name:"Returnee",
-    meta:"Starts in Ikeja · ₦150,000",
-    d:"Came back from abroad with savings and a strong accent. Lagos will humble you."
+    district:"Ikeja",
+    cash:150000,
+    description:"You came back with money, experience and ambition."
   }
 
 ];
+
 
 const SK = {
 
@@ -1025,6 +914,7 @@ const SKIN_TONES = [
 
 ];
 
+
 const HAIRSTYLES = [
 
   ["short","Short"],
@@ -1045,6 +935,7 @@ const HAIRSTYLES = [
 
 ];
 
+
 const HAIR_COLORS = [
 
   ["black","Black"],
@@ -1056,6 +947,7 @@ const HAIR_COLORS = [
   ["red","Red"]
 
 ];
+
 
 const OUTFITS = [
 
@@ -1072,6 +964,7 @@ const OUTFITS = [
   ["business","Business"]
 
 ];
+
 
 const ACCESSORIES = [
 
@@ -1096,88 +989,61 @@ const ACCESSORIES = [
 HELPERS
 ========================================================= */
 
-const esc =
-  value =>
-    String(value ?? "")
-      .replace(
-        /[&<>"']/g,
-        char =>
-          ({
-            "&":"&amp;",
-            "<":"&lt;",
-            ">":"&gt;",
-            '"':"&quot;",
-            "'":"&#39;"
-          }[char])
-      );
+function esc(value){
 
-const naira =
-  value =>
-    "₦" +
-    Number(value || 0)
-      .toLocaleString("en-NG");
+  return String(
+    value ?? ""
+  )
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
-const cap =
-  value => {
+}
 
-    const str =
-      String(value || "");
 
-    return str
-      ? str.charAt(0).toUpperCase() +
-        str.slice(1)
-      : "";
+function naira(value){
 
-  };
+  const n =
+    Number(value) || 0;
 
-const bgName =
-  id => {
+  return "₦" +
+    n.toLocaleString(
+      "en-NG"
+    );
 
-    const bg =
-      BG.find(
-        item =>
-          item.id === id
-      );
+}
 
-    return bg
-      ? bg.name
-      : id;
 
-  };
+function cap(value){
 
-const setMsg =
-  (
-    text,
-    ok=false
-  ) => {
+  return String(
+    value ?? ""
+  )
+    .replaceAll("_"," ")
+    .replace(/\b\w/g,
+      letter =>
+        letter.toUpperCase()
+    );
 
-    S.msg =
-      text
-        ? {
-            t:text,
-            ok
-          }
-        : null;
+}
 
-  };
 
-const msgHtml =
-  () => {
+function bgName(id){
 
-    if (!S.msg) {
-      return "";
-    }
+  const found =
+    BACKGROUNDS.find(
+      item =>
+        item.id === id
+    );
 
-    return `
-      <div
-        class="${S.msg.ok ? "ok" : "err"}"
-        role="alert"
-      >
-        ${esc(S.msg.t)}
-      </div>
-    `;
+  return found
+    ? found.name
+    : cap(id);
 
-  };
+}
+
 
 function optionLabel(
   list,
@@ -1197,288 +1063,145 @@ function optionLabel(
 }
 
 
+function setMsg(message){
+
+  S.msg = {
+
+    t:
+      message,
+
+    ok:false
+
+  };
+
+}
+
+
+function msgHtml(){
+
+  if(!S.msg){
+    return "";
+  }
+
+  const output = `
+
+    <div
+      class="${
+        S.msg.ok
+          ? "ok"
+          : "err"
+      }"
+    >
+      ${esc(S.msg.t)}
+    </div>
+
+  `;
+
+  S.msg = null;
+
+  return output;
+
+}
+
+
 /* =========================================================
 AVATAR ENGINE
 ========================================================= */
 
-const AVATAR_SKIN = {
-
-  light:"#F1C7A8",
-
-  medium:"#C98F6B",
-
-  deep:"#8D573D",
-
-  dark:"#6B3F2D"
-
-};
-
-const AVATAR_HAIR = {
-
-  black:"#171717",
-
-  brown:"#4A2A1B",
-
-  blonde:"#C99A3E",
-
-  red:"#7B2D26"
-
-};
-
-function avatarSkin(value){
-
-  return (
-    AVATAR_SKIN[value] ||
-    AVATAR_SKIN.medium
-  );
-
-}
-
-function avatarHair(value){
-
-  return (
-    AVATAR_HAIR[value] ||
-    AVATAR_HAIR.black
-  );
-
-}
-
 function avatarSvg(
   c,
-  size=220
+  size=120
 ){
 
-  const skin =
-    avatarSkin(
-      c?.skin_tone
-    );
+  const skin = {
 
-  const hair =
-    avatarHair(
-      c?.hair_color
-    );
+    light:"#F1C7A5",
+
+    medium:"#C98E68",
+
+    deep:"#8A5438",
+
+    dark:"#633A29"
+
+  }[
+    c?.skin_tone
+  ] || "#C98E68";
+
+
+  const hair = {
+
+    black:"#191716",
+
+    brown:"#5A3424",
+
+    blonde:"#D5A84C",
+
+    red:"#8F3326"
+
+  }[
+    c?.hair_color
+  ] || "#191716";
+
 
   const hairstyle =
     c?.hairstyle ||
     "short";
 
+
   const outfit =
     c?.outfit ||
     "casual";
+
 
   const accessory =
     c?.accessory ||
     "none";
 
-  let clothes = `
 
-    <path
-      d="
-        M58 210
-        C62 178 78 164 110 160
-        C142 164 158 178 162 210
-        Z
-      "
-      fill="#0F6B6F"
-    />
+  let clothes =
+    "#2C7779";
 
-  `;
 
   if(
     outfit === "streetwear"
   ){
-
-    clothes = `
-
-      <path
-        d="
-          M50 210
-          C54 175 76 158 110 158
-          C144 158 166 175 170 210
-          Z
-        "
-        fill="#14201F"
-      />
-
-      <path
-        d="
-          M76 170
-          L110 205
-          L144 170
-        "
-        fill="none"
-        stroke="#FFC20E"
-        stroke-width="7"
-      />
-
-    `;
-
+    clothes = "#26384C";
   }
 
   if(
     outfit === "formal"
   ){
-
-    clothes = `
-
-      <path
-        d="
-          M54 210
-          C58 176 78 160 110 158
-          C142 160 162 176 166 210
-          Z
-        "
-        fill="#17242B"
-      />
-
-      <path
-        d="
-          M96 162
-          L110 185
-          L124 162
-        "
-        fill="#FFFFFF"
-      />
-
-      <path
-        d="
-          M110 181
-          L105 210
-          L115 210
-          Z
-        "
-        fill="#C2410C"
-      />
-
-    `;
-
+    clothes = "#20262A";
   }
 
   if(
     outfit === "traditional"
   ){
-
-    clothes = `
-
-      <path
-        d="
-          M50 210
-          C54 174 76 157 110 157
-          C144 157 166 174 170 210
-          Z
-        "
-        fill="#D4A017"
-      />
-
-      <path
-        d="
-          M58 185
-          Q110 205 162 185
-        "
-        fill="none"
-        stroke="#14201F"
-        stroke-width="5"
-      />
-
-      <path
-        d="
-          M62 198
-          Q110 216 158 198
-        "
-        fill="none"
-        stroke="#0F6B6F"
-        stroke-width="5"
-      />
-
-    `;
-
+    clothes = "#B87923";
   }
 
   if(
     outfit === "sport"
   ){
-
-    clothes = `
-
-      <path
-        d="
-          M52 210
-          C56 174 78 158 110 158
-          C142 158 164 174 168 210
-          Z
-        "
-        fill="#C2410C"
-      />
-
-      <path
-        d="
-          M78 168
-          L78 210
-        "
-        stroke="#FFFFFF"
-        stroke-width="5"
-      />
-
-      <path
-        d="
-          M142 168
-          L142 210
-        "
-        stroke="#FFFFFF"
-        stroke-width="5"
-      />
-
-    `;
-
+    clothes = "#C2410C";
   }
 
   if(
     outfit === "business"
   ){
-
-    clothes = `
-
-      <path
-        d="
-          M52 210
-          C56 176 78 159 110 158
-          C142 159 164 176 168 210
-          Z
-        "
-        fill="#14201F"
-      />
-
-      <path
-        d="
-          M110 160
-          L110 210
-        "
-        stroke="#FFFFFF"
-        stroke-width="4"
-      />
-
-      <path
-        d="
-          M101 161
-          L110 181
-          L119 161
-          Z
-        "
-        fill="#FFC20E"
-      />
-
-    `;
-
+    clothes = "#253A36";
   }
+
 
   let hairShape = `
 
     <path
       d="
-        M69 91
-        C66 53 84 32 110 32
-        C136 32 154 53 151 91
-        C141 71 79 71 69 91
+        M38 49
+        C36 27 52 13 80 13
+        C108 13 124 29 122 51
+        C111 42 99 39 80 39
+        C62 39 49 43 38 49
         Z
       "
       fill="${hair}"
@@ -1486,28 +1209,9 @@ function avatarSvg(
 
   `;
 
-  if(
-    hairstyle === "low_cut"
-  ){
-
-    hairShape = `
-
-      <path
-        d="
-          M70 73
-          C73 45 88 34 110 34
-          C132 34 147 45 150 73
-          C135 59 85 59 70 73
-          Z
-        "
-        fill="${hair}"
-      />
-
-    `;
-
-  }
 
   if(
+    hairstyle === "low_cut" ||
     hairstyle === "fade"
   ){
 
@@ -1515,10 +1219,11 @@ function avatarSvg(
 
       <path
         d="
-          M73 76
-          C75 48 91 34 110 34
-          C129 34 145 48 147 76
-          C133 61 87 61 73 76
+          M39 48
+          C39 27 55 16 80 16
+          C105 16 121 28 121 48
+          C106 40 96 38 80 38
+          C64 38 53 40 39 48
           Z
         "
         fill="${hair}"
@@ -1527,6 +1232,7 @@ function avatarSvg(
     `;
 
   }
+
 
   if(
     hairstyle === "afro"
@@ -1535,29 +1241,16 @@ function avatarSvg(
     hairShape = `
 
       <circle
-        cx="110"
-        cy="63"
-        r="42"
-        fill="${hair}"
-      />
-
-      <circle
-        cx="76"
-        cy="67"
-        r="17"
-        fill="${hair}"
-      />
-
-      <circle
-        cx="144"
-        cy="67"
-        r="17"
+        cx="80"
+        cy="35"
+        r="29"
         fill="${hair}"
       />
 
     `;
 
   }
+
 
   if(
     hairstyle === "braids"
@@ -1567,32 +1260,41 @@ function avatarSvg(
 
       <path
         d="
-          M70 88
-          C65 45 84 27 110 27
-          C136 27 155 45 150 88
+          M39 48
+          C38 26 54 14 80 14
+          C106 14 122 27 121 48
+          C105 40 94 37 80 37
+          C65 37 53 41 39 48
           Z
         "
         fill="${hair}"
       />
 
-      <g
+      <path
+        d="
+          M43 43
+          L35 74
+          M51 39
+          L45 79
+          M60 36
+          L57 82
+          M100 36
+          L103 82
+          M109 39
+          L115 79
+          M117 43
+          L125 74
+        "
         stroke="${hair}"
-        stroke-width="7"
+        stroke-width="5"
         stroke-linecap="round"
-      >
-
-        <path d="M73 73 L58 115"/>
-        <path d="M83 64 L70 124"/>
-        <path d="M95 59 L86 128"/>
-        <path d="M125 59 L134 128"/>
-        <path d="M137 64 L150 124"/>
-        <path d="M147 73 L162 115"/>
-
-      </g>
+        fill="none"
+      />
 
     `;
 
   }
+
 
   if(
     hairstyle === "dreads"
@@ -1602,32 +1304,67 @@ function avatarSvg(
 
       <path
         d="
-          M69 84
-          C66 45 84 27 110 27
-          C136 27 154 45 151 84
+          M40 48
+          C39 25 55 13 80 13
+          C105 13 121 26 120 48
+          L120 70
+          L111 63
+          L105 76
+          L97 62
+          L89 78
+          L80 62
+          L71 78
+          L62 62
+          L54 75
+          L48 62
+          L40 70
           Z
         "
         fill="${hair}"
       />
 
-      <g
+    `;
+
+  }
+
+
+  if(
+    hairstyle === "natural"
+  ){
+
+    hairShape = `
+
+      <path
+        d="
+          M38 50
+          C36 27 53 12 80 12
+          C107 12 124 28 122 50
+          C108 39 98 36 80 36
+          C62 36 51 40 38 50
+          Z
+        "
+        fill="${hair}"
+      />
+
+      <path
+        d="
+          M49 30
+          Q57 19 66 29
+          M67 25
+          Q76 14 84 27
+          M87 27
+          Q97 14 106 29
+        "
         stroke="${hair}"
-        stroke-width="8"
+        stroke-width="5"
+        fill="none"
         stroke-linecap="round"
-      >
-
-        <path d="M72 72 L60 118"/>
-        <path d="M84 62 L76 132"/>
-        <path d="M96 57 L92 128"/>
-        <path d="M124 57 L128 128"/>
-        <path d="M136 62 L144 132"/>
-        <path d="M148 72 L160 118"/>
-
-      </g>
+      />
 
     `;
 
   }
+
 
   if(
     hairstyle === "long"
@@ -1637,15 +1374,18 @@ function avatarSvg(
 
       <path
         d="
-          M67 88
-          C63 45 84 27 110 27
-          C136 27 157 45 153 88
-          L153 142
-          C143 151 136 147 131 139
-          L131 83
-          C120 71 100 71 89 83
-          L89 139
-          C84 147 77 151 67 142
+          M38 52
+          C36 27 53 13 80 13
+          C107 13 124 28 122 52
+          L119 98
+          L104 88
+          L98 99
+          L90 88
+          L80 99
+          L70 88
+          L61 99
+          L54 88
+          L41 98
           Z
         "
         fill="${hair}"
@@ -1655,7 +1395,9 @@ function avatarSvg(
 
   }
 
+
   let accessorySvg = "";
+
 
   if(
     accessory === "cap"
@@ -1665,23 +1407,23 @@ function avatarSvg(
 
       <path
         d="
-          M68 58
-          Q110 22 152 58
-          L157 67
-          Q110 55 63 67
+          M43 31
+          Q80 4 117 31
+          Q103 23 80 23
+          Q57 23 43 31
           Z
         "
-        fill="#C2410C"
+        fill="#FFC20E"
       />
 
       <path
         d="
-          M112 57
-          Q146 57 164 67
+          M42 31
+          Q72 25 112 34
         "
-        fill="none"
         stroke="#14201F"
         stroke-width="5"
+        fill="none"
         stroke-linecap="round"
       />
 
@@ -1689,43 +1431,41 @@ function avatarSvg(
 
   }
 
+
   if(
     accessory === "glasses"
   ){
 
     accessorySvg = `
 
-      <g
+      <circle
+        cx="63"
+        cy="57"
+        r="9"
         fill="none"
         stroke="#14201F"
-        stroke-width="4"
-      >
+        stroke-width="3"
+      />
 
-        <rect
-          x="77"
-          y="87"
-          width="25"
-          height="17"
-          rx="6"
-        />
+      <circle
+        cx="97"
+        cy="57"
+        r="9"
+        fill="none"
+        stroke="#14201F"
+        stroke-width="3"
+      />
 
-        <rect
-          x="118"
-          y="87"
-          width="25"
-          height="17"
-          rx="6"
-        />
-
-        <path
-          d="M102 93 L118 93"
-        />
-
-      </g>
+      <path
+        d="M72 57 L88 57"
+        stroke="#14201F"
+        stroke-width="3"
+      />
 
     `;
 
   }
+
 
   if(
     accessory === "chain"
@@ -1735,24 +1475,18 @@ function avatarSvg(
 
       <path
         d="
-          M87 146
-          Q110 164 133 146
+          M55 91
+          Q80 106 105 91
         "
         fill="none"
-        stroke="#FFC20E"
-        stroke-width="5"
-      />
-
-      <circle
-        cx="110"
-        cy="160"
-        r="5"
-        fill="#FFC20E"
+        stroke="#D4A83B"
+        stroke-width="4"
       />
 
     `;
 
   }
+
 
   if(
     accessory === "watch"
@@ -1761,17 +1495,18 @@ function avatarSvg(
     accessorySvg = `
 
       <rect
-        x="150"
-        y="173"
-        width="14"
-        height="22"
-        rx="4"
-        fill="#FFC20E"
+        x="106"
+        y="92"
+        width="13"
+        height="9"
+        rx="3"
+        fill="#D4A83B"
       />
 
     `;
 
   }
+
 
   if(
     accessory === "earrings"
@@ -1780,22 +1515,23 @@ function avatarSvg(
     accessorySvg = `
 
       <circle
-        cx="68"
-        cy="115"
-        r="4"
-        fill="#FFC20E"
+        cx="42"
+        cy="70"
+        r="3"
+        fill="#D4A83B"
       />
 
       <circle
-        cx="152"
-        cy="115"
-        r="4"
-        fill="#FFC20E"
+        cx="118"
+        cy="70"
+        r="3"
+        fill="#D4A83B"
       />
 
     `;
 
   }
+
 
   if(
     accessory === "headphones"
@@ -1805,99 +1541,165 @@ function avatarSvg(
 
       <path
         d="
-          M66 100
-          C66 55 154 55 154 100
+          M39 59
+          Q39 24 80 24
+          Q121 24 121 59
         "
         fill="none"
-        stroke="#14201F"
-        stroke-width="8"
-        stroke-linecap="round"
+        stroke="#202B2B"
+        stroke-width="6"
       />
 
       <rect
-        x="59"
-        y="96"
-        width="15"
-        height="29"
-        rx="6"
-        fill="#14201F"
+        x="33"
+        y="54"
+        width="12"
+        height="23"
+        rx="5"
+        fill="#202B2B"
       />
 
       <rect
-        x="146"
-        y="96"
-        width="15"
-        height="29"
-        rx="6"
-        fill="#14201F"
+        x="115"
+        y="54"
+        width="12"
+        height="23"
+        rx="5"
+        fill="#202B2B"
       />
 
     `;
 
   }
 
+
+  const id =
+    "avatar_" +
+    Math.random()
+      .toString(36)
+      .slice(2);
+
+
   return `
 
     <svg
-      viewBox="0 0 220 230"
-      role="img"
-      aria-label="Your Naija Hustle character"
-      style="
-        width:${size}px;
-        height:${Math.round(size * 1.05)}px;
-      "
+      id="${id}"
+      viewBox="0 0 160 180"
+      width="${size}"
+      height="${size}"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label="Character avatar"
     >
 
       <ellipse
-        cx="110"
-        cy="214"
-        rx="55"
-        ry="9"
+        cx="80"
+        cy="169"
+        rx="48"
+        ry="8"
         fill="rgba(20,32,31,.12)"
       />
 
-      ${clothes}
+      <path
+        d="
+          M36 166
+          C37 129 52 111 80 111
+          C108 111 123 129 124 166
+          Z
+        "
+        fill="${clothes}"
+      />
+
+      ${
+        outfit === "formal"
+          ? `
+            <path
+              d="M80 116 L70 166 L90 166 Z"
+              fill="#F5F7F6"
+            />
+
+            <path
+              d="M80 117 L74 132 L86 132 Z"
+              fill="#C2410C"
+            />
+          `
+          : ""
+      }
+
+      ${
+        outfit === "traditional"
+          ? `
+            <path
+              d="
+                M43 137
+                Q80 122 117 137
+                L124 166
+                L36 166
+                Z
+              "
+              fill="#D39A31"
+              opacity=".55"
+            />
+          `
+          : ""
+      }
+
+      ${
+        outfit === "sport"
+          ? `
+            <path
+              d="
+                M49 123
+                Q80 139 111 123
+              "
+              stroke="#fff"
+              stroke-width="5"
+              fill="none"
+            />
+          `
+          : ""
+      }
 
       <rect
-        x="97"
-        y="142"
-        width="26"
-        height="30"
-        rx="11"
+        x="66"
+        y="95"
+        width="28"
+        height="24"
+        rx="10"
         fill="${skin}"
       />
 
       <ellipse
-        cx="110"
-        cy="104"
-        rx="43"
-        ry="51"
+        cx="80"
+        cy="66"
+        rx="40"
+        ry="45"
         fill="${skin}"
       />
 
       ${hairShape}
 
-      <ellipse
-        cx="92"
-        cy="105"
-        rx="4"
-        ry="5"
+      <circle
+        cx="64"
+        cy="62"
+        r="3.2"
         fill="#14201F"
       />
 
-      <ellipse
-        cx="128"
-        cy="105"
-        rx="4"
-        ry="5"
+      <circle
+        cx="96"
+        cy="62"
+        r="3.2"
         fill="#14201F"
       />
 
       <path
-        d="M100 125 Q110 132 120 125"
-        fill="none"
-        stroke="#7B3F2F"
+        d="
+          M72 82
+          Q80 88 88 82
+        "
+        stroke="#7C4030"
         stroke-width="3"
+        fill="none"
         stroke-linecap="round"
       />
 
@@ -1916,90 +1718,58 @@ AVATAR PREVIEW
 
 function characterPreviewHtml(){
 
-  const trait1 =
-    S.personalityTraits?.find(
-      trait =>
-        trait.id ===
-        S.personality1
-    );
+  const fake = {
 
-  const trait2 =
-    S.personalityTraits?.find(
-      trait =>
-        trait.id ===
-        S.personality2
-    );
+    skin_tone:S.skinTone,
+
+    hairstyle:S.hairstyle,
+
+    hair_color:S.hairColor,
+
+    outfit:S.outfit,
+
+    accessory:S.accessory
+
+  };
 
   return `
 
-    <div class="look-preview">
+    <div class="avatar-stage">
 
       <div class="avatar-large">
+
         ${avatarSvg(
-          {
-            name:S.nameDraft || "Your Hustler",
-            skin_tone:S.skinTone,
-            hairstyle:S.hairstyle,
-            hair_color:S.hairColor,
-            outfit:S.outfit,
-            accessory:S.accessory
-          },
-          105
-        )}
-      </div>
-
-      <div class="look-name">
-        ${esc(
-          S.nameDraft ||
-          "Your Hustler"
-        )}
-      </div>
-
-      <div class="look-meta">
-
-        ${optionLabel(
-          SKIN_TONES,
-          S.skinTone
-        )}
-
-        ·
-
-        ${optionLabel(
-          HAIRSTYLES,
-          S.hairstyle
-        )}
-
-        ·
-
-        ${optionLabel(
-          OUTFITS,
-          S.outfit
+          fake,
+          120
         )}
 
       </div>
 
-      <div class="look-traits">
+      <strong>
+        Your Hustler
+      </strong>
 
+      <div class="avatar-note">
         ${
-          trait1
-            ? `
-              <span class="pill">
-                ${esc(trait1.name)}
-              </span>
-            `
-            : ""
+          optionLabel(
+            SKIN_TONES,
+            S.skinTone
+          )
         }
-
+        ·
         ${
-          trait2
-            ? `
-              <span class="pill">
-                ${esc(trait2.name)}
-              </span>
-            `
-            : ""
+          optionLabel(
+            HAIRSTYLES,
+            S.hairstyle
+          )
         }
-
+        ·
+        ${
+          optionLabel(
+            OUTFITS,
+            S.outfit
+          )
+        }
       </div>
 
     </div>
@@ -2019,113 +1789,102 @@ function avatarStageHtml(c){
 
     <div class="card">
 
-      <div class="section-head">
-
-        <div>
-          <h2>Avatar Stage</h2>
-
-          <p class="mute">
-            This is your hustler.
-            Your look can evolve as you rise.
-          </p>
-        </div>
-
+      <div class="eyebrow">
+        YOUR CHARACTER
       </div>
 
-      <div class="avatar-stage">
+      <h2>
+        ${esc(c.name)}
+      </h2>
 
-        ${avatarSvg(
-          c,
-          240
-        )}
-
-      </div>
-
-      <div class="avatar-spin">
-
-        <button
-          type="button"
-          data-avatar-rotate="-1"
-        >
-          ← Rotate
-        </button>
-
-        <button
-          type="button"
-          data-avatar-rotate="1"
-        >
-          Rotate →
-        </button>
-
-      </div>
-
-      <p class="avatar-note">
-        Full 3D rotation will come in the next avatar stage.
-        This version gives you the customizable character foundation.
+      <p class="mute">
+        Your current look.
       </p>
 
     </div>
 
     <div class="card">
 
-      <div class="profile-card-title">
-        <span>🎨</span>
-        <strong>Character Look</strong>
-      </div>
+      <div
+        class="avatar-stage"
+      >
 
-      <div class="profile-details">
-
-        <div class="profile-detail">
-          <span>Skin</span>
-          <strong>
-            ${esc(
-              optionLabel(
-                SKIN_TONES,
-                c.skin_tone
-              )
-            )}
-          </strong>
+        <div
+          class="avatar-large"
+          style="
+            width:210px;
+            height:210px;
+          "
+        >
+          ${avatarSvg(
+            c,
+            190
+          )}
         </div>
 
-        <div class="profile-detail">
-          <span>Hair</span>
-          <strong>
-            ${esc(
-              optionLabel(
-                HAIRSTYLES,
-                c.hairstyle
-              )
-            )}
-          </strong>
-        </div>
+        <strong>
+          ${esc(c.name)}
+        </strong>
 
-        <div class="profile-detail">
-          <span>Outfit</span>
-          <strong>
-            ${esc(
-              optionLabel(
-                OUTFITS,
-                c.outfit
-              )
-            )}
-          </strong>
-        </div>
-
-        <div class="profile-detail">
-          <span>Accessory</span>
-          <strong>
-            ${esc(
-              optionLabel(
-                ACCESSORIES,
-                c.accessory
-              )
-            )}
-          </strong>
+        <div class="avatar-note">
+          ${
+            optionLabel(
+              SKIN_TONES,
+              c.skin_tone
+            )
+          }
+          ·
+          ${
+            optionLabel(
+              HAIRSTYLES,
+              c.hairstyle
+            )
+          }
+          ·
+          ${
+            optionLabel(
+              OUTFITS,
+              c.outfit
+            )
+          }
         </div>
 
       </div>
+
+      <div class="avatar-controls">
+
+        <button
+          class="avatar-control"
+          type="button"
+          data-avatar-rotate="-1"
+        >
+          ← Turn
+        </button>
+
+        <button
+          class="avatar-control"
+          type="button"
+          data-avatar-rotate="1"
+        >
+          Turn →
+        </button>
+
+      </div>
+
+      <p class="avatar-note">
+        Avatar items can later become unlockable
+        equipment through the Buy system.
+      </p>
 
     </div>
+
+    <button
+      class="btn"
+      type="button"
+      data-back-game
+    >
+      Back to game
+    </button>
 
   `;
 
@@ -2133,134 +1892,55 @@ function avatarStageHtml(c){
 
 
 /* =========================================================
-REAL NIGERIAN CLOCK
+CLOCK
 ========================================================= */
 
-function realTimeInfo(){
+function nigeriaDate(){
 
-  const now =
-    new Date();
-
-  const time =
-    new Intl.DateTimeFormat(
-      "en-NG",
-      {
-        timeZone:"Africa/Lagos",
-        hour:"numeric",
-        minute:"2-digit",
-        second:"2-digit",
-        hour12:true
-      }
-    ).format(now);
-
-  const hour =
-    Number(
-      new Intl.DateTimeFormat(
-        "en-NG",
-        {
-          timeZone:"Africa/Lagos",
-          hour:"numeric",
-          hourCycle:"h23"
-        }
-      ).format(now)
-    );
-
-  let phase =
-    "Night";
-
-  let icon =
-    "🌙";
-
-  if(
-    hour >= 5 &&
-    hour < 12
-  ){
-
-    phase =
-      "Morning";
-
-    icon =
-      "🌅";
-
-  }else if(
-    hour >= 12 &&
-    hour < 17
-  ){
-
-    phase =
-      "Afternoon";
-
-    icon =
-      "☀️";
-
-  }else if(
-    hour >= 17 &&
-    hour < 21
-  ){
-
-    phase =
-      "Evening";
-
-    icon =
-      "🌆";
-
-  }
-
-  const date =
-    new Intl.DateTimeFormat(
-      "en-NG",
-      {
-        timeZone:"Africa/Lagos",
-        weekday:"long",
-        day:"numeric",
-        month:"long"
-      }
-    ).format(now);
-
-  return {
-    time,
-    phase,
-    icon,
-    date
-  };
+  return new Date();
 
 }
 
+
 function gameClockHtml(){
 
-  const info =
-    realTimeInfo();
+  const now =
+    nigeriaDate();
+
+  const time =
+    now.toLocaleTimeString(
+      "en-NG",
+      {
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:true,
+        timeZone:"Africa/Lagos"
+      }
+    );
+
+  const date =
+    now.toLocaleDateString(
+      "en-NG",
+      {
+        weekday:"long",
+        day:"numeric",
+        month:"long",
+        year:"numeric",
+        timeZone:"Africa/Lagos"
+      }
+    );
 
   return `
 
     <div class="clock">
 
-      <div class="row">
-
-        <div>
-
-          <div class="clock-time">
-            ${info.time}
-          </div>
-
-          <div class="clock-phase">
-            ${info.icon}
-            ${info.phase}
-          </div>
-
-        </div>
-
-        <div class="mute">
-          Lagos time
-        </div>
-
+      <div class="clock-time">
+        ${time}
       </div>
 
-      <div
-        class="mute"
-        style="margin-top:6px;font-size:.78rem"
-      >
-        ${esc(info.date)}
+      <div class="clock-date">
+        ${date} · Nigeria
       </div>
 
     </div>
@@ -2268,6 +1948,7 @@ function gameClockHtml(){
   `;
 
 }
+
 
 function startGameClock(){
 
@@ -2285,15 +1966,19 @@ function startGameClock(){
     setInterval(
       () => {
 
+        if(
+          !S.ch ||
+          S.tab === "avatar"
+        ){
+          return;
+        }
+
         const clock =
           document.querySelector(
             ".clock"
           );
 
-        if(
-          clock &&
-          S.ch
-        ){
+        if(clock){
 
           clock.outerHTML =
             gameClockHtml();
@@ -2311,118 +1996,82 @@ function startGameClock(){
 NEEDS
 ========================================================= */
 
-function needPct(value){
+function needBar(
+  label,
+  value
+){
 
-  return Math.max(
-    0,
-    Math.min(
-      100,
-      Number(value) || 0
-    )
-  );
+  const v =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(value) || 0
+      )
+    );
+
+  return `
+
+    <div class="need">
+
+      <div class="need-head">
+
+        <span>
+          ${label}
+        </span>
+
+        <strong>
+          ${v}/100
+        </strong>
+
+      </div>
+
+      <div class="need-bar">
+
+        <i
+          style="
+            width:${v}%
+          "
+        ></i>
+
+      </div>
+
+    </div>
+
+  `;
 
 }
 
-function needClass(value){
-
-  const n =
-    needPct(value);
-
-  if(n <= 30){
-    return "low";
-  }
-
-  if(n <= 60){
-    return "mid";
-  }
-
-  return "high";
-
-}
 
 function needsHtml(c){
-
-  const needs = [
-
-    [
-      "Hunger",
-      c.hunger
-    ],
-
-    [
-      "Fun",
-      c.fun
-    ],
-
-    [
-      "Social",
-      c.social
-    ],
-
-    [
-      "Hygiene",
-      c.hygiene
-    ]
-
-  ];
 
   return `
 
     <div class="card">
 
-      <div class="profile-card-title">
-        <span>❤️</span>
-        <strong>Needs</strong>
-      </div>
+      <h2>
+        Condition
+      </h2>
 
-      <div class="need-grid">
+      ${needBar(
+        "Hunger",
+        c.hunger
+      )}
 
-        ${
-          needs
-            .map(
-              ([name,value]) => {
+      ${needBar(
+        "Fun",
+        c.fun
+      )}
 
-                const pct =
-                  needPct(value);
+      ${needBar(
+        "Social",
+        c.social
+      )}
 
-                return `
-
-                  <div
-                    class="need ${needClass(value)}"
-                  >
-
-                    <div class="need-head">
-
-                      <span>
-                        ${name}
-                      </span>
-
-                      <b>
-                        ${pct}
-                      </b>
-
-                    </div>
-
-                    <div class="bar">
-
-                      <i
-                        style="
-                          width:${pct}%
-                        "
-                      ></i>
-
-                    </div>
-
-                  </div>
-
-                `;
-
-              }
-            )
-            .join("")
-        }
-
-      </div>
+      ${needBar(
+        "Hygiene",
+        c.hygiene
+      )}
 
     </div>
 
@@ -2436,42 +2085,6 @@ ACTIVITIES
 ========================================================= */
 
 function activitiesHtml(){
-
-  const activities = [
-
-    [
-      "eat",
-      "🍲",
-      "Eat",
-      "₦500 · 1 energy",
-      "Restores 30 Hunger"
-    ],
-
-    [
-      "entertainment",
-      "🎮",
-      "Entertainment",
-      "₦300 · 2 energy",
-      "Restores 30 Fun"
-    ],
-
-    [
-      "socialize",
-      "🤝",
-      "Socialize",
-      "₦200 · 1 energy",
-      "Restores 30 Social"
-    ],
-
-    [
-      "freshen_up",
-      "🚿",
-      "Freshen Up",
-      "₦100 · 1 energy",
-      "Restores 30 Hygiene"
-    ]
-
-  ];
 
   return `
 
@@ -2502,39 +2115,41 @@ function activitiesHtml(){
 
       <div class="activity-grid">
 
-        ${
-          activities
-            .map(
-              item => `
+        <button
+          class="activity"
+          type="button"
+          data-activity="eat"
+        >
+          <strong>🍲 Eat</strong>
+          <small>₦500 · +30 Hunger</small>
+        </button>
 
-                <div class="activity">
+        <button
+          class="activity"
+          type="button"
+          data-activity="entertainment"
+        >
+          <strong>🎮 Entertainment</strong>
+          <small>₦300 · +30 Fun</small>
+        </button>
 
-                  <strong>
-                    ${item[1]}
-                    ${item[2]}
-                  </strong>
+        <button
+          class="activity"
+          type="button"
+          data-activity="socialize"
+        >
+          <strong>🤝 Socialize</strong>
+          <small>₦200 · +30 Social</small>
+        </button>
 
-                  <small>
-                    ${item[3]}
-                  </small>
-
-                  <small>
-                    ${item[4]}
-                  </small>
-
-                  <button
-                    type="button"
-                    data-activity="${item[0]}"
-                  >
-                    Do it
-                  </button>
-
-                </div>
-
-              `
-            )
-            .join("")
-        }
+        <button
+          class="activity"
+          type="button"
+          data-activity="freshen_up"
+        >
+          <strong>🚿 Freshen Up</strong>
+          <small>₦100 · +30 Hygiene</small>
+        </button>
 
       </div>
 
@@ -2551,328 +2166,294 @@ AUTH
 
 function viewAuth(){
 
-  if(
-    window.naijaClockTimer
-  ){
-
-    clearInterval(
-      window.naijaClockTimer
-    );
-
-  }
-
   app.innerHTML = `
 
-    <div class="stripe"></div>
+    <div class="auth">
 
-    <main class="wrap auth">
+      <div class="auth-box">
 
-      <div class="auth-logo">
-        NAIJA HUSTLE
+        <div class="card">
+
+          <div class="brand">
+            Naija<span>Hustle</span>
+          </div>
+
+          <p class="mute">
+            Hustle → Earn → Improve → Build.
+          </p>
+
+          ${msgHtml()}
+
+          ${
+            S.mode === "login"
+              ? `
+
+                <h2>
+                  Welcome back
+                </h2>
+
+                <div class="field">
+
+                  <label>
+                    Email
+                  </label>
+
+                  <input
+                    id="authEmail"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                  >
+
+                </div>
+
+                <div class="field">
+
+                  <label>
+                    Password
+                  </label>
+
+                  <input
+                    id="authPassword"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="At least 6 characters"
+                  >
+
+                </div>
+
+                <button
+                  class="btn"
+                  id="authSubmit"
+                  type="button"
+                >
+                  Login
+                </button>
+
+                <button
+                  class="link"
+                  id="switchAuth"
+                  type="button"
+                >
+                  Create an account
+                </button>
+
+              `
+              : `
+
+                <h2>
+                  Create your account
+                </h2>
+
+                <div class="field">
+
+                  <label>
+                    Email
+                  </label>
+
+                  <input
+                    id="authEmail"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                  >
+
+                </div>
+
+                <div class="field">
+
+                  <label>
+                    Password
+                  </label>
+
+                  <input
+                    id="authPassword"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="At least 6 characters"
+                  >
+
+                </div>
+
+                <button
+                  class="btn yellow"
+                  id="authSubmit"
+                  type="button"
+                >
+                  Create Account
+                </button>
+
+                <button
+                  class="link"
+                  id="switchAuth"
+                  type="button"
+                >
+                  I already have an account
+                </button>
+
+              `
+          }
+
+        </div>
+
       </div>
 
-      ${
-        S.mode === "login"
-          ? `
-
-            <h1>
-              Your hustle starts here.
-            </h1>
-
-            <p class="mute">
-              Earn. Improve. Build.
-              Become the name everyone knows.
-            </p>
-
-            ${msgHtml()}
-
-            <form id="authForm">
-
-              <div class="card">
-
-                <label>
-                  Email
-                </label>
-
-                <input
-                  id="email"
-                  type="email"
-                  autocomplete="email"
-                  required
-                  placeholder="you@example.com"
-                >
-
-                <label
-                  style="
-                    display:block;
-                    margin-top:12px;
-                  "
-                >
-                  Password
-                </label>
-
-                <input
-                  id="password"
-                  type="password"
-                  autocomplete="current-password"
-                  minlength="6"
-                  required
-                  placeholder="At least 6 characters"
-                >
-
-                <button
-                  class="btn"
-                  type="submit"
-                >
-                  Log in
-                </button>
-
-              </div>
-
-            </form>
-
-            <p class="mute">
-              New hustler?
-              <button
-                class="link"
-                id="switchSignup"
-                type="button"
-              >
-                Create account
-              </button>
-            </p>
-
-          `
-          : `
-
-            <h1>
-              Create your account.
-            </h1>
-
-            <p class="mute">
-              Your account is only the beginning.
-              Next, you'll build your hustler.
-            </p>
-
-            ${msgHtml()}
-
-            <form id="authForm">
-
-              <div class="card">
-
-                <label>
-                  Email
-                </label>
-
-                <input
-                  id="email"
-                  type="email"
-                  autocomplete="email"
-                  required
-                  placeholder="you@example.com"
-                >
-
-                <label
-                  style="
-                    display:block;
-                    margin-top:12px;
-                  "
-                >
-                  Password
-                </label>
-
-                <input
-                  id="password"
-                  type="password"
-                  autocomplete="new-password"
-                  minlength="6"
-                  required
-                  placeholder="At least 6 characters"
-                >
-
-                <button
-                  class="btn"
-                  type="submit"
-                >
-                  Create account
-                </button>
-
-              </div>
-
-            </form>
-
-            <p class="mute">
-              Already registered?
-
-              <button
-                class="link"
-                id="switchLogin"
-                type="button"
-              >
-                Log in
-              </button>
-
-            </p>
-
-          `
-      }
-
-    </main>
+    </div>
 
   `;
 
-  const form =
-    document.getElementById(
-      "authForm"
-    );
 
-  if(form){
-
-    form.onsubmit =
-      async event => {
-
-        event.preventDefault();
-
-        if(S.busy){
-          return;
-        }
-
-        S.busy = true;
-
-        const email =
-          document
-            .getElementById(
-              "email"
-            )
-            .value
-            .trim();
-
-        const password =
-          document
-            .getElementById(
-              "password"
-            )
-            .value;
-
-        try{
-
-          let result;
-
-          if(
-            S.mode === "login"
-          ){
-
-            result =
-              await db.auth.signInWithPassword({
-                email,
-                password
-              });
-
-          }else{
-
-            result =
-              await db.auth.signUp({
-                email,
-                password
-              });
-
-          }
-
-          S.busy = false;
-
-          if(
-            result.error
-          ){
-
-            setMsg(
-              result.error.message
-            );
-
-            return viewAuth();
-
-          }
-
-          if(
-            S.mode === "signup" &&
-            !result.data?.session
-          ){
-
-            setMsg(
-              "Account created. If email confirmation is enabled, confirm your email before logging in.",
-              true
-            );
-
-            return viewAuth();
-
-          }
-
-          S.user =
-            result.data?.user ||
-            result.data?.session?.user ||
-            null;
-
-          setMsg(null);
-
-          await load();
-
-        }catch(error){
-
-          S.busy = false;
-
-          setMsg(
-            error?.message ||
-            "Authentication failed."
-          );
-
-          viewAuth();
-
-        }
-
-      };
-
-  }
-
-  const signup =
-    document.getElementById(
-      "switchSignup"
-    );
-
-  if(signup){
-
-    signup.onclick =
+  document
+    .getElementById("switchAuth")
+    ?.addEventListener(
+      "click",
       () => {
 
         S.mode =
-          "signup";
+          S.mode === "login"
+            ? "signup"
+            : "login";
 
         S.msg =
           null;
 
         viewAuth();
 
-      };
+      }
+    );
+
+
+  document
+    .getElementById("authSubmit")
+    ?.addEventListener(
+      "click",
+      authSubmit
+    );
+
+}
+
+
+/* =========================================================
+AUTH ACTION
+========================================================= */
+
+async function authSubmit(){
+
+  if(S.busy){
+    return;
+  }
+
+  const email =
+    document
+      .getElementById(
+        "authEmail"
+      )
+      ?.value
+      .trim();
+
+  const password =
+    document
+      .getElementById(
+        "authPassword"
+      )
+      ?.value;
+
+  if(!email){
+
+    setMsg(
+      "Enter your email."
+    );
+
+    return viewAuth();
 
   }
 
-  const login =
-    document.getElementById(
-      "switchLogin"
+  if(
+    !password ||
+    password.length < 6
+  ){
+
+    setMsg(
+      "Password must be at least 6 characters."
     );
 
-  if(login){
+    return viewAuth();
 
-    login.onclick =
-      () => {
+  }
 
-        S.mode =
-          "login";
+  S.busy =
+    true;
 
-        S.msg =
-          null;
+  try{
 
-        viewAuth();
+    let result;
+
+    if(
+      S.mode === "login"
+    ){
+
+      result =
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+    }else{
+
+      result =
+        await db.auth.signUp({
+          email,
+          password
+        });
+
+    }
+
+    if(result.error){
+      throw result.error;
+    }
+
+    S.busy =
+      false;
+
+    if(
+      S.mode === "signup" &&
+      !result.data.session
+    ){
+
+      S.msg = {
+
+        t:
+          "Account created. If email confirmation is enabled, confirm your email before logging in.",
+
+        ok:true
 
       };
+
+      S.mode =
+        "login";
+
+      return viewAuth();
+
+    }
+
+    S.user =
+      result.data.user ||
+      result.data.session?.user ||
+      null;
+
+    await load();
+
+  }catch(error){
+
+    S.busy =
+      false;
+
+    setMsg(
+      error?.message ||
+      "Authentication failed."
+    );
+
+    viewAuth();
 
   }
 
@@ -2885,29 +2466,100 @@ PERSONALITY
 
 async function loadPersonalityTraits(){
 
-  const {
-    data,
-    error
-  } =
+  const result =
     await db
-      .from(
-        "personality_traits"
-      )
-      .select(
-        "id,name,description,skill_bonus,skill_bonus_amount,effect_key,effect_amount"
-      )
+      .from("personality_traits")
+      .select("*")
       .order("name");
 
-  if(error){
-
-    throw error;
-
+  if(result.error){
+    throw result.error;
   }
 
   S.personalityTraits =
-    data || [];
+    result.data || [];
 
-  return S.personalityTraits;
+}
+
+
+function traitButton(trait){
+
+  const selected =
+    S.personality1 === trait.id ||
+    S.personality2 === trait.id;
+
+  return `
+
+    <button
+      type="button"
+      class="trait ${
+        selected
+          ? "selected"
+          : ""
+      }"
+      data-trait="${esc(
+        trait.id
+      )}"
+    >
+
+      <strong>
+        ${esc(trait.name)}
+      </strong>
+
+      <small>
+        ${esc(
+          trait.description
+        )}
+      </small>
+
+    </button>
+
+  `;
+
+}
+
+
+function selectTrait(id){
+
+  if(
+    S.personality1 === id
+  ){
+
+    S.personality1 =
+      null;
+
+  }else if(
+    S.personality2 === id
+  ){
+
+    S.personality2 =
+      null;
+
+  }else if(
+    !S.personality1
+  ){
+
+    S.personality1 =
+      id;
+
+  }else if(
+    !S.personality2
+  ){
+
+    S.personality2 =
+      id;
+
+  }else{
+
+    S.personality1 =
+      S.personality2;
+
+    S.personality2 =
+      id;
+
+  }
+
+  viewCreate();
 
 }
 
@@ -2919,7 +2571,15 @@ CHARACTER CREATION
 function viewCreate(){
 
   if(
-    !S.personalityTraits
+    !S.user
+  ){
+
+    return viewAuth();
+
+  }
+
+  if(
+    !S.personalityTraits?.length
   ){
 
     loadPersonalityTraits()
@@ -2936,15 +2596,15 @@ function viewCreate(){
 
           app.innerHTML = `
 
-            <div class="stripe"></div>
+            <div class="wrap">
 
-            <main class="wrap">
+              <div class="stripe"></div>
 
               <div class="card">
 
-                <h1>
-                  Build your hustler.
-                </h1>
+                <h2>
+                  Character setup
+                </h2>
 
                 <div class="err">
                   ${esc(
@@ -2954,14 +2614,14 @@ function viewCreate(){
 
                 <button
                   class="btn"
-                  onclick="location.reload()"
+                  onclick="loadPersonalityTraits().then(viewCreate)"
                 >
-                  Retry
+                  Try again
                 </button>
 
               </div>
 
-            </main>
+            </div>
 
           `;
 
@@ -2970,15 +2630,21 @@ function viewCreate(){
 
     app.innerHTML = `
 
-      <div class="stripe"></div>
+      <div class="wrap">
 
-      <main class="wrap">
+        <div class="card">
 
-        <div class="loading">
-          Loading character system...
+          <h1>
+            Loading character creator...
+          </h1>
+
+          <p class="mute">
+            Preparing your traits.
+          </p>
+
         </div>
 
-      </main>
+      </div>
 
     `;
 
@@ -2986,16 +2652,15 @@ function viewCreate(){
 
   }
 
+
   app.innerHTML = `
 
-    <div class="stripe"></div>
+    <div class="wrap">
 
-    <main class="wrap">
+      <div class="card">
 
-      <div style="padding-top:24px">
-
-        <div class="auth-logo">
-          NAIJA HUSTLE
+        <div class="eyebrow">
+          NAija Hustle
         </div>
 
         <h1>
@@ -3007,389 +2672,324 @@ function viewCreate(){
           Your personality and look make the character yours.
         </p>
 
-        ${msgHtml()}
+      </div>
+
+
+      <div class="card">
+
+        <h2>
+          Character name
+        </h2>
+
+        <div class="field">
+
+          <label>
+            Choose a name
+          </label>
+
+          <input
+            id="characterName"
+            maxlength="20"
+            minlength="3"
+            value="${esc(
+              S.nameDraft
+            )}"
+            placeholder="3 to 20 characters"
+          >
+
+        </div>
 
       </div>
 
 
       <div class="card">
 
-        <div class="section-head">
+        <h2>
+          Background
+        </h2>
 
-          <div>
-            <strong>
-              Character name
-            </strong>
+        <div class="bg-grid">
 
-            <div class="counter">
-              3 to 20 characters
-            </div>
-          </div>
-
-        </div>
-
-        <input
-          id="characterName"
-          maxlength="20"
-          minlength="3"
-          value="${esc(S.nameDraft)}"
-          placeholder="Enter your hustler name"
-        >
-
-      </div>
-
-
-      <div class="section-head">
-
-        <div>
-          <h2>
-            Background
-          </h2>
-
-          <div class="counter">
-            Choose one
-          </div>
-        </div>
-
-      </div>
-
-
-      <div class="grid">
-
-        ${
-          BG.map(
-            bg => `
-
-              <button
-                type="button"
-                class="bg ${
-                  S.picked === bg.id
-                    ? "selected"
-                    : ""
-                }"
-                data-bg="${bg.id}"
-              >
-
-                <h3>
-                  ${esc(bg.name)}
-                </h3>
-
-                <p>
-                  ${esc(bg.meta)}
-                </p>
-
-                <p style="margin-top:7px">
-                  ${esc(bg.d)}
-                </p>
-
-              </button>
-
-            `
-          ).join("")
-        }
-
-      </div>
-
-
-      <div class="section-head">
-
-        <div>
-          <h2>
-            Personality
-          </h2>
-
-          <div class="counter">
-            Pick exactly two traits.
-          </div>
-        </div>
-
-        <div class="counter">
           ${
-            [
-              S.personality1,
-              S.personality2
-            ].filter(Boolean).length
-          } / 2 selected
-        </div>
-
-      </div>
-
-
-      <div class="trait-grid">
-
-        ${
-          S.personalityTraits
-            .map(
-              trait => {
-
-                const selected1 =
-                  S.personality1 ===
-                  trait.id;
-
-                const selected2 =
-                  S.personality2 ===
-                  trait.id;
-
-                const selected =
-                  selected1 ||
-                  selected2;
-
-                const number =
-                  selected1
-                    ? 1
-                    : selected2
-                      ? 2
-                      : "";
-
-                return `
+            BACKGROUNDS
+              .map(
+                bg => `
 
                   <button
                     type="button"
-                    class="trait ${
-                      selected
+                    class="bg-choice ${
+                      S.picked === bg.id
                         ? "selected"
                         : ""
                     }"
-                    data-trait="${esc(
-                      trait.id
-                    )}"
+                    data-bg="${bg.id}"
                   >
 
-                    ${
-                      selected
-                        ? `
-                          <span class="trait-number">
-                            ${number}
-                          </span>
-                        `
-                        : ""
-                    }
-
                     <strong>
-                      ${esc(
-                        trait.name
-                      )}
+                      ${esc(bg.name)}
                     </strong>
 
                     <small>
-                      ${esc(
-                        trait.description
-                      )}
+                      Starts in
+                      ${esc(bg.district)}
+                    </small>
+
+                    <small>
+                      ${naira(bg.cash)}
                     </small>
 
                   </button>
 
-                `;
+                `
+              )
+              .join("")
+          }
 
-              }
-            )
-            .join("")
-        }
+        </div>
 
       </div>
 
 
-      <div class="section-head">
+      <div class="card">
 
-        <div>
+        <div class="row">
+
           <h2>
-            Character design
+            Personality
           </h2>
 
-          <div class="counter">
-            Choose how your hustler looks.
+          <span class="pill">
+            ${
+              Number(
+                Boolean(
+                  S.personality1
+                )
+              ) +
+              Number(
+                Boolean(
+                  S.personality2
+                )
+              )
+            }
+            / 2 selected
+          </span>
+
+        </div>
+
+        <p class="mute">
+          Pick exactly two traits.
+        </p>
+
+        <div class="trait-grid">
+
+          ${
+            S.personalityTraits
+              .map(
+                trait =>
+                  traitButton(
+                    trait
+                  )
+              )
+              .join("")
+          }
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2>
+          Character design
+        </h2>
+
+        <p class="mute">
+          Choose how your hustler looks.
+        </p>
+
+        ${characterPreviewHtml()}
+
+        <div class="appearance-grid">
+
+          <div class="field">
+
+            <label>
+              Skin tone
+            </label>
+
+            <select id="skinTone">
+
+              ${
+                SKIN_TONES
+                  .map(
+                    ([id,label]) =>
+                      `
+                        <option
+                          value="${id}"
+                          ${
+                            S.skinTone === id
+                              ? "selected"
+                              : ""
+                          }
+                        >
+                          ${label}
+                        </option>
+                      `
+                  )
+                  .join("")
+              }
+
+            </select>
+
           </div>
-        </div>
-
-      </div>
 
 
-      ${characterPreviewHtml()}
+          <div class="field">
+
+            <label>
+              Hairstyle
+            </label>
+
+            <select id="hairstyle">
+
+              ${
+                HAIRSTYLES
+                  .map(
+                    ([id,label]) =>
+                      `
+                        <option
+                          value="${id}"
+                          ${
+                            S.hairstyle === id
+                              ? "selected"
+                              : ""
+                          }
+                        >
+                          ${label}
+                        </option>
+                      `
+                  )
+                  .join("")
+              }
+
+            </select>
+
+          </div>
 
 
-      <div class="card">
+          <div class="field">
 
-        <h3>
-          Skin tone
-        </h3>
+            <label>
+              Hair colour
+            </label>
 
-        <div class="choice-grid">
+            <select id="hairColor">
 
-          ${
-            SKIN_TONES
-              .map(
-                ([id,label]) => `
+              ${
+                HAIR_COLORS
+                  .map(
+                    ([id,label]) =>
+                      `
+                        <option
+                          value="${id}"
+                          ${
+                            S.hairColor === id
+                              ? "selected"
+                              : ""
+                          }
+                        >
+                          ${label}
+                        </option>
+                      `
+                  )
+                  .join("")
+              }
 
-                  <button
-                    type="button"
-                    class="choice ${
-                      S.skinTone === id
-                        ? "selected"
-                        : ""
-                    }"
-                    data-choice="skinTone"
-                    data-value="${id}"
-                  >
-                    ${label}
-                  </button>
+            </select>
 
-                `
-              )
-              .join("")
-          }
-
-        </div>
-
-      </div>
+          </div>
 
 
-      <div class="card">
+          <div class="field">
 
-        <h3>
-          Hairstyle
-        </h3>
+            <label>
+              Outfit
+            </label>
 
-        <div class="choice-grid">
+            <select id="outfit">
 
-          ${
-            HAIRSTYLES
-              .map(
-                ([id,label]) => `
+              ${
+                OUTFITS
+                  .map(
+                    ([id,label]) =>
+                      `
+                        <option
+                          value="${id}"
+                          ${
+                            S.outfit === id
+                              ? "selected"
+                              : ""
+                          }
+                        >
+                          ${label}
+                        </option>
+                      `
+                  )
+                  .join("")
+              }
 
-                  <button
-                    type="button"
-                    class="choice ${
-                      S.hairstyle === id
-                        ? "selected"
-                        : ""
-                    }"
-                    data-choice="hairstyle"
-                    data-value="${id}"
-                  >
-                    ${label}
-                  </button>
+            </select>
 
-                `
-              )
-              .join("")
-          }
-
-        </div>
-
-      </div>
+          </div>
 
 
-      <div class="card">
+          <div
+            class="field"
+            style="grid-column:1/-1"
+          >
 
-        <h3>
-          Hair colour
-        </h3>
+            <label>
+              Accessory
+            </label>
 
-        <div class="choice-grid">
+            <select id="accessory">
 
-          ${
-            HAIR_COLORS
-              .map(
-                ([id,label]) => `
+              ${
+                ACCESSORIES
+                  .map(
+                    ([id,label]) =>
+                      `
+                        <option
+                          value="${id}"
+                          ${
+                            S.accessory === id
+                              ? "selected"
+                              : ""
+                          }
+                        >
+                          ${label}
+                        </option>
+                      `
+                  )
+                  .join("")
+              }
 
-                  <button
-                    type="button"
-                    class="choice ${
-                      S.hairColor === id
-                        ? "selected"
-                        : ""
-                    }"
-                    data-choice="hairColor"
-                    data-value="${id}"
-                  >
-                    ${label}
-                  </button>
+            </select>
 
-                `
-              )
-              .join("")
-          }
-
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <h3>
-          Outfit
-        </h3>
-
-        <div class="choice-grid">
-
-          ${
-            OUTFITS
-              .map(
-                ([id,label]) => `
-
-                  <button
-                    type="button"
-                    class="choice ${
-                      S.outfit === id
-                        ? "selected"
-                        : ""
-                    }"
-                    data-choice="outfit"
-                    data-value="${id}"
-                  >
-                    ${label}
-                  </button>
-
-                `
-              )
-              .join("")
-          }
+          </div>
 
         </div>
 
       </div>
 
 
-      <div class="card">
-
-        <h3>
-          Accessory
-        </h3>
-
-        <div class="choice-grid">
-
-          ${
-            ACCESSORIES
-              .map(
-                ([id,label]) => `
-
-                  <button
-                    type="button"
-                    class="choice ${
-                      S.accessory === id
-                        ? "selected"
-                        : ""
-                    }"
-                    data-choice="accessory"
-                    data-value="${id}"
-                  >
-                    ${label}
-                  </button>
-
-                `
-              )
-              .join("")
-          }
-
-        </div>
-
-      </div>
+      ${msgHtml()}
 
 
       <button
-        class="btn gold"
-        id="createCharacter"
+        class="btn yellow"
+        id="startHustling"
         type="button"
       >
         Start hustling
@@ -3398,45 +2998,30 @@ function viewCreate(){
 
       <button
         class="link"
-        id="createLogout"
+        id="logoutCreate"
         type="button"
       >
         Log out
       </button>
 
-    </main>
+    </div>
 
   `;
 
 
-  const nameInput =
-    document.getElementById(
+  document
+    .getElementById(
       "characterName"
-    );
-
-  if(nameInput){
-
-    nameInput.oninput =
-      () => {
+    )
+    ?.addEventListener(
+      "input",
+      event => {
 
         S.nameDraft =
-          nameInput.value;
+          event.target.value;
 
-        const preview =
-          document.querySelector(
-            ".look-preview"
-          );
-
-        if(preview){
-
-          preview.outerHTML =
-            characterPreviewHtml();
-
-        }
-
-      };
-
-  }
+      }
+    );
 
 
   document
@@ -3468,109 +3053,72 @@ function viewCreate(){
       button => {
 
         button.onclick =
-          () => {
+          () =>
+            selectTrait(
+              button.dataset.trait
+            );
 
-            const id =
-              button.dataset.trait;
+      }
+    );
 
-            if(
-              S.personality1 === id
-            ){
 
-              S.personality1 =
-                null;
+  const appearanceIds = {
 
-            }else if(
-              S.personality2 === id
-            ){
+    skinTone:"skinTone",
 
-              S.personality2 =
-                null;
+    hairstyle:"hairstyle",
 
-            }else if(
-              !S.personality1
-            ){
+    hairColor:"hairColor",
 
-              S.personality1 =
-                id;
+    outfit:"outfit",
 
-            }else if(
-              !S.personality2
-            ){
+    accessory:"accessory"
 
-              S.personality2 =
-                id;
+  };
 
-            }else{
 
-              S.personality2 =
-                id;
+  Object.entries(
+    appearanceIds
+  )
+  .forEach(
+    ([stateKey,id]) => {
 
-            }
+      document
+        .getElementById(id)
+        ?.addEventListener(
+          "change",
+          event => {
+
+            S[stateKey] =
+              event.target.value;
 
             viewCreate();
 
-          };
+          }
+        );
 
-      }
+    }
+  );
+
+
+  document
+    .getElementById(
+      "startHustling"
+    )
+    ?.addEventListener(
+      "click",
+      createCharacter
     );
 
 
   document
-    .querySelectorAll(
-      "[data-choice]"
+    .getElementById(
+      "logoutCreate"
     )
-    .forEach(
-      button => {
-
-        button.onclick =
-          () => {
-
-            const field =
-              button.dataset.choice;
-
-            const value =
-              button.dataset.value;
-
-            S[field] =
-              value;
-
-            viewCreate();
-
-          };
-
-      }
+    ?.addEventListener(
+      "click",
+      logout
     );
-
-
-  const create =
-    document.getElementById(
-      "createCharacter"
-    );
-
-  if(create){
-
-    create.onclick =
-      createCharacter;
-
-  }
-
-
-  const logout =
-    document.getElementById(
-      "createLogout"
-    );
-
-  if(logout){
-
-    logout.onclick =
-      () => {
-
-        db.auth.signOut();
-
-      };
-
-  }
 
 }
 
@@ -3585,20 +3133,8 @@ async function createCharacter(){
     return;
   }
 
-  const input =
-    document.getElementById(
-      "characterName"
-    );
-
   const name =
-    (
-      input
-        ? input.value
-        : S.nameDraft
-    ).trim();
-
-  S.nameDraft =
-    name;
+    S.nameDraft.trim();
 
   if(
     name.length < 3 ||
@@ -3616,7 +3152,7 @@ async function createCharacter(){
   if(!S.picked){
 
     setMsg(
-      "Choose a background first."
+      "Choose a background."
     );
 
     return viewCreate();
@@ -3627,7 +3163,7 @@ async function createCharacter(){
     !S.personality1 ||
     !S.personality2 ||
     S.personality1 ===
-    S.personality2
+      S.personality2
   ){
 
     setMsg(
@@ -3638,7 +3174,8 @@ async function createCharacter(){
 
   }
 
-  S.busy = true;
+  S.busy =
+    true;
 
   try{
 
@@ -3649,7 +3186,9 @@ async function createCharacter(){
       await db.rpc(
         "create_character",
         {
-          p_name:name,
+
+          p_name:
+            name,
 
           p_background:
             S.picked,
@@ -3674,37 +3213,38 @@ async function createCharacter(){
 
           p_accessory:
             S.accessory
+
         }
       );
 
-    S.busy = false;
-
     if(error){
-
-      setMsg(
-        error.message
-      );
-
-      return viewCreate();
-
+      throw error;
     }
 
-    if(data?.id){
+    S.busy =
+      false;
 
-      S.ch =
-        data;
+    S.ch =
+      data;
 
-    }
+    S.nameDraft =
+      "";
 
     await load();
 
   }catch(error){
 
-    S.busy = false;
+    S.busy =
+      false;
+
+    console.error(
+      "Character creation failed:",
+      error
+    );
 
     setMsg(
       error?.message ||
-      "Character creation failed."
+      "Could not create your character."
     );
 
     viewCreate();
@@ -3715,7 +3255,7 @@ async function createCharacter(){
 
 
 /* =========================================================
-CHARACTER PROFILE
+PROFILE
 ========================================================= */
 
 function profileHtml(c){
@@ -3832,12 +3372,10 @@ function profileHtml(c){
 
       <div class="profile-avatar">
 
-        <div class="avatar-mini">
-          ${avatarSvg(
-            c,
-            58
-          )}
-        </div>
+        ${avatarSvg(
+          c,
+          72
+        )}
 
       </div>
 
@@ -4016,15 +3554,28 @@ function profileHtml(c){
       >
 
         <div class="avatar-large">
+
           ${avatarSvg(
             c,
             105
           )}
+
         </div>
 
       </div>
 
-      <div class="profile-details">
+      <button
+        class="btn"
+        type="button"
+        data-go-avatar
+      >
+        View Avatar
+      </button>
+
+      <div
+        class="profile-details"
+        style="margin-top:14px"
+      >
 
         <div class="profile-detail">
 
@@ -4154,65 +3705,40 @@ function profileHtml(c){
       <div class="profile-details">
 
         <div class="profile-detail">
-
-          <span>
-            Energy
-          </span>
-
+          <span>Energy</span>
           <strong>
             ${Number(c.energy || 0)}
             /
             ${Number(c.max_energy || 0)}
           </strong>
-
         </div>
 
         <div class="profile-detail">
-
-          <span>
-            Hunger
-          </span>
-
+          <span>Hunger</span>
           <strong>
             ${Number(c.hunger || 0)}/100
           </strong>
-
         </div>
 
         <div class="profile-detail">
-
-          <span>
-            Fun
-          </span>
-
+          <span>Fun</span>
           <strong>
             ${Number(c.fun || 0)}/100
           </strong>
-
         </div>
 
         <div class="profile-detail">
-
-          <span>
-            Social
-          </span>
-
+          <span>Social</span>
           <strong>
             ${Number(c.social || 0)}/100
           </strong>
-
         </div>
 
         <div class="profile-detail">
-
-          <span>
-            Hygiene
-          </span>
-
+          <span>Hygiene</span>
           <strong>
             ${Number(c.hygiene || 0)}/100
           </strong>
-
         </div>
 
       </div>
@@ -4227,7 +3753,7 @@ function profileHtml(c){
         <strong>Hustle Assets</strong>
       </div>
 
-      <div class="profile-status">
+      <div>
 
         <strong>
           ${businessText}
@@ -4388,9 +3914,7 @@ function viewGame(){
   if(!S.ch){
 
     if(S.user){
-
       return viewCreate();
-
     }
 
     return viewAuth();
@@ -4644,25 +4168,13 @@ function homeHtml(c){
 
   const skills = [
 
-    [
-      "hustle",
-      c.skill_hustle
-    ],
+    ["hustle",c.skill_hustle],
 
-    [
-      "edu",
-      c.skill_edu
-    ],
+    ["edu",c.skill_edu],
 
-    [
-      "charm",
-      c.skill_charm
-    ],
+    ["charm",c.skill_charm],
 
-    [
-      "tech",
-      c.skill_tech
-    ]
+    ["tech",c.skill_tech]
 
   ];
 
@@ -4695,21 +4207,26 @@ function homeHtml(c){
       >
 
         <div class="avatar-mini">
+
           ${avatarSvg(
             c,
             54
           )}
+
         </div>
 
         <div>
 
           <h2>
             Welcome to
-            ${cap(c.district)},
+            ${esc(
+              cap(c.district)
+            )},
             ${esc(c.name)}
           </h2>
 
           <p class="mute">
+
             ${esc(
               bgName(
                 c.background
@@ -4718,10 +4235,13 @@ function homeHtml(c){
 
             ·
 
-            ${cap(c.city)}.
+            ${esc(
+              cap(c.city || "Lagos")
+            )}.
 
             Work jobs to earn,
             then build your empire.
+
           </p>
 
         </div>
@@ -4857,10 +4377,12 @@ function homeHtml(c){
       >
 
         <div class="avatar-large">
+
           ${avatarSvg(
             c,
             100
           )}
+
         </div>
 
       </div>
@@ -4925,8 +4447,7 @@ async function doActivity(
 
       S.activityMsg = {
 
-        t:
-          error.message,
+        t:error.message,
 
         ok:false
 
@@ -5064,11 +4585,9 @@ function jobCard(
       >
 
         <span>
-
           ${naira(job.pay_min)}
           to
           ${naira(job.pay_max)}
-
         </span>
 
         <span>
@@ -5803,7 +5322,6 @@ async function bizView(
                 class="btn alt"
                 id="upgrade"
                 type="button"
-                style="width:100%"
               >
 
                 Upgrade to level
@@ -6087,18 +5605,14 @@ function mapSvg(
         ([from,to]) => `
 
           <line
-
             x1="${positions[from][0]}"
             y1="${positions[from][1]}"
-
             x2="${positions[to][0]}"
             y2="${positions[to][1]}"
-
             stroke="#94A3A2"
             stroke-width="2.5"
             stroke-dasharray="6 5"
             stroke-linecap="round"
-
           />
 
         `
@@ -6130,45 +5644,33 @@ function mapSvg(
           >
 
             <circle
-
               cx="${x}"
               cy="${y}"
-
               r="${
                 current
                   ? 13
                   : 9
               }"
-
               fill="${
                 current
                   ? "#FFC20E"
                   : "#fff"
               }"
-
               stroke="${
                 current
                   ? "#14201F"
                   : "#0F6B6F"
               }"
-
               stroke-width="3"
-
             />
 
             <text
-
               x="${x}"
               y="${y + 28}"
-
               text-anchor="middle"
-
               font-size="12"
-
               font-weight="700"
-
               fill="#14201F"
-
             >
               ${labels[id]}
             </text>
@@ -6198,7 +5700,6 @@ function mapSvg(
         />
 
         <path
-
           d="
             M0 128
             C55 112 125 155 205 132
@@ -6207,22 +5708,15 @@ function mapSvg(
             C265 152 200 178 115 162
             S35 152 0 155 Z
           "
-
           fill="#A8D5D5"
-
         />
 
         <text
-
           x="28"
           y="152"
-
           font-size="11"
-
           fill="#0F6B6F"
-
           font-weight="600"
-
         >
           Lagos Lagoon
         </text>
@@ -6697,9 +6191,6 @@ AVATAR NAVIGATION
 
 function openAvatarStage(){
 
-  S.tab =
-    "avatar";
-
   if(
     window.naijaClockTimer
   ){
@@ -6715,8 +6206,13 @@ function openAvatarStage(){
       "main"
     );
 
-  if(!main){
+  if(
+    !main ||
+    !S.ch
+  ){
+
     return;
+
   }
 
   main.innerHTML =
@@ -6773,26 +6269,97 @@ function openAvatarStage(){
 
 
 /* =========================================================
-HOME AVATAR BUTTON
+GLOBAL CLICKS
 ========================================================= */
 
 document.addEventListener(
   "click",
   event => {
 
-    const target =
+    const avatarButton =
       event.target.closest(
         "[data-go-avatar]"
       );
 
-    if(!target){
+    if(avatarButton){
+
+      openAvatarStage();
+
       return;
+
     }
 
-    openAvatarStage();
+    const backButton =
+      event.target.closest(
+        "[data-back-game]"
+      );
+
+    if(backButton){
+
+      S.tab =
+        "profile";
+
+      viewGame();
+
+      return;
+
+    }
+
+    const logoutButton =
+      event.target.closest(
+        "#lo2"
+      );
+
+    if(logoutButton){
+
+      logout();
+
+    }
 
   }
 );
+
+
+/* =========================================================
+LOGOUT
+========================================================= */
+
+async function logout(){
+
+  try{
+
+    await db.auth.signOut();
+
+  }catch(error){
+
+    console.error(
+      "Logout failed:",
+      error
+    );
+
+  }
+
+  S.user =
+    null;
+
+  S.ch =
+    null;
+
+  S.tab =
+    "home";
+
+  S.biz =
+    null;
+
+  S.bizLoaded =
+    false;
+
+  S.msg =
+    null;
+
+  viewAuth();
+
+}
 
 
 /* =========================================================
