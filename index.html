@@ -426,54 +426,37 @@ const HOUSING = [
     rent:18000,
     cost:45000,
     desc:"Your own toilet & kitchenette. Still in a busy compound."
+  },
+  {
+    id:"flat",
+    name:"Mini Flat",
+    rent:35000,
+    cost:120000,
+    desc:"One bedroom, small sitting room. Better area."
+  },
+  {
+    id:"two_bed",
+    name:"2-Bedroom Flat",
+    rent:65000,
+    cost:280000,
+    desc:"Proper flat, more space, higher expectations."
+  },
+  {
+    id:"apartment",
+    name:"Better Apartment",
+    rent:110000,
+    cost:550000,
+    desc:"Serviced, safer, closer to the action."
+  },
+  {
+    id:"condo",
+    name:"Condo / High-end",
+    rent:220000,
+    cost:1200000,
+    desc:"Lekki / VI level. Status unlocked."
   }
-];  {id:"flat", name:"Mini Flat", rent:35000, cost:120000, desc:"One bedroom, small sitting room. Better area."},
-  {id:"two_bed", name:"2-Bedroom Flat", rent:65000, cost:280000, desc:"Proper flat, more space, higher expectations."},
-  {id:"apartment", name:"Better Apartment", rent:110000, cost:550000, desc:"Serviced, safer, closer to the action."},
-  {id:"condo", name:"Condo / High-end", rent:220000, cost:1200000, desc:"Lekki / VI level. Status unlocked."}
 ];
-
-const PLACES = [
-  {name:"Job Centre", tab:"jobs", sx:1, sz:-1, color:"#49b7ff", kind:"career"},
-  {name:"Computer Village", tab:"business", sx:-1, sz:-1, color:"#ff8b3d", kind:"market"},
-  {name:"Hall of Fame", tab:"board", sx:1, sz:1, color:"#c76cff", kind:"board"},
-  {name:"Your Home", tab:"home", sx:-1, sz:1, color:"#57d98b", kind:"home"}
-];
-
-const SOCIAL_PLACES = [
-  {name:"Mama's Kitchen", kind:"restaurant", sx:0, sz:-2, color:"#f08a42"},
-  {name:"Pulse Club", kind:"club", sx:2, sz:0, color:"#bb62e8"},
-  {name:"City View Hotel", kind:"hotel", sx:-2, sz:0, color:"#55a8ff"},
-  {name:"Glow Spa", kind:"spa", sx:0, sz:2, color:"#e56ba9"},
-  {name:"Aunty Ada's House", kind:"house", sx:-2, sz:2, color:"#67c98b"},
-  {name:"Corner Shop", kind:"shop", sx:2, sz:2, color:"#e7b83e"},
-  {name:"Onyx Office", kind:"office", sx:2, sz:-2, color:"#8e9cff"},
-  {name:"FitLife Gym", kind:"gym", sx:-2, sz:-2, color:"#55d1c7"}
-];
-
-const ALL_PLACES = [...PLACES, ...SOCIAL_PLACES];
-
-const state = {
-  mode:"play",
-  cfg:{...DEFAULT_CFG},
-  name:"Guest",
-  sub:"Lagos · Starting Out",
-  user:null,
-  money:25000,
-  housingLevel:0,
-  rentDueIn:14,
-  keys:{up:false,down:false,left:false,right:false,shift:false},
-  joy:{active:false,x:0,y:0},
-  runToggle:false,
-  jumpQueued:false,
-  emote:null,
-  status:"Idle",
-  quality:localStorage.getItem("nh_quality")||"high",
-  socialMessages:[],
-  relationships:{},
-  opportunities:[],
-  activeNpc:null
-};
+  
 
 const cam = {mode:"chase",yaw:Math.PI,pitch:.28,dist:5.5};
 const viewer = {preset:"full",pose:"idle",yaw:0,pitch:.08,dist:4.6,userDist:undefined,spin:false,lastDrag:0};
