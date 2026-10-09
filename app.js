@@ -1,13 +1,13 @@
-// ============================================================
-// NAIJA HUSTLE — MODULAR APP.JS REPLACEMENT
-// Version: 2.0.0
-// Requires a browser environment and Three.js.
-// Optional cloud support: Supabase JS v2.
-// ============================================================
+/* ============================================================
+   NAIJA HUSTLE — MODULAR APP.JS
+   Version: 2.1.0
+   Online-only gameplay • Three.js • Supabase Auth + Cloud Saves
+   ============================================================ */
 
 import * as THREE from
   "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
+// Replace both placeholders with your Supabase project credentials.
 const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
 const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
@@ -28,12 +28,6 @@ const choice = (items) =>
 
 const money = (amount) =>
   "₦" + Math.floor(amount).toLocaleString("en-NG");
-
-const safeText = (value) =>
-  String(value ?? "").replace(/[<>]/g, "");
-
-const wait = (ms) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
 
 function notify(message) {
   let element = $("#gameToast");
@@ -67,11 +61,12 @@ function notify(message) {
   clearTimeout(notify.timer);
   notify.timer = setTimeout(() => {
     element.style.display = "none";
-  }, 2600);
+  }, 2800);
 }
 
 function makeButton(label, action) {
   const button = document.createElement("button");
+  button.type = "button";
   button.textContent = label;
 
   Object.assign(button.style, {
@@ -88,12 +83,31 @@ function makeButton(label, action) {
   return button;
 }
 
+function showLogin(message = "") {
+  $("#loginScreen")?.classList.remove("hidden");
+  $("#hud")?.classList.add("hidden");
+  $("#loadingScreen")?.classList.add("hidden");
+
+  // Online-only: never offer guest play.
+  const guestButton = $("#guestBtn");
+  if (guestButton) guestButton.hidden = true;
+
+  const messageElement = $("#loginMessage");
+  if (messageElement) messageElement.textContent = message;
+}
+
+function hideLogin() {
+  $("#loginScreen")?.classList.add("hidden");
+  $("#hud")?.classList.remove("hidden");
+  $("#loadingScreen")?.classList.add("hidden");
+}
+
 // ------------------------------------------------------------
 // 2. GAME DATA
 // ------------------------------------------------------------
 
 const CONFIG = {
-  version: "2.0.0",
+  version: "2.1.0",
   worldSize: 100,
   moveSpeed: 7,
   sprintMultiplier: 1.55,
@@ -194,12 +208,6 @@ function createInitialState() {
 
 let state = createInitialState();
 
-// ------------------------------------------------------------
-// 3. STATE VALIDATION AND SAVING
-// ------------------------------------------------------------
-
-const SAVE_KEY = "naijaHustleSave_v2";
-
 function normalizeState(input) {
   const defaults = createInitialState();
 
@@ -222,9 +230,7 @@ function normalizeState(input) {
   result.time = clamp(Number(result.time) || 8, 0, 24);
 
   for (const key of Object.keys(result.needs)) {
-    result.needs[key] = clamp(
-      Number(result.needs[key]) || 0, 0, 100
-    );
+    result.needs[key] = clamp(Number(result.needs[key]) || 0, 0, 100);
   }
 
   result.player.x = clamp(
@@ -240,117 +246,82 @@ function normalizeState(input) {
   );
 
   if (!Array.isArray(result.inventory)) result.inventory = [];
-  if (!Array.isArray(result.completedQuests)) {
-    result.completedQuests = [];
-  }
+  if (!Array.isArray(result.completedQuests)) result.completedQuests = [];
 
   return result;
 }
 
-function saveGame() {
-  try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    return true;
-  } catch (error) {
-    console.error("Local save failed:", error);
-    notify("Could not save game on this device.");
-    return false;
-  }
-}
-
-function loadGame() {
-  try {
-    const saved = localStorage.getItem(SAVE_KEY);
-
-    if (saved) {
-      state = normalizeState(JSON.parse(saved));
-      return true;
-    }
-  } catch (error) {
-    console.error("Save data could not be loaded:", error);
-  }
-
-  state = createInitialState();
-  return false;
-}
-
-function resetGame() {
-  if (!confirm("Start a new game? This replaces your local save.")) {
-    return;
-  }
-
-  state = createInitialState();
-  saveGame();
-  refreshGameUI();
-  notify("New game started.");
-}
-
 // ------------------------------------------------------------
-// 4. OPTIONAL SUPABASE CONNECTION
+// 3. SUPABASE AUTHENTICATION AND CLOUD SAVES
 // ------------------------------------------------------------
 
 let supabase = null;
 let currentUser = null;
+let authReady = false;
+let gameStarted = false;
+let saveInProgress = false;
+let saveQueued = false;
 
 async function initializeSupabase() {
   if (
+    !SUPABASE_URL.startsWith("https://") ||
     SUPABASE_URL.includes("YOUR_PROJECT") ||
+    !SUPABASE_ANON_KEY ||
     SUPABASE_ANON_KEY.includes("YOUR_SUPABASE")
   ) {
-    console.info("Cloud saving disabled: configure Supabase credentials.");
-    return;
+    throw new Error(
+      "Supabase is not configured. Add your project URL and public anon key."
+    );
   }
 
-  try {
-    const module = await import(
-      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
-    );
+  const module = await import(
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+  );
 
-    supabase = module.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
+  supabase = module.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    }
+  );
 
-    const { data, error } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
 
-    if (error) throw error;
+  currentUser = data.session?.user || null;
+  authReady = true;
 
-    currentUser = data.session?.user || null;
+  supabase.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+  });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      currentUser = session?.user || null;
-    });
-  } catch (error) {
-    console.error("Supabase initialization failed:", error);
-    notify("Cloud connection unavailable. Local play is still available.");
-  }
+  return true;
 }
 
 async function signInWithEmail(email, password) {
-  if (!supabase) {
-    notify("Cloud login is not configured.");
-    return false;
-  }
+  if (!supabase) throw new Error("Online login is not configured.");
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
 
-  if (error) {
-    notify(error.message);
-    return false;
-  }
+  if (error) throw error;
 
   currentUser = data.user;
-  notify("Signed in.");
-  return true;
+  return Boolean(currentUser);
 }
 
 async function signUpWithEmail(email, password) {
-  if (!supabase) {
-    notify("Cloud login is not configured.");
-    return false;
+  if (!supabase) throw new Error("Online registration is not configured.");
+
+  if (password.length < 8) {
+    throw new Error("Use a password with at least 8 characters.");
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -358,63 +329,86 @@ async function signUpWithEmail(email, password) {
     password
   });
 
-  if (error) {
-    notify(error.message);
-    return false;
-  }
+  if (error) throw error;
 
-  currentUser = data.user;
-  notify("Account created. Check your email if verification is required.");
-  return true;
+  currentUser = data.session?.user || null;
+  return {
+    user: data.user,
+    hasSession: Boolean(data.session)
+  };
 }
 
 async function signOut() {
-  if (supabase) {
-    const { error } = await supabase.auth.signOut();
+  if (!supabase) return;
 
-    if (error) {
-      notify(error.message);
-      return;
-    }
+  // Stop the game before clearing the authenticated session.
+  gamePaused = true;
+  gameStarted = false;
+  keys.clear();
+  joystick.x = 0;
+  joystick.y = 0;
+
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    gamePaused = false;
+    gameStarted = true;
+    throw error;
   }
 
   currentUser = null;
-  notify("Signed out.");
+  showLogin("You have signed out.");
 }
 
-async function saveCloudGame() {
+async function saveCloudGame({ silent = false } = {}) {
   if (!supabase || !currentUser) {
-    notify("Sign in to enable cloud saving.");
+    if (!silent) notify("Sign in to save your game.");
     return false;
   }
 
-  // This requires a table you own, with:
-  // user_id UUID PRIMARY KEY REFERENCES auth.users(id)
-  // save_data JSONB, updated_at TIMESTAMPTZ
-  //
-  // Configure the table's RLS policies before enabling cloud saves.
-  const { error } = await supabase
-    .from("game_saves")
-    .upsert({
-      user_id: currentUser.id,
-      save_data: state,
-      updated_at: new Date().toISOString()
-    }, { onConflict: "user_id" });
+  // Avoid overlapping saves. Queue one more save if state changes mid-save.
+  if (saveInProgress) {
+    saveQueued = true;
+    return false;
+  }
 
-  if (error) {
+  saveInProgress = true;
+
+  try {
+    const snapshot = JSON.parse(JSON.stringify(state));
+
+    const { error } = await supabase
+      .from("game_saves")
+      .upsert({
+        user_id: currentUser.id,
+        save_data: snapshot,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: "user_id"
+      });
+
+    if (error) throw error;
+
+    if (!silent) notify("Game saved to your account.");
+    return true;
+  } catch (error) {
     console.error("Cloud save failed:", error);
-    notify("Cloud save failed. Your local save is unchanged.");
+    if (!silent) notify("Cloud save failed. Check your connection.");
     return false;
-  }
+  } finally {
+    saveInProgress = false;
 
-  notify("Cloud save complete.");
-  return true;
+    if (saveQueued) {
+      saveQueued = false;
+      if (currentUser) {
+        void saveCloudGame({ silent: true });
+      }
+    }
+  }
 }
 
-async function loadCloudGame() {
+async function loadGame() {
   if (!supabase || !currentUser) {
-    notify("Sign in first.");
-    return false;
+    throw new Error("Sign in before loading a game.");
   }
 
   const { data, error } = await supabase
@@ -423,27 +417,53 @@ async function loadCloudGame() {
     .eq("user_id", currentUser.id)
     .maybeSingle();
 
-  if (error) {
-    notify("Cloud load failed.");
-    console.error(error);
-    return false;
+  if (error) throw error;
+
+  if (data?.save_data) {
+    state = normalizeState(data.save_data);
+  } else {
+    // A new player's first save is still stored online.
+    state = createInitialState();
+
+    const saved = await saveCloudGame({ silent: true });
+    if (!saved) {
+      throw new Error(
+        "Your new game could not be saved. Check the game_saves table and its RLS policies."
+      );
+    }
   }
 
-  if (!data?.save_data) {
-    notify("No cloud save found.");
-    return false;
-  }
-
-  state = normalizeState(data.save_data);
-  saveGame();
-  refreshGameUI();
-  syncPlayerPosition();
-  notify("Cloud save loaded.");
   return true;
 }
 
+// New Game replaces the signed-in player's cloud save.
+async function resetGame() {
+  if (!currentUser) {
+    notify("Sign in before starting a new game.");
+    return;
+  }
+
+  if (!confirm("Start a new game? This replaces your cloud save.")) return;
+
+  const previousState = state;
+  state = createInitialState();
+
+  const saved = await saveCloudGame({ silent: true });
+
+  if (!saved) {
+    state = previousState;
+    notify("Could not start a new game. Your previous state was restored.");
+    return;
+  }
+
+  syncPlayerPosition();
+  applyAvatar();
+  refreshGameUI();
+  notify("New game started and saved online.");
+}
+
 // ------------------------------------------------------------
-// 5. THREE.JS WORLD
+// 4. THREE.JS WORLD
 // ------------------------------------------------------------
 
 let scene;
@@ -470,12 +490,10 @@ let gamePaused = false;
 let currentInteraction = null;
 let lastSave = 0;
 let lastHudUpdate = 0;
+let jumpUntil = 0;
 
 function makeMaterial(color, roughness = 0.9) {
-  return new THREE.MeshStandardMaterial({
-    color,
-    roughness
-  });
+  return new THREE.MeshStandardMaterial({ color, roughness });
 }
 
 function makeBox(width, height, depth, color) {
@@ -495,14 +513,12 @@ function addGround() {
   ground.position.y = -0.08;
   scene.add(ground);
 
-  // Roads
   const roadMaterial = makeMaterial(0x444448);
 
   const road1 = new THREE.Mesh(
     new THREE.BoxGeometry(90, 0.08, 9),
     roadMaterial
   );
-
   road1.position.set(0, 0, 0);
   scene.add(road1);
 
@@ -510,11 +526,9 @@ function addGround() {
     new THREE.BoxGeometry(9, 0.08, 90),
     roadMaterial
   );
-
   road2.position.set(0, 0.01, 0);
   scene.add(road2);
 
-  // Road markings
   for (let i = -40; i <= 40; i += 8) {
     const marking = new THREE.Mesh(
       new THREE.BoxGeometry(3, 0.03, 0.18),
@@ -557,7 +571,6 @@ function createBuilding(data) {
 
   scene.add(group);
   buildingMeshes.push(group);
-
   return group;
 }
 
@@ -568,7 +581,6 @@ function createTree(x, z) {
     new THREE.CylinderGeometry(0.25, 0.4, 2.2, 7),
     makeMaterial(0x6a4329)
   );
-
   trunk.position.y = 1.1;
   tree.add(trunk);
 
@@ -576,7 +588,6 @@ function createTree(x, z) {
     new THREE.SphereGeometry(1.6, 8, 7),
     makeMaterial(0x326b3c)
   );
-
   leaves.position.y = 3;
   tree.add(leaves);
 
@@ -590,15 +601,13 @@ function createNPC(x, z) {
   const body = makeBox(0.8, 1.5, 0.55, choice([
     0x315c80, 0x7e4b33, 0x7d3974, 0x476d45, 0xc09a39
   ]));
-
-  body.position.y = 1.0;
+  body.position.y = 1;
   npc.add(body);
 
   const head = new THREE.Mesh(
     new THREE.SphereGeometry(0.42, 12, 10),
     makeMaterial(choice([0x5c3525, 0x8d5524, 0xb98058]))
   );
-
   head.position.y = 2.1;
   npc.add(head);
 
@@ -621,15 +630,13 @@ function createPlayer() {
     0.9, 1.4, 0.6,
     state.avatar.outfitColor || "#315c80"
   );
-
-  playerBody.position.y = 1.0;
+  playerBody.position.y = 1;
   player.add(playerBody);
 
   playerHead = new THREE.Mesh(
     new THREE.SphereGeometry(0.43, 16, 12),
     makeMaterial(state.avatar.skinTone || "#8d5524")
   );
-
   playerHead.position.y = 2.1;
   player.add(playerHead);
 
@@ -637,7 +644,6 @@ function createPlayer() {
     new THREE.SphereGeometry(0.45, 12, 8, 0, Math.PI * 2, 0, 0.9),
     makeMaterial(state.avatar.hairColor || "#201710")
   );
-
   playerHair.position.y = 2.35;
   player.add(playerHair);
 
@@ -651,20 +657,25 @@ function applyAvatar() {
   playerBody.material.color.set(state.avatar.outfitColor);
   playerHead.material.color.set(state.avatar.skinTone);
   playerHair.material.color.set(state.avatar.hairColor);
-
   playerHair.visible = state.avatar.hairstyle !== "bald";
 }
 
 function initializeWorld() {
-  const host = $("#gameCanvas") || $("#game-world") || $("#gameWorld");
+  const foundHost =
+    $("#gameCanvas") || $("#game-world") || $("#gameWorld") || $("#game");
 
-  if (!host) {
-    console.error(
-      "No game canvas container found. Expected #gameCanvas, #game-world, or #gameWorld."
+  if (!foundHost) {
+    throw new Error(
+      "No game container found. Add #gameCanvas or #game to index.html."
     );
-    notify("Game canvas container not found. Check your index.html.");
-    return;
   }
+
+  // If #gameCanvas is itself a canvas, use its parent as the renderer host.
+  const host = foundHost instanceof HTMLCanvasElement
+    ? foundHost.parentElement
+    : foundHost;
+
+  if (!host) throw new Error("The game canvas parent container is missing.");
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x9ec6d7);
@@ -673,7 +684,6 @@ function initializeWorld() {
   const width = host.clientWidth || window.innerWidth;
   const height = host.clientHeight || window.innerHeight;
 
-  // Orthographic camera creates the isometric-style view.
   camera = new THREE.OrthographicCamera(
     -cameraZoom * width / height / 2,
     cameraZoom * width / height / 2,
@@ -698,24 +708,27 @@ function initializeWorld() {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   host.replaceChildren(renderer.domElement);
-  renderer.domElement.style.width = "100%";
-  renderer.domElement.style.height = "100%";
-  renderer.domElement.style.display = "block";
-  renderer.domElement.style.touchAction = "none";
 
-  const ambient = new THREE.HemisphereLight(0xffffff, 0x4e5943, 2.0);
-  scene.add(ambient);
+  Object.assign(renderer.domElement.style, {
+    width: "100%",
+    height: "100%",
+    display: "block",
+    touchAction: "none"
+  });
 
-  const sunlight = new THREE.DirectionalLight(0xffe3b0, 2.0);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x4e5943, 2));
+
+  const sunlight = new THREE.DirectionalLight(0xffe3b0, 2);
   sunlight.position.set(-25, 45, 25);
   sunlight.castShadow = true;
   scene.add(sunlight);
 
   addGround();
 
-  for (const building of BUILDINGS) {
-    createBuilding(building);
-  }
+  buildingMeshes.length = 0;
+  npcMeshes.length = 0;
+
+  for (const building of BUILDINGS) createBuilding(building);
 
   for (let i = 0; i < 28; i++) {
     const x = random(-42, 42);
@@ -730,27 +743,25 @@ function initializeWorld() {
   }
 
   createPlayer();
-
   clock = new THREE.Clock();
   worldReady = true;
 
   window.addEventListener("resize", resizeRenderer);
-
   renderer.domElement.addEventListener("pointerdown", onWorldPointer);
-  animate();
 
-  notify("Welcome to Naija Hustle!");
+  animate();
 }
 
 function resizeRenderer() {
   if (!renderer || !camera) return;
 
   const host = renderer.domElement.parentElement;
+  if (!host) return;
+
   const width = host.clientWidth || window.innerWidth;
   const height = host.clientHeight || window.innerHeight;
 
   renderer.setSize(width, height);
-
   camera.left = -cameraZoom * width / height / 2;
   camera.right = cameraZoom * width / height / 2;
   camera.top = cameraZoom / 2;
@@ -759,7 +770,7 @@ function resizeRenderer() {
 }
 
 function onWorldPointer(event) {
-  if (!renderer || !camera) return;
+  if (!renderer || !camera || !player || gamePaused) return;
 
   const rect = renderer.domElement.getBoundingClientRect();
 
@@ -772,7 +783,6 @@ function onWorldPointer(event) {
   raycaster.setFromCamera(pointer, camera);
 
   const hits = raycaster.intersectObjects(buildingMeshes, true);
-
   if (!hits.length) return;
 
   let object = hits[0].object;
@@ -798,12 +808,11 @@ function onWorldPointer(event) {
 }
 
 // ------------------------------------------------------------
-// 6. PLAYER MOVEMENT AND CAMERA
+// 5. MOVEMENT AND CAMERA
 // ------------------------------------------------------------
 
 function syncPlayerPosition() {
   if (!player) return;
-
   player.position.x = state.player.x;
   player.position.z = state.player.z;
 }
@@ -829,31 +838,27 @@ function updateMovement(dt) {
     z /= length;
   }
 
-  const multiplier = sprinting ? CONFIG.sprintMultiplier : 1;
-  const speed = CONFIG.moveSpeed * multiplier;
+  const speed = CONFIG.moveSpeed *
+    (sprinting ? CONFIG.sprintMultiplier : 1);
 
   if (length > 0.05) {
-    // Isometric movement: controls remain aligned with the screen.
-    const worldX = x - z;
-    const worldZ = x + z;
-    const scale = 1 / Math.SQRT2;
+    const worldX = (x - z) / Math.SQRT2;
+    const worldZ = (x + z) / Math.SQRT2;
 
-    player.position.x += worldX * scale * speed * dt;
-    player.position.z += worldZ * scale * speed * dt;
-
+    player.position.x += worldX * speed * dt;
+    player.position.z += worldZ * speed * dt;
     player.rotation.y = Math.atan2(worldX, worldZ);
 
     state.needs.energy = clamp(
       state.needs.energy - dt * (sprinting ? 0.75 : 0.25),
-      0, 100
+      0,
+      100
     );
   }
 
-  // Keep the player inside the world boundary.
   player.position.x = clamp(
     player.position.x, -CONFIG.worldSize, CONFIG.worldSize
   );
-
   player.position.z = clamp(
     player.position.z, -CONFIG.worldSize, CONFIG.worldSize
   );
@@ -868,20 +873,32 @@ function updateCamera(dt) {
   if (!camera || !player) return;
 
   cameraTarget.copy(player.position);
-
   const desired = cameraTarget.clone().add(cameraOffset);
 
-  camera.position.lerp(
-    desired,
-    1 - Math.exp(-5 * dt)
-  );
-
+  camera.position.lerp(desired, 1 - Math.exp(-5 * dt));
   camera.lookAt(cameraTarget);
 }
 
 function zoomCamera(amount) {
   cameraZoom = clamp(cameraZoom + amount, 8, 28);
   resizeRenderer();
+}
+
+function updateWorld(dt) {
+  for (const npc of npcMeshes) {
+    npc.userData.phase += dt * npc.userData.speed;
+    npc.position.x =
+      npc.userData.originX + Math.sin(npc.userData.phase) * 1.5;
+    npc.position.z =
+      npc.userData.originZ + Math.cos(npc.userData.phase * 0.7) * 1.5;
+  }
+
+  if (player) {
+    const jumping = performance.now() < jumpUntil;
+    player.position.y = jumping
+      ? Math.abs(Math.sin((jumpUntil - performance.now()) / 350 * Math.PI)) * 1.2
+      : 0;
+  }
 }
 
 function animate() {
@@ -893,12 +910,12 @@ function animate() {
 
   updateMovement(dt);
   updateWorld(dt);
-  updateGameTime(dt);
+
+  if (!gamePaused) updateGameTime(dt);
 
   renderer.render(scene, camera);
 
   lastHudUpdate += dt;
-
   if (lastHudUpdate >= 0.25) {
     refreshGameUI();
     lastHudUpdate = 0;
@@ -907,30 +924,13 @@ function animate() {
   lastSave += dt * 1000;
 
   if (lastSave >= CONFIG.saveInterval) {
-    saveGame();
     lastSave = 0;
-  }
-}
-
-function updateWorld(dt) {
-  for (const npc of npcMeshes) {
-    npc.userData.phase += dt * npc.userData.speed;
-
-    npc.position.x =
-      npc.userData.originX + Math.sin(npc.userData.phase) * 1.5;
-
-    npc.position.z =
-      npc.userData.originZ + Math.cos(npc.userData.phase * 0.7) * 1.5;
-  }
-
-  if (player) {
-    player.position.y = Math.abs(Math.sin(performance.now() * 0.006)) *
-      (keys.has(" ") ? 0.65 : 0);
+    if (currentUser) void saveCloudGame({ silent: true });
   }
 }
 
 // ------------------------------------------------------------
-// 7. NEEDS, TIME, XP AND QUESTS
+// 6. NEEDS, TIME, XP AND QUESTS
 // ------------------------------------------------------------
 
 function updateGameTime(dt) {
@@ -954,18 +954,18 @@ function payDailyExpenses() {
 
   if (home.rent > 0) {
     state.money = Math.max(0, state.money - home.rent);
-    notify("Daily housing expense: " + money(home.rent));
+    notify("Housing expense: " + money(home.rent));
   }
 
   const career = CAREERS.find((item) => item.name === state.career);
 
   if (career?.salary > 0) {
     state.money += career.salary;
-    notify("Work income received: " + money(career.salary));
+    notify("Work income: " + money(career.salary));
     addXP(20);
   }
 
-  saveGame();
+  void saveCloudGame({ silent: true });
 }
 
 function addXP(amount) {
@@ -983,14 +983,12 @@ function addXP(amount) {
 
 function setNeed(name, value) {
   if (!(name in state.needs)) return;
-
   state.needs[name] = clamp(value, 0, 100);
   refreshGameUI();
 }
 
 function restoreNeed(name, amount) {
   if (!(name in state.needs)) return;
-
   setNeed(name, state.needs[name] + amount);
 }
 
@@ -1017,7 +1015,7 @@ function checkQuest() {
 }
 
 // ------------------------------------------------------------
-// 8. ECONOMY: JOBS AND GIGS
+// 7. JOBS AND GIGS
 // ------------------------------------------------------------
 
 function getJob() {
@@ -1030,10 +1028,7 @@ function getJob() {
     money(career.salary) + " per game day"
   ).join("\n");
 
-  const answer = prompt(
-    "Choose a career by number:\n" + list
-  );
-
+  const answer = prompt("Choose a career by number:\n" + list);
   if (answer === null) return;
 
   const index = Number(answer) - 1;
@@ -1048,7 +1043,7 @@ function getJob() {
 
   notify("Career selected: " + state.career);
   addXP(25);
-  saveGame();
+  void saveCloudGame({ silent: true });
 }
 
 function doGig() {
@@ -1072,12 +1067,12 @@ function doGig() {
     "Gig completed: " + gig.name + ". Earned " + money(gig.reward)
   );
 
-  saveGame();
+  void saveCloudGame({ silent: true });
   refreshGameUI();
 }
 
 // ------------------------------------------------------------
-// 9. INVENTORY, SHOPS AND NEEDS
+// 8. INVENTORY, SHOPPING AND NEEDS
 // ------------------------------------------------------------
 
 function buyItem(item) {
@@ -1091,7 +1086,7 @@ function buyItem(item) {
   state.stats.itemsPurchased += 1;
 
   notify("Purchased " + item.name);
-  saveGame();
+  void saveCloudGame({ silent: true });
   refreshGameUI();
 
   return true;
@@ -1119,7 +1114,7 @@ function useItem(itemName) {
   if (item.hygiene) restoreNeed("hygiene", item.hygiene);
 
   notify("Used " + item.name);
-  saveGame();
+  void saveCloudGame({ silent: true });
   refreshGameUI();
 }
 
@@ -1129,7 +1124,6 @@ function openShop() {
   ).join("\n");
 
   const answer = prompt("Shop\n" + options + "\n\nEnter item number:");
-
   if (answer === null) return;
 
   const index = Number(answer) - 1;
@@ -1148,15 +1142,20 @@ function rest() {
   state.time = (state.time + 2) % 24;
 
   notify("You rested and recovered energy.");
-  saveGame();
+  void saveCloudGame({ silent: true });
 }
 
 function shower() {
+  if (state.money < 300) {
+    notify("You need ₦300 for a shower.");
+    return;
+  }
+
+  state.money -= 300;
   restoreNeed("hygiene", 55);
-  state.money = Math.max(0, state.money - 300);
 
   notify("You freshened up. Cost: ₦300");
-  saveGame();
+  void saveCloudGame({ silent: true });
 }
 
 function eat() {
@@ -1167,23 +1166,20 @@ function eat() {
   ).join("\n");
 
   const answer = prompt("Food options:\n" + options);
-
   if (answer === null) return;
 
-  const item = food[Number(answer) - 1];
-
-  if (!item) {
+  const index = Number(answer) - 1;
+  if (!Number.isInteger(index) || !food[index]) {
     notify("Invalid choice.");
     return;
   }
 
-  if (buyItem(item)) {
-    useItem(item.name);
-  }
+  const item = food[index];
+  if (buyItem(item)) useItem(item.name);
 }
 
 // ------------------------------------------------------------
-// 10. HOUSING AND VEHICLES
+// 9. HOUSING AND VEHICLES
 // ------------------------------------------------------------
 
 function upgradeHome() {
@@ -1194,16 +1190,11 @@ function upgradeHome() {
   ).join("\n");
 
   const answer = prompt("Housing:\n" + options);
-
   if (answer === null) return;
 
   const index = Number(answer) - 1;
 
-  if (
-    !Number.isInteger(index) ||
-    index < 0 ||
-    index >= HOMES.length
-  ) {
+  if (!Number.isInteger(index) || index < 0 || index >= HOMES.length) {
     notify("Invalid housing choice.");
     return;
   }
@@ -1225,7 +1216,8 @@ function upgradeHome() {
 
   notify("You moved into " + home.name);
   addXP(50);
-  saveGame();
+  void saveCloudGame({ silent: true });
+  refreshGameUI();
 }
 
 function buyVehicle() {
@@ -1234,16 +1226,11 @@ function buyVehicle() {
   ).join("\n");
 
   const answer = prompt("Vehicle shop:\n" + options);
-
   if (answer === null) return;
 
   const index = Number(answer) - 1;
 
-  if (
-    !Number.isInteger(index) ||
-    index < 0 ||
-    index >= VEHICLES.length
-  ) {
+  if (!Number.isInteger(index) || index < 0 || index >= VEHICLES.length) {
     notify("Invalid vehicle choice.");
     return;
   }
@@ -1264,7 +1251,8 @@ function buyVehicle() {
   state.vehicleIndex = index;
 
   notify("Purchased: " + vehicle.name);
-  saveGame();
+  void saveCloudGame({ silent: true });
+  refreshGameUI();
 }
 
 function useVehicle() {
@@ -1274,12 +1262,14 @@ function useVehicle() {
   }
 
   const vehicle = VEHICLES[state.vehicleIndex];
-
-  notify(vehicle.name + " selected. Vehicle driving physics are not yet implemented.");
+  notify(
+    vehicle.name +
+    " selected. Driving mechanics have not been implemented yet."
+  );
 }
 
 // ------------------------------------------------------------
-// 11. BUILDING INTERACTIONS
+// 10. BUILDING INTERACTIONS
 // ------------------------------------------------------------
 
 function interactWithBuilding(building) {
@@ -1289,29 +1279,23 @@ function interactWithBuilding(building) {
     case "shop":
       openShop();
       break;
-
     case "food":
       eat();
       break;
-
     case "clinic":
       restoreNeed("energy", 10);
       restoreNeed("hygiene", 5);
       notify("You took a short break at the clinic.");
       break;
-
     case "job":
       getJob();
       break;
-
     case "home":
       rest();
       break;
-
     case "garage":
       buyVehicle();
       break;
-
     default:
       notify("Nothing to do here yet.");
   }
@@ -1320,100 +1304,67 @@ function interactWithBuilding(building) {
 }
 
 // ------------------------------------------------------------
-// 12. AVATAR CUSTOMIZATION
+// 11. AVATAR CUSTOMIZATION
 // ------------------------------------------------------------
 
 function customizeAvatar() {
-  const options = [
-    "1. Skin tone",
-    "2. Hair color",
-    "3. Outfit color",
+  const answer = prompt(
+    "Avatar customization:\n" +
+    "1. Skin tone\n" +
+    "2. Hair color\n" +
+    "3. Outfit color\n" +
     "4. Hairstyle"
-  ].join("\n");
-
-  const answer = prompt("Avatar customization:\n" + options);
+  );
 
   if (answer === null) return;
 
-  switch (answer) {
-    case "1": {
-      const value = prompt(
-        "Enter a hex skin color, e.g. #8d5524",
-        state.avatar.skinTone
-      );
+  if (answer === "1" || answer === "2" || answer === "3") {
+    const key = {
+      "1": "skinTone",
+      "2": "hairColor",
+      "3": "outfitColor"
+    }[answer];
 
-      if (value && /^#[0-9a-f]{6}$/i.test(value)) {
-        state.avatar.skinTone = value;
-      } else if (value !== null) {
-        notify("Use a valid hex color.");
-        return;
-      }
+    const value = prompt(
+      "Enter a hex color, e.g. #8d5524",
+      state.avatar[key]
+    );
 
-      break;
-    }
+    if (value === null) return;
 
-    case "2": {
-      const value = prompt(
-        "Enter a hex hair color, e.g. #201710",
-        state.avatar.hairColor
-      );
-
-      if (value && /^#[0-9a-f]{6}$/i.test(value)) {
-        state.avatar.hairColor = value;
-      } else if (value !== null) {
-        notify("Use a valid hex color.");
-        return;
-      }
-
-      break;
-    }
-
-    case "3": {
-      const value = prompt(
-        "Enter a hex outfit color, e.g. #315c80",
-        state.avatar.outfitColor
-      );
-
-      if (value && /^#[0-9a-f]{6}$/i.test(value)) {
-        state.avatar.outfitColor = value;
-      } else if (value !== null) {
-        notify("Use a valid hex color.");
-        return;
-      }
-
-      break;
-    }
-
-    case "4": {
-      const value = prompt(
-        "Choose: short, afro, bald",
-        state.avatar.hairstyle
-      );
-
-      if (["short", "afro", "bald"].includes(value)) {
-        state.avatar.hairstyle = value;
-      }
-
-      break;
-    }
-
-    default:
-      notify("Invalid choice.");
+    if (!/^#[0-9a-f]{6}$/i.test(value)) {
+      notify("Use a valid hex color such as #8d5524.");
       return;
+    }
+
+    state.avatar[key] = value;
+  } else if (answer === "4") {
+    const value = prompt("Choose: short, afro, bald", state.avatar.hairstyle);
+
+    if (value === null) return;
+
+    if (!["short", "afro", "bald"].includes(value)) {
+      notify("Choose short, afro, or bald.");
+      return;
+    }
+
+    state.avatar.hairstyle = value;
+  } else {
+    notify("Invalid choice.");
+    return;
   }
 
   applyAvatar();
-  saveGame();
+  void saveCloudGame({ silent: true });
   notify("Avatar updated.");
 }
 
 // ------------------------------------------------------------
-// 13. MINIMAP
+// 12. MINIMAP
 // ------------------------------------------------------------
 
 function drawMinimap() {
   const canvas = $("#minimap");
-
   if (!(canvas instanceof HTMLCanvasElement)) return;
 
   const context = canvas.getContext("2d");
@@ -1430,7 +1381,6 @@ function drawMinimap() {
 
   context.strokeStyle = "#545454";
   context.lineWidth = 7;
-
   context.beginPath();
   context.moveTo(width / 2, 0);
   context.lineTo(width / 2, height);
@@ -1456,12 +1406,11 @@ function drawMinimap() {
 }
 
 // ------------------------------------------------------------
-// 14. GAME UI
+// 13. GAME UI
 // ------------------------------------------------------------
 
 function setText(selector, value) {
   const element = $(selector);
-
   if (element) element.textContent = value;
 }
 
@@ -1484,21 +1433,28 @@ function updateNeedBar(name, value) {
     }
   }
 
+  // Support both the previous and current index.html naming patterns.
   setText("#" + name + "Value", Math.round(value) + "%");
+  setText("#need" + name[0].toUpperCase() + name.slice(1) + "V",
+    Math.round(value) + "%");
 }
 
 function refreshGameUI() {
   setText("#money", money(state.money));
   setText("#moneyDisplay", money(state.money));
   setText("#cashDisplay", money(state.money));
+
   setText("#level", String(state.level));
   setText("#levelBadge", "Lv " + state.level);
   setText("#xp", String(state.xp));
+  setText("#xpText", "XP " + state.xp);
   setText("#day", String(state.day));
   setText("#career", state.career);
   setText("#activeQuest", state.activeQuest);
   setText("#questText", state.activeQuest);
+  setText("#objectiveText", state.activeQuest);
   setText("#homeName", HOMES[state.homeIndex]?.name || "Unknown");
+
   setText(
     "#vehicleName",
     state.vehicleIndex >= 0
@@ -1506,8 +1462,18 @@ function refreshGameUI() {
       : "None"
   );
 
+  setText("#name", currentUser?.email || "Player");
+  setText("#sub", state.career);
+  setText("#housingPill", HOMES[state.homeIndex]?.name || "Shared Room");
+
   for (const [name, value] of Object.entries(state.needs)) {
     updateNeedBar(name, value);
+  }
+
+  const xpFill = $("#xpFill");
+  if (xpFill) {
+    xpFill.style.width =
+      clamp(state.xp / Math.max(1, state.level * 100) * 100, 0, 100) + "%";
   }
 
   const inventory = $("#inventoryList");
@@ -1520,39 +1486,44 @@ function refreshGameUI() {
     } else {
       for (const item of state.inventory) {
         const row = document.createElement("div");
-        row.style.display = "flex";
-        row.style.justifyContent = "space-between";
-        row.style.gap = "10px";
+        Object.assign(row.style, {
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "10px",
+          marginBottom: "6px"
+        });
 
         const label = document.createElement("span");
         label.textContent = item;
 
-        row.append(
-          label,
-          makeButton("Use", () => useItem(item))
-        );
-
+        row.append(label, makeButton("Use", () => useItem(item)));
         inventory.appendChild(row);
       }
     }
   }
 
-  const clockElement = $("#gameClock");
+  const hours = Math.floor(state.time) % 24;
+  const minutes = Math.floor((state.time % 1) * 60);
+  const formattedTime =
+    String(hours).padStart(2, "0") + ":" +
+    String(minutes).padStart(2, "0");
 
-  if (clockElement) {
-    const hours = Math.floor(state.time) % 24;
-    const minutes = Math.floor((state.time % 1) * 60);
-
-    clockElement.textContent =
-      String(hours).padStart(2, "0") + ":" +
-      String(minutes).padStart(2, "0");
-  }
+  setText("#gameClock", formattedTime);
+  setText("#clock", formattedTime);
 
   drawMinimap();
 }
 
+// Only create a fallback menu if the page has no existing action controls.
 function createBasicUI() {
   if ($("#nhBasicMenu")) return;
+
+  const hasExistingControls = [
+    "#gigBtn", "#jobBtn", "#shopBtn", "#restBtn",
+    "#avatarBtn", "#phoneBtn", "#bagBtn"
+  ].some((selector) => $(selector));
+
+  if (hasExistingControls) return;
 
   const panel = document.createElement("div");
   panel.id = "nhBasicMenu";
@@ -1562,7 +1533,7 @@ function createBasicUI() {
     top: "12px",
     right: "12px",
     width: "min(260px, 68vw)",
-    maxHeight: "75vh",
+    maxHeight: "65vh",
     overflowY: "auto",
     background: "rgba(18,18,18,0.92)",
     color: "#fff",
@@ -1578,17 +1549,12 @@ function createBasicUI() {
   heading.style.color = "#f4c95d";
   panel.appendChild(heading);
 
-  const status = document.createElement("div");
-  status.id = "nhBasicStatus";
-  panel.appendChild(status);
-
   const controls = document.createElement("div");
 
   Object.assign(controls.style, {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "6px",
-    marginTop: "10px"
+    gap: "6px"
   });
 
   const actions = [
@@ -1600,13 +1566,10 @@ function createBasicUI() {
     ["Housing", upgradeHome],
     ["Vehicles", buyVehicle],
     ["Avatar", customizeAvatar],
-    ["Inventory", () => showInventory()],
-    ["Save", () => {
-      saveGame();
-      notify("Game saved on this device.");
-    }],
-    ["Cloud Save", saveCloudGame],
-    ["New Game", resetGame]
+    ["Inventory", showInventory],
+    ["Save Online", () => saveCloudGame()],
+    ["New Game", resetGame],
+    ["Sign Out", signOut]
   ];
 
   for (const [label, action] of actions) {
@@ -1632,17 +1595,68 @@ function showInventory() {
   alert("Inventory\n\n" + list);
 }
 
+function showGamePanel(title, message, actions = []) {
+  const overlay = $("#overlay");
+  const titleElement = $("#sheetTitle");
+  const body = $("#sheetBody");
+
+  if (!overlay || !body || !titleElement) {
+    const lines = [message, ...actions.map((item, index) =>
+      (index + 1) + ". " + item.label
+    )].join("\n");
+
+    const answer = prompt(title + "\n\n" + lines);
+    if (answer === null || !actions.length) return;
+
+    const index = Number(answer) - 1;
+    if (actions[index]) actions[index].action();
+    return;
+  }
+
+  titleElement.textContent = title;
+  body.replaceChildren();
+
+  const paragraph = document.createElement("p");
+  paragraph.textContent = message;
+  body.appendChild(paragraph);
+
+  for (const item of actions) {
+    const button = makeButton(item.label, () => {
+      overlay.classList.add("hidden");
+      item.action();
+    });
+
+    button.style.margin = "4px";
+    body.appendChild(button);
+  }
+
+  overlay.classList.remove("hidden");
+}
+
+function showPhoneMenu() {
+  showGamePanel("Phone", "What would you like to do?", [
+    { label: "Do a Gig", action: doGig },
+    { label: "Find a Job", action: getJob },
+    { label: "Shop", action: openShop },
+    { label: "Housing", action: upgradeHome },
+    { label: "Buy Vehicle", action: buyVehicle },
+    { label: "Save Online", action: () => saveCloudGame() },
+    { label: "Sign Out", action: signOut }
+  ]);
+}
+
 // ------------------------------------------------------------
-// 15. INPUTS AND MOBILE JOYSTICK
+// 14. KEYBOARD AND MOBILE INPUTS
 // ------------------------------------------------------------
 
 function onKeyDown(event) {
+  if (!gameStarted || gamePaused) return;
+
   const key = event.key.toLowerCase();
 
-  if (
-    ["arrowup", "arrowdown", "arrowleft", "arrowright", " "]
-      .includes(key)
-  ) {
+  if ([
+    "arrowup", "arrowdown", "arrowleft", "arrowright", " "
+  ].includes(key)) {
     event.preventDefault();
   }
 
@@ -1664,7 +1678,11 @@ function onKeyDown(event) {
 
   if (key === "i") showInventory();
   if (key === "c") customizeAvatar();
-  if (key === "escape") gamePaused = !gamePaused;
+
+  if (key === "escape") {
+    gamePaused = !gamePaused;
+    notify(gamePaused ? "Game paused." : "Game resumed.");
+  }
 }
 
 function onKeyUp(event) {
@@ -1694,10 +1712,15 @@ function getNearestBuilding() {
 }
 
 function bindJoystick() {
-  const base = $("#joystickBase") || $("#joystick-base");
-  const knob = $("#joystickKnob") || $("#joystick-knob");
+  // Match both the IDs from the supplied app.js and current index.html.
+  const base =
+    $("#joystick") || $("#joystickBase") || $("#joystick-base");
 
-  if (!base) return;
+  const knob =
+    $("#stick") || $("#joystickKnob") || $("#joystick-knob");
+
+  if (!base || base.dataset.nhBound === "true") return;
+  base.dataset.nhBound = "true";
 
   let pointerId = null;
 
@@ -1710,9 +1733,7 @@ function bindJoystick() {
     const dx = event.clientX - centerX;
     const dy = event.clientY - centerY;
     const distance = Math.hypot(dx, dy);
-    const factor = distance > maxDistance
-      ? maxDistance / distance
-      : 1;
+    const factor = distance > maxDistance ? maxDistance / distance : 1;
 
     joystick.x = (dx * factor) / maxDistance;
     joystick.y = (dy * factor) / maxDistance;
@@ -1727,8 +1748,12 @@ function bindJoystick() {
   }
 
   base.addEventListener("pointerdown", (event) => {
+    if (!gameStarted) return;
+
     pointerId = event.pointerId;
-    base.setPointerCapture(pointerId);
+    try {
+      base.setPointerCapture(pointerId);
+    } catch (_) {}
     update(event);
   });
 
@@ -1737,7 +1762,7 @@ function bindJoystick() {
   });
 
   function stop(event) {
-    if (event.pointerId !== pointerId) return;
+    if (event && event.pointerId !== pointerId) return;
 
     pointerId = null;
     joystick.x = 0;
@@ -1749,70 +1774,211 @@ function bindJoystick() {
 
   base.addEventListener("pointerup", stop);
   base.addEventListener("pointercancel", stop);
-  base.addEventListener("lostpointercapture", () => {
-    pointerId = null;
-    joystick.x = 0;
-    joystick.y = 0;
-    joystick.active = false;
+  base.addEventListener("lostpointercapture", () => stop());
+}
 
-    if (knob) knob.style.transform = "translate(0, 0)";
+function bindButton(selector, action) {
+  const element = $(selector);
+
+  if (!element || element.dataset.nhBound === "true") return;
+
+  element.dataset.nhBound = "true";
+  element.addEventListener("click", (event) => {
+    if (!gameStarted) return;
+    event.preventDefault();
+    action();
   });
 }
 
 function bindExistingButtons() {
-  const bindings = {
-    "#gigBtn": doGig,
-    "#jobBtn": getJob,
-    "#shopBtn": openShop,
-    "#restBtn": rest,
-    "#showerBtn": shower,
-    "#homeBtn": upgradeHome,
-    "#vehicleBtn": buyVehicle,
-    "#avatarBtn": customizeAvatar,
-    "#inventoryBtn": showInventory,
-    "#saveBtn": saveGame,
-    "#zoomIn": () => zoomCamera(-1),
-    "#zoomOut": () => zoomCamera(1)
-  };
+  // Existing or optional game action buttons.
+  bindButton("#gigBtn", doGig);
+  bindButton("#jobBtn", getJob);
+  bindButton("#shopBtn", openShop);
+  bindButton("#restBtn", rest);
+  bindButton("#showerBtn", shower);
+  bindButton("#vehicleBtn", buyVehicle);
+  bindButton("#inventoryBtn", showInventory);
+  bindButton("#saveBtn", () => saveCloudGame());
+  bindButton("#zoomIn", () => zoomCamera(-1));
+  bindButton("#zoomOut", () => zoomCamera(1));
 
-  for (const [selector, action] of Object.entries(bindings)) {
-    const element = $(selector);
+  // Buttons used by the current main page.
+  bindButton("#phoneBtn", showPhoneMenu);
+  bindButton("#bagBtn", showInventory);
+  bindButton("#mapBtn", () => {
+    const map = $("#minimap");
+    if (map) map.classList.toggle("hidden");
+    else notify("Minimap is not present in index.html.");
+  });
+  bindButton("#profileBtn", customizeAvatar);
+  bindButton("#avatarBtn", customizeAvatar);
+  bindButton("#socialBtn", () => {
+    restoreNeed("social", 20);
+    restoreNeed("fun", 10);
+    notify("You spent time socializing.");
+    void saveCloudGame({ silent: true });
+  });
+  bindButton("#emoteBtn", () => {
+    restoreNeed("fun", 12);
+    notify("You expressed yourself!");
+    void saveCloudGame({ silent: true });
+  });
+  bindButton("#homeBtn", rest);
+  bindButton("#runBtn", () => {
+    sprinting = !sprinting;
+    notify(sprinting ? "Sprint enabled." : "Sprint disabled.");
+  });
+  bindButton("#jumpBtn", () => {
+    jumpUntil = performance.now() + 650;
+  });
 
-    if (element && !element.dataset.nhBound) {
-      element.addEventListener("click", action);
-      element.dataset.nhBound = "true";
-    }
+  bindButton("#cameraBtn", () => zoomCamera(-1));
+
+  const closeButton = $("#sheetClose");
+  if (closeButton && closeButton.dataset.nhBound !== "true") {
+    closeButton.dataset.nhBound = "true";
+    closeButton.addEventListener("click", () => {
+      $("#overlay")?.classList.add("hidden");
+    });
   }
 }
 
 // ------------------------------------------------------------
-// 16. STARTUP AND CLEANUP
+// 15. AUTHENTICATED GAME STARTUP
 // ------------------------------------------------------------
 
+async function startAuthenticatedGame() {
+  if (!currentUser || gameStarted) return;
+
+  try {
+    // Load the cloud save before creating the playable world.
+    await loadGame();
+
+    createBasicUI();
+    initializeWorld();
+
+    if (!worldReady) {
+      throw new Error("The 3D city failed to initialize.");
+    }
+
+    bindJoystick();
+    bindExistingButtons();
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+
+    gameStarted = true;
+    gamePaused = false;
+
+    hideLogin();
+    refreshGameUI();
+
+    notify("Welcome to Naija Hustle!");
+    console.info("Naija Hustle " + CONFIG.version + " initialized.");
+  } catch (error) {
+    console.error("Authenticated game startup failed:", error);
+
+    // If world initialization partially failed, don't leave gameplay active.
+    gameStarted = false;
+    gamePaused = true;
+
+    showLogin(
+      error.message || "Could not load your game. Please try again."
+    );
+  }
+}
+
+async function handleLogin() {
+  const email = $("#loginEmail")?.value.trim();
+  const password = $("#loginPassword")?.value || "";
+
+  if (!email || !password) {
+    showLogin("Enter your email and password.");
+    return;
+  }
+
+  const loginButton = $("#loginBtn");
+  if (loginButton) loginButton.disabled = true;
+
+  try {
+    await signInWithEmail(email, password);
+    await startAuthenticatedGame();
+  } catch (error) {
+    console.error("Login failed:", error);
+    showLogin(error.message || "Login failed. Check your details.");
+  } finally {
+    if (loginButton) loginButton.disabled = false;
+  }
+}
+
+async function handleSignup() {
+  const email = $("#loginEmail")?.value.trim();
+  const password = $("#loginPassword")?.value || "";
+
+  if (!email || !password) {
+    showLogin("Enter your email and password.");
+    return;
+  }
+
+  const signupButton = $("#signupBtn");
+  if (signupButton) signupButton.disabled = true;
+
+  try {
+    const result = await signUpWithEmail(email, password);
+
+    if (!result.hasSession) {
+      showLogin(
+        "Account created. Verify your email, then return here and sign in."
+      );
+      return;
+    }
+
+    await startAuthenticatedGame();
+  } catch (error) {
+    console.error("Registration failed:", error);
+    showLogin(error.message || "Could not create your account.");
+  } finally {
+    if (signupButton) signupButton.disabled = false;
+  }
+}
+
 async function start() {
-  loadGame();
+  showLogin();
 
-  createBasicUI();
-  initializeWorld();
+  // The current index.html dispatches these custom events from its buttons.
+  document.addEventListener("naijahustle:login", () => {
+    void handleLogin();
+  });
 
-  if (!worldReady) return;
+  document.addEventListener("naijahustle:signup", () => {
+    void handleSignup();
+  });
 
-  bindJoystick();
-  bindExistingButtons();
+  // Prevent accidental guest-mode use even if the old button remains in HTML.
+  const guestButton = $("#guestBtn");
+  if (guestButton) {
+    guestButton.hidden = true;
+    guestButton.disabled = true;
+  }
 
-  window.addEventListener("keydown", onKeyDown);
-  window.addEventListener("keyup", onKeyUp);
+  try {
+    await initializeSupabase();
 
-  window.addEventListener("beforeunload", saveGame);
-
-  await initializeSupabase();
-
-  refreshGameUI();
-
-  console.info("Naija Hustle " + CONFIG.version + " initialized.");
+    if (currentUser) {
+      await startAuthenticatedGame();
+    } else {
+      showLogin("Sign in or create an account to play online.");
+    }
+  } catch (error) {
+    console.error("Online startup failed:", error);
+    showLogin(
+      "Online connection is not ready. Check your Supabase credentials and connection."
+    );
+  }
 }
 
 start().catch((error) => {
   console.error("Naija Hustle startup failed:", error);
-  notify("The game could not start. Check the browser console.");
+  showLogin("The game could not start. Please try again.");
 });
