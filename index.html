@@ -1,100 +1,103 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0c1211">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Lagos Life — Recreate</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0F6B6F">
+<title>Naija Hustle</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- BOOT / CHARACTER CREATE -->
-  <div id="boot" class="screen">
-    <div class="card boot-card">
-      <div class="logo">LAGOS LIFE</div>
-      <p class="tag">Live your Lagos story · Browser only</p>
-      <p class="muted small">Original recreation for development. Not the official game.</p>
+<div id="game"></div>
 
-      <label class="field">
-        <span>Display name</span>
-        <input id="bootName" type="text" maxlength="16" placeholder="e.g. Chinedu" autocomplete="off">
-      </label>
-
-      <div class="start-row">
-        <button class="btn primary" id="btnNepo">Start as NEPO</button>
-        <button class="btn secondary" id="btnLapo">Start as LAPO</button>
-      </div>
-      <p class="muted tiny center">NEPO = richer start · LAPO = harder hustle</p>
+<section id="loginScreen" class="screen">
+  <div class="loginCard">
+    <div class="brandBadge">NH</div>
+    <h1>NAIJA HUSTLE</h1>
+    <p class="tagline">Build your life. Build your hustle.</p>
+    <p class="muted">Start with a room, a wallet and a whole city to figure out.</p>
+    <label>Email<input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+    <label>Password<input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password"></label>
+    <div class="loginGrid">
+      <button id="loginBtn" class="primary">LOGIN</button>
+      <button id="signupBtn" class="secondary">CREATE ACCOUNT</button>
     </div>
+    <div class="loginGrid startModes"><button id="lapoBtn" class="secondary">START LAPO</button><button id="nepoBtn" class="primary">START NEPO</button></div>
+    <button id="guestBtn" class="linkBtn">Continue as Guest</button>
+    <div id="loginMessage" class="message"></div>
+  </div>
+</section>
+
+<div id="hud" class="hidden">
+  <div class="hudTopLeft">
+    <div class="pill playerPill"><b id="name">Guest</b><span id="levelBadge">Lv 1</span></div>
+    <div class="pill" id="sub">Lagos · Starting Out</div>
+    <div class="pill money">₦ <span id="money">25,000</span></div>
+    <div class="pill" id="housingPill">Room</div>
+    <div class="pill" id="clock">8:00 AM</div>
+  </div>
+  <div class="hudTopRight">
+    <button class="mini" id="cameraBtn">3RD</button>
+    <button class="mini" id="qualityBtn">HIGH</button>
+    <button class="mini" id="phoneBtn">PHONE</button>
+    <button class="mini" id="bagBtn">BAG</button>
+    <button class="mini" id="mapBtn">MAP</button>
+    <button class="mini" id="profileBtn">ME</button>
   </div>
 
-  <!-- MAIN GAME -->
-  <div id="game" class="hidden">
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <div class="pill name-pill">
-        <strong id="uiName">Player</strong>
-        <span id="uiLevel">Lv 1</span>
-      </div>
-      <div class="pill money-pill">₦ <span id="uiMoney">0</span></div>
-      <div class="pill" id="uiLocation">Mushin</div>
-      <div class="pill" id="uiClock">Mon 08:00</div>
+  <div class="panel needsPanel">
+    <div class="panelHead"><b>Daily Needs</b><span id="moodText">Doing Fine</span></div>
+    <div class="need"><span>Hunger</span><i><em id="needHunger"></em></i><b id="needHungerV">82</b></div>
+    <div class="need"><span>Energy</span><i><em id="needEnergy"></em></i><b id="needEnergyV">90</b></div>
+    <div class="need"><span>Hygiene</span><i><em id="needHygiene"></em></i><b id="needHygieneV">86</b></div>
+    <div class="need"><span>Fun</span><i><em id="needFun"></em></i><b id="needFunV">76</b></div>
+    <div class="need"><span>Social</span><i><em id="needSocial"></em></i><b id="needSocialV">70</b></div>
+    <div class="need"><span>Bladder</span><i><em id="needBladder"></em></i><b id="needBladderV">94</b></div>
+    <div class="need"><span>Focus</span><i><em id="needFocus"></em></i><b id="needFocusV">75</b></div>
+  </div>
+
+  <div class="panel objectivePanel">
+    <div class="panelHead"><b>Next Move</b><span id="xpText">0 / 100 XP</span></div>
+    <div id="objectiveText">Get to the Job Centre and choose a hustle.</div>
+    <div class="xp"><em id="xpFill"></em></div>
+  </div>
+
+  <div class="panel mapPanel"><canvas id="minimap" width="180" height="180"></canvas></div>
+
+  <button id="prompt" class="primary prompt">Enter</button>
+  <button id="avatarBtn" class="bottomBtn left1">AVATAR</button>
+  <button id="socialBtn" class="bottomBtn left2">SOCIAL</button>
+  <button id="emoteBtn" class="bottomBtn right1">EMOTES</button>
+  <button id="homeBtn" class="bottomBtn right2">HOME</button>
+
+  <div id="emoteMenu" class="emoteMenu">
+    <button data-emote="wave">Wave</button><button data-emote="dance">Dance</button><button data-emote="cheer">Cheer</button><button data-emote="none">Stop</button>
+  </div>
+  <div id="joystick"><div id="stick"></div></div>
+  <button id="runBtn" class="actionCircle run">RUN</button>
+  <button id="jumpBtn" class="actionCircle">JUMP</button>
+</div>
+
+<section id="overlay" class="overlay">
+  <div class="sheet">
+    <header class="sheetHead">
+      <div><div id="sheetEyebrow" class="eyebrow">NAIJA HUSTLE</div><h2 id="sheetTitle">City</h2></div>
+      <button id="sheetClose" class="close">×</button>
     </header>
-
-    <!-- NEEDS -->
-    <section class="needs" id="needsPanel">
-      <div class="needs-head">
-        <b>Daily Needs</b>
-        <span id="uiMood">Doing Fine</span>
-      </div>
-      <div class="need" data-need="hunger"><span>Hunger</span><i><em id="barHunger"></em></i><b id="valHunger">80</b></div>
-      <div class="need" data-need="energy"><span>Energy</span><i><em id="barEnergy"></em></i><b id="valEnergy">80</b></div>
-      <div class="need" data-need="hygiene"><span>Hygiene</span><i><em id="barHygiene"></em></i><b id="valHygiene">80</b></div>
-      <div class="need" data-need="fun"><span>Fun</span><i><em id="barFun"></em></i><b id="valFun">70</b></div>
-      <div class="need" data-need="social"><span>Social</span><i><em id="barSocial"></em></i><b id="valSocial">60</b></div>
-      <div class="need" data-need="bladder"><span>Bladder</span><i><em id="barBladder"></em></i><b id="valBladder">80</b></div>
-    </section>
-
-    <!-- OBJECTIVE / RENT WARNING -->
-    <div class="objective" id="objectiveBox">
-      <div class="obj-title">Today</div>
-      <div id="objectiveText">Get a job and keep your needs up. Rent is due every Saturday.</div>
-    </div>
-
-    <!-- MAP / PLACES -->
-    <section class="places" id="placesPanel">
-      <div class="places-head">Where to go</div>
-      <div class="place-grid" id="placeGrid"></div>
-    </section>
-
-    <!-- BOTTOM ACTIONS -->
-    <nav class="bottom">
-      <button class="bbtn" data-act="phone">Phone</button>
-      <button class="bbtn" data-act="work">Work</button>
-      <button class="bbtn" data-act="home">Home</button>
-      <button class="bbtn" data-act="bag">Bag</button>
-      <button class="bbtn" data-act="menu">Menu</button>
-    </nav>
+    <div id="sheetBody" class="sheetBody"></div>
   </div>
+</section>
 
-  <!-- SHEET OVERLAY -->
-  <div id="overlay" class="overlay" aria-hidden="true">
-    <div class="sheet">
-      <div class="sheet-head">
-        <div>
-          <div class="eyebrow">LAGOS LIFE</div>
-          <h2 id="sheetTitle">Title</h2>
-        </div>
-        <button class="close" id="sheetClose" type="button">×</button>
-      </div>
-      <div class="sheet-body" id="sheetBody"></div>
-    </div>
+<section id="customizer" class="overlay">
+  <div class="sheet customSheet">
+    <header class="sheetHead"><div><div class="eyebrow">LOOK</div><h2>Customize Avatar</h2></div><button id="closeCustomizer" class="close">×</button></header>
+    <div class="sheetBody"><div id="sections"></div><div class="stickyActions"><button id="randomBtn" class="secondary">RANDOM</button><button id="saveAvatar" class="primary">SAVE AVATAR</button></div></div>
   </div>
+</section>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast hidden"></div>
+<section id="loading" class="screen loading"><div class="loadingCard"><div class="brandBadge">NH</div><h2>NAIJA HUSTLE</h2><p id="loadingText">Loading your city...</p><div class="spinner"></div></div></section>
 
-  <script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
-</html>
+   </html>
