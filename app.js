@@ -2092,19 +2092,19 @@ async function handleSignup() {
 }
 
 function bindAuthenticationEvents() {
-  // The current index.html dispatches these custom events.
-  document.addEventListener("naijahustle:login", (event) => {
+  // index.html dispatches these events on window.
+  window.addEventListener("naijahustle:login", (event) => {
     event.preventDefault();
     handleLogin();
   });
 
-  document.addEventListener("naijahustle:signup", (event) => {
+  window.addEventListener("naijahustle:signup", (event) => {
     event.preventDefault();
     handleSignup();
   });
 
-  // Ensure the form never causes a page reload.
-  const form = $("#loginForm");
+  // Prevent form submission from reloading the page.
+  const form = document.querySelector("#loginForm");
 
   if (form && form.dataset.nhBound !== "true") {
     form.dataset.nhBound = "true";
@@ -2115,8 +2115,8 @@ function bindAuthenticationEvents() {
     });
   }
 
-  // Remove guest mode from the actual page if the old button remains.
-  const guestButton = $("#guestBtn");
+  // Disable any leftover guest-play button.
+  const guestButton = document.querySelector("#guestBtn");
 
   if (guestButton) {
     guestButton.disabled = true;
