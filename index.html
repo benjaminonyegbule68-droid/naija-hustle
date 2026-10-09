@@ -1,965 +1,1152 @@
+
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-
-  <meta name="theme-color" content="#0F6B6F">
-  <meta name="color-scheme" content="dark">
-  <meta name="application-name" content="Naija Hustle">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Naija Hustle">
-  <meta name="description" content="Naija Hustle — Build your life. Build your hustle.">
-
-  <title>Naija Hustle — Build Your Life. Build Your Hustle.</title>
-
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="apple-touch-icon" href="favicon.svg">
-  <link rel="preload" href="logo.svg" as="image" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111711">
+  <meta name="description" content="Naija Hustle — Build your life, grow your hustle, and explore Lagos in a 3D life simulator.">
+  <title>Naija Hustle — Live Your Lagos Story</title>
 
   <style>
-    /* Compatibility and safe defaults for the new game foundation. */
-
-    #game {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      background: #18221b;
+    :root {
+      color-scheme: dark;
+      --bg: #101510;
+      --panel: rgba(19, 27, 22, .95);
+      --panel-solid: #18211b;
+      --gold: #f4c95d;
+      --gold-dark: #9e7a2d;
+      --text: #f5f2e9;
+      --muted: #a8b2a9;
+      --border: rgba(201, 164, 69, .35);
+      --green: #75d69a;
+      --red: #f18c80;
     }
 
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    .hidden { display: none !important; }
+
+    /* WORLD */
+
     #gameCanvas {
-      position: absolute;
+      position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
+      background: #9ec6d7;
+      z-index: 0;
     }
 
     #gameCanvas canvas {
       display: block;
       width: 100%;
       height: 100%;
+      touch-action: none;
     }
 
-    .hidden {
-      display: none !important;
+    /* COMMON COMPONENTS */
+
+    .glass {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 35px rgba(0,0,0,.25);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
-    #loginScreen,
-    #loading {
-      position: fixed;
-      inset: 0;
-      z-index: 20000;
-      overflow-y: auto;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
     }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      flex: 0 0 43px;
+      border-radius: 13px;
+      background: linear-gradient(145deg, #f7d77d, #b58325);
+      color: #17140d;
+      font-size: 21px;
+      font-weight: 950;
+      box-shadow: 0 5px 18px #c69a3525;
+    }
+
+    .brand-name {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -.7px;
+      line-height: 1.1;
+    }
+
+    .brand-name span { color: var(--gold); }
+
+    .brand-tagline {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      min-height: 40px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #202a22;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 750;
+      transition: background .15s, transform .15s, border-color .15s;
+    }
+
+    .btn:hover { background: #2b382d; border-color: var(--gold-dark); }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f4d57e, #c69a35);
+      color: #17140c;
+      border-color: #f4d57e;
+    }
+
+    .btn-primary:hover { background: #ffdf8a; }
+
+    .btn-block { width: 100%; }
+    .btn-small { min-height: 34px; padding: 8px 11px; }
+
+    /* LOGIN */
 
     #loginScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      overflow-y: auto;
+      padding: 24px 16px;
+      background:
+        radial-gradient(ellipse at 15% 15%, #8c69221c, transparent 40%),
+        radial-gradient(ellipse at 85% 85%, #37634a22, transparent 40%),
+        #101510;
+    }
+
+    .login-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(290px, 390px);
+      width: min(900px, 100%);
+      min-height: 470px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      background: #151c17;
+      box-shadow: 0 28px 100px #0008;
+    }
+
+    .login-intro {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 35px;
+      padding: clamp(25px, 5vw, 48px);
+      background:
+        radial-gradient(ellipse at 50% 45%, #b68b3020, transparent 60%),
+        linear-gradient(145deg, #202b21, #131914);
+    }
+
+    .login-intro h1 {
+      max-width: 450px;
+      margin: 26px 0 14px;
+      font-size: clamp(35px, 5.3vw, 58px);
+      line-height: 1.03;
+      letter-spacing: -2px;
+    }
+
+    .login-intro h1 span { color: var(--gold); }
+
+    .login-intro p {
+      max-width: 390px;
+      color: #b6c0b5;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .feature {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: #ffffff;
+      gap: 10px;
+      color: #e1e5dc;
+      font-size: 12px;
     }
 
-    .loginCard,
-    .loadingCard {
-      width: min(100%, 430px);
-      margin: auto;
-      padding: 26px;
-      border: 1px solid rgba(221, 178, 75, 0.4);
-      border-radius: 20px;
-      background: #111918;
-      color: #f5f5f5;
-      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+    .feature-icon {
+      display: grid;
+      place-items: center;
+      width: 27px;
+      height: 27px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--gold);
+      flex-shrink: 0;
     }
 
-    .brandLogo {
+    .login-note { color: #859084; font-size: 11px; }
+
+    .login-panel {
+      padding: 34px 26px;
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      margin-bottom: 14px;
+      gap: 20px;
+      border-left: 1px solid #ffffff0c;
     }
 
-    .brandLogo img {
-      display: block;
-      width: min(100%, 330px);
-      height: auto;
-      object-fit: contain;
+    .login-panel h2 {
+      margin: 0 0 7px;
+      font-size: 25px;
+      letter-spacing: -.6px;
     }
 
-    .brandBadge {
-      display: none;
-      width: 52px;
-      height: 52px;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 12px;
-      border: 1px solid #d6aa45;
-      border-radius: 15px;
-      color: #f4c95d;
-      font-weight: 900;
-    }
-
-    #loginTitle,
-    .loadingCard h2 {
-      text-align: center;
-      letter-spacing: 2px;
-    }
-
-    .tagline,
-    .muted {
-      text-align: center;
+    .login-panel > p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
       line-height: 1.6;
     }
 
-    .muted {
-      color: #aeb9b5;
-      font-size: 14px;
-    }
-
-    #loginForm {
-      display: grid;
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    #loginForm label {
+    .form-field {
       display: grid;
       gap: 8px;
-      font-size: 14px;
+      margin-bottom: 15px;
     }
 
-    #loginForm input {
+    .form-field label {
+      color: #d5dbd0;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .form-field input {
       width: 100%;
       min-height: 46px;
       padding: 12px;
-      border: 1px solid #394541;
+      border: 1px solid #3b473d;
       border-radius: 10px;
+      background: #101611;
+      color: var(--text);
       outline: none;
-      background: #0b100f;
-      color: #fff;
-      font: inherit;
-      box-sizing: border-box;
     }
 
-    #loginForm input:focus {
-      border-color: #d6aa45;
-    }
+    .form-field input:focus { border-color: var(--gold-dark); }
 
-    .loginGrid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    button {
-      font: inherit;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .primary,
-    .secondary,
-    .linkBtn,
-    .mini,
-    .bottomBtn,
-    .actionCircle,
-    .close {
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    .primary,
-    .secondary {
-      min-height: 42px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-weight: 750;
-    }
-
-    .primary {
-      border: 1px solid #d5ad4c;
-      background: #c69a35;
-      color: #17130a;
-    }
-
-    .secondary {
-      border: 1px solid #5a625d;
-      background: #222a27;
-      color: #f3f3f3;
-    }
-
-    .linkBtn {
-      display: block;
-      margin: 16px auto 0;
-      padding: 10px;
-      border: 0;
-      background: transparent;
-      color: #f4c95d;
-    }
-
-    .message {
-      min-height: 20px;
-      margin-top: 12px;
-      color: #f4c95d;
-      font-size: 13px;
+    #loginMessage {
+      min-height: 18px;
+      margin: 0;
+      color: var(--gold);
+      font-size: 12px;
       line-height: 1.5;
       overflow-wrap: anywhere;
     }
 
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #798579;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #ffffff14;
+    }
+
+    .login-footnote {
+      color: #7e897e;
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    /* GAME HUD */
+
     #hud {
       position: fixed;
       inset: 0;
-      z-index: 100;
+      z-index: 10;
       pointer-events: none;
-      color: white;
-      font-family: system-ui, sans-serif;
     }
 
-    #hud button,
-    #hud input,
-    #hud .panel,
-    #hud .pill,
-    #hud #joystick {
+    #hud button, #hud input, #hud select,
+    #hud a, #hud canvas, #hud [data-interactive] {
       pointer-events: auto;
     }
 
-    .hudTopLeft,
-    .hudTopRight {
+    .topbar {
       position: absolute;
       top: max(12px, env(safe-area-inset-top));
+      left: 12px;
+      right: 12px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .player-card {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      max-width: min(320px, 58vw);
+      padding: 10px 13px;
+      border-radius: 15px;
+    }
+
+    .player-avatar {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #d8b563, #765322);
+      color: #17140d;
+      font-size: 20px;
+    }
+
+    .player-info { min-width: 0; }
+
+    #name {
+      max-width: 190px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    #sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .top-right {
+      display: grid;
+      justify-items: end;
+      gap: 8px;
+    }
+
+    .cash-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border-radius: 13px;
+      color: var(--gold);
+      font-size: 15px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cash-symbol { font-size: 19px; }
+
+    .top-pills {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      max-width: 48%;
-    }
-
-    .hudTopLeft {
-      left: max(12px, env(safe-area-inset-left));
-    }
-
-    .hudTopRight {
-      right: max(12px, env(safe-area-inset-right));
       justify-content: flex-end;
+      gap: 6px;
     }
 
     .pill {
-      padding: 8px 11px;
-      border: 1px solid rgba(213, 173, 76, 0.35);
-      border-radius: 12px;
-      background: rgba(13, 20, 18, 0.9);
-      color: #f2f2f2;
-      font-size: 12px;
-      backdrop-filter: blur(8px);
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel);
+      color: #e9e6dc;
+      font-size: 10px;
+      font-weight: 750;
     }
 
-    .money,
-    #levelBadge {
-      color: #f4c95d;
-    }
+    #levelBadge { color: var(--gold); }
 
-    .panel {
+    /* NEEDS PANEL */
+
+    .needs-panel {
       position: absolute;
-      padding: 12px;
-      border: 1px solid rgba(213, 173, 76, 0.35);
-      border-radius: 14px;
-      background: rgba(13, 20, 18, 0.92);
-      box-sizing: border-box;
-      backdrop-filter: blur(8px);
+      top: 108px;
+      left: 12px;
+      width: 205px;
+      padding: 14px;
+      border-radius: 16px;
     }
 
-    .needsPanel {
-      top: 125px;
-      left: max(12px, env(safe-area-inset-left));
-      width: min(225px, 43vw);
-    }
-
-    .panelHead {
+    .panel-heading {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      font-size: 12px;
-    }
-
-    .panelHead span {
-      color: #c9b67e;
+      margin-bottom: 13px;
       font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .7px;
     }
 
-    .need {
-      display: grid;
-      grid-template-columns: 54px minmax(20px, 1fr) 24px;
-      align-items: center;
-      gap: 7px;
-      margin: 9px 0;
-      font-size: 11px;
-    }
-
-    .need i,
-    .xp {
-      display: block;
-      height: 6px;
-      overflow: hidden;
-      border-radius: 20px;
-      background: #35403b;
-    }
-
-    .need em,
-    .xp em {
-      display: block;
-      width: 50%;
-      height: 100%;
-      border-radius: inherit;
-      background: #d5ad4c;
-      transition: width 0.2s ease;
-    }
-
-    .need b {
-      text-align: right;
+    .panel-heading span:last-child {
+      color: var(--muted);
       font-size: 10px;
-      font-weight: 600;
+      font-weight: 500;
     }
 
-    .objectivePanel {
-      bottom: max(18px, env(safe-area-inset-bottom));
-      left: 50%;
-      width: min(330px, 50vw);
-      transform: translateX(-50%);
+    .need-row { margin-bottom: 12px; }
+    .need-row:last-child { margin-bottom: 0; }
+
+    .need-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: #e0e4da;
+      font-size: 10px;
     }
+
+    .need-label span:last-child {
+      color: #aeb8ad;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .need-track {
+      height: 5px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #ffffff13;
+    }
+
+    .need-fill {
+      height: 100%;
+      width: 50%;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width .25s;
+    }
+
+    .need-fill.energy { background: #71b9f0; }
+    .need-fill.hygiene { background: #7dd5c1; }
+    .need-fill.fun { background: #c4a0f4; }
+    .need-fill.social { background: #edb6d1; }
+    .need-fill.bladder { background: #e8cf72; }
+
+    /* OBJECTIVE AND MAP */
+
+    .objective-card {
+      position: absolute;
+      top: 108px;
+      right: 12px;
+      width: min(225px, 30vw);
+      padding: 13px;
+      border-radius: 14px;
+    }
+
+    .objective-card .eyebrow { margin-bottom: 8px; }
 
     #objectiveText {
-      margin: 8px 0 12px;
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.5;
+      font-weight: 750;
     }
 
-    .mapPanel {
-      top: 125px;
-      right: max(12px, env(safe-area-inset-right));
-      width: 150px;
-      padding: 6px;
+    .xp-section { margin-top: 12px; }
+
+    .xp-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .xp-track {
+      height: 5px;
+      border-radius: 10px;
+      background: #ffffff13;
+      overflow: hidden;
+    }
+
+    #xpFill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #c69a35, #ffe6a0);
+      transition: width .25s;
+    }
+
+    .minimap-wrap {
+      position: absolute;
+      right: 12px;
+      bottom: 116px;
+      padding: 7px;
+      border-radius: 14px;
     }
 
     #minimap {
       display: block;
-      width: 100%;
-      height: auto;
-      aspect-ratio: 1;
-      border-radius: 9px;
-    }
-
-    .mini,
-    .bottomBtn,
-    .actionCircle {
-      border: 1px solid rgba(213, 173, 76, 0.55);
-      background: rgba(13, 20, 18, 0.92);
-      color: #f4c95d;
-      font-weight: 750;
-    }
-
-    .mini {
-      min-height: 35px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      font-size: 10px;
-    }
-
-    .prompt {
-      position: absolute;
-      left: 50%;
-      bottom: 24%;
-      transform: translateX(-50%);
-      display: none;
-    }
-
-    .bottomBtn {
-      position: absolute;
-      bottom: max(18px, env(safe-area-inset-bottom));
-      min-width: 68px;
-      min-height: 42px;
-      padding: 9px;
-      border-radius: 12px;
-      font-size: 10px;
-    }
-
-    .left1 {
-      left: max(12px, env(safe-area-inset-left));
-    }
-
-    .left2 {
-      left: max(86px, calc(env(safe-area-inset-left) + 86px));
-    }
-
-    .right1 {
-      right: max(86px, calc(env(safe-area-inset-right) + 86px));
-    }
-
-    .right2 {
-      right: max(12px, env(safe-area-inset-right));
-    }
-
-    .emoteMenu {
-      position: absolute;
-      right: 12px;
-      bottom: 75px;
-      display: none;
-      gap: 6px;
-      flex-direction: column;
-      padding: 8px;
-      border: 1px solid #705821;
-      border-radius: 12px;
-      background: #111918;
-      pointer-events: auto;
-    }
-
-    .emoteMenu.open {
-      display: flex;
-    }
-
-    .emoteMenu button {
-      padding: 8px 12px;
-      border: 1px solid #394541;
+      width: 112px;
+      height: 112px;
       border-radius: 8px;
-      background: #222a27;
-      color: white;
     }
 
-    #joystick {
-      position: absolute;
-      bottom: max(90px, calc(env(safe-area-inset-bottom) + 90px));
-      left: max(18px, env(safe-area-inset-left));
-      display: none;
-      width: 118px;
-      height: 118px;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 50%;
-      background: rgba(10, 15, 14, 0.45);
-      touch-action: none;
-    }
-
-    #stick {
-      width: 44px;
-      height: 44px;
-      border: 1px solid #d5ad4c;
-      border-radius: 50%;
-      background: rgba(213, 173, 76, 0.5);
-    }
-
-    .actionCircle {
-      position: absolute;
-      right: max(22px, env(safe-area-inset-right));
-      bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px));
-      width: 66px;
-      height: 66px;
-      border-radius: 50%;
-    }
-
-    .actionCircle.run {
-      right: max(96px, calc(env(safe-area-inset-right) + 96px));
-      bottom: max(120px, calc(env(safe-area-inset-bottom) + 120px));
-      width: 54px;
-      height: 54px;
-      font-size: 11px;
-    }
-
-    .overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 5000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.72);
-    }
-
-    .overlay.open {
-      display: flex;
-    }
-
-    .sheet {
-      width: min(100%, 560px);
-      max-height: min(85dvh, 760px);
-      overflow-y: auto;
-      border: 1px solid #705821;
-      border-radius: 18px;
-      background: #111918;
-      color: #f5f5f5;
-    }
-
-    .sheetHead {
-      position: sticky;
-      top: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
-      border-bottom: 1px solid #303b36;
-      background: #111918;
-    }
-
-    .sheetHead h2 {
-      margin: 5px 0 0;
-    }
-
-    .eyebrow {
-      color: #f4c95d;
-      font-size: 10px;
-      letter-spacing: 2px;
-    }
-
-    .close {
-      width: 38px;
-      height: 38px;
-      border: 1px solid #46504a;
-      border-radius: 10px;
-      background: #222a27;
-      color: white;
-      font-size: 24px;
-    }
-
-    .sheetBody {
-      display: grid;
-      gap: 12px;
-      padding: 16px;
-    }
-
-    .stickyActions {
-      position: sticky;
-      bottom: 0;
-      display: flex;
-      gap: 10px;
-      padding: 12px 0 0;
-      background: #111918;
-    }
-
-    .stickyActions button {
-      flex: 1;
-    }
-
-    .loading {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: #09100f;
-      color: white;
-    }
-
-    .loadingCard {
+    .minimap-caption {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 9px;
       text-align: center;
     }
 
-    .spinner {
-      width: 30px;
-      height: 30px;
-      margin: 20px auto 0;
-      border: 3px solid #37423d;
-      border-top-color: #f4c95d;
+    /* QUICK ACTIONS */
+
+    #nhBasicMenu {
+      position: fixed !important;
+      top: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: min(285px, 86vw) !important;
+      max-height: 100dvh !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain;
+      padding: max(18px, env(safe-area-inset-top)) 14px
+        max(18px, env(safe-area-inset-bottom)) !important;
+      border-radius: 0 !important;
+      border-top: 0 !important;
+      border-right: 0 !important;
+      border-bottom: 0 !important;
+      background: #141b16 !important;
+      box-shadow: -18px 0 70px #0008;
+      z-index: 80 !important;
+      color: var(--text) !important;
+    }
+
+    #nhBasicMenu h3 {
+      margin: 12px 0 18px;
+      font-size: 13px;
+      letter-spacing: 1.4px;
+    }
+
+    #nhBasicMenu button {
+      min-height: 40px;
+      padding: 9px 7px !important;
+      font-size: 11px !important;
+    }
+
+    #nhBasicMenu p { color: var(--muted) !important; }
+
+    /* BOTTOM CONTROLS */
+
+    .bottom-left {
+      position: absolute;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .control-row { display: flex; gap: 7px; }
+
+    .round-control {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      padding: 0;
+      border-radius: 13px;
+      font-size: 16px;
+      font-weight: 850;
+    }
+
+    .bottom-right {
+      position: absolute;
+      right: 12px;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      display: grid;
+      gap: 8px;
+      justify-items: end;
+    }
+
+    .bottom-right .control-row { justify-content: flex-end; }
+
+    #joystick {
+      position: absolute;
+      left: 50%;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: 124px;
+      height: 124px;
+      border: 1px solid #ffffff35;
       border-radius: 50%;
-      animation: nh-spin 0.8s linear infinite;
+      background: #151b1780;
+      box-shadow: 0 8px 30px #0002;
+      touch-action: none;
+      pointer-events: auto;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    @keyframes nh-spin {
-      to { transform: rotate(360deg); }
+    #joystick::before {
+      content: "";
+      position: absolute;
+      inset: 21px;
+      border: 1px dashed #ffffff23;
+      border-radius: 50%;
     }
 
-    @media (pointer: coarse), (max-width: 760px) {
-      #joystick {
-        display: flex;
-      }
-
-      .needsPanel {
-        top: 112px;
-        width: min(195px, 48vw);
-      }
-
-      .mapPanel {
-        top: 235px;
-        width: 105px;
-      }
-
-      .objectivePanel {
-        bottom: 170px;
-        width: min(260px, 52vw);
-      }
-
-      .hudTopLeft,
-      .hudTopRight {
-        max-width: 60%;
-      }
-
-      .pill {
-        padding: 7px 9px;
-      }
-
-      .bottomBtn {
-        min-width: 58px;
-        font-size: 9px;
-      }
+    #stick {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 46px;
+      height: 46px;
+      transform: translate(0, 0);
+      margin: -23px 0 0 -23px;
+      border-radius: 50%;
+      border: 2px solid #e7c36c;
+      background: linear-gradient(145deg, #f3d37b, #a77a28);
+      box-shadow: 0 4px 15px #0005;
+      pointer-events: none;
     }
 
-    @media (max-width: 420px) {
-      .loginGrid {
+    .desktop-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      padding: 8px 11px;
+      border-radius: 9px;
+      color: #f0f0e5;
+      font-size: 10px;
+      white-space: nowrap;
+      background: #141b16d9;
+      border: 1px solid #ffffff16;
+    }
+
+    /* GAME SHEET */
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 18px;
+      background: #0009;
+      pointer-events: auto;
+    }
+
+    #overlay.open { display: flex; }
+
+    .sheet {
+      width: min(560px, 100%);
+      max-height: min(82dvh, 760px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: #151d17;
+      box-shadow: 0 24px 90px #0008;
+      animation: sheet-in .18s ease-out;
+    }
+
+    @keyframes sheet-in {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 17px 18px;
+      border-bottom: 1px solid #ffffff12;
+    }
+
+    #sheetTitle {
+      margin: 5px 0 0;
+      font-size: 21px;
+      letter-spacing: -.5px;
+    }
+
+    #sheetClose {
+      display: grid;
+      place-items: center;
+      width: 37px;
+      height: 37px;
+      flex-shrink: 0;
+      border: 1px solid #ffffff20;
+      border-radius: 11px;
+      background: #202820;
+      color: white;
+      font-size: 21px;
+      cursor: pointer;
+    }
+
+    #sheetBody {
+      display: grid;
+      gap: 10px;
+      overflow-y: auto;
+      padding: 16px;
+      overscroll-behavior: contain;
+    }
+
+    /* LOADING AND TOAST */
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: #101510ee;
+      text-align: center;
+    }
+
+    .loading-content { display: grid; justify-items: center; gap: 13px; }
+
+    .loading-spinner {
+      width: 38px;
+      height: 38px;
+      border: 3px solid #ffffff1c;
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-title { font-weight: 850; }
+    .loading-message { color: var(--muted); font-size: 12px; }
+
+    #gameToast {
+      z-index: 10000;
+      box-shadow: 0 12px 35px #0005;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 700px) {
+      .login-layout {
         grid-template-columns: 1fr;
+        max-width: 410px;
       }
 
-      .hudTopLeft,
-      .hudTopRight {
+      .login-intro { padding: 24px; gap: 20px; }
+      .login-intro h1 { margin-top: 20px; font-size: 39px; }
+      .login-intro p { font-size: 12px; }
+      .feature-list { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .feature { font-size: 10px; }
+      .feature-icon { width: 24px; height: 24px; }
+      .login-note { display: none; }
+      .login-panel { padding: 25px 24px; gap: 16px; }
+
+      .topbar { top: max(8px, env(safe-area-inset-top)); left: 8px; right: 8px; }
+      .player-card { padding: 8px; gap: 7px; max-width: 56vw; }
+      .player-avatar { width: 32px; height: 32px; }
+      .brand-name { font-size: 15px; }
+      #name { max-width: 120px; font-size: 11px; }
+      #sub { font-size: 9px; }
+      .cash-card { padding: 9px 10px; font-size: 12px; }
+      .top-pills { gap: 4px; }
+      .pill { padding: 6px 7px; font-size: 9px; }
+
+      .needs-panel {
+        top: 91px;
+        left: 8px;
+        width: 153px;
+        padding: 10px;
+        border-radius: 13px;
+      }
+
+      .panel-heading { margin-bottom: 10px; font-size: 10px; }
+      .need-row { margin-bottom: 10px; }
+      .need-label { font-size: 9px; }
+
+      .objective-card {
+        top: 91px;
+        right: 8px;
+        width: 145px;
+        padding: 10px;
+      }
+
+      #objectiveText { font-size: 10px; }
+      .xp-label { font-size: 9px; }
+
+      .minimap-wrap { right: 8px; bottom: 100px; padding: 5px; }
+      #minimap { width: 78px; height: 78px; }
+      .minimap-caption { font-size: 8px; }
+
+      #joystick {
+        left: 14px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        transform: none;
+        width: 108px;
+        height: 108px;
+      }
+
+      #joystick::before { inset: 17px; }
+
+      #stick {
+        width: 42px;
+        height: 42px;
+        margin: -21px 0 0 -21px;
+      }
+
+      .bottom-left {
+        left: 8px;
+        bottom: 137px;
         gap: 5px;
       }
 
-      .hudTopRight {
-        top: 74px;
+      .bottom-right {
+        right: 8px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        gap: 5px;
       }
 
-      .needsPanel {
-        top: 155px;
-        width: 170px;
-      }
+      .round-control { width: 37px; height: 37px; font-size: 14px; }
+      .bottom-left .btn, .bottom-right .btn { font-size: 10px; }
+      .desktop-hint { display: none; }
 
-      .mapPanel {
-        top: 295px;
-        width: 88px;
-      }
+      #nhBasicMenu { width: min(285px, 86vw) !important; }
+      #overlay { padding: 0; }
+      .sheet { max-height: 86dvh; border-radius: 20px 20px 0 0; }
+    }
 
-      .objectivePanel {
-        bottom: 158px;
-        width: 54vw;
-        padding: 9px;
-      }
-
-      .panelHead {
-        font-size: 11px;
-      }
-
-      .need {
-        grid-template-columns: 46px minmax(15px, 1fr) 20px;
-        gap: 4px;
-      }
-
-      .actionCircle {
-        width: 56px;
-        height: 56px;
-      }
+    @media (max-width: 370px) {
+      .needs-panel { width: 135px; }
+      .objective-card { width: 128px; }
+      .player-card { max-width: 53vw; }
+      .player-avatar { display: none; }
+      .pill { font-size: 8px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
       }
     }
   </style>
 </head>
 
 <body>
+  <!-- Three.js mounts its renderer inside this container. -->
+  <div id="gameCanvas" aria-label="Naija Hustle 3D Lagos game world"></div>
 
-  <!-- 3D WORLD -->
-  <main id="game" aria-label="Naija Hustle game world">
-    <div id="gameCanvas"></div>
-  </main>
+  <!-- LOGIN SCREEN -->
+  <section id="loginScreen">
+    <div class="login-layout">
+      <div class="login-intro">
+        <div>
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">N</div>
+            <div>
+              <div class="brand-name">NAIJA <span>HUSTLE</span></div>
+              <div class="brand-tagline">Your story. Your hustle. Your Lagos.</div>
+            </div>
+          </div>
 
-  <!-- LOGIN -->
-  <section id="loginScreen" class="screen" aria-labelledby="loginTitle">
-    <div class="loginCard">
+          <h1>Make moves.<br>Build your <span>life.</span></h1>
 
-      <div class="brandLogo">
-        <img src="logo.svg" alt="Naija Hustle" width="330" height="84">
+          <p>
+            Explore a 3D Lagos-inspired city, find your hustle,
+            earn money, upgrade your lifestyle and write your own story.
+          </p>
+
+          <div class="feature-list">
+            <div class="feature">
+              <span class="feature-icon">₦</span>
+              <span>Earn and grow</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">⌂</span>
+              <span>Build your lifestyle</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">◇</span>
+              <span>Explore the city</span>
+            </div>
+            <div class="feature">
+              <span class="feature-icon">✦</span>
+              <span>Customise your player</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-note">
+          ONLINE GAME · CLOUD SAVES · NAIJA HUSTLE v3
+        </div>
       </div>
 
-      <div class="brandBadge" aria-hidden="true">NH</div>
-
-      <h1 id="loginTitle">NAIJA HUSTLE</h1>
-      <p class="tagline">Build your life. Build your hustle.</p>
-      <p class="muted">Start with a room, a wallet and a whole city to figure out.</p>
-
-      <form id="loginForm" autocomplete="on">
-        <label for="loginEmail">
-          Email
-          <input
-            id="loginEmail"
-            name="email"
-            type="email"
-            inputmode="email"
-            autocomplete="email"
-            autocapitalize="none"
-            spellcheck="false"
-            placeholder="you@example.com"
-            required
-          >
-        </label>
-
-        <label for="loginPassword">
-          Password
-          <input
-            id="loginPassword"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            placeholder="Password"
-            minlength="6"
-            required
-          >
-        </label>
-
-        <div class="loginGrid">
-          <button id="loginBtn" class="primary" type="button">LOGIN</button>
-          <button id="signupBtn" class="secondary" type="button">CREATE ACCOUNT</button>
+      <div class="login-panel">
+        <div>
+          <div class="eyebrow">YOUR JOURNEY STARTS HERE</div>
+          <h2>Enter the city</h2>
+          <p>Sign in or create an account to continue your game.</p>
         </div>
-      </form>
 
-  
+        <form id="loginForm">
+          <div class="form-field">
+            <label for="loginEmail">Email address</label>
+            <input
+              id="loginEmail"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            >
+          </div>
 
-      <div id="loginMessage" class="message" role="status" aria-live="polite"></div>
+          <div class="form-field">
+            <label for="loginPassword">Password</label>
+            <input
+              id="loginPassword"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              minlength="6"
+              required
+            >
+          </div>
+
+          <button class="btn btn-primary btn-block" type="submit">
+            Sign In
+          </button>
+        </form>
+
+        <div class="auth-divider">New to Naija Hustle?</div>
+
+        <button class="btn btn-block" id="signupBtn" type="button">
+          Create Account
+        </button>
+
+        <p id="loginMessage" role="status" aria-live="polite">
+          Connecting to Naija Hustle…
+        </p>
+
+        <p class="login-footnote">
+          Your progress is linked to your account and saved online.
+          An internet connection is required to play.
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- GAME HUD -->
-  <div id="hud" class="hidden" aria-label="Naija Hustle game interface">
-
-    <div class="hudTopLeft">
-      <div class="pill playerPill">
-        <b id="name">Guest</b>
-        <span id="levelBadge">Lv 1</span>
+  <section id="hud" class="hidden" aria-label="Game interface">
+    <header class="topbar">
+      <div class="player-card glass">
+        <div class="player-avatar" aria-hidden="true">♟</div>
+        <div class="player-info">
+          <div id="name">Player</div>
+          <div id="sub">Unemployed · Day 1</div>
+        </div>
       </div>
-      <div class="pill" id="sub">Lagos · Starting Out</div>
-      <div class="pill money">₦ <span id="money">25,000</span></div>
-      <div class="pill" id="housingPill">Room</div>
-      <div class="pill" id="clock" aria-label="Game time">8:00 AM</div>
-    </div>
 
-    <div class="hudTopRight" aria-label="Game controls">
-      <button class="mini" id="cameraBtn" type="button" aria-label="Change camera">ISO</button>
-      <button class="mini" id="qualityBtn" type="button" aria-label="Change graphics quality">HIGH</button>
-      <button class="mini" id="phoneBtn" type="button" aria-label="Open phone">PHONE</button>
-      <button class="mini" id="bagBtn" type="button" aria-label="Open inventory bag">BAG</button>
-      <button class="mini" id="mapBtn" type="button" aria-label="Open map">MAP</button>
-      <button class="mini" id="profileBtn" type="button" aria-label="Open profile">ME</button>
-    </div>
+      <div class="top-right">
+        <div class="cash-card glass">
+          <span class="cash-symbol">₦</span>
+          <span id="money">25,000</span>
+        </div>
+        <div class="top-pills">
+          <span class="pill" id="levelBadge">Lv 1</span>
+          <span class="pill" id="clock">8:00 AM</span>
+          <span class="pill" id="housingPill">Shared Room (Face-me)</span>
+        </div>
+      </div>
+    </header>
 
-    <!-- Needs -->
-    <section class="panel needsPanel" aria-label="Daily needs">
-      <div class="panelHead">
-        <b>Daily Needs</b>
+    <aside class="needs-panel glass">
+      <div class="panel-heading">
+        <span>YOUR NEEDS</span>
         <span id="moodText">Doing Fine</span>
       </div>
 
-      <div class="need">
-        <span>Hunger</span>
-        <i><em id="needHunger" data-need="hunger" style="width:85%"></em></i>
-        <b id="needHungerV">85</b>
+      <div class="need-row">
+        <div class="need-label"><span>Hunger</span><span id="needHungerV">85</span></div>
+        <div class="need-track"><div class="need-fill" data-need="hunger" style="width:85%"></div></div>
       </div>
 
-      <div class="need">
-        <span>Energy</span>
-        <i><em id="needEnergy" data-need="energy" style="width:90%"></em></i>
-        <b id="needEnergyV">90</b>
+      <div class="need-row">
+        <div class="need-label"><span>Energy</span><span id="needEnergyV">90</span></div>
+        <div class="need-track"><div class="need-fill energy" data-need="energy" style="width:90%"></div></div>
       </div>
 
-      <div class="need">
-        <span>Hygiene</span>
-        <i><em id="needHygiene" data-need="hygiene" style="width:80%"></em></i>
-        <b id="needHygieneV">80</b>
+      <div class="need-row">
+        <div class="need-label"><span>Hygiene</span><span id="needHygieneV">80</span></div>
+        <div class="need-track"><div class="need-fill hygiene" data-need="hygiene" style="width:80%"></div></div>
       </div>
 
-      <div class="need">
-        <span>Fun</span>
-        <i><em id="needFun" data-need="fun" style="width:75%"></em></i>
-        <b id="needFunV">75</b>
+      <div class="need-row">
+        <div class="need-label"><span>Fun</span><span id="needFunV">75</span></div>
+        <div class="need-track"><div class="need-fill fun" data-need="fun" style="width:75%"></div></div>
       </div>
 
-      <div class="need">
-        <span>Social</span>
-        <i><em id="needSocial" data-need="social" style="width:60%"></em></i>
-        <b id="needSocialV">60</b>
+      <div class="need-row">
+        <div class="need-label"><span>Social</span><span id="needSocialV">60</span></div>
+        <div class="need-track"><div class="need-fill social" data-need="social" style="width:60%"></div></div>
       </div>
 
-      <div class="need">
-        <span>Bladder</span>
-        <i><em id="needBladder" data-need="bladder" style="width:85%"></em></i>
-        <b id="needBladderV">85</b>
+      <div class="need-row">
+        <div class="need-label"><span>Bladder</span><span id="needBladderV">85</span></div>
+        <div class="need-track"><div class="need-fill bladder" data-need="bladder" style="width:85%"></div></div>
       </div>
-    </section>
+    </aside>
 
-    <!-- Objective -->
-    <section class="panel objectivePanel" aria-label="Current objective">
-      <div class="panelHead">
-        <b>Next Move</b>
-        <span id="xpText">0 / 100 XP</span>
+    <aside class="objective-card glass">
+      <div class="eyebrow">CURRENT OBJECTIVE</div>
+      <div id="objectiveText">Earn your first ₦5,000</div>
+
+      <div class="xp-section">
+        <div class="xp-label">
+          <span>Experience</span>
+          <span id="xpText">0 / 100 XP</span>
+        </div>
+        <div class="xp-track"><div id="xpFill"></div></div>
       </div>
-      <div id="objectiveText">Get to the Job Centre and choose a hustle.</div>
-      <div class="xp" aria-hidden="true"><em id="xpFill" style="width:0%"></em></div>
-    </section>
+    </aside>
 
-    <!-- Minimap -->
-    <section class="panel mapPanel" aria-label="City minimap">
-      <canvas id="minimap" width="180" height="180"></canvas>
-    </section>
-
-    <button id="prompt" class="primary prompt" type="button">Interact</button>
-
-    <!-- Bottom controls -->
-    <button id="avatarBtn" class="bottomBtn left1" type="button">AVATAR</button>
-    <button id="socialBtn" class="bottomBtn left2" type="button">SOCIAL</button>
-    <button id="emoteBtn" class="bottomBtn right1" type="button" aria-expanded="false" aria-controls="emoteMenu">EMOTES</button>
-    <button id="homeBtn" class="bottomBtn right2" type="button">HOME</button>
-
-    <div id="emoteMenu" class="emoteMenu" aria-label="Emotes">
-      <button type="button" data-emote="wave">Wave</button>
-      <button type="button" data-emote="dance">Dance</button>
-      <button type="button" data-emote="cheer">Cheer</button>
-      <button type="button" data-emote="none">Stop</button>
+    <div class="minimap-wrap glass">
+      <canvas id="minimap" width="224" height="224" aria-label="City minimap"></canvas>
+      <div class="minimap-caption">CITY MAP</div>
     </div>
 
-    <!-- Joystick IDs are kept compatible with the replacement app.js -->
-    <div id="joystick" aria-label="Movement joystick">
+    <!-- Only buttons with matching handlers in app.js are included here. -->
+    <div class="bottom-left">
+      <div class="control-row">
+        <button class="btn round-control" id="avatarBtn" type="button" aria-label="Customise avatar" title="Avatar">♟</button>
+        <button class="btn round-control" id="homeBtn" type="button" aria-label="Housing" title="Housing">⌂</button>
+        <button class="btn round-control" id="bagBtn" type="button" aria-label="Inventory" title="Inventory">▤</button>
+      </div>
+      <div class="control-row">
+        <button class="btn round-control" id="socialBtn" type="button" aria-label="Socialise" title="Socialise">☺</button>
+        <button class="btn round-control" id="emoteBtn" type="button" aria-label="Wave" title="Wave">✋</button>
+      </div>
+    </div>
+
+    <div id="joystick" aria-label="Movement joystick" role="application">
       <div id="stick"></div>
     </div>
 
-    <button id="runBtn" class="actionCircle run" type="button" aria-label="Run">RUN</button>
-    <button id="jumpBtn" class="actionCircle" type="button" aria-label="Jump">JUMP</button>
+    <div class="bottom-right">
+      <div class="control-row">
+        <button class="btn round-control" id="runBtn" type="button" aria-label="Toggle running" title="Run">➤</button>
+        <button class="btn round-control" id="jumpBtn" type="button" aria-label="Jump" title="Jump">↑</button>
+      </div>
+      <div class="control-row">
+        <button class="btn round-control" id="zoomOut" type="button" aria-label="Zoom out" title="Zoom out">−</button>
+        <button class="btn round-control" id="zoomIn" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+      </div>
+    </div>
+
+    <div class="desktop-hint">
+      WASD / Arrows: Move · Shift: Run · E: Interact · I: Inventory · C: Avatar · Esc: Pause
+    </div>
+  </section>
+
+  <!-- SHEET USED BY app.js -->
+  <div id="overlay" aria-hidden="true">
+    <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <header class="sheet-header">
+        <div>
+          <div class="eyebrow" id="sheetEyebrow">NAIJA HUSTLE</div>
+          <h2 id="sheetTitle">Game Menu</h2>
+        </div>
+        <button id="sheetClose" type="button" aria-label="Close menu">×</button>
+      </header>
+      <div id="sheetBody"></div>
+    </section>
   </div>
 
-  <!-- GENERAL SHEET -->
-  <section id="overlay" class="overlay" aria-hidden="true" aria-labelledby="sheetTitle">
-    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-      <header class="sheetHead">
-        <div>
-          <div id="sheetEyebrow" class="eyebrow">NAIJA HUSTLE</div>
-          <h2 id="sheetTitle">City</h2>
-        </div>
-        <button id="sheetClose" class="close" type="button" aria-label="Close">×</button>
-      </header>
-      <div id="sheetBody" class="sheetBody"></div>
-    </div>
-  </section>
-
-  <!-- AVATAR CUSTOMIZER -->
-  <section id="customizer" class="overlay" aria-hidden="true" aria-labelledby="customizerTitle">
-    <div class="sheet customSheet" role="dialog" aria-modal="true" aria-labelledby="customizerTitle">
-      <header class="sheetHead">
-        <div>
-          <div class="eyebrow">LOOK</div>
-          <h2 id="customizerTitle">Customize Avatar</h2>
-        </div>
-        <button id="closeCustomizer" class="close" type="button" aria-label="Close avatar customizer">×</button>
-      </header>
-
-      <div class="sheetBody">
-        <div id="sections"></div>
-        <div class="stickyActions">
-          <button id="randomBtn" class="secondary" type="button">RANDOM</button>
-          <button id="saveAvatar" class="primary" type="button">SAVE AVATAR</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- LOADING SCREEN -->
-  <section id="loading" class="screen loading" aria-live="polite" aria-busy="true">
-    <div class="loadingCard">
-      <div class="brandLogo loadingLogo">
-        <img src="logo.svg" alt="Naija Hustle" width="330" height="84">
-      </div>
-      <div class="brandBadge" aria-hidden="true">NH</div>
-      <h2>NAIJA HUSTLE</h2>
-      <p id="loadingText">Preparing your city...</p>
-      <div class="spinner" aria-hidden="true"></div>
+  <div id="loading" class="hidden" role="status" aria-live="polite">
+    <div class="loading-content">
+      <div class="brand-mark" aria-hidden="true">N</div>
+      <div class="loading-spinner"></div>
+      <div class="loading-title">Preparing your city…</div>
+      <div class="loading-message">Loading your online progress</div>
     </div>
-  </section>
+  </div>
 
-  <noscript>
-    <div style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:#09100f;color:#fff;font-family:system-ui,sans-serif;text-align:center">
-      <div>
-        <h1>Naija Hustle</h1>
-        <p>JavaScript is required to play Naija Hustle. Enable JavaScript and reload the game.</p>
-      </div>
-    </div>
-  </noscript>
+  <script type="module" src="./app.js"></script>
 
-  <!-- Login and guest-screen handling -->
   <script>
-    (() => {
-      const loginScreen = document.getElementById("loginScreen");
-      const hud = document.getElementById("hud");
-      const loading = document.getElementById("loading");
-      const message = document.getElementById("loginMessage");
+    /*
+      The game logic is in app.js.
+      These controls connect the matching HTML buttons to its existing handlers.
+    */
+    document.addEventListener("DOMContentLoaded", () => {
+      const signup = document.getElementById("signupBtn");
 
-      function showMessage(text) {
-        if (message) message.textContent = text;
-      }
-
-      document.getElementById("guestBtn")?.addEventListener("click", () => {
-        loginScreen?.classList.add("hidden");
-        loading?.classList.add("hidden");
-        hud?.classList.remove("hidden");
-
-        try {
-          localStorage.setItem("naijaHustleMode", "guest");
-        } catch (_) {}
-
-        window.dispatchEvent(new CustomEvent("naijahustle:guest"));
+      signup?.addEventListener("click", () => {
+        window.dispatchEvent(new CustomEvent("naijahustle:signup"));
       });
 
-      document.getElementById("loginBtn")?.addEventListener("click", () => {
-        const email = document.getElementById("loginEmail")?.value.trim();
-        const password = document.getElementById("loginPassword")?.value;
-
-        if (!email || !password) {
-          showMessage("Enter your email and password.");
-          return;
-        }
-
-        window.dispatchEvent(new CustomEvent("naijahustle:login", {
-          detail: { email, password }
+      document.getElementById("zoomIn")?.addEventListener("click", () => {
+        // app.js binds zoom controls through the custom event below.
+        window.dispatchEvent(new CustomEvent("naijahustle:zoom", {
+          detail: { amount: -1 }
         }));
-
-        showMessage("Cloud login must be connected to your Supabase account before it can sign you in.");
       });
 
-      document.getElementById("signupBtn")?.addEventListener("click", () => {
-        const email = document.getElementById("loginEmail")?.value.trim();
-        const password = document.getElementById("loginPassword")?.value;
-
-        if (!email || !password) {
-          showMessage("Enter your email and a password of at least 6 characters.");
-          return;
-        }
-
-        if (password.length < 6) {
-          showMessage("Your password must contain at least 6 characters.");
-          return;
-        }
-
-        window.dispatchEvent(new CustomEvent("naijahustle:signup", {
-          detail: { email, password }
+      document.getElementById("zoomOut")?.addEventListener("click", () => {
+        window.dispatchEvent(new CustomEvent("naijahustle:zoom", {
+          detail: { amount: 1 }
         }));
-
-        showMessage("Account creation must be connected to Supabase before an account can be created.");
       });
-
-      document.getElementById("loginForm")?.addEventListener("submit", (event) => {
-        event.preventDefault();
-        document.getElementById("loginBtn")?.click();
-      });
-
-      // Dismiss the loading layer without hiding the login screen.
-      window.addEventListener("load", () => {
-        setTimeout(() => {
-          loading?.classList.add("hidden");
-        }, 500);
-      });
-    })();
+    });
   </script>
-
-  <script type="module" src="app.js"></script>
 </body>
-  </html>
+</html>
