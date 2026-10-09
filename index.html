@@ -1,715 +1,967 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
->
+  <meta name="theme-color" content="#0F6B6F">
+  <meta name="color-scheme" content="dark">
+  <meta name="application-name" content="Naija Hustle">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Naija Hustle">
+  <meta name="description" content="Naija Hustle — Build your life. Build your hustle.">
 
-<meta name="theme-color" content="#0F6B6F">
-<meta name="color-scheme" content="dark">
-<meta name="application-name" content="Naija Hustle">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Naija Hustle">
+  <title>Naija Hustle — Build Your Life. Build Your Hustle.</title>
 
-<meta
-  name="description"
-  content="Naija Hustle — Build your life. Build your hustle."
->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <link rel="preload" href="logo.svg" as="image" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
 
-<title>Naija Hustle — Build Your Life. Build Your Hustle.</title>
+  <style>
+    /* Compatibility and safe defaults for the new game foundation. */
 
-<!-- Brand assets -->
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="apple-touch-icon" href="favicon.svg">
-<link rel="preload" href="logo.svg" as="image" type="image/svg+xml">
+    #game {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: #18221b;
+    }
 
-<!-- Main game styles -->
-<link rel="stylesheet" href="styles.css">
+    #gameCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #gameCanvas canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #loginScreen,
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      overflow-y: auto;
+    }
+
+    #loginScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(8, 14, 13, 0.96);
+    }
+
+    .loginCard,
+    .loadingCard {
+      width: min(100%, 430px);
+      margin: auto;
+      padding: 26px;
+      border: 1px solid rgba(221, 178, 75, 0.4);
+      border-radius: 20px;
+      background: #111918;
+      color: #f5f5f5;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    .brandLogo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .brandLogo img {
+      display: block;
+      width: min(100%, 330px);
+      height: auto;
+      object-fit: contain;
+    }
+
+    .brandBadge {
+      display: none;
+      width: 52px;
+      height: 52px;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      border: 1px solid #d6aa45;
+      border-radius: 15px;
+      color: #f4c95d;
+      font-weight: 900;
+    }
+
+    #loginTitle,
+    .loadingCard h2 {
+      text-align: center;
+      letter-spacing: 2px;
+    }
+
+    .tagline,
+    .muted {
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .muted {
+      color: #aeb9b5;
+      font-size: 14px;
+    }
+
+    #loginForm {
+      display: grid;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    #loginForm label {
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    #loginForm input {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px;
+      border: 1px solid #394541;
+      border-radius: 10px;
+      outline: none;
+      background: #0b100f;
+      color: #fff;
+      font: inherit;
+      box-sizing: border-box;
+    }
+
+    #loginForm input:focus {
+      border-color: #d6aa45;
+    }
+
+    .loginGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      font: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .primary,
+    .secondary,
+    .linkBtn,
+    .mini,
+    .bottomBtn,
+    .actionCircle,
+    .close {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .primary,
+    .secondary {
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 750;
+    }
+
+    .primary {
+      border: 1px solid #d5ad4c;
+      background: #c69a35;
+      color: #17130a;
+    }
+
+    .secondary {
+      border: 1px solid #5a625d;
+      background: #222a27;
+      color: #f3f3f3;
+    }
+
+    .linkBtn {
+      display: block;
+      margin: 16px auto 0;
+      padding: 10px;
+      border: 0;
+      background: transparent;
+      color: #f4c95d;
+    }
+
+    .message {
+      min-height: 20px;
+      margin-top: 12px;
+      color: #f4c95d;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    #hud {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      color: white;
+      font-family: system-ui, sans-serif;
+    }
+
+    #hud button,
+    #hud input,
+    #hud .panel,
+    #hud .pill,
+    #hud #joystick {
+      pointer-events: auto;
+    }
+
+    .hudTopLeft,
+    .hudTopRight {
+      position: absolute;
+      top: max(12px, env(safe-area-inset-top));
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-width: 48%;
+    }
+
+    .hudTopLeft {
+      left: max(12px, env(safe-area-inset-left));
+    }
+
+    .hudTopRight {
+      right: max(12px, env(safe-area-inset-right));
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 8px 11px;
+      border: 1px solid rgba(213, 173, 76, 0.35);
+      border-radius: 12px;
+      background: rgba(13, 20, 18, 0.9);
+      color: #f2f2f2;
+      font-size: 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    .money,
+    #levelBadge {
+      color: #f4c95d;
+    }
+
+    .panel {
+      position: absolute;
+      padding: 12px;
+      border: 1px solid rgba(213, 173, 76, 0.35);
+      border-radius: 14px;
+      background: rgba(13, 20, 18, 0.92);
+      box-sizing: border-box;
+      backdrop-filter: blur(8px);
+    }
+
+    .needsPanel {
+      top: 125px;
+      left: max(12px, env(safe-area-inset-left));
+      width: min(225px, 43vw);
+    }
+
+    .panelHead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    .panelHead span {
+      color: #c9b67e;
+      font-size: 11px;
+    }
+
+    .need {
+      display: grid;
+      grid-template-columns: 54px minmax(20px, 1fr) 24px;
+      align-items: center;
+      gap: 7px;
+      margin: 9px 0;
+      font-size: 11px;
+    }
+
+    .need i,
+    .xp {
+      display: block;
+      height: 6px;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #35403b;
+    }
+
+    .need em,
+    .xp em {
+      display: block;
+      width: 50%;
+      height: 100%;
+      border-radius: inherit;
+      background: #d5ad4c;
+      transition: width 0.2s ease;
+    }
+
+    .need b {
+      text-align: right;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .objectivePanel {
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: 50%;
+      width: min(330px, 50vw);
+      transform: translateX(-50%);
+    }
+
+    #objectiveText {
+      margin: 8px 0 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .mapPanel {
+      top: 125px;
+      right: max(12px, env(safe-area-inset-right));
+      width: 150px;
+      padding: 6px;
+    }
+
+    #minimap {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      border-radius: 9px;
+    }
+
+    .mini,
+    .bottomBtn,
+    .actionCircle {
+      border: 1px solid rgba(213, 173, 76, 0.55);
+      background: rgba(13, 20, 18, 0.92);
+      color: #f4c95d;
+      font-weight: 750;
+    }
+
+    .mini {
+      min-height: 35px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 10px;
+    }
+
+    .prompt {
+      position: absolute;
+      left: 50%;
+      bottom: 24%;
+      transform: translateX(-50%);
+      display: none;
+    }
+
+    .bottomBtn {
+      position: absolute;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      min-width: 68px;
+      min-height: 42px;
+      padding: 9px;
+      border-radius: 12px;
+      font-size: 10px;
+    }
+
+    .left1 {
+      left: max(12px, env(safe-area-inset-left));
+    }
+
+    .left2 {
+      left: max(86px, calc(env(safe-area-inset-left) + 86px));
+    }
+
+    .right1 {
+      right: max(86px, calc(env(safe-area-inset-right) + 86px));
+    }
+
+    .right2 {
+      right: max(12px, env(safe-area-inset-right));
+    }
+
+    .emoteMenu {
+      position: absolute;
+      right: 12px;
+      bottom: 75px;
+      display: none;
+      gap: 6px;
+      flex-direction: column;
+      padding: 8px;
+      border: 1px solid #705821;
+      border-radius: 12px;
+      background: #111918;
+      pointer-events: auto;
+    }
+
+    .emoteMenu.open {
+      display: flex;
+    }
+
+    .emoteMenu button {
+      padding: 8px 12px;
+      border: 1px solid #394541;
+      border-radius: 8px;
+      background: #222a27;
+      color: white;
+    }
+
+    #joystick {
+      position: absolute;
+      bottom: max(90px, calc(env(safe-area-inset-bottom) + 90px));
+      left: max(18px, env(safe-area-inset-left));
+      display: none;
+      width: 118px;
+      height: 118px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50%;
+      background: rgba(10, 15, 14, 0.45);
+      touch-action: none;
+    }
+
+    #stick {
+      width: 44px;
+      height: 44px;
+      border: 1px solid #d5ad4c;
+      border-radius: 50%;
+      background: rgba(213, 173, 76, 0.5);
+    }
+
+    .actionCircle {
+      position: absolute;
+      right: max(22px, env(safe-area-inset-right));
+      bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px));
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+    }
+
+    .actionCircle.run {
+      right: max(96px, calc(env(safe-area-inset-right) + 96px));
+      bottom: max(120px, calc(env(safe-area-inset-bottom) + 120px));
+      width: 54px;
+      height: 54px;
+      font-size: 11px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.72);
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .sheet {
+      width: min(100%, 560px);
+      max-height: min(85dvh, 760px);
+      overflow-y: auto;
+      border: 1px solid #705821;
+      border-radius: 18px;
+      background: #111918;
+      color: #f5f5f5;
+    }
+
+    .sheetHead {
+      position: sticky;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid #303b36;
+      background: #111918;
+    }
+
+    .sheetHead h2 {
+      margin: 5px 0 0;
+    }
+
+    .eyebrow {
+      color: #f4c95d;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    .close {
+      width: 38px;
+      height: 38px;
+      border: 1px solid #46504a;
+      border-radius: 10px;
+      background: #222a27;
+      color: white;
+      font-size: 24px;
+    }
+
+    .sheetBody {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .stickyActions {
+      position: sticky;
+      bottom: 0;
+      display: flex;
+      gap: 10px;
+      padding: 12px 0 0;
+      background: #111918;
+    }
+
+    .stickyActions button {
+      flex: 1;
+    }
+
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #09100f;
+      color: white;
+    }
+
+    .loadingCard {
+      text-align: center;
+    }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      margin: 20px auto 0;
+      border: 3px solid #37423d;
+      border-top-color: #f4c95d;
+      border-radius: 50%;
+      animation: nh-spin 0.8s linear infinite;
+    }
+
+    @keyframes nh-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (pointer: coarse), (max-width: 760px) {
+      #joystick {
+        display: flex;
+      }
+
+      .needsPanel {
+        top: 112px;
+        width: min(195px, 48vw);
+      }
+
+      .mapPanel {
+        top: 235px;
+        width: 105px;
+      }
+
+      .objectivePanel {
+        bottom: 170px;
+        width: min(260px, 52vw);
+      }
+
+      .hudTopLeft,
+      .hudTopRight {
+        max-width: 60%;
+      }
+
+      .pill {
+        padding: 7px 9px;
+      }
+
+      .bottomBtn {
+        min-width: 58px;
+        font-size: 9px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .loginGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .hudTopLeft,
+      .hudTopRight {
+        gap: 5px;
+      }
+
+      .hudTopRight {
+        top: 74px;
+      }
+
+      .needsPanel {
+        top: 155px;
+        width: 170px;
+      }
+
+      .mapPanel {
+        top: 295px;
+        width: 88px;
+      }
+
+      .objectivePanel {
+        bottom: 158px;
+        width: 54vw;
+        padding: 9px;
+      }
+
+      .panelHead {
+        font-size: 11px;
+      }
+
+      .need {
+        grid-template-columns: 46px minmax(15px, 1fr) 20px;
+        gap: 4px;
+      }
+
+      .actionCircle {
+        width: 56px;
+        height: 56px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- =========================================================
-     GAME WORLD
-     ========================================================= -->
-<div id="game" aria-label="Naija Hustle game world"></div>
+  <!-- 3D WORLD -->
+  <main id="game" aria-label="Naija Hustle game world">
+    <div id="gameCanvas"></div>
+  </main>
 
+  <!-- LOGIN -->
+  <section id="loginScreen" class="screen" aria-labelledby="loginTitle">
+    <div class="loginCard">
 
-<!-- =========================================================
-     LOGIN / ACCOUNT SCREEN
-     ========================================================= -->
-<section
-  id="loginScreen"
-  class="screen"
-  aria-labelledby="loginTitle"
->
-
-  <div class="loginCard">
-
-    <!-- Official Naija Hustle logo -->
-    <div class="brandLogo">
-      <img
-        src="logo.svg"
-        alt="Naija Hustle"
-        width="330"
-        height="84"
-        loading="eager"
-      >
-    </div>
-
-    <!-- Fallback compact brand mark -->
-    <div
-      class="brandBadge"
-      aria-hidden="true"
-    >
-      NH
-    </div>
-
-    <h1 id="loginTitle">NAIJA HUSTLE</h1>
-
-    <p class="tagline">
-      Build your life. Build your hustle.
-    </p>
-
-    <p class="muted">
-      Start with a room, a wallet and a whole city to figure out.
-    </p>
-
-    <form
-      id="loginForm"
-      autocomplete="on"
-      onsubmit="return false;"
-    >
-
-      <label for="loginEmail">
-        Email
-
-        <input
-          id="loginEmail"
-          name="email"
-          type="email"
-          inputmode="email"
-          autocomplete="email"
-          autocapitalize="none"
-          spellcheck="false"
-          placeholder="you@example.com"
-          aria-label="Email address"
-        >
-      </label>
-
-      <label for="loginPassword">
-        Password
-
-        <input
-          id="loginPassword"
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Password"
-          aria-label="Password"
-        >
-      </label>
-
-      <div class="loginGrid">
-
-        <button
-          id="loginBtn"
-          class="primary"
-          type="button"
-        >
-          LOGIN
-        </button>
-
-        <button
-          id="signupBtn"
-          class="secondary"
-          type="button"
-        >
-          CREATE ACCOUNT
-        </button>
-
+      <div class="brandLogo">
+        <img src="logo.svg" alt="Naija Hustle" width="330" height="84">
       </div>
 
-    </form>
-
-    <button
-      id="guestBtn"
-      class="linkBtn"
-      type="button"
-    >
-      Play offline on this device
-    </button>
-
-    <div
-      id="loginMessage"
-      class="message"
-      role="status"
-      aria-live="polite"
-    ></div>
-
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     MAIN GAME HUD
-     ========================================================= -->
-<div
-  id="hud"
-  class="hidden"
-  aria-label="Naija Hustle game interface"
->
-
-  <!-- =======================================================
-       TOP LEFT — PLAYER INFORMATION
-       ======================================================= -->
-  <div class="hudTopLeft">
-
-    <div class="pill playerPill">
-      <b id="name">Guest</b>
-      <span id="levelBadge">Lv 1</span>
-    </div>
-
-    <div
-      class="pill"
-      id="sub"
-    >
-      Lagos · Starting Out
-    </div>
-
-    <div class="pill money">
-      ₦ <span id="money">25,000</span>
-    </div>
-
-    <div
-      class="pill"
-      id="housingPill"
-    >
-      Room
-    </div>
-
-    <div
-      class="pill"
-      id="clock"
-      aria-label="Game time"
-    >
-      8:00 AM
-    </div>
-
-  </div>
-
-
-  <!-- =======================================================
-       TOP RIGHT — GAME CONTROLS
-       ======================================================= -->
-  <div
-    class="hudTopRight"
-    aria-label="Game controls"
-  >
-
-    <button
-      class="mini"
-      id="cameraBtn"
-      type="button"
-      aria-label="Change camera"
-    >
-      3RD
-    </button>
-
-    <button
-      class="mini"
-      id="qualityBtn"
-      type="button"
-      aria-label="Change graphics quality"
-    >
-      HIGH
-    </button>
-
-    <button
-      class="mini"
-      id="phoneBtn"
-      type="button"
-      aria-label="Open phone"
-    >
-      PHONE
-    </button>
-
-    <button
-      class="mini"
-      id="bagBtn"
-      type="button"
-      aria-label="Open inventory bag"
-    >
-      BAG
-    </button>
-
-    <button
-      class="mini"
-      id="mapBtn"
-      type="button"
-      aria-label="Open map"
-    >
-      MAP
-    </button>
-
-    <button
-      class="mini"
-      id="profileBtn"
-      type="button"
-      aria-label="Open profile"
-    >
-      ME
-    </button>
-
-  </div>
-
-
-  <!-- =======================================================
-       DAILY NEEDS
-       ======================================================= -->
-  <div
-    class="panel needsPanel"
-    aria-label="Daily needs"
-  >
-
-    <div class="panelHead">
-      <b>Daily Needs</b>
-      <span id="moodText">Doing Fine</span>
-    </div>
-
-    <div class="need">
-      <span>Hunger</span>
-      <i>
-        <em id="needHunger"></em>
-      </i>
-      <b id="needHungerV">82</b>
-    </div>
-
-    <div class="need">
-      <span>Energy</span>
-      <i>
-        <em id="needEnergy"></em>
-      </i>
-      <b id="needEnergyV">90</b>
-    </div>
-
-    <div class="need">
-      <span>Hygiene</span>
-      <i>
-        <em id="needHygiene"></em>
-      </i>
-      <b id="needHygieneV">86</b>
-    </div>
-
-    <div class="need">
-      <span>Fun</span>
-      <i>
-        <em id="needFun"></em>
-      </i>
-      <b id="needFunV">76</b>
-    </div>
-
-    <div class="need">
-      <span>Social</span>
-      <i>
-        <em id="needSocial"></em>
-      </i>
-      <b id="needSocialV">70</b>
-    </div>
-
-    <div class="need">
-      <span>Bladder</span>
-      <i>
-        <em id="needBladder"></em>
-      </i>
-      <b id="needBladderV">94</b>
-    </div>
-
-  </div>
-
-
-  <!-- =======================================================
-       OBJECTIVE / XP
-       ======================================================= -->
-  <div
-    class="panel objectivePanel"
-    aria-label="Current objective"
-  >
-
-    <div class="panelHead">
-      <b>Next Move</b>
-      <span id="xpText">0 / 100 XP</span>
-    </div>
-
-    <div id="objectiveText">
-      Get to the Job Centre and choose a hustle.
-    </div>
-
-    <div
-      class="xp"
-      aria-hidden="true"
-    >
-      <em id="xpFill"></em>
-    </div>
-
-  </div>
-
-
-  <!-- =======================================================
-       MINIMAP
-       ======================================================= -->
-  <div
-    class="panel mapPanel"
-    aria-label="City minimap"
-  >
-    <canvas
-      id="minimap"
-      width="180"
-      height="180"
-    ></canvas>
-  </div>
-
-
-  <!-- =======================================================
-       INTERACTION PROMPT
-       ======================================================= -->
-  <button
-    id="prompt"
-    class="primary prompt"
-    type="button"
-  >
-    Enter
-  </button>
-
-
-  <!-- =======================================================
-       BOTTOM GAME ACTIONS
-       ======================================================= -->
-  <button
-    id="avatarBtn"
-    class="bottomBtn left1"
-    type="button"
-  >
-    AVATAR
-  </button>
-
-  <button
-    id="socialBtn"
-    class="bottomBtn left2"
-    type="button"
-  >
-    SOCIAL
-  </button>
-
-  <button
-    id="emoteBtn"
-    class="bottomBtn right1"
-    type="button"
-    aria-expanded="false"
-    aria-controls="emoteMenu"
-  >
-    EMOTES
-  </button>
-
-  <button
-    id="homeBtn"
-    class="bottomBtn right2"
-    type="button"
-  >
-    HOME
-  </button>
-
-
-  <!-- =======================================================
-       EMOTE MENU
-       ======================================================= -->
-  <div
-    id="emoteMenu"
-    class="emoteMenu"
-    aria-label="Emotes"
-  >
-
-    <button
-      type="button"
-      data-emote="wave"
-    >
-      Wave
-    </button>
-
-    <button
-      type="button"
-      data-emote="dance"
-    >
-      Dance
-    </button>
-
-    <button
-      type="button"
-      data-emote="cheer"
-    >
-      Cheer
-    </button>
-
-    <button
-      type="button"
-      data-emote="none"
-    >
-      Stop
-    </button>
-
-  </div>
-
-
-  <!-- =======================================================
-       MOBILE JOYSTICK
-       ======================================================= -->
-  <div
-    id="joystick"
-    aria-label="Movement joystick"
-  >
-    <div id="stick"></div>
-  </div>
-
-
-  <!-- =======================================================
-       MOVEMENT ACTIONS
-       ======================================================= -->
-  <button
-    id="runBtn"
-    class="actionCircle run"
-    type="button"
-    aria-label="Run"
-  >
-    RUN
-  </button>
-
-  <button
-    id="jumpBtn"
-    class="actionCircle"
-    type="button"
-    aria-label="Jump"
-  >
-    JUMP
-  </button>
-
-</div>
-
-
-<!-- =========================================================
-     GENERAL GAME OVERLAY / SHEET
-     ========================================================= -->
-<section
-  id="overlay"
-  class="overlay"
-  aria-hidden="true"
-  aria-labelledby="sheetTitle"
->
-
-  <div
-    class="sheet"
-    role="dialog"
-    aria-modal="true"
-  >
-
-    <header class="sheetHead">
-
-      <div>
-
-        <div
-          id="sheetEyebrow"
-          class="eyebrow"
-        >
-          NAIJA HUSTLE
+      <div class="brandBadge" aria-hidden="true">NH</div>
+
+      <h1 id="loginTitle">NAIJA HUSTLE</h1>
+      <p class="tagline">Build your life. Build your hustle.</p>
+      <p class="muted">Start with a room, a wallet and a whole city to figure out.</p>
+
+      <form id="loginForm" autocomplete="on">
+        <label for="loginEmail">
+          Email
+          <input
+            id="loginEmail"
+            name="email"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            autocapitalize="none"
+            spellcheck="false"
+            placeholder="you@example.com"
+            required
+          >
+        </label>
+
+        <label for="loginPassword">
+          Password
+          <input
+            id="loginPassword"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Password"
+            minlength="6"
+            required
+          >
+        </label>
+
+        <div class="loginGrid">
+          <button id="loginBtn" class="primary" type="button">LOGIN</button>
+          <button id="signupBtn" class="secondary" type="button">CREATE ACCOUNT</button>
         </div>
+      </form>
 
-        <h2 id="sheetTitle">
-          City
-        </h2>
-
-      </div>
-
-      <button
-        id="sheetClose"
-        class="close"
-        type="button"
-        aria-label="Close"
-      >
-        ×
+      <button id="guestBtn" class="linkBtn" type="button">
+        Play offline on this device
       </button>
 
-    </header>
+      <div id="loginMessage" class="message" role="status" aria-live="polite"></div>
+    </div>
+  </section>
 
-    <div
-      id="sheetBody"
-      class="sheetBody"
-    ></div>
+  <!-- GAME HUD -->
+  <div id="hud" class="hidden" aria-label="Naija Hustle game interface">
 
+    <div class="hudTopLeft">
+      <div class="pill playerPill">
+        <b id="name">Guest</b>
+        <span id="levelBadge">Lv 1</span>
+      </div>
+      <div class="pill" id="sub">Lagos · Starting Out</div>
+      <div class="pill money">₦ <span id="money">25,000</span></div>
+      <div class="pill" id="housingPill">Room</div>
+      <div class="pill" id="clock" aria-label="Game time">8:00 AM</div>
+    </div>
+
+    <div class="hudTopRight" aria-label="Game controls">
+      <button class="mini" id="cameraBtn" type="button" aria-label="Change camera">ISO</button>
+      <button class="mini" id="qualityBtn" type="button" aria-label="Change graphics quality">HIGH</button>
+      <button class="mini" id="phoneBtn" type="button" aria-label="Open phone">PHONE</button>
+      <button class="mini" id="bagBtn" type="button" aria-label="Open inventory bag">BAG</button>
+      <button class="mini" id="mapBtn" type="button" aria-label="Open map">MAP</button>
+      <button class="mini" id="profileBtn" type="button" aria-label="Open profile">ME</button>
+    </div>
+
+    <!-- Needs -->
+    <section class="panel needsPanel" aria-label="Daily needs">
+      <div class="panelHead">
+        <b>Daily Needs</b>
+        <span id="moodText">Doing Fine</span>
+      </div>
+
+      <div class="need">
+        <span>Hunger</span>
+        <i><em id="needHunger" data-need="hunger" style="width:85%"></em></i>
+        <b id="needHungerV">85</b>
+      </div>
+
+      <div class="need">
+        <span>Energy</span>
+        <i><em id="needEnergy" data-need="energy" style="width:90%"></em></i>
+        <b id="needEnergyV">90</b>
+      </div>
+
+      <div class="need">
+        <span>Hygiene</span>
+        <i><em id="needHygiene" data-need="hygiene" style="width:80%"></em></i>
+        <b id="needHygieneV">80</b>
+      </div>
+
+      <div class="need">
+        <span>Fun</span>
+        <i><em id="needFun" data-need="fun" style="width:75%"></em></i>
+        <b id="needFunV">75</b>
+      </div>
+
+      <div class="need">
+        <span>Social</span>
+        <i><em id="needSocial" data-need="social" style="width:60%"></em></i>
+        <b id="needSocialV">60</b>
+      </div>
+
+      <div class="need">
+        <span>Bladder</span>
+        <i><em id="needBladder" data-need="bladder" style="width:85%"></em></i>
+        <b id="needBladderV">85</b>
+      </div>
+    </section>
+
+    <!-- Objective -->
+    <section class="panel objectivePanel" aria-label="Current objective">
+      <div class="panelHead">
+        <b>Next Move</b>
+        <span id="xpText">0 / 100 XP</span>
+      </div>
+      <div id="objectiveText">Get to the Job Centre and choose a hustle.</div>
+      <div class="xp" aria-hidden="true"><em id="xpFill" style="width:0%"></em></div>
+    </section>
+
+    <!-- Minimap -->
+    <section class="panel mapPanel" aria-label="City minimap">
+      <canvas id="minimap" width="180" height="180"></canvas>
+    </section>
+
+    <button id="prompt" class="primary prompt" type="button">Interact</button>
+
+    <!-- Bottom controls -->
+    <button id="avatarBtn" class="bottomBtn left1" type="button">AVATAR</button>
+    <button id="socialBtn" class="bottomBtn left2" type="button">SOCIAL</button>
+    <button id="emoteBtn" class="bottomBtn right1" type="button" aria-expanded="false" aria-controls="emoteMenu">EMOTES</button>
+    <button id="homeBtn" class="bottomBtn right2" type="button">HOME</button>
+
+    <div id="emoteMenu" class="emoteMenu" aria-label="Emotes">
+      <button type="button" data-emote="wave">Wave</button>
+      <button type="button" data-emote="dance">Dance</button>
+      <button type="button" data-emote="cheer">Cheer</button>
+      <button type="button" data-emote="none">Stop</button>
+    </div>
+
+    <!-- Joystick IDs are kept compatible with the replacement app.js -->
+    <div id="joystick" aria-label="Movement joystick">
+      <div id="stick"></div>
+    </div>
+
+    <button id="runBtn" class="actionCircle run" type="button" aria-label="Run">RUN</button>
+    <button id="jumpBtn" class="actionCircle" type="button" aria-label="Jump">JUMP</button>
   </div>
 
-</section>
-
-
-<!-- =========================================================
-     AVATAR CUSTOMIZER
-     ========================================================= -->
-<section
-  id="customizer"
-  class="overlay"
-  aria-hidden="true"
-  aria-labelledby="customizerTitle"
->
-
-  <div
-    class="sheet customSheet"
-    role="dialog"
-    aria-modal="true"
-  >
-
-    <header class="sheetHead">
-
-      <div>
-
-        <div class="eyebrow">
-          LOOK
+  <!-- GENERAL SHEET -->
+  <section id="overlay" class="overlay" aria-hidden="true" aria-labelledby="sheetTitle">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <header class="sheetHead">
+        <div>
+          <div id="sheetEyebrow" class="eyebrow">NAIJA HUSTLE</div>
+          <h2 id="sheetTitle">City</h2>
         </div>
+        <button id="sheetClose" class="close" type="button" aria-label="Close">×</button>
+      </header>
+      <div id="sheetBody" class="sheetBody"></div>
+    </div>
+  </section>
 
-        <h2 id="customizerTitle">
-          Customize Avatar
-        </h2>
+  <!-- AVATAR CUSTOMIZER -->
+  <section id="customizer" class="overlay" aria-hidden="true" aria-labelledby="customizerTitle">
+    <div class="sheet customSheet" role="dialog" aria-modal="true" aria-labelledby="customizerTitle">
+      <header class="sheetHead">
+        <div>
+          <div class="eyebrow">LOOK</div>
+          <h2 id="customizerTitle">Customize Avatar</h2>
+        </div>
+        <button id="closeCustomizer" class="close" type="button" aria-label="Close avatar customizer">×</button>
+      </header>
 
+      <div class="sheetBody">
+        <div id="sections"></div>
+        <div class="stickyActions">
+          <button id="randomBtn" class="secondary" type="button">RANDOM</button>
+          <button id="saveAvatar" class="primary" type="button">SAVE AVATAR</button>
+        </div>
       </div>
+    </div>
+  </section>
 
-      <button
-        id="closeCustomizer"
-        class="close"
-        type="button"
-        aria-label="Close avatar customizer"
-      >
-        ×
-      </button>
-
-    </header>
-
-    <div class="sheetBody">
-
-      <div id="sections"></div>
-
-      <div class="stickyActions">
-
-        <button
-          id="randomBtn"
-          class="secondary"
-          type="button"
-        >
-          RANDOM
-        </button>
-
-        <button
-          id="saveAvatar"
-          class="primary"
-          type="button"
-        >
-          SAVE AVATAR
-        </button>
-
+  <!-- LOADING SCREEN -->
+  <section id="loading" class="screen loading" aria-live="polite" aria-busy="true">
+    <div class="loadingCard">
+      <div class="brandLogo loadingLogo">
+        <img src="logo.svg" alt="Naija Hustle" width="330" height="84">
       </div>
-
+      <div class="brandBadge" aria-hidden="true">NH</div>
+      <h2>NAIJA HUSTLE</h2>
+      <p id="loadingText">Preparing your city...</p>
+      <div class="spinner" aria-hidden="true"></div>
     </div>
+  </section>
 
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     LOADING SCREEN
-     ========================================================= -->
-<section
-  id="loading"
-  class="screen loading"
-  aria-live="polite"
-  aria-busy="true"
->
-
-  <div class="loadingCard">
-
-    <div class="brandLogo loadingLogo">
-      <img
-        src="logo.svg"
-        alt="Naija Hustle"
-        width="330"
-        height="84"
-        loading="eager"
-      >
+  <noscript>
+    <div style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:#09100f;color:#fff;font-family:system-ui,sans-serif;text-align:center">
+      <div>
+        <h1>Naija Hustle</h1>
+        <p>JavaScript is required to play Naija Hustle. Enable JavaScript and reload the game.</p>
+      </div>
     </div>
+  </noscript>
 
-    <div
-      class="brandBadge"
-      aria-hidden="true"
-    >
-      NH
-    </div>
+  <!-- Login and guest-screen handling -->
+  <script>
+    (() => {
+      const loginScreen = document.getElementById("loginScreen");
+      const hud = document.getElementById("hud");
+      const loading = document.getElementById("loading");
+      const message = document.getElementById("loginMessage");
 
-    <h2>
-      NAIJA HUSTLE
-    </h2>
+      function showMessage(text) {
+        if (message) message.textContent = text;
+      }
 
-    <p id="loadingText">
-      Loading your city...
-    </p>
+      document.getElementById("guestBtn")?.addEventListener("click", () => {
+        loginScreen?.classList.add("hidden");
+        loading?.classList.add("hidden");
+        hud?.classList.remove("hidden");
 
-    <div
-      class="spinner"
-      aria-hidden="true"
-    ></div>
+        try {
+          localStorage.setItem("naijaHustleMode", "guest");
+        } catch (_) {}
 
-  </div>
+        window.dispatchEvent(new CustomEvent("naijahustle:guest"));
+      });
 
-</section>
+      document.getElementById("loginBtn")?.addEventListener("click", () => {
+        const email = document.getElementById("loginEmail")?.value.trim();
+        const password = document.getElementById("loginPassword")?.value;
 
+        if (!email || !password) {
+          showMessage("Enter your email and password.");
+          return;
+        }
 
-<!-- =========================================================
-     NO-JAVASCRIPT FALLBACK
-     ========================================================= -->
-<noscript>
-  <div
-    style="
-      position:fixed;
-      inset:0;
-      z-index:99999;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      background:#09100f;
-      color:#fff;
-      font-family:system-ui,sans-serif;
-      text-align:center;
-    "
-  >
-    <div>
-      <h1>Naija Hustle</h1>
-      <p>
-        JavaScript is required to play Naija Hustle.
-        Please enable JavaScript and reload the game.
-      </p>
-    </div>
-  </div>
-</noscript>
+        window.dispatchEvent(new CustomEvent("naijahustle:login", {
+          detail: { email, password }
+        }));
 
+        showMessage("Cloud login must be connected to your Supabase account before it can sign you in.");
+      });
 
-<!-- =========================================================
-     MAIN GAME SCRIPT
-     ========================================================= -->
-<script
-  type="module"
-  src="app.js"
-></script>
+      document.getElementById("signupBtn")?.addEventListener("click", () => {
+        const email = document.getElementById("loginEmail")?.value.trim();
+        const password = document.getElementById("loginPassword")?.value;
 
+        if (!email || !password) {
+          showMessage("Enter your email and a password of at least 6 characters.");
+          return;
+        }
+
+        if (password.length < 6) {
+          showMessage("Your password must contain at least 6 characters.");
+          return;
+        }
+
+        window.dispatchEvent(new CustomEvent("naijahustle:signup", {
+          detail: { email, password }
+        }));
+
+        showMessage("Account creation must be connected to Supabase before an account can be created.");
+      });
+
+      document.getElementById("loginForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        document.getElementById("loginBtn")?.click();
+      });
+
+      // Dismiss the loading layer without hiding the login screen.
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          loading?.classList.add("hidden");
+        }, 500);
+      });
+    })();
+  </script>
+
+  <script type="module" src="app.js"></script>
 </body>
-</html>
+  </html>
