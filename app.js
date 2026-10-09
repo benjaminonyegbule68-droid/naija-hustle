@@ -1,4658 +1,1818 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+// ============================================================
+// NAIJA HUSTLE — MODULAR APP.JS REPLACEMENT
+// Version: 2.0.0
+// Requires a browser environment and Three.js.
+// Optional cloud support: Supabase JS v2.
+// ============================================================
 
-/* =========================================================
-   NAIJA HUSTLE — APP.JS
-   Build your life. Build your hustle.
-   ========================================================= */
+import * as THREE from
+  "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
-const $ = id => document.getElementById(id);
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-const SUPABASE_URL = "https://pbqtbwiymlwksdtfsfcb.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
+// ------------------------------------------------------------
+// 1. UTILITIES
+// ------------------------------------------------------------
 
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = (selector) => document.querySelector(selector);
 
-const SAVE_KEY = "nh_world_save_v3";
-const AVATAR_KEY = "nh_avatar_v3";
-const QUALITY_KEY = "nh_quality";
+const clamp = (value, min, max) =>
+  Math.max(min, Math.min(max, value));
 
-function readQuality() {
-  try {
-    return localStorage.getItem(QUALITY_KEY) === "low" ? "low" : "high";
-  } catch {
-    return "high";
+const random = (min, max) =>
+  min + Math.random() * (max - min);
+
+const choice = (items) =>
+  items[Math.floor(Math.random() * items.length)];
+
+const money = (amount) =>
+  "₦" + Math.floor(amount).toLocaleString("en-NG");
+
+const safeText = (value) =>
+  String(value ?? "").replace(/[<>]/g, "");
+
+const wait = (ms) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+function notify(message) {
+  let element = $("#gameToast");
+
+  if (!element) {
+    element = document.createElement("div");
+    element.id = "gameToast";
+    document.body.appendChild(element);
+
+    Object.assign(element.style, {
+      position: "fixed",
+      bottom: "100px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#171717",
+      color: "#f4c95d",
+      border: "1px solid #9e7a2d",
+      padding: "12px 18px",
+      borderRadius: "12px",
+      zIndex: "10000",
+      font: "14px system-ui",
+      maxWidth: "85vw",
+      textAlign: "center",
+      pointerEvents: "none"
+    });
   }
+
+  element.textContent = message;
+  element.style.display = "block";
+
+  clearTimeout(notify.timer);
+  notify.timer = setTimeout(() => {
+    element.style.display = "none";
+  }, 2600);
 }
 
-/* =========================================================
-   AVATAR OPTIONS
-   ========================================================= */
+function makeButton(label, action) {
+  const button = document.createElement("button");
+  button.textContent = label;
 
-const OPTIONS = {
-  skinTone: {
-    label: "Skin Tone",
-    kind: "swatch",
-    values: {
-      light: "#f3c7a5",
-      honey: "#d99a6c",
-      tan: "#b9784e",
-      brown: "#855033",
-      deep: "#60351f",
-      dark: "#351d14"
-    }
-  },
+  Object.assign(button.style, {
+    background: "#191919",
+    color: "#f4c95d",
+    border: "1px solid #705821",
+    padding: "10px 14px",
+    borderRadius: "9px",
+    cursor: "pointer",
+    font: "inherit"
+  });
 
-  hairstyle: {
-    label: "Hairstyle",
-    values: {
-      low_cut: "Low Cut",
-      fade: "Fade",
-      high_top: "High Top",
-      afro: "Afro",
-      twists: "Twists",
-      braids: "Braids",
-      locs: "Locs",
-      headwrap: "Headwrap",
-      bald: "Bald"
-    }
-  },
+  button.addEventListener("click", action);
+  return button;
+}
 
-  hairColor: {
-    label: "Hair Color",
-    kind: "swatch",
-    values: {
-      black: "#151313",
-      darkBrown: "#2c1b14",
-      brown: "#4b2c1e",
-      burgundy: "#541d2c",
-      blonde: "#d6ad65",
-      grey: "#8d8d8d"
-    }
-  },
+// ------------------------------------------------------------
+// 2. GAME DATA
+// ------------------------------------------------------------
 
-  beard: {
-    label: "Beard",
-    values: {
-      none: "None",
-      stubble: "Stubble",
-      goatee: "Goatee",
-      full: "Full"
-    }
-  },
-
-  outfit: {
-    label: "Outfit",
-    values: {
-      hoodie: "Hoodie",
-      tee: "T-Shirt",
-      jersey: "Jersey",
-      kaftan: "Kaftan",
-      agbada: "Agbada",
-      ankara: "Ankara",
-      suit: "Suit"
-    }
-  },
-
-  outfitColor: {
-    label: "Outfit Color",
-    kind: "swatch",
-    values: {
-      default: "#315d50",
-      red: "#b72f2f",
-      blue: "#285ca8",
-      green: "#24734b",
-      purple: "#6942a8",
-      black: "#171717",
-      white: "#e8e4da",
-      gold: "#b88718",
-      teal: "#0F6B6F"
-    }
-  },
-
-  accessory: {
-    label: "Accessory",
-    values: {
-      none: "None",
-      cap: "Cap",
-      glasses: "Glasses",
-      sunglasses: "Sunglasses",
-      chain: "Chain",
-      headphones: "Headphones"
-    }
-  },
-
-  bodyBuild: {
-    label: "Body Build",
-    values: {
-      compact: "Compact",
-      standard: "Standard",
-      broad: "Broad"
-    }
-  },
-
-  height: {
-    label: "Height",
-    values: {
-      short: "Short",
-      standard: "Standard",
-      tall: "Tall"
-    }
-  }
+const CONFIG = {
+  version: "2.0.0",
+  worldSize: 100,
+  moveSpeed: 7,
+  sprintMultiplier: 1.55,
+  cameraZoom: 16,
+  dayLength: 300,
+  saveInterval: 15000
 };
-
-const DEFAULT_CFG = {
-  skinTone: "brown",
-  hairstyle: "fade",
-  hairColor: "black",
-  beard: "none",
-  outfit: "hoodie",
-  outfitColor: "default",
-  accessory: "none",
-  bodyBuild: "standard",
-  height: "standard"
-};
-
-/* =========================================================
-   HOUSING
-   ========================================================= */
-
-const HOUSING = [
-  {
-    id: "room",
-    name: "Basic Room",
-    area: "Surulere Edge",
-    rent: 8000,
-    move: 0,
-    comfort: 40,
-    desc: "Cheap start. Small space, low rent."
-  },
-  {
-    id: "self",
-    name: "Self-contained",
-    area: "Yaba",
-    rent: 18000,
-    move: 45000,
-    comfort: 52,
-    desc: "Your own toilet and kitchenette."
-  },
-  {
-    id: "flat",
-    name: "Mini Flat",
-    area: "Ikeja",
-    rent: 35000,
-    move: 120000,
-    comfort: 65,
-    desc: "One bedroom and a sitting room."
-  },
-  {
-    id: "two",
-    name: "2-Bedroom Flat",
-    area: "GRA",
-    rent: 65000,
-    move: 280000,
-    comfort: 76,
-    desc: "More room, more status, more bills."
-  },
-  {
-    id: "premium",
-    name: "Premium Apartment",
-    area: "Victoria Island",
-    rent: 110000,
-    move: 550000,
-    comfort: 88,
-    desc: "Better security, comfort and location."
-  },
-  {
-    id: "condo",
-    name: "High-end Condo",
-    area: "Lekki Phase 1",
-    rent: 220000,
-    move: 1200000,
-    comfort: 97,
-    desc: "Top-tier city living. Expensive but powerful."
-  }
-];
-
-/* =========================================================
-   CAREERS
-   ========================================================= */
 
 const CAREERS = [
-  {
-    id: "retail",
-    name: "Retail Associate",
-    skill: "charisma",
-    pay: 7000,
-    levelPay: 3400,
-    home: "market",
-    desc: "Sell products, learn customers and build your network."
-  },
-  {
-    id: "designer",
-    name: "Graphic Designer",
-    skill: "coding",
-    pay: 9000,
-    levelPay: 4300,
-    home: "office",
-    desc: "Design flyers, brands and campaigns."
-  },
-  {
-    id: "developer",
-    name: "Web Developer",
-    skill: "coding",
-    pay: 10000,
-    levelPay: 5600,
-    home: "office",
-    desc: "Build websites and digital products."
-  },
-  {
-    id: "chef",
-    name: "Chef",
-    skill: "cooking",
-    pay: 8000,
-    levelPay: 4200,
-    home: "restaurant",
-    desc: "Cook shifts and build your food reputation."
-  },
-  {
-    id: "fitness",
-    name: "Fitness Coach",
-    skill: "fitness",
-    pay: 7500,
-    levelPay: 4000,
-    home: "gym",
-    desc: "Coach clients and turn fitness into income."
-  },
-  {
-    id: "creator",
-    name: "Content Creator",
-    skill: "charisma",
-    pay: 6500,
-    levelPay: 5200,
-    home: "studio",
-    desc: "Build an audience and attract sponsorships."
-  },
-  {
-    id: "teacher",
-    name: "Tutor",
-    skill: "charisma",
-    pay: 6500,
-    levelPay: 3600,
-    home: "school",
-    desc: "Teach useful skills and grow a stable career."
-  },
-  {
-    id: "sales",
-    name: "Sales Executive",
-    skill: "hustle",
-    pay: 8000,
-    levelPay: 4600,
-    home: "office",
-    desc: "Close deals and chase commissions."
-  },
-  {
-    id: "photo",
-    name: "Photographer",
-    skill: "photography",
-    pay: 6500,
-    levelPay: 4300,
-    home: "studio",
-    desc: "Events, portraits and commercial shoots."
-  },
-  {
-    id: "event",
-    name: "Event Planner",
-    skill: "organization",
-    pay: 7000,
-    levelPay: 4900,
-    home: "market",
-    desc: "Coordinate vendors and memorable events."
-  },
-  {
-    id: "music",
-    name: "Music Creative",
-    skill: "music",
-    pay: 5500,
-    levelPay: 5600,
-    home: "club",
-    desc: "Perform, produce and build a fanbase."
-  },
-  {
-    id: "property",
-    name: "Property Agent",
-    skill: "charisma",
-    pay: 7000,
-    levelPay: 6800,
-    home: "office",
-    desc: "Close property deals and learn real estate."
-  },
-  {
-    id: "banking",
-    name: "Banking Associate",
-    skill: "charisma",
-    pay: 9200,
-    levelPay: 5200,
-    home: "office",
-    desc: "Structured work with strong promotion potential."
-  },
-  {
-    id: "logistics",
-    name: "Logistics Coordinator",
-    skill: "organization",
-    pay: 7800,
-    levelPay: 5100,
-    home: "market",
-    desc: "Move packages, people and information."
-  }
+  { name: "Unemployed", salary: 0 },
+  { name: "Shop Assistant", salary: 18000 },
+  { name: "Delivery Rider", salary: 25000 },
+  { name: "Graphic Designer", salary: 40000 },
+  { name: "Web Developer", salary: 65000 },
+  { name: "Business Owner", salary: 85000 }
 ];
-
-/* =========================================================
-   GIGS
-   ========================================================= */
 
 const GIGS = [
-  {
-    id: "design",
-    name: "Quick Design Job",
-    cost: 500,
-    reward: 5500,
-    min: 60,
-    skill: "coding"
-  },
-  {
-    id: "delivery",
-    name: "Local Delivery",
-    cost: 800,
-    reward: 4200,
-    min: 50,
-    skill: "fitness"
-  },
-  {
-    id: "food",
-    name: "Food Order",
-    cost: 1200,
-    reward: 6200,
-    min: 75,
-    skill: "cooking"
-  },
-  {
-    id: "photo",
-    name: "Street Photo Job",
-    cost: 400,
-    reward: 7000,
-    min: 90,
-    skill: "photography"
-  },
-  {
-    id: "content",
-    name: "Brand Social Content",
-    cost: 600,
-    reward: 8500,
-    min: 100,
-    skill: "charisma"
-  },
-  {
-    id: "event",
-    name: "Event Crew",
-    cost: 1500,
-    reward: 9000,
-    min: 120,
-    skill: "organization"
-  },
-  {
-    id: "flip",
-    name: "Accessory Flip",
-    cost: 3000,
-    reward: 5200,
-    min: 45,
-    skill: "hustle"
-  }
+  { name: "Deliver a package", reward: 3500, energy: 8 },
+  { name: "Design a flyer", reward: 5000, energy: 10 },
+  { name: "Help at a shop", reward: 2500, energy: 6 },
+  { name: "Build a landing page", reward: 9000, energy: 15 }
 ];
 
-/* =========================================================
-   SHOPS
-   ========================================================= */
-
-const SHOPS = [
-  {
-    id: "food",
-    name: "Mama Kemi's Kitchen",
-    kind: "food",
-    x: 0,
-    z: -56,
-    items: [
-      {
-        id: "jollof",
-        name: "Jollof + Chicken",
-        price: 1400,
-        e: { hunger: 24, fun: 4 }
-      },
-      {
-        id: "shawarma",
-        name: "Shawarma",
-        price: 1800,
-        e: { hunger: 17, fun: 9 }
-      },
-      {
-        id: "drink",
-        name: "Cold Drink",
-        price: 700,
-        e: { hunger: 4, fun: 8 }
-      }
-    ]
-  },
-
-  {
-    id: "market",
-    name: "Ariaria Tech & Style",
-    kind: "market",
-    x: -28,
-    z: -28,
-    items: [
-      {
-        id: "tee",
-        name: "Fresh Street Tee",
-        price: 6500,
-        e: { fun: 6, social: 2 }
-      },
-      {
-        id: "sneakers",
-        name: "Sneakers",
-        price: 18000,
-        e: { fun: 7, social: 4 }
-      },
-      {
-        id: "phone",
-        name: "Midrange Phone",
-        price: 125000,
-        e: { focus: 8, social: 7 }
-      }
-    ]
-  },
-
-  {
-    id: "home",
-    name: "Home & Living",
-    kind: "home",
-    x: -28,
-    z: 28,
-    items: [
-      {
-        id: "fan",
-        name: "Standing Fan",
-        price: 28000,
-        e: { energy: 4 }
-      },
-      {
-        id: "desk",
-        name: "Work Desk",
-        price: 42000,
-        e: { focus: 10 }
-      },
-      {
-        id: "bed",
-        name: "Better Bed",
-        price: 65000,
-        e: { energy: 12 }
-      }
-    ]
-  },
-
-  {
-    id: "style",
-    name: "Glow Spa & Grooming",
-    kind: "style",
-    x: 0,
-    z: 56,
-    items: [
-      {
-        id: "barber",
-        name: "Sharp Barber Cut",
-        price: 2500,
-        e: { hygiene: 12, social: 4 }
-      },
-      {
-        id: "spa",
-        name: "Spa Session",
-        price: 7500,
-        e: { hygiene: 28, fun: 12 }
-      },
-      {
-        id: "gym",
-        name: "Gym Session",
-        price: 2500,
-        e: { fitness: 4, energy: -5 }
-      }
-    ]
-  }
+const ITEMS = [
+  { name: "Jollof Rice", price: 1500, type: "food", hunger: 35 },
+  { name: "Bottle of Water", price: 300, type: "drink", hunger: 5 },
+  { name: "Shower Supplies", price: 800, type: "hygiene", hygiene: 35 },
+  { name: "Energy Drink", price: 700, type: "drink", energy: 20 }
 ];
 
-/* =========================================================
-   PLACES
-   ========================================================= */
-
-const PLACES = [
-  {
-    id: "home",
-    name: "Your Home",
-    kind: "home",
-    x: -28,
-    z: 28,
-    color: "#55d88b"
-  },
-  {
-    id: "job",
-    name: "Job Centre",
-    kind: "job",
-    x: 28,
-    z: -28,
-    color: "#56c7ff"
-  },
-  {
-    id: "market",
-    name: "Ariaria Tech & Style",
-    kind: "market",
-    x: -28,
-    z: -28,
-    color: "#ff9445"
-  },
-  {
-    id: "restaurant",
-    name: "Mama Kemi's Kitchen",
-    kind: "food",
-    x: 0,
-    z: -56,
-    color: "#f39a52"
-  },
-  {
-    id: "office",
-    name: "Onyx Office Hub",
-    kind: "office",
-    x: 56,
-    z: -56,
-    color: "#9098ff"
-  },
-  {
-    id: "club",
-    name: "Pulse Club",
-    kind: "club",
-    x: 56,
-    z: 0,
-    color: "#c268e7"
-  },
-  {
-    id: "hotel",
-    name: "City View Hotel",
-    kind: "hotel",
-    x: -56,
-    z: 0,
-    color: "#58acff"
-  },
-  {
-    id: "spa",
-    name: "Glow Spa & Grooming",
-    kind: "style",
-    x: 0,
-    z: 56,
-    color: "#e86da8"
-  },
-  {
-    id: "gym",
-    name: "FitLife Gym",
-    kind: "gym",
-    x: -56,
-    z: -56,
-    color: "#57d5c7"
-  },
-  {
-    id: "school",
-    name: "Skill House",
-    kind: "school",
-    x: -56,
-    z: 56,
-    color: "#9cd16f"
-  },
-  {
-    id: "hall",
-    name: "Hall of Fame",
-    kind: "hall",
-    x: 56,
-    z: 56,
-    color: "#d277ff"
-  }
-];
-
-/* =========================================================
-   SKILLS, BUSINESSES AND VEHICLES
-   ========================================================= */
-
-const NAMES = [
-  "Ada", "Chinedu", "Tolu", "Mimi", "Seyi",
-  "Emeka", "Amaka", "Zainab", "Dami", "Kelechi",
-  "Favour", "Ife", "Obi", "Uche", "Nneka",
-  "Kunle", "Aisha", "Yomi"
-];
-
-const SKILLS = [
-  "hustle",
-  "charisma",
-  "coding",
-  "fitness",
-  "cooking",
-  "photography",
-  "organization",
-  "music"
-];
-
-const INVESTMENTS = [
-  {
-    id: "kiosk",
-    name: "Street Kiosk",
-    cost: 85000,
-    income: 9000,
-    req: 1
-  },
-  {
-    id: "foodcart",
-    name: "Food Cart",
-    cost: 120000,
-    income: 14000,
-    req: 2
-  },
-  {
-    id: "studio",
-    name: "Creative Studio",
-    cost: 250000,
-    income: 25000,
-    req: 3
-  },
-  {
-    id: "delivery",
-    name: "Delivery Hub",
-    cost: 400000,
-    income: 42000,
-    req: 4
-  },
-  {
-    id: "property",
-    name: "Rental Property",
-    cost: 800000,
-    income: 76000,
-    req: 5
-  }
+const HOMES = [
+  { name: "Shared Room", price: 0, rent: 0 },
+  { name: "Basic Apartment", price: 150000, rent: 5000 },
+  { name: "Comfort Apartment", price: 450000, rent: 15000 },
+  { name: "Luxury Apartment", price: 1500000, rent: 45000 }
 ];
 
 const VEHICLES = [
-  {
-    id: "feet",
-    name: "Walk",
-    fare: 0,
-    purchase: 0,
-    speed: 1,
-    owned: true
-  },
-  {
-    id: "danfo",
-    name: "Danfo",
-    fare: 600,
-    purchase: 0,
-    speed: 3,
-    owned: false
-  },
-  {
-    id: "ride",
-    name: "Ride App",
-    fare: 2200,
-    purchase: 0,
-    speed: 6,
-    owned: false
-  },
-  {
-    id: "bike",
-    name: "Bike",
-    fare: 0,
-    purchase: 85000,
-    speed: 1.55,
-    owned: false
-  },
-  {
-    id: "car",
-    name: "Personal Car",
-    fare: 0,
-    purchase: 650000,
-    speed: 1.9,
-    owned: false
-  }
+  { name: "Bicycle", price: 12000, speed: 1.2 },
+  { name: "Okada", price: 85000, speed: 1.6 },
+  { name: "Compact Car", price: 450000, speed: 2.0 }
 ];
 
-/* =========================================================
-   QUESTS
-   ========================================================= */
-
-const QUESTS = [
-  {
-    id: "job",
-    title: "First Hustle",
-    desc: "Complete your first paid shift or gig.",
-    reward: 6000,
-    xp: 45,
-    done: s => s.totalEarnings > 0
-  },
-  {
-    id: "meal",
-    title: "Feed Yourself",
-    desc: "Buy food and keep the day moving.",
-    reward: 2500,
-    xp: 18,
-    done: s => s.stats.meals > 0
-  },
-  {
-    id: "skill",
-    title: "Level Up",
-    desc: "Reach skill level 2 in any skill.",
-    reward: 3000,
-    xp: 25,
-    done: s => Object.values(s.skills).some(v => v >= 2)
-  },
-  {
-    id: "home",
-    title: "Move Up",
-    desc: "Upgrade your home.",
-    reward: 7000,
-    xp: 50,
-    done: s => s.housing > 0
-  },
-  {
-    id: "friend",
-    title: "Build A Network",
-    desc: "Raise a friendship to 25.",
-    reward: 3500,
-    xp: 28,
-    done: s => Object.values(s.relationships).some(v => v >= 25)
-  },
-  {
-    id: "business",
-    title: "Small Boss",
-    desc: "Own an investment.",
-    reward: 12000,
-    xp: 65,
-    done: s => s.investments.length > 0
-  },
-  {
-    id: "vehicle",
-    title: "Find Your Motion",
-    desc: "Own personal transport.",
-    reward: 9000,
-    xp: 40,
-    done: s => s.ownedVehicles.some(id => id !== "feet")
-  },
-  {
-    id: "wealth",
-    title: "Six Figures",
-    desc: "Hold at least ₦100,000 cash.",
-    reward: 15000,
-    xp: 55,
-    done: s => s.money >= 100000
-  }
+const BUILDINGS = [
+  { name: "Market", kind: "shop", x: -18, z: -8, color: 0xb57b44 },
+  { name: "Food Spot", kind: "food", x: 0, z: -16, color: 0xb84b35 },
+  { name: "Clinic", kind: "clinic", x: 18, z: -8, color: 0xe7e0d4 },
+  { name: "Office", kind: "job", x: -18, z: 12, color: 0x738ba5 },
+  { name: "Apartment", kind: "home", x: 0, z: 16, color: 0x9d8a74 },
+  { name: "Garage", kind: "garage", x: 18, z: 12, color: 0x7a7771 }
 ];
 
-/* =========================================================
-   GAME STATE
-   ========================================================= */
-
-const state = {
-  user: null,
-  guest: false,
-  accountEmail: "",
-
-  name: "Guest",
-  district: "Lagos",
-
-  day: 1,
-  time: 8 * 60,
-
+const DEFAULT_STATE = {
   money: 25000,
-  xp: 0,
   level: 1,
-
-  housing: 0,
-  rentDue: 14,
-
-  needs: {
-    hunger: 82,
-    energy: 90,
-    hygiene: 86,
-    fun: 76,
-    social: 70,
-    bladder: 94,
-    focus: 75
-  },
-
-  skills: Object.fromEntries(SKILLS.map(k => [k, 1])),
-
-  career: null,
-  careerLevel: 0,
-
+  xp: 0,
+  day: 1,
+  time: 8,
+  career: "Unemployed",
+  homeIndex: 0,
+  vehicleIndex: -1,
   inventory: [],
-  relationships: {},
-  investments: [],
-
-  vehicle: "feet",
-  ownedVehicles: ["feet"],
-
-  achievements: [],
-  quest: 0,
-
-  totalEarnings: 0,
-  weeklyEarnings: 0,
-
+  completedQuests: [],
+  activeQuest: "Earn your first ₦5,000",
+  needs: {
+    hunger: 85,
+    energy: 90,
+    hygiene: 80,
+    fun: 75,
+    social: 60,
+    bladder: 85
+  },
+  skills: {
+    creativity: 1,
+    business: 1,
+    technology: 1,
+    social: 1
+  },
+  avatar: {
+    skinTone: "#8d5524",
+    hairColor: "#201710",
+    hairstyle: "short",
+    outfitColor: "#315c80",
+    accessory: "none"
+  },
+  player: { x: 0, z: 0 },
   stats: {
-    meals: 0,
-    days: 0,
-    shifts: 0,
-    gigs: 0
-  },
-
-  cfg: { ...DEFAULT_CFG },
-
-  pos: {
-    x: -28,
-    y: 0,
-    z: 28
-  },
-
-  emote: "none",
-  status: "Idle",
-  activity: "Get to the Job Centre and choose a hustle.",
-
-  run: false,
-
-  joy: {
-    active: false,
-    x: 0,
-    y: 0
-  },
-
-  keys: {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-    shift: false
-  },
-
-  jump: false,
-  quality: readQuality()
+    jobsCompleted: 0,
+    gigsCompleted: 0,
+    itemsPurchased: 0
+  }
 };
 
-/* =========================================================
-   THREE.JS RUNTIME
-   ========================================================= */
-
-let scene;
-let camera;
-let renderer;
-let sun;
-let hemi;
-let player;
-let npcGroup;
-let carGroup;
-
-let last = performance.now();
-let saveClock = 0;
-let mapClock = 0;
-let hudClock = 0;
-
-let geoCache = new Map();
-let matCache = new Map();
-
-let npcs = [];
-let cars = [];
-let route = null;
-
-let cameraState = "third";
-let routePulse = 0;
-
-let starting = false;
-let gameStarted = false;
-let setupComplete = false;
-let inputInstalled = false;
-
-/* =========================================================
-   GENERAL HELPERS
-   ========================================================= */
-
-function clamp(v, min = 0, max = 100) {
-  const n = Number(v);
-  if (!Number.isFinite(n)) return min;
-  return Math.max(min, Math.min(max, n));
+function createInitialState() {
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
 }
 
-function fmt(v) {
-  return Math.round(Number(v) || 0).toLocaleString("en-NG");
-}
+let state = createInitialState();
 
-function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+// ------------------------------------------------------------
+// 3. STATE VALIDATION AND SAVING
+// ------------------------------------------------------------
 
-function cap(s) {
-  return String(s || "")
-    .replaceAll("_", " ")
-    .replace(/^./, x => x.toUpperCase());
-}
+const SAVE_KEY = "naijaHustleSave_v2";
 
-function setText(id, value) {
-  const el = $(id);
-  if (el) el.textContent = value;
-}
+function normalizeState(input) {
+  const defaults = createInitialState();
 
-function on(id, eventName, handler) {
-  const el = $(id);
-  if (el) el.addEventListener(eventName, handler);
-}
+  if (!input || typeof input !== "object") return defaults;
 
-function spend(amount) {
-  const value = Math.max(0, Number(amount) || 0);
+  const result = {
+    ...defaults,
+    ...input,
+    needs: { ...defaults.needs, ...(input.needs || {}) },
+    skills: { ...defaults.skills, ...(input.skills || {}) },
+    avatar: { ...defaults.avatar, ...(input.avatar || {}) },
+    player: { ...defaults.player, ...(input.player || {}) },
+    stats: { ...defaults.stats, ...(input.stats || {}) }
+  };
 
-  if (state.money < value) return false;
+  result.money = Math.max(0, Number(result.money) || 0);
+  result.level = Math.max(1, Number(result.level) || 1);
+  result.xp = Math.max(0, Number(result.xp) || 0);
+  result.day = Math.max(1, Number(result.day) || 1);
+  result.time = clamp(Number(result.time) || 8, 0, 24);
 
-  state.money -= value;
-  return true;
-}
-
-function earn(amount) {
-  const value = Math.max(0, Number(amount) || 0);
-
-  state.money += value;
-  state.totalEarnings += value;
-  state.weeklyEarnings += value;
-
-  gainXP(Math.max(6, Math.round(value / 1000)));
-}
-
-function gainXP(amount) {
-  state.xp += Math.max(0, Number(amount) || 0);
-
-  while (state.xp >= state.level * 100) {
-    state.xp -= state.level * 100;
-    state.level++;
-
-    toast(`Level ${state.level} reached.`);
+  for (const key of Object.keys(result.needs)) {
+    result.needs[key] = clamp(
+      Number(result.needs[key]) || 0, 0, 100
+    );
   }
-}
 
-function addNeed(key, amount) {
-  if (!(key in state.needs)) return;
-
-  state.needs[key] = clamp(
-    state.needs[key] + amount,
-    0,
-    100
+  result.player.x = clamp(
+    Number(result.player.x) || 0,
+    -CONFIG.worldSize,
+    CONFIG.worldSize
   );
-}
 
-function sanitize(raw) {
-  const result = { ...DEFAULT_CFG };
+  result.player.z = clamp(
+    Number(result.player.z) || 0,
+    -CONFIG.worldSize,
+    CONFIG.worldSize
+  );
 
-  if (!raw || typeof raw !== "object") {
-    return result;
-  }
-
-  for (const key of Object.keys(DEFAULT_CFG)) {
-    if (
-      OPTIONS[key]?.values &&
-      Object.prototype.hasOwnProperty.call(
-        OPTIONS[key].values,
-        raw[key]
-      )
-    ) {
-      result[key] = raw[key];
-    }
+  if (!Array.isArray(result.inventory)) result.inventory = [];
+  if (!Array.isArray(result.completedQuests)) {
+    result.completedQuests = [];
   }
 
   return result;
 }
 
-/* =========================================================
-   THREE.JS GEOMETRY AND MATERIAL CACHES
-   ========================================================= */
-
-function geo(key, make) {
-  if (!geoCache.has(key)) {
-    geoCache.set(key, make());
-  }
-
-  return geoCache.get(key);
-}
-
-function mat(color, rough = 0.72, metal = 0, opts = {}) {
-  const key = `${color}|${rough}|${metal}|${JSON.stringify(opts)}`;
-
-  if (!matCache.has(key)) {
-    matCache.set(
-      key,
-      new THREE.MeshStandardMaterial({
-        color,
-        roughness: rough,
-        metalness: metal,
-        ...opts
-      })
-    );
-  }
-
-  return matCache.get(key);
-}
-
-function box(x, y, z) {
-  return geo(
-    `b${x}|${y}|${z}`,
-    () => new THREE.BoxGeometry(x, y, z)
-  );
-}
-
-function sph(r) {
-  return geo(
-    `s${r}`,
-    () => new THREE.SphereGeometry(r, 18, 14)
-  );
-}
-
-function cyl(r1, r2, h, segments = 14) {
-  return geo(
-    `c${r1}|${r2}|${h}|${segments}`,
-    () => new THREE.CylinderGeometry(r1, r2, h, segments)
-  );
-}
-
-function capGeo(r, length) {
-  return geo(
-    `p${r}|${length}`,
-    () => new THREE.CapsuleGeometry(r, length, 8, 12)
-  );
-}
-
-function torus(r, tube, rs = 10, ts = 20, arc = Math.PI * 2) {
-  return geo(
-    `t${r}|${tube}|${rs}|${ts}|${arc}`,
-    () => new THREE.TorusGeometry(r, tube, rs, ts, arc)
-  );
-}
-
-/* =========================================================
-   CHARACTER CREATION
-   ========================================================= */
-
-function createCharacter(raw, scale = 0.82) {
-  const cfg = sanitize(raw);
-
-  const root = new THREE.Group();
-  root.scale.setScalar(scale);
-
-  const skin = mat(
-    OPTIONS.skinTone.values[cfg.skinTone] || "#855033"
-  );
-
-  const hair = mat(
-    OPTIONS.hairColor.values[cfg.hairColor] || "#151313"
-  );
-
-  const outfit = mat(
-    OPTIONS.outfitColor.values[cfg.outfitColor] || "#315d50"
-  );
-
-  const dark = mat("#171717");
-  const white = mat("#f4f1ea");
-
-  const W =
-    cfg.bodyBuild === "compact"
-      ? 0.88
-      : cfg.bodyBuild === "broad"
-        ? 1.12
-        : 1;
-
-  const S =
-    cfg.bodyBuild === "compact"
-      ? 0.92
-      : cfg.bodyBuild === "broad"
-        ? 1.12
-        : 1;
-
-  const H =
-    cfg.height === "short"
-      ? 0.94
-      : cfg.height === "tall"
-        ? 1.07
-        : 1;
-
-  const hips = new THREE.Group();
-  hips.position.y = 1.02 * H;
-  root.add(hips);
-
-  const body = new THREE.Mesh(
-    capGeo(0.32 * W, 0.75 * H),
-    outfit
-  );
-
-  body.scale.set(1.2 * S, 1, 0.83 * W);
-  body.position.y = 0.46 * H;
-  hips.add(body);
-
-  const spine = new THREE.Group();
-  spine.position.y = 0.35 * H;
-  hips.add(spine);
-
-  const neck = new THREE.Mesh(
-    cyl(0.13, 0.14, 0.22, 16),
-    skin
-  );
-
-  neck.position.y = 0.84 * H;
-  spine.add(neck);
-
-  const head = new THREE.Group();
-  head.position.y = 1.12 * H;
-  spine.add(head);
-
-  const face = new THREE.Mesh(sph(0.36), skin);
-  face.scale.set(1, 0.99, 0.93);
-  head.add(face);
-
-  for (const x of [-0.125, 0.125]) {
-    const eye = new THREE.Mesh(sph(0.082), white);
-
-    eye.scale.set(1, 0.86, 0.45);
-    eye.position.set(x, 0.045, 0.325);
-
-    head.add(eye);
-
-    const pupil = new THREE.Mesh(sph(0.042), dark);
-
-    pupil.scale.set(0.9, 0.95, 0.45);
-    pupil.position.set(x, 0.045, 0.36);
-
-    head.add(pupil);
-  }
-
-  const nose = new THREE.Mesh(sph(0.07), skin);
-
-  nose.scale.set(0.7, 1, 1.2);
-  nose.position.set(0, -0.04, 0.36);
-
-  head.add(nose);
-
-  const mouth = new THREE.Mesh(
-    capGeo(0.035, 0.13),
-    mat("#5b2825")
-  );
-
-  mouth.rotation.z = Math.PI / 2;
-  mouth.scale.set(1, 0.6, 0.55);
-  mouth.position.set(0, -0.17, 0.345);
-
-  head.add(mouth);
-
-  if (cfg.hairstyle !== "bald") {
-    if (cfg.hairstyle === "afro") {
-      const hairstyle = new THREE.Mesh(sph(0.43), hair);
-
-      hairstyle.scale.set(1.08, 0.9, 1.08);
-      hairstyle.position.y = 0.18;
-
-      head.add(hairstyle);
-    } else if (
-      ["twists", "locs", "braids"].includes(cfg.hairstyle)
-    ) {
-      const hairstyle = new THREE.Mesh(sph(0.37), hair);
-
-      hairstyle.scale.set(1, 0.63, 1);
-      hairstyle.position.y = 0.17;
-
-      head.add(hairstyle);
-
-      const count =
-        cfg.hairstyle === "braids"
-          ? 12
-          : cfg.hairstyle === "locs"
-            ? 14
-            : 10;
-
-      for (let i = 0; i < count; i++) {
-        const angle = (i / count) * Math.PI * 2;
-
-        const strand = new THREE.Mesh(
-          capGeo(
-            0.052,
-            cfg.hairstyle === "locs" ? 0.33 : 0.27
-          ),
-          hair
-        );
-
-        strand.position.set(
-          Math.cos(angle) * 0.28,
-          0.14,
-          Math.sin(angle) * 0.28
-        );
-
-        head.add(strand);
-      }
-    } else {
-      const hairstyle = new THREE.Mesh(sph(0.38), hair);
-
-      hairstyle.scale.set(
-        1,
-        cfg.hairstyle === "fade" ? 0.52 : 0.63,
-        1
-      );
-
-      hairstyle.position.y = 0.2;
-
-      head.add(hairstyle);
-    }
-  }
-
-  if (cfg.beard !== "none") {
-    const beard = new THREE.Mesh(
-      sph(cfg.beard === "full" ? 0.22 : 0.17),
-      hair
-    );
-
-    beard.scale.set(1, 0.7, 0.55);
-    beard.position.set(0, -0.18, 0.34);
-
-    head.add(beard);
-  }
-
-  if (cfg.accessory === "cap") {
-    const cap = new THREE.Mesh(sph(0.39), dark);
-
-    cap.scale.set(1, 0.44, 1);
-    cap.position.y = 0.29;
-
-    head.add(cap);
-
-    const brim = new THREE.Mesh(box(0.66, 0.04, 0.25), dark);
-
-    brim.position.set(0, 0.22, 0.43);
-
-    head.add(brim);
-  }
-
-  if (
-    cfg.accessory === "glasses" ||
-    cfg.accessory === "sunglasses"
-  ) {
-    const frame = mat(
-      cfg.accessory === "sunglasses"
-        ? "#101010"
-        : "#303030"
-    );
-
-    for (const x of [-0.16, 0.16]) {
-      const lens = new THREE.Mesh(box(0.18, 0.1, 0.03), frame);
-
-      lens.position.set(x, 0.04, 0.43);
-
-      head.add(lens);
-    }
-
-    const bridge = new THREE.Mesh(box(0.11, 0.03, 0.03), frame);
-
-    bridge.position.set(0, 0.04, 0.43);
-
-    head.add(bridge);
-  }
-
-  if (cfg.accessory === "chain") {
-    const chain = new THREE.Mesh(
-      torus(0.25, 0.022, 8, 24),
-      mat("#d7aa28", 0.3, 0.8)
-    );
-
-    chain.rotation.x = Math.PI / 2;
-    chain.position.set(0, -0.48, 0.4);
-
-    root.add(chain);
-  }
-
-  if (cfg.accessory === "headphones") {
-    const band = new THREE.Mesh(
-      torus(0.27, 0.035, 8, 24, Math.PI),
-      dark
-    );
-
-    band.position.y = 0.16;
-    band.rotation.x = Math.PI / 2;
-
-    head.add(band);
-  }
-
-  const legs = [];
-  const arms = [];
-
-  for (const x of [-0.2 * W, 0.2 * W]) {
-    const leg = new THREE.Group();
-
-    leg.position.x = x;
-
-    hips.add(leg);
-
-    const thigh = new THREE.Mesh(
-      capGeo(0.14, 0.42 * H),
-      outfit
-    );
-
-    thigh.position.y = -0.3 * H;
-
-    leg.add(thigh);
-
-    const shin = new THREE.Mesh(
-      capGeo(0.12, 0.42 * H),
-      outfit
-    );
-
-    shin.position.y = -0.75 * H;
-
-    leg.add(shin);
-
-    const shoe = new THREE.Mesh(
-      box(0.3, 0.16, 0.5),
-      dark
-    );
-
-    shoe.position.set(0, -1.06 * H, 0.1);
-
-    leg.add(shoe);
-    legs.push(leg);
-  }
-
-  for (const x of [-0.5 * S, 0.5 * S]) {
-    const arm = new THREE.Group();
-
-    arm.position.set(x, 0.62 * H, 0);
-
-    spine.add(arm);
-
-    const upper = new THREE.Mesh(
-      capGeo(0.125, 0.36 * H),
-      outfit
-    );
-
-    upper.position.y = -0.2 * H;
-
-    arm.add(upper);
-
-    const forearm = new THREE.Mesh(
-      capGeo(0.105, 0.32 * H),
-      skin
-    );
-
-    forearm.position.y = -0.57 * H;
-
-    arm.add(forearm);
-
-    const hand = new THREE.Mesh(sph(0.13), skin);
-
-    hand.position.y = -0.79 * H;
-
-    arm.add(hand);
-    arms.push(arm);
-  }
-
-  return {
-    root,
-    hips,
-    spine,
-    head,
-    legs,
-    arms,
-    cfg,
-    time: Math.random() * 6
-  };
-}
-
-function buildPlayer() {
-  player = createCharacter(state.cfg);
-
-  player.root.position.set(
-    state.pos.x,
-    state.pos.y || 0,
-    state.pos.z
-  );
-
-  scene.add(player.root);
-}
-
-function rebuildPlayer() {
-  if (!scene) return;
-
-  if (!player) {
-    buildPlayer();
-    return;
-  }
-
-  const old = player.root;
-  const position = old.position.clone();
-  const rotation = old.rotation.clone();
-
-  scene.remove(old);
-
-  player = createCharacter(state.cfg);
-
-  player.root.position.copy(position);
-  player.root.rotation.copy(rotation);
-
-  scene.add(player.root);
-
-  state.pos = {
-    x: position.x,
-    y: position.y,
-    z: position.z
-  };
-}
-
-/* =========================================================
-   WORLD CONSTRUCTION
-   ========================================================= */
-
-function setup() {
-  if (setupComplete) return;
-
-  const game = $("game");
-
-  if (!game) {
-    throw new Error("The #game element is missing from index.html.");
-  }
-
-  scene = new THREE.Scene();
-
-  scene.background = new THREE.Color("#8cc2c7");
-  scene.fog = new THREE.Fog("#8cc2c7", 48, 190);
-
-  camera = new THREE.PerspectiveCamera(
-    55,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    260
-  );
-
-  renderer = new THREE.WebGLRenderer({
-    antialias: state.quality !== "low",
-    powerPreference: "high-performance"
-  });
-
-  renderer.setPixelRatio(
-    state.quality === "low"
-      ? 1
-      : Math.min(window.devicePixelRatio || 1, 2)
-  );
-
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  renderer.shadowMap.enabled = state.quality !== "low";
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-  game.appendChild(renderer.domElement);
-
-  hemi = new THREE.HemisphereLight(
-    "#e8ffff",
-    "#3c4638",
-    1.4
-  );
-
-  scene.add(hemi);
-
-  sun = new THREE.DirectionalLight("#fff1d4", 2);
-
-  sun.position.set(40, 80, 30);
-  sun.castShadow = state.quality !== "low";
-  sun.shadow.mapSize.set(1024, 1024);
-
-  scene.add(sun);
-
-  const world = new THREE.Group();
-
-  scene.add(world);
-
-  buildWorld(world);
-
-  npcGroup = new THREE.Group();
-  carGroup = new THREE.Group();
-
-  scene.add(npcGroup);
-  scene.add(carGroup);
-
-  buildPlayer();
-  buildNPCs();
-  buildCars();
-
-  buildCustomizer();
-  attachInput();
-
-  window.addEventListener("resize", resize);
-
-  updateHUD();
-
-  setupComplete = true;
-}
-
-function buildWorld(group) {
-  const ground = new THREE.Mesh(
-    box(210, 0.2, 210),
-    mat("#5c6b58", 0.95)
-  );
-
-  ground.position.y = -0.1;
-  ground.receiveShadow = true;
-
-  group.add(ground);
-
-  const asphalt = mat("#2b3331", 1);
-  const stripe = mat("#d8d0a3", 0.8);
-
-  for (let i = -3; i <= 3; i++) {
-    const verticalRoad = new THREE.Mesh(
-      box(13, 0.04, 210),
-      asphalt
-    );
-
-    verticalRoad.position.x = i * 28;
-
-    group.add(verticalRoad);
-
-    const horizontalRoad = new THREE.Mesh(
-      box(210, 0.04, 13),
-      asphalt
-    );
-
-    horizontalRoad.position.z = i * 28;
-
-    group.add(horizontalRoad);
-
-    const verticalStripe = new THREE.Mesh(
-      box(0.18, 0.045, 210),
-      stripe
-    );
-
-    verticalStripe.position.x = i * 28;
-
-    group.add(verticalStripe);
-
-    const horizontalStripe = new THREE.Mesh(
-      box(210, 0.045, 0.18),
-      stripe
-    );
-
-    horizontalStripe.position.z = i * 28;
-
-    group.add(horizontalStripe);
-  }
-
-  PLACES.forEach((place, index) => {
-    buildPlace(group, place, index);
-  });
-
-  for (let i = 0; i < 55; i++) {
-    const x = Math.random() * 180 - 90;
-    const z = Math.random() * 180 - 90;
-
-    const nearPlace = PLACES.some(
-      place => Math.hypot(place.x - x, place.z - z) < 10
-    );
-
-    if (nearPlace) continue;
-
-    const type = pick(["tree", "stall", "house", "lamp"]);
-
-    if (type === "tree") tree(group, x, z);
-    if (type === "stall") stall(group, x, z);
-    if (type === "house") house(group, x, z);
-    if (type === "lamp") lamp(group, x, z);
-  }
-}
-
-function label(root, text, x, y, z) {
-  const canvas = document.createElement("canvas");
-
-  canvas.width = 512;
-  canvas.height = 88;
-
-  const ctx = canvas.getContext("2d");
-
-  if (!ctx) return;
-
-  ctx.fillStyle = "#14201F";
-  ctx.fillRect(0, 0, 512, 88);
-
-  ctx.fillStyle = "#FFC20E";
-  ctx.font = "bold 38px system-ui";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  ctx.fillText(text, 256, 44);
-
-  const texture = new THREE.CanvasTexture(canvas);
-
-  const sprite = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: texture })
-  );
-
-  sprite.scale.set(7.3, 1.25, 1);
-  sprite.position.set(x, y, z);
-
-  root.add(sprite);
-}
-
-function buildPlace(group, place, index) {
-  const building = new THREE.Group();
-
-  building.position.set(place.x, 0, place.z);
-
-  const base = new THREE.Mesh(
-    box(11, 0.5, 9),
-    mat(index % 2 ? "#b78d68" : "#b6a776")
-  );
-
-  base.position.y = 0.25;
-
-  building.add(base);
-
-  const walls = new THREE.Mesh(
-    box(10, 6.6, 8),
-    mat("#e0cfb0")
-  );
-
-  walls.position.y = 3.55;
-
-  building.add(walls);
-
-  const roof = new THREE.Mesh(
-    box(11, 0.55, 9),
-    mat(index % 2 ? "#345d58" : "#95453a")
-  );
-
-  roof.position.y = 7;
-
-  building.add(roof);
-
-  const door = new THREE.Mesh(
-    box(1.6, 2.6, 0.22),
-    mat("#503020")
-  );
-
-  door.position.set(0, 1.4, -4.12);
-
-  building.add(door);
-
-  label(building, place.name, 0, 5.1, -4.35);
-
-  group.add(building);
-}
-
-function tree(group, x, z) {
-  const object = new THREE.Group();
-
-  object.position.set(x, 0, z);
-
-  const trunk = new THREE.Mesh(
-    cyl(0.25, 0.34, 2.8),
-    mat("#6b4a2e")
-  );
-
-  trunk.position.y = 1.4;
-
-  object.add(trunk);
-
-  const leaves = new THREE.Mesh(
-    sph(1.9),
-    mat("#2f7145")
-  );
-
-  leaves.position.y = 3.6;
-
-  object.add(leaves);
-  group.add(object);
-}
-
-function stall(group, x, z) {
-  const object = new THREE.Group();
-
-  object.position.set(x, 0, z);
-
-  const base = new THREE.Mesh(
-    box(3, 2, 2.2),
-    mat("#c48646")
-  );
-
-  base.position.y = 1;
-
-  object.add(base);
-
-  const roof = new THREE.Mesh(
-    box(3.4, 0.2, 2.6),
-    mat("#0F6B6F")
-  );
-
-  roof.position.y = 2.15;
-
-  object.add(roof);
-  group.add(object);
-}
-
-function house(group, x, z) {
-  const object = new THREE.Group();
-
-  object.position.set(x, 0, z);
-
-  const base = new THREE.Mesh(
-    box(7, 4.4, 6),
-    mat("#9e8e77")
-  );
-
-  base.position.y = 2.2;
-
-  object.add(base);
-
-  const roof = new THREE.Mesh(
-    box(7.6, 0.5, 6.6),
-    mat("#4e5752")
-  );
-
-  roof.position.y = 4.6;
-
-  object.add(roof);
-  group.add(object);
-}
-
-function lamp(group, x, z) {
-  const object = new THREE.Group();
-
-  object.position.set(x, 0, z);
-
-  const pole = new THREE.Mesh(
-    cyl(0.06, 0.08, 3.5),
-    mat("#333333")
-  );
-
-  pole.position.y = 1.75;
-
-  object.add(pole);
-
-  const bulb = new THREE.Mesh(
-    sph(0.16),
-    mat("#ffe28e", 0.2, 0, {
-      emissive: "#ffe28e",
-      emissiveIntensity: 2
-    })
-  );
-
-  bulb.position.y = 3.5;
-
-  object.add(bulb);
-  group.add(object);
-}
-
-/* =========================================================
-   NON-PLAYER CHARACTERS AND CARS
-   ========================================================= */
-
-function buildNPCs() {
-  npcs = [];
-
-  for (let i = 0; i < 20; i++) {
-    const cfg = {
-      ...DEFAULT_CFG,
-
-      skinTone: pick(
-        Object.keys(OPTIONS.skinTone.values)
-      ),
-
-      hairstyle: pick(
-        Object.keys(OPTIONS.hairstyle.values)
-      ),
-
-      outfit: pick([
-        "tee",
-        "hoodie",
-        "kaftan",
-        "ankara"
-      ]),
-
-      outfitColor: pick([
-        "red",
-        "blue",
-        "green",
-        "gold",
-        "teal",
-        "default"
-      ]),
-
-      accessory: pick([
-        "none",
-        "cap",
-        "glasses"
-      ])
-    };
-
-    const character = createCharacter(cfg, 0.68);
-    const place = pick(PLACES);
-
-    character.root.position.set(
-      place.x + Math.random() * 10 - 5,
-      0,
-      place.z + Math.random() * 10 - 5
-    );
-
-    npcGroup.add(character.root);
-
-    npcs.push({
-      c: character,
-      name: NAMES[i % NAMES.length],
-      speed: 0.35 + Math.random() * 0.8,
-      target: null
-    });
-  }
-}
-
-function updateNPCs(dt) {
-  for (const npc of npcs) {
-    npc.c.time += dt;
-
-    if (!npc.target || Math.random() < 0.008) {
-      npc.target = {
-        x: clamp(
-          npc.c.root.position.x + Math.random() * 12 - 6,
-          -90,
-          90
-        ),
-
-        z: clamp(
-          npc.c.root.position.z + Math.random() * 12 - 6,
-          -90,
-          90
-        )
-      };
-    }
-
-    const dx = npc.target.x - npc.c.root.position.x;
-    const dz = npc.target.z - npc.c.root.position.z;
-    const distance = Math.hypot(dx, dz);
-
-    if (distance > 0.5) {
-      npc.c.root.position.x +=
-        (dx / distance) * npc.speed * dt;
-
-      npc.c.root.position.z +=
-        (dz / distance) * npc.speed * dt;
-
-      npc.c.legs.forEach((leg, index) => {
-        leg.rotation.x =
-          Math.sin(npc.c.time * 6 + index * Math.PI) * 0.18;
-      });
-    }
-  }
-}
-
-function buildCars() {
-  cars = [];
-
-  for (let i = 0; i < 12; i++) {
-    const car = new THREE.Group();
-
-    const body = new THREE.Mesh(
-      box(2.1, 1, 4.1),
-      mat(
-        pick([
-          "#253635",
-          "#eee9dc",
-          "#a9473c",
-          "#d4a62e",
-          "#6774ad"
-        ])
-      )
-    );
-
-    body.position.y = 0.62;
-
-    car.add(body);
-
-    const roof = new THREE.Mesh(
-      box(1.55, 0.6, 2.1),
-      mat("#1d2524")
-    );
-
-    roof.position.y = 1.2;
-
-    car.add(roof);
-
-    const axis = i % 2;
-    const direction = i % 4 < 2 ? 1 : -1;
-
-    car.position.set(
-      axis
-        ? Math.round(Math.random() * 6 - 3) * 28
-        : Math.random() * 170 - 85,
-
-      0,
-
-      axis
-        ? Math.random() * 170 - 85
-        : Math.round(Math.random() * 6 - 3) * 28
-    );
-
-    car.userData = {
-      axis,
-      dir: direction,
-      speed: 4 + Math.random() * 5
-    };
-
-    carGroup.add(car);
-    cars.push(car);
-  }
-}
-
-function updateCars(dt) {
-  for (const car of cars) {
-    const config = car.userData;
-
-    if (config.axis) {
-      car.position.z += config.dir * config.speed * dt;
-    } else {
-      car.position.x += config.dir * config.speed * dt;
-    }
-
-    const value = config.axis
-      ? car.position.z
-      : car.position.x;
-
-    if (Math.abs(value) > 96) {
-      if (config.axis) {
-        car.position.z = -config.dir * 96;
-      } else {
-        car.position.x = -config.dir * 96;
-      }
-    }
-  }
-}
-
-/* =========================================================
-   INPUT AND BUTTON SETUP
-   ========================================================= */
-
-function attachInput() {
-  if (inputInstalled) return;
-
-  inputInstalled = true;
-
-  window.addEventListener("keydown", event => {
-    if (!gameStarted) return;
-
-    if (
-      event.target instanceof HTMLInputElement ||
-      event.target instanceof HTMLTextAreaElement
-    ) {
-      return;
-    }
-
-    const key = event.key.toLowerCase();
-
-    if (
-      [
-        "arrowup",
-        "arrowdown",
-        "arrowleft",
-        "arrowright",
-        " "
-      ].includes(key)
-    ) {
-      event.preventDefault();
-    }
-
-    if (key === "w" || key === "arrowup") {
-      state.keys.up = true;
-    }
-
-    if (key === "s" || key === "arrowdown") {
-      state.keys.down = true;
-    }
-
-    if (key === "a" || key === "arrowleft") {
-      state.keys.left = true;
-    }
-
-    if (key === "d" || key === "arrowright") {
-      state.keys.right = true;
-    }
-
-    if (key === "shift") {
-      state.keys.shift = true;
-    }
-
-    if (key === " ") {
-      state.jump = true;
-    }
-
-    if (key === "e") {
-      interact();
-    }
-  });
-
-  window.addEventListener("keyup", event => {
-    const key = event.key.toLowerCase();
-
-    if (key === "w" || key === "arrowup") {
-      state.keys.up = false;
-    }
-
-    if (key === "s" || key === "arrowdown") {
-      state.keys.down = false;
-    }
-
-    if (key === "a" || key === "arrowleft") {
-      state.keys.left = false;
-    }
-
-    if (key === "d" || key === "arrowright") {
-      state.keys.right = false;
-    }
-
-    if (key === "shift") {
-      state.keys.shift = false;
-    }
-  });
-
-  window.addEventListener("blur", clearMovement);
-
-  const runButton = $("runBtn");
-
-  if (runButton) {
-    runButton.onpointerdown = () => {
-      state.run = !state.run;
-    };
-  }
-
-  const jumpButton = $("jumpBtn");
-
-  if (jumpButton) {
-    jumpButton.onpointerdown = () => {
-      state.jump = true;
-    };
-  }
-
-  const joystick = $("joystick");
-  const stick = $("stick");
-
-  if (joystick && stick) {
-    const setJoystick = event => {
-      const rect = joystick.getBoundingClientRect();
-
-      let x =
-        (event.clientX - (rect.left + rect.width / 2)) /
-        (rect.width / 2 - 20);
-
-      let y =
-        (event.clientY - (rect.top + rect.height / 2)) /
-        (rect.height / 2 - 20);
-
-      const distance = Math.hypot(x, y);
-
-      if (distance > 1) {
-        x /= distance;
-        y /= distance;
-      }
-
-      state.joy.x = x;
-      state.joy.y = y;
-
-      stick.style.transform =
-        `translate(${x * 33}px, ${y * 33}px)`;
-    };
-
-    const stopJoystick = () => {
-      state.joy.active = false;
-      state.joy.x = 0;
-      state.joy.y = 0;
-
-      stick.style.transform = "translate(0, 0)";
-    };
-
-    joystick.addEventListener("pointerdown", event => {
-      state.joy.active = true;
-
-      try {
-        joystick.setPointerCapture(event.pointerId);
-      } catch {}
-
-      setJoystick(event);
-    });
-
-    joystick.addEventListener("pointermove", event => {
-      if (state.joy.active) {
-        setJoystick(event);
-      }
-    });
-
-    joystick.addEventListener("pointerup", stopJoystick);
-    joystick.addEventListener("pointercancel", stopJoystick);
-    joystick.addEventListener("lostpointercapture", stopJoystick);
-  }
-
-  on("cameraBtn", "click", () => {
-    cameraState =
-      cameraState === "third"
-        ? "close"
-        : cameraState === "close"
-          ? "front"
-          : "third";
-
-    toast(`Camera: ${cameraState}`);
-  });
-
-  on("qualityBtn", "click", () => {
-    state.quality =
-      state.quality === "high" ? "low" : "high";
-
-    try {
-      localStorage.setItem(QUALITY_KEY, state.quality);
-    } catch {}
-
-    if (renderer) {
-      renderer.setPixelRatio(
-        state.quality === "high"
-          ? Math.min(window.devicePixelRatio || 1, 2)
-          : 1
-      );
-
-      renderer.shadowMap.enabled = state.quality === "high";
-    }
-
-    setText("qualityBtn", state.quality.toUpperCase());
-  });
-
-  on("phoneBtn", "click", () => open("Phone", "phone"));
-  on("bagBtn", "click", () => open("Inventory", "inventory"));
-  on("mapBtn", "click", () => open("City Map", "map"));
-  on("profileBtn", "click", () => open("My Life", "profile"));
-  on("homeBtn", "click", () => open("Your Home", "home"));
-  on("socialBtn", "click", () => open("People", "social"));
-
-  on("avatarBtn", "click", () => {
-    if (!$("customizer")) return;
-
-    $("customizer").classList.add("open");
-    renderCustomizer();
-  });
-
-  on("emoteBtn", "click", () => {
-    $("emoteMenu")?.classList.toggle("open");
-  });
-
-  document.querySelectorAll("#emoteMenu button").forEach(button => {
-    button.onclick = () => {
-      state.emote = button.dataset.emote || "none";
-      $("emoteMenu")?.classList.remove("open");
-    };
-  });
-
-  on("prompt", "click", interact);
-
-  on("sheetClose", "click", () => {
-    $("overlay")?.classList.remove("open");
-  });
-
-  on("closeCustomizer", "click", () => {
-    $("customizer")?.classList.remove("open");
-  });
-
-  on("randomBtn", "click", () => {
-    for (const key of Object.keys(OPTIONS)) {
-      state.cfg[key] = pick(Object.keys(OPTIONS[key].values));
-    }
-
-    rebuildPlayer();
-    renderCustomizer();
-    saveGame();
-  });
-
-  on("saveAvatar", "click", saveAvatar);
-
-  setText(
-    "qualityBtn",
-    state.quality.toUpperCase()
-  );
-}
-
-function clearMovement() {
-  state.keys.up = false;
-  state.keys.down = false;
-  state.keys.left = false;
-  state.keys.right = false;
-  state.keys.shift = false;
-
-  state.joy.active = false;
-  state.joy.x = 0;
-  state.joy.y = 0;
-
-  state.run = false;
-}
-
-/* =========================================================
-   AVATAR CUSTOMIZER
-   ========================================================= */
-
-function buildCustomizer() {
-  renderCustomizer();
-}
-
-function renderCustomizer() {
-  const root = $("sections");
-
-  if (!root) return;
-
-  root.innerHTML = "";
-
-  for (const [key, option] of Object.entries(OPTIONS)) {
-    const section = document.createElement("section");
-
-    section.className = "optionSection";
-
-    const heading = document.createElement("h3");
-
-    heading.textContent = option.label;
-
-    section.appendChild(heading);
-
-    const choices = document.createElement("div");
-
-    choices.className = "options";
-
-    for (const [id, value] of Object.entries(option.values)) {
-      const button = document.createElement("button");
-
-      button.type = "button";
-
-      button.className = [
-        "option",
-        state.cfg[key] === id ? "active" : "",
-        option.kind === "swatch" ? "swatch" : ""
-      ].filter(Boolean).join(" ");
-
-      if (option.kind === "swatch") {
-        button.style.background = value;
-        button.setAttribute("aria-label", `${option.label}: ${id}`);
-        button.title = id;
-      } else {
-        button.textContent = value;
-      }
-
-      button.onclick = () => {
-        state.cfg[key] = id;
-
-        rebuildPlayer();
-        renderCustomizer();
-        saveGame();
-      };
-
-      choices.appendChild(button);
-    }
-
-    section.appendChild(choices);
-    root.appendChild(section);
-  }
-}
-
-async function saveAvatar() {
-  try {
-    localStorage.setItem(
-      AVATAR_KEY,
-      JSON.stringify(state.cfg)
-    );
-
-    toast("Avatar saved on this device.");
-  } catch (error) {
-    console.error("Could not save avatar locally:", error);
-    toast("Avatar could not be saved on this device.");
-    return;
-  }
-
-  if (state.user && !state.guest) {
-    try {
-      const { error } = await db.rpc("save_avatar", {
-        p_avatar: state.cfg
-      });
-
-      if (error) throw error;
-
-      toast("Avatar saved to your account.");
-    } catch (error) {
-      console.warn("Cloud avatar save failed:", error);
-      toast("Avatar saved locally; cloud save was unsuccessful.");
-    }
-  }
-}
-
-/* =========================================================
-   GAME TIME, NEEDS AND RENT
-   ========================================================= */
-
-function advanceTime(minutes) {
-  let remaining = Number(minutes);
-
-  if (!Number.isFinite(remaining) || remaining <= 0) {
-    return;
-  }
-
-  while (remaining > 0) {
-    const untilMidnight = 1440 - state.time;
-
-    if (remaining < untilMidnight) {
-      state.time += remaining;
-      remaining = 0;
-    } else {
-      remaining -= untilMidnight;
-
-      state.time = 0;
-      state.day++;
-
-      state.stats.days++;
-      state.rentDue--;
-
-      dailyTick();
-    }
-  }
-}
-
-function dailyTick() {
-  addNeed("hunger", -7);
-  addNeed("hygiene", -4);
-  addNeed("fun", -3);
-  addNeed("social", -3);
-  addNeed("bladder", 16);
-  addNeed("energy", 22);
-  addNeed("focus", 18);
-
-  if (state.day % 7 === 0) {
-    weeklyTick();
-  }
-
-  if (state.rentDue <= 0) {
-    payRent();
-  }
-}
-
-function weeklyTick() {
-  state.weeklyEarnings = 0;
-
-  let passive = 0;
-
-  for (const id of state.investments) {
-    const investment = INVESTMENTS.find(item => item.id === id);
-
-    if (investment) {
-      passive += investment.income;
-    }
-  }
-
-  if (passive > 0) {
-    earn(passive);
-    toast(`Business week: +₦${fmt(passive)} income.`);
-  }
-}
-
-function payRent() {
-  const home = HOUSING[state.housing];
-
-  if (!home) return;
-
-  if (spend(home.rent)) {
-    state.rentDue = 14;
-
-    addNeed("fun", 4);
-
-    toast(`Rent paid: ₦${fmt(home.rent)}.`);
-  } else {
-    state.rentDue = 3;
-
-    addNeed("fun", -15);
-    addNeed("energy", -10);
-
-    toast(`Rent problem: ₦${fmt(home.rent)} due. Earn fast.`);
-  }
-}
-
-function currentClock() {
-  const h = Math.floor(state.time / 60) % 24;
-  const m = Math.floor(state.time % 60);
-
-  const ap = h >= 12 ? "PM" : "AM";
-  const hh = h % 12 || 12;
-
-  return `${hh}:${String(m).padStart(2, "0")} ${ap}`;
-}
-
-function mood() {
-  const values = Object.values(state.needs);
-
-  const average =
-    values.reduce((sum, value) => sum + value, 0) /
-    Math.max(values.length, 1);
-
-  if (average >= 80) return "Thriving";
-  if (average >= 60) return "Doing Fine";
-  if (average >= 40) return "Stressed";
-  if (average >= 20) return "Struggling";
-
-  return "Emergency";
-}
-
-/* =========================================================
-   PLAYER MOVEMENT
-   ========================================================= */
-
-function updatePlayer(dt) {
-  if (!player) return;
-
-  let ix =
-    (state.keys.right ? 1 : 0) -
-    (state.keys.left ? 1 : 0);
-
-  let iz =
-    (state.keys.down ? 1 : 0) -
-    (state.keys.up ? 1 : 0);
-
-  if (state.joy.active) {
-    ix = state.joy.x;
-    iz = state.joy.y;
-  }
-
-  const moving = Math.hypot(ix, iz) > 0.12;
-
-  let speed =
-    state.run || state.keys.shift
-      ? 7.1
-      : 3.6;
-
-  if (state.vehicle === "bike") speed *= 1.55;
-  if (state.vehicle === "car") speed *= 1.9;
-
-  if (moving) {
-    const length = Math.hypot(ix, iz);
-
-    ix /= length;
-    iz /= length;
-
-    player.root.position.x = clamp(
-      player.root.position.x + ix * speed * dt,
-      -96,
-      96
-    );
-
-    player.root.position.z = clamp(
-      player.root.position.z + iz * speed * dt,
-      -96,
-      96
-    );
-
-    player.root.rotation.y = Math.atan2(ix, iz);
-
-    player.legs.forEach((leg, index) => {
-      leg.rotation.x =
-        Math.sin(performance.now() / 80 + index * Math.PI) * 0.3;
-    });
-
-    state.status =
-      state.run || state.keys.shift
-        ? "Running"
-        : "Walking";
-
-    addNeed(
-      "energy",
-      -(state.run || state.keys.shift ? 2.2 : 1) * dt
-    );
-
-    addNeed("hunger", -0.18 * dt);
-    addNeed("hygiene", -0.08 * dt);
-    addNeed("bladder", -0.06 * dt);
-  } else {
-    state.status =
-      state.emote !== "none"
-        ? state.emote
-        : "Idle";
-
-    player.legs.forEach(leg => {
-      leg.rotation.x *= 0.8;
-    });
-  }
-
-  if (state.jump) {
-    state.jump = false;
-
-    if (player.root.position.y <= 0.02) {
-      player.root.userData.vy = 6;
-    }
-  }
-
-  player.root.userData.vy =
-    player.root.userData.vy || 0;
-
-  if (
-    player.root.position.y > 0 ||
-    player.root.userData.vy > 0
-  ) {
-    player.root.userData.vy -= 17 * dt;
-
-    player.root.position.y +=
-      player.root.userData.vy * dt;
-
-    if (player.root.position.y < 0) {
-      player.root.position.y = 0;
-      player.root.userData.vy = 0;
-    }
-  }
-
-  advanceTime(dt * 1.1);
-}
-
-/* =========================================================
-   LIGHTING, CAMERA AND LOCATION PROMPT
-   ========================================================= */
-
-function updateWorldLight() {
-  if (!scene || !sun || !hemi) return;
-
-  const hour = state.time / 60;
-
-  const sunY = Math.sin(
-    ((hour - 6) / 12) * Math.PI
-  );
-
-  const light = clamp(
-    (sunY + 0.1) * 1.15,
-    0,
-    1
-  );
-
-  sun.position.set(40, 20 + sunY * 65, 30);
-
-  sun.intensity = 0.55 + 1.8 * light;
-  hemi.intensity = 0.55 + 1.05 * light;
-
-  const sky = new THREE.Color(
-    light > 0.45 ? "#8cc2c7" : "#17282e"
-  );
-
-  scene.background.lerp(sky, 0.05);
-  scene.fog.color.copy(scene.background);
-}
-
-function updateCamera(dt) {
-  if (!player || !camera) return;
-
-  const position = player.root.position;
-
-  const distance =
-    cameraState === "close" ? 5.4 : 8.5;
-
-  const offset = new THREE.Vector3(
-    Math.sin(performance.now() / 100000) * distance,
-    4,
-    Math.cos(performance.now() / 100000) * distance
-  );
-
-  if (cameraState === "front") {
-    offset.multiplyScalar(-1);
-  }
-
-  camera.position.lerp(
-    new THREE.Vector3(
-      position.x + offset.x,
-      position.y + offset.y,
-      position.z + offset.z
-    ),
-    Math.min(1, dt * 5)
-  );
-
-  camera.lookAt(
-    position.x,
-    position.y + 1.02,
-    position.z
-  );
-}
-
-function nearestPlace() {
-  if (!player) {
-    return { p: null, d: Infinity };
-  }
-
-  let best = null;
-  let distance = Infinity;
-
-  for (const place of PLACES) {
-    const currentDistance = Math.hypot(
-      player.root.position.x - place.x,
-      player.root.position.z - place.z
-    );
-
-    if (currentDistance < distance) {
-      distance = currentDistance;
-      best = place;
-    }
-  }
-
-  return {
-    p: best,
-    d: distance
-  };
-}
-
-function updatePrompt() {
-  const prompt = $("prompt");
-
-  if (!prompt || !player) return;
-
-  const { p, d } = nearestPlace();
-
-  if (p && d < 11) {
-    prompt.style.display = "block";
-    prompt.textContent = `Enter ${p.name}`;
-  } else {
-    prompt.style.display = "none";
-  }
-}
-
-function toast(message) {
-  state.activity = String(message || "");
-}
-
-/* =========================================================
-   GAME PANELS
-   ========================================================= */
-
-function open(title, mode) {
-  setText("sheetEyebrow", "NAIJA HUSTLE");
-  setText("sheetTitle", title);
-
-  $("overlay")?.classList.add("open");
-
-  render(mode);
-}
-
-function bindActions() {
-  const body = $("sheetBody");
-
-  if (!body) return;
-
-  body.querySelectorAll("[data-action]").forEach(button => {
-    button.onclick = () => {
-      handleAction(
-        button.dataset.action,
-        button.dataset.id
-      );
-    };
-  });
-}
-
-function render(mode) {
-  const body = $("sheetBody");
-
-  if (!body) return;
-
-  if (mode === "phone") {
-    body.innerHTML = renderPhone();
-  } else if (mode === "inventory") {
-    body.innerHTML = renderInventory();
-  } else if (mode === "map") {
-    body.innerHTML = renderMap();
-  } else if (mode === "profile") {
-    body.innerHTML = renderProfile();
-  } else if (mode === "home") {
-    body.innerHTML = renderHome();
-  } else if (mode === "social") {
-    body.innerHTML = renderSocial();
-  } else if (mode === "jobs") {
-    body.innerHTML = renderJobs();
-  } else if (mode === "gigs") {
-    body.innerHTML = renderGigs();
-  } else if (mode === "business") {
-    body.innerHTML = renderBusiness();
-  } else if (mode === "transport") {
-    body.innerHTML = renderTransport();
-  } else if (mode === "housing") {
-    body.innerHTML = renderHousing();
-  } else if (mode && mode.startsWith("shop")) {
-    body.innerHTML = renderShop(mode);
-  } else if (mode === "skills") {
-    body.innerHTML = renderSkills();
-  } else {
-    body.innerHTML = renderPhone();
-  }
-
-  bindActions();
-}
-
-function refreshOpen(mode) {
-  render(mode);
-}
-
-function renderPhone() {
-  return `
-    <div class="stats">
-      <div class="stat">
-        <strong>₦${fmt(state.money)}</strong>
-        <span>WALLET</span>
-      </div>
-
-      <div class="stat">
-        <strong>Day ${state.day}</strong>
-        <span>TIME</span>
-      </div>
-
-      <div class="stat">
-        <strong>${mood()}</strong>
-        <span>MOOD</span>
-      </div>
-
-      <div class="stat">
-        <strong>${state.rentDue}</strong>
-        <span>DAYS TO RENT</span>
-      </div>
-    </div>
-
-    <div class="grid">
-      <article class="card">
-        <h3>Work</h3>
-        <p>Pick a career, train skills and work shifts.</p>
-
-        <div class="actions">
-          <button class="action primary"
-            data-action="open" data-id="jobs">
-            Careers
-          </button>
-
-          <button class="action"
-            data-action="open" data-id="gigs">
-            Gigs
-          </button>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Life</h3>
-        <p>Keep needs balanced and improve your home.</p>
-
-        <div class="actions">
-          <button class="action primary"
-            data-action="open" data-id="home">
-            Home
-          </button>
-
-          <button class="action"
-            data-action="open" data-id="skills">
-            Train
-          </button>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Money</h3>
-        <p>Buy things, transport, and eventually a business.</p>
-
-        <div class="actions">
-          <button class="action primary"
-            data-action="open" data-id="business">
-            Business
-          </button>
-
-          <button class="action"
-            data-action="open" data-id="transport">
-            Transport
-          </button>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>People</h3>
-        <p>Meet locals and build useful relationships.</p>
-
-        <div class="actions">
-          <button class="action primary"
-            data-action="open" data-id="social">
-            Social
-          </button>
-        </div>
-      </article>
-    </div>
-  `;
-}
-
-function renderJobs() {
-  return `
-    <div class="grid">
-      ${CAREERS.map(career => {
-        const current = state.career === career.id;
-        const skill = state.skills[career.skill] || 1;
-
-        const careerLevel = current
-          ? state.careerLevel
-          : 0;
-
-        const pay =
-          career.pay +
-          Math.max(0, skill - 1) * career.levelPay +
-          careerLevel * 1300;
-
-        return `
-          <article class="card">
-            <h3>${career.name}</h3>
-            <p>${career.desc}</p>
-
-            <div class="meta">
-              Skill: ${cap(career.skill)} Lv ${skill}
-              · Pay about ₦${fmt(pay)}
-            </div>
-
-            <div class="actions">
-              <button class="action primary"
-                data-action="career"
-                data-id="${career.id}">
-                ${current ? "Work Shift" : "Choose"}
-              </button>
-
-              <button class="action"
-                data-action="train"
-                data-id="${career.skill}">
-                Train
-              </button>
-            </div>
-          </article>
-        `;
-      }).join("")}
-    </div>
-  `;
-}
-
-function renderGigs() {
-  return `
-    <div class="grid">
-      ${GIGS.map(gig => `
-        <article class="card">
-          <h3>${gig.name}</h3>
-
-          <p>
-            Cost ₦${fmt(gig.cost)}
-            · ${gig.min} game minutes
-            · ${cap(gig.skill)} Lv ${state.skills[gig.skill] || 1}
-          </p>
-
-          <div class="meta">
-            Reward ₦${fmt(gig.reward)}
-          </div>
-
-          <div class="actions">
-            <button class="action primary"
-              data-action="gig"
-              data-id="${gig.id}">
-              Take Gig
-            </button>
-          </div>
-        </article>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderHome() {
-  const home = HOUSING[state.housing];
-
-  return `
-    <div class="stats">
-      <div class="stat">
-        <strong>${home.name}</strong>
-        <span>HOME</span>
-      </div>
-
-      <div class="stat">
-        <strong>₦${fmt(home.rent)}</strong>
-        <span>RENT / 14 DAYS</span>
-      </div>
-
-      <div class="stat">
-        <strong>${home.comfort}</strong>
-        <span>COMFORT</span>
-      </div>
-
-      <div class="stat">
-        <strong>${state.rentDue}</strong>
-        <span>DAYS LEFT</span>
-      </div>
-    </div>
-
-    <div class="grid">
-      <article class="card">
-        <h3>Rest</h3>
-        <p>Sleep and recover energy.</p>
-
-        <div class="actions">
-          <button class="action primary" data-action="rest">
-            Sleep
-          </button>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Bathroom</h3>
-        <p>Restore hygiene and bladder.</p>
-
-        <div class="actions">
-          <button class="action primary" data-action="bath">
-            Use Bathroom
-          </button>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Cook</h3>
-        <p>Make a simple meal at home.</p>
-
-        <div class="actions">
-          <button class="action primary" data-action="cook">
-            Cook Meal · ₦600
-          </button>
-        </div>
-      </article>
-
-      <article class="card">
-        <h3>Upgrade</h3>
-        <p>Move to the next home when you can afford it.</p>
-
-        <div class="actions">
-          <button class="action primary" data-action="upgrade">
-            View Homes
-          </button>
-        </div>
-      </article>
-    </div>
-  `;
-}
-
-function renderHousing() {
-  return `
-    <div class="grid">
-      ${HOUSING.map((home, index) => {
-        const isCurrent = index === state.housing;
-        const isNext = index === state.housing + 1;
-        const disabled = !isNext;
-
-        return `
-          <article class="card">
-            <h3>${home.name} · ${home.area}</h3>
-            <p>${home.desc}</p>
-
-            <div class="meta">
-              Move ₦${fmt(home.move)}
-              · Rent ₦${fmt(home.rent)} / 14 days
-            </div>
-
-            <div class="actions">
-              <button
-                class="action primary"
-                data-action="move"
-                data-id="${index}"
-                ${disabled ? "disabled" : ""}>
-                ${isCurrent ? "Current Home" : isNext ? "Move Here" : "Upgrade Previous Home First"}
-              </button>
-            </div>
-          </article>
-        `;
-      }).join("")}
-    </div>
-  `;
-}
-
-function renderShop(mode) {
-  let shops = SHOPS;
-
-  if (mode === "shop-food") {
-    shops = SHOPS.filter(shop => shop.id === "food");
-  } else if (mode === "shop-market") {
-    shops = SHOPS.filter(shop => shop.id === "market");
-  } else if (mode === "shop-style") {
-    shops = SHOPS.filter(shop => shop.id === "style");
-  } else if (mode === "shop-home") {
-    shops = SHOPS.filter(shop => shop.id === "home");
-  }
-
-  return shops.map(shop => `
-    <div class="sectionBlock">
-      <h3>${shop.name}</h3>
-
-      <div class="grid">
-        ${shop.items.map(item => `
-          <article class="card">
-            <h3>${item.name}</h3>
-
-            <div class="meta">
-              ₦${fmt(item.price)}
-            </div>
-
-            <p>
-              ${Object.entries(item.e)
-                .map(([key, value]) =>
-                  `${value > 0 ? "+" : ""}${value} ${cap(key)}`
-                )
-                .join(" · ")}
-            </p>
-
-            <div class="actions">
-              <button
-                class="action primary"
-                data-action="item"
-                data-id="${item.id}">
-                Buy
-              </button>
-            </div>
-          </article>
-        `).join("")}
-      </div>
-    </div>
-  `).join("");
-}
-
-function renderInventory() {
-  const counts = {};
-
-  state.inventory.forEach(id => {
-    counts[id] = (counts[id] || 0) + 1;
-  });
-
-  const names = Object.fromEntries(
-    SHOPS.flatMap(shop =>
-      shop.items.map(item => [item.id, item.name])
-    )
-  );
-
-  names.home_meal = "Home-cooked Meal";
-
-  const entries = Object.entries(counts);
-
-  return `
-    <div class="list">
-      ${entries.map(([id, count]) => `
-        <div class="listRow">
-          <b>${names[id] || cap(id)}</b>
-          <span>x${count}</span>
-        </div>
-      `).join("") ||
-        `<div class="placeholder">Your bag is empty.</div>`
-      }
-    </div>
-  `;
-}
-
-function renderTransport() {
-  return `
-    <div class="grid">
-      ${VEHICLES.map(vehicle => {
-        const isOwned = state.ownedVehicles.includes(vehicle.id);
-        const isActive = state.vehicle === vehicle.id;
-
-        let label;
-
-        if (isActive) {
-          label = "Active";
-        } else if (vehicle.purchase && isOwned) {
-          label = "Use";
-        } else if (vehicle.purchase) {
-          label = "Buy & Use";
-        } else if (vehicle.fare) {
-          label = "Pay Fare";
-        } else {
-          label = "Use";
-        }
-
-        return `
-          <article class="card">
-            <h3>${vehicle.name}</h3>
-
-            <p>
-              ${vehicle.fare ? `Fare around ₦${fmt(vehicle.fare)}` : ""}
-              ${vehicle.purchase
-                ? `${vehicle.fare ? " · " : ""}Buy ₦${fmt(vehicle.purchase)}`
-                : ""}
-            </p>
-
-            <div class="meta">
-              ${vehicle.purchase && isOwned
-                ? "Owned"
-                : vehicle.fare
-                  ? "One-time ride"
-                  : vehicle.id === "feet"
-                    ? "Always available"
-                    : "Personal transport"}
-            </div>
-
-            <div class="actions">
-              <button
-                class="action primary"
-                data-action="vehicle"
-                data-id="${vehicle.id}"
-                ${isActive ? "disabled" : ""}>
-                ${label}
-              </button>
-            </div>
-          </article>
-        `;
-      }).join("")}
-    </div>
-
-    <p class="muted">
-      To use Danfo or a ride app, set a destination on the City Map first.
-    </p>
-  `;
-}
-
-function renderBusiness() {
-  return `
-    <div class="grid">
-      ${INVESTMENTS.map(investment => `
-        <article class="card">
-          <h3>${investment.name}</h3>
-
-          <p>
-            Investment ₦${fmt(investment.cost)}
-            · Weekly income ₦${fmt(investment.income)}
-            · Requires level ${investment.req}.
-          </p>
-
-          <div class="actions">
-            <button class="action primary"
-              data-action="business"
-              data-id="${investment.id}"
-              ${state.investments.includes(investment.id) ? "disabled" : ""}>
-              ${state.investments.includes(investment.id)
-                ? "Owned"
-                : "Invest"}
-            </button>
-          </div>
-        </article>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderSkills() {
-  return `
-    <div class="grid">
-      ${SKILLS.map(skill => `
-        <article class="card">
-          <h3>${cap(skill)}</h3>
-
-          <p>Level ${state.skills[skill]} / 5</p>
-
-          <div class="actions">
-            <button class="action primary"
-              data-action="train"
-              data-id="${skill}"
-              ${state.skills[skill] >= 5 ? "disabled" : ""}>
-              Train · ₦${fmt(450 + state.skills[skill] * 400)}
-            </button>
-          </div>
-        </article>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderSocial() {
-  return `
-    <div class="grid">
-      ${npcs.slice(0, 12).map(npc => `
-        <article class="card">
-          <h3>${npc.name}</h3>
-
-          <p>
-            Friendship
-            ${Math.round(state.relationships[npc.name] || 0)}
-            / 100
-          </p>
-
-          <div class="actions">
-            <button class="action primary"
-              data-action="talk"
-              data-id="${npc.name}">
-              Talk
-            </button>
-          </div>
-        </article>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderMap() {
-  return `
-    <div class="grid">
-      ${PLACES.map(place => {
-        const distance = player
-          ? Math.round(
-              Math.hypot(
-                player.root.position.x - place.x,
-                player.root.position.z - place.z
-              )
-            )
-          : 0;
-
-        return `
-          <article class="card">
-            <h3>${place.name}</h3>
-            <p>${distance}m away.</p>
-
-            <div class="actions">
-              <button class="action primary"
-                data-action="route"
-                data-id="${place.id}">
-                Set Route
-              </button>
-            </div>
-          </article>
-        `;
-      }).join("")}
-    </div>
-  `;
-}
-
-function renderProfile() {
-  const quest = QUESTS[state.quest];
-
-  const careerName = state.career
-    ? CAREERS.find(c => c.id === state.career)?.name || state.career
-    : "No career";
-
-  return `
-    <div class="stats">
-      <div class="stat">
-        <strong>Lv ${state.level}</strong>
-        <span>PLAYER</span>
-      </div>
-
-      <div class="stat">
-        <strong>₦${fmt(state.totalEarnings)}</strong>
-        <span>LIFETIME EARNINGS</span>
-      </div>
-
-      <div class="stat">
-        <strong>${careerName}</strong>
-        <span>CAREER</span>
-      </div>
-
-      <div class="stat">
-        <strong>${state.investments.length}</strong>
-        <span>BUSINESSES</span>
-      </div>
-    </div>
-
-    <div class="sectionBlock">
-      <h3>Current Quest</h3>
-
-      <div class="card">
-        <h3>${quest?.title || "All starter quests complete"}</h3>
-        <p>${quest?.desc || "Keep building your life."}</p>
-      </div>
-    </div>
-
-    <div class="sectionBlock">
-      <h3>Skills</h3>
-
-      <div class="list">
-        ${SKILLS.map(skill => `
-          <div class="listRow">
-            <b>${cap(skill)}</b>
-            <span>Lv ${state.skills[skill]}</span>
-          </div>
-        `).join("")}
-      </div>
-    </div>
-
-    <div class="sectionBlock">
-      <h3>Transport</h3>
-
-      <div class="list">
-        ${state.ownedVehicles.map(id => {
-          const vehicle = VEHICLES.find(v => v.id === id);
-
-          return `
-            <div class="listRow">
-              <b>${vehicle?.name || cap(id)}</b>
-              <span>${state.vehicle === id ? "Active" : "Owned"}</span>
-            </div>
-          `;
-        }).join("")}
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="action" data-action="logout">
-        SIGN OUT
-      </button>
-    </div>
-  `;
-}
-
-/* =========================================================
-   ACTION ROUTER
-   ========================================================= */
-
-function handleAction(action, id) {
-  if (action === "open") {
-    const modes = {
-      jobs: "jobs",
-      gigs: "gigs",
-      home: "home",
-      skills: "skills",
-      business: "business",
-      transport: "transport",
-      social: "social"
-    };
-
-    const mode = modes[id] || "phone";
-
-    setText("sheetTitle", cap(id));
-    render(mode);
-
-    return;
-  }
-
-  if (action === "career") doCareer(id);
-  else if (action === "gig") doGig(id);
-  else if (action === "train") train(id);
-  else if (action === "upgrade") upgradeHomeMenu();
-  else if (action === "move") moveHome(Number(id));
-  else if (action === "rest") rest();
-  else if (action === "bath") bath();
-  else if (action === "cook") cook();
-  else if (action === "item") buyItem(id);
-  else if (action === "vehicle") useVehicle(id);
-  else if (action === "business") buyBusiness(id);
-  else if (action === "talk") talk(id);
-  else if (action === "route") setRoute(id);
-  else if (action === "logout") signOut();
-}
-
-function upgradeHomeMenu() {
-  setText("sheetTitle", "Housing");
-  render("housing");
-}
-
-/* =========================================================
-   CAREERS, GIGS AND TRAINING
-   ========================================================= */
-
-function doCareer(id) {
-  const career = CAREERS.find(item => item.id === id);
-
-  if (!career) return;
-
-  if (state.career !== id) {
-    state.career = id;
-    state.careerLevel = 1;
-
-    toast(`Career selected: ${career.name}.`);
-
-    saveGame();
-    updateHUD();
-    refreshOpen("jobs");
-
-    return;
-  }
-
-  const skill = state.skills[career.skill] || 1;
-
-  if (
-    state.needs.energy < 28 ||
-    state.needs.focus < 20
-  ) {
-    toast("You need more energy and focus before a full shift.");
-    return;
-  }
-
-  const pay =
-    career.pay +
-    (skill - 1) * career.levelPay +
-    Math.floor(state.careerLevel) * 1300 +
-    (mood() === "Thriving" ? 1200 : 0);
-
-  earn(pay);
-
-  state.stats.shifts++;
-
-  advanceTime(120);
-
-  addNeed("energy", -19);
-  addNeed("hunger", -12);
-  addNeed("focus", -10);
-  addNeed("fun", -6);
-
-  state.careerLevel = Math.min(
-    5,
-    state.careerLevel + (skill >= state.careerLevel ? 0.15 : 0)
-  );
-
-  toast(`Shift complete: +₦${fmt(pay)}.`);
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  refreshOpen("jobs");
-}
-
-function doGig(id) {
-  const gig = GIGS.find(item => item.id === id);
-
-  if (!gig) return;
-
-  if (
-    state.needs.energy < 15 ||
-    state.needs.focus < 15
-  ) {
-    toast("You need more energy and focus to take this gig.");
-    return;
-  }
-
-  if (!spend(gig.cost)) {
-    toast("Not enough money for the gig costs.");
-    return;
-  }
-
-  const reward =
-    gig.reward +
-    (state.skills[gig.skill] - 1) * 700;
-
-  earn(reward);
-
-  state.stats.gigs++;
-
-  advanceTime(gig.min);
-
-  addNeed("energy", -10);
-  addNeed("hunger", -7);
-  addNeed("focus", -8);
-
-  toast(`Gig complete: +₦${fmt(reward)}.`);
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  refreshOpen("gigs");
-}
-
-function hasSkill(key) {
-  return Object.prototype.hasOwnProperty.call(
-    state.skills,
-    key
-  );
-}
-
-function train(key) {
-  if (!hasSkill(key)) return;
-
-  if (state.skills[key] >= 5) {
-    toast(`${cap(key)} is already at the maximum level.`);
-    return;
-  }
-
-  if (
-    state.needs.energy < 20 ||
-    state.needs.focus < 20
-  ) {
-    toast("Too tired to train. Rest first.");
-    return;
-  }
-
-  const cost = 450 + state.skills[key] * 400;
-
-  if (!spend(cost)) {
-    toast("Not enough money.");
-    return;
-  }
-
-  state.skills[key]++;
-
-  advanceTime(60);
-
-  addNeed("energy", -13);
-  addNeed("focus", -8);
-
-  gainXP(22);
-
-  toast(`${cap(key)} is now level ${state.skills[key]}.`);
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  refreshOpen("skills");
-}
-
-/* =========================================================
-   HOME AND NEEDS ACTIONS
-   ========================================================= */
-
-function moveHome(index) {
-  if (
-    !Number.isInteger(index) ||
-    index !== state.housing + 1 ||
-    !HOUSING[index]
-  ) {
-    toast("You can move one step at a time.");
-    return;
-  }
-
-  const home = HOUSING[index];
-
-  if (!spend(home.move)) {
-    toast(`You need ₦${fmt(home.move)}.`);
-    return;
-  }
-
-  state.housing = index;
-  state.rentDue = 14;
-
-  addNeed("energy", 8);
-  addNeed("hygiene", 8);
-
-  gainXP(45);
-
-  toast(`Moved into ${home.name}.`);
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  upgradeHomeMenu();
-}
-
-function rest() {
-  const home = HOUSING[state.housing];
-
-  const energyGain = home.comfort * 0.32;
-
-  advanceTime(360);
-
-  addNeed("energy", energyGain);
-  addNeed("focus", 22);
-  addNeed("fun", 8);
-  addNeed("hunger", -5);
-
-  state.status = "Resting";
-
-  toast("You slept and recovered.");
-
-  saveGame();
-  updateHUD();
-  refreshOpen("home");
-}
-
-function bath() {
-  advanceTime(35);
-
-  addNeed("hygiene", 38);
-  addNeed("bladder", 30);
-  addNeed("energy", -2);
-
-  toast("Freshened up.");
-
-  saveGame();
-  updateHUD();
-  refreshOpen("home");
-}
-
-function cook() {
-  if (!spend(600)) {
-    toast("You need ₦600 for ingredients.");
-    return;
-  }
-
-  state.inventory.push("home_meal");
-  state.stats.meals++;
-
-  advanceTime(35);
-
-  addNeed("hunger", 30);
-  addNeed("fun", 3);
-
-  toast("Meal ready.");
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  refreshOpen("home");
-}
-
-function buyItem(id) {
-  const item = SHOPS
-    .flatMap(shop => shop.items)
-    .find(item => item.id === id);
-
-  if (!item) return;
-
-  if (!spend(item.price)) {
-    toast("Not enough money.");
-    return;
-  }
-
-  state.inventory.push(item.id);
-
-  for (const [key, value] of Object.entries(item.e)) {
-    if (key in state.needs) {
-      addNeed(key, value);
-    }
-  }
-
-  if (item.id === "gym") {
-    state.skills.fitness = Math.min(
-      5,
-      state.skills.fitness + 1
-    );
-  }
-
-  if (["jollof", "shawarma", "drink"].includes(item.id)) {
-    state.stats.meals++;
-  }
-
-  advanceTime(20);
-
-  gainXP(6);
-
-  toast(`Bought ${item.name}.`);
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  refreshCurrentShop(id);
-}
-
-function refreshCurrentShop(id) {
-  const item = SHOPS
-    .flatMap(shop => shop.items)
-    .find(entry => entry.id === id);
-
-  if (!item) return;
-
-  const shop = SHOPS.find(entry =>
-    entry.items.some(product => product.id === id)
-  );
-
-  if (shop) {
-    refreshOpen(`shop-${shop.id}`);
-  }
-}
-
-/* =========================================================
-   PERSONAL TRANSPORT AND FARES
-   ========================================================= */
-
-function useVehicle(id) {
-  const vehicle = VEHICLES.find(item => item.id === id);
-
-  if (!vehicle) return;
-
-  if (vehicle.id === "feet") {
-    state.vehicle = "feet";
-
-    toast("You are travelling on foot.");
-
-    saveGame();
-    updateHUD();
-    render("transport");
-
-    return;
-  }
-
-  if (vehicle.fare > 0) {
-    if (!route) {
-      toast("Set a destination on the City Map first.");
-      return;
-    }
-
-    if (!spend(vehicle.fare)) {
-      toast(`You need ₦${fmt(vehicle.fare)} for the ride.`);
-      return;
-    }
-
-    const destination = route;
-
-    if (player) {
-      player.root.position.set(
-        destination.x,
-        0,
-        destination.z
-      );
-
-      state.pos = {
-        x: destination.x,
-        y: 0,
-        z: destination.z
-      };
-    }
-
-    route = null;
-
-    advanceTime(20);
-
-    addNeed("energy", 4);
-
-    toast(`Arrived at ${destination.name} by ${vehicle.name}.`);
-
-    saveGame();
-    updateHUD();
-    render("transport");
-
-    return;
-  }
-
-  const alreadyOwned = state.ownedVehicles.includes(id);
-
-  if (!alreadyOwned) {
-    if (!spend(vehicle.purchase)) {
-      toast(`You need ₦${fmt(vehicle.purchase)}.`);
-      return;
-    }
-
-    state.ownedVehicles.push(id);
-
-    toast(`${vehicle.name} purchased.`);
-  }
-
-  state.vehicle = id;
-
-  checkQuest();
-
-  saveGame();
-  updateHUD();
-  render("transport");
-}
-
-/* =========================================================
-   BUSINESSES, SOCIAL AND MAP ROUTES
-   ========================================================= */
-
-function buyBusiness(id) {
-  const investment = INVESTMENTS.find(item => item.id === id);
-
-  if (!investment) return;
-
-  if (state.investments.includes(id)) {
-    toast("You already own this business.");
-    return;
-  }
-
-  if (state.level < investment.req) {
-    toast(`Reach player level ${investment.req}.`);
-    return;
-  }
-
-  if (!spend(investment.cost)) {
-    toast(`You need ₦${fmt(investment.cost)}.`);
-    return;
-  }
-
-  state.investments.push(id);
-
-  gainXP(60);
-
-  toast(`${investment.name} is now part of your hustle.`);
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  render("business");
-}
-
-function talk(name) {
-  state.relationships[name] = clamp(
-    (state.relationships[name] || 0) + 8
-  );
-
-  advanceTime(15);
-
-  addNeed("social", 10);
-  addNeed("fun", 4);
-
-  gainXP(8);
-
-  toast(`You and ${name} connected.`);
-
-  checkQuest();
-  saveGame();
-  updateHUD();
-  render("social");
-}
-
-function setRoute(id) {
-  const place = PLACES.find(item => item.id === id);
-
-  if (!place) return;
-
-  route = place;
-  routePulse = 0;
-
-  toast(`Route set: ${place.name}.`);
-
-  $("overlay")?.classList.remove("open");
-}
-
-function interact() {
-  const { p, d } = nearestPlace();
-
-  if (!p || d > 11) return;
-
-  if (p.kind === "job") {
-    open(p.name, "jobs");
-  } else if (p.kind === "home") {
-    open(p.name, "home");
-  } else if (p.kind === "market") {
-    open(p.name, "shop-market");
-  } else if (p.kind === "food") {
-    open(p.name, "shop-food");
-  } else if (p.kind === "style") {
-    open(p.name, "shop-style");
-  } else if (p.kind === "gym") {
-    open(p.name, "skills");
-  } else if (p.kind === "office") {
-    open(p.name, "business");
-  } else if (p.kind === "hall") {
-    open(p.name, "profile");
-  } else if (
-    p.kind === "club" ||
-    p.kind === "hotel" ||
-    p.kind === "school"
-  ) {
-    open(p.name, "social");
-  }
-}
-
-/* =========================================================
-   QUEST PROGRESSION
-   ========================================================= */
-
-function checkQuest() {
-  while (state.quest < QUESTS.length) {
-    const quest = QUESTS[state.quest];
-
-    if (!quest || !quest.done(state)) {
-      break;
-    }
-
-    if (state.achievements.includes(quest.id)) {
-      state.quest++;
-      continue;
-    }
-
-    state.achievements.push(quest.id);
-
-    state.money += quest.reward;
-
-    gainXP(quest.xp);
-
-    state.quest++;
-
-    toast(
-      `Quest complete: ${quest.title} · +₦${fmt(quest.reward)}.`
-    );
-  }
-}
-
-/* =========================================================
-   SAVE AND LOAD
-   ========================================================= */
-
 function saveGame() {
-  const copy = { ...state };
-
-  copy.user = null;
-  copy.accountEmail = "";
-  copy.guest = false;
-
-  copy.needs = { ...state.needs };
-  copy.skills = { ...state.skills };
-  copy.relationships = { ...state.relationships };
-  copy.stats = { ...state.stats };
-  copy.cfg = { ...state.cfg };
-  copy.inventory = [...state.inventory];
-  copy.investments = [...state.investments];
-  copy.achievements = [...state.achievements];
-  copy.ownedVehicles = [...state.ownedVehicles];
-
-  if (player) {
-    copy.pos = {
-      x: player.root.position.x,
-      y: player.root.position.y,
-      z: player.root.position.z
-    };
-  } else {
-    copy.pos = { ...state.pos };
-  }
-
-  copy.keys = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-    shift: false
-  };
-
-  copy.joy = {
-    active: false,
-    x: 0,
-    y: 0
-  };
-
-  copy.run = false;
-  copy.jump = false;
-
   try {
-    localStorage.setItem(
-      SAVE_KEY,
-      JSON.stringify(copy)
-    );
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    return true;
   } catch (error) {
-    console.warn("Could not save game locally:", error);
+    console.error("Local save failed:", error);
+    notify("Could not save game on this device.");
+    return false;
   }
 }
 
-function loadLocalGame() {
-  let saved = null;
-
+function loadGame() {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    const saved = localStorage.getItem(SAVE_KEY);
 
-    if (raw) {
-      saved = JSON.parse(raw);
+    if (saved) {
+      state = normalizeState(JSON.parse(saved));
+      return true;
     }
   } catch (error) {
-    console.warn("Local save could not be loaded:", error);
+    console.error("Save data could not be loaded:", error);
   }
 
-  const authenticatedUser = state.user;
-  const guestMode = state.guest;
-  const quality = readQuality();
+  state = createInitialState();
+  return false;
+}
 
-  if (saved && typeof saved === "object") {
-    Object.assign(state, saved);
+function resetGame() {
+  if (!confirm("Start a new game? This replaces your local save.")) {
+    return;
   }
 
-  // Restore runtime-only values so a saved object cannot
-  // accidentally replace authentication or input state.
-  state.user = authenticatedUser;
-  state.guest = guestMode;
-  state.quality = quality;
+  state = createInitialState();
+  saveGame();
+  refreshGameUI();
+  notify("New game started.");
+}
 
-  state.accountEmail = authenticatedUser?.email || "";
+// ------------------------------------------------------------
+// 4. OPTIONAL SUPABASE CONNECTION
+// ------------------------------------------------------------
 
-  state.name =
-    typeof state.name === "string" && state.name.trim()
-      ? state.name
-      : "Guest";
+let supabase = null;
+let currentUser = null;
 
-  state.district =
-    typeof state.district === "string" && state.district.trim()
-      ? state.district
-      : "Lagos";
-
-  state.day = Math.max(1, Math.floor(Number(state.day) || 1));
-
-  state.time = clamp(
-    Number(state.time) || 480,
-    0,
-    1439.999
-  );
-
-  state.money = Math.max(0, Number(state.money) || 0);
-
-  state.xp = Math.max(0, Number(state.xp) || 0);
-
-  state.level = Math.max(1, Math.floor(Number(state.level) || 1));
-
-  state.housing = clamp(
-    Math.floor(Number(state.housing) || 0),
-    0,
-    HOUSING.length - 1
-  );
-
-  state.rentDue = Math.max(
-    1,
-    Math.floor(Number(state.rentDue) || 14)
-  );
-
-  state.needs = {
-    hunger: 82,
-    energy: 90,
-    hygiene: 86,
-    fun: 76,
-    social: 70,
-    bladder: 94,
-    focus: 75,
-    ...(state.needs || {})
-  };
-
-  for (const key of Object.keys(state.needs)) {
-    state.needs[key] = clamp(state.needs[key]);
-  }
-
-  state.skills = {
-    ...Object.fromEntries(SKILLS.map(key => [key, 1])),
-    ...(state.skills || {})
-  };
-
-  for (const key of SKILLS) {
-    state.skills[key] = clamp(
-      Math.floor(Number(state.skills[key]) || 1),
-      1,
-      5
-    );
-  }
-
-  state.cfg = sanitize(state.cfg);
-
-  state.relationships =
-    state.relationships &&
-    typeof state.relationships === "object"
-      ? state.relationships
-      : {};
-
-  state.inventory = Array.isArray(state.inventory)
-    ? state.inventory
-    : [];
-
-  state.investments = Array.isArray(state.investments)
-    ? state.investments.filter(id =>
-        INVESTMENTS.some(item => item.id === id)
-      )
-    : [];
-
-  state.achievements = Array.isArray(state.achievements)
-    ? state.achievements
-    : [];
-
-  state.ownedVehicles = Array.isArray(state.ownedVehicles)
-    ? state.ownedVehicles.filter(id =>
-        VEHICLES.some(vehicle => vehicle.id === id)
-      )
-    : ["feet"];
-
-  if (!state.ownedVehicles.includes("feet")) {
-    state.ownedVehicles.unshift("feet");
-  }
-
+async function initializeSupabase() {
   if (
-    state.vehicle === "bike" ||
-    state.vehicle === "car"
+    SUPABASE_URL.includes("YOUR_PROJECT") ||
+    SUPABASE_ANON_KEY.includes("YOUR_SUPABASE")
   ) {
-    if (!state.ownedVehicles.includes(state.vehicle)) {
-      state.vehicle = "feet";
-    }
+    console.info("Cloud saving disabled: configure Supabase credentials.");
+    return;
   }
-
-  if (!VEHICLES.some(vehicle => vehicle.id === state.vehicle)) {
-    state.vehicle = "feet";
-  }
-
-  state.quest = clamp(
-    Math.floor(Number(state.quest) || 0),
-    0,
-    QUESTS.length
-  );
-
-  state.stats = {
-    meals: 0,
-    days: 0,
-    shifts: 0,
-    gigs: 0,
-    ...(state.stats || {})
-  };
-
-  state.pos = {
-    x: clamp(Number(state.pos?.x ?? -28), -96, 96),
-    y: 0,
-    z: clamp(Number(state.pos?.z ?? 28), -96, 96)
-  };
-
-  state.keys = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-    shift: false
-  };
-
-  state.joy = {
-    active: false,
-    x: 0,
-    y: 0
-  };
-
-  state.run = false;
-  state.jump = false;
-  state.emote = "none";
-
-  // Preserve a separately saved avatar if one exists.
-  try {
-    const avatar = localStorage.getItem(AVATAR_KEY);
-
-    if (avatar) {
-      state.cfg = sanitize(JSON.parse(avatar));
-    }
-  } catch (error) {
-    console.warn("Local avatar could not be loaded:", error);
-  }
-}
-
-async function loadCloudCharacter() {
-  if (!state.user || state.guest) return;
 
   try {
-    const { data, error } = await db.rpc("get_my_character");
+    const module = await import(
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+    );
+
+    supabase = module.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const { data, error } = await supabase.auth.getSession();
 
     if (error) throw error;
 
-    if (data?.id) {
-      state.name = data.name || state.name;
-      state.district = data.district || state.district;
+    currentUser = data.session?.user || null;
 
-      if (data.avatar) {
-        state.cfg = sanitize(data.avatar);
-      }
-    }
+    supabase.auth.onAuthStateChange((_event, session) => {
+      currentUser = session?.user || null;
+    });
   } catch (error) {
-    console.warn(
-      "Cloud character could not be loaded. Local progress will still be used:",
-      error
+    console.error("Supabase initialization failed:", error);
+    notify("Cloud connection unavailable. Local play is still available.");
+  }
+}
+
+async function signInWithEmail(email, password) {
+  if (!supabase) {
+    notify("Cloud login is not configured.");
+    return false;
+  }
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    notify(error.message);
+    return false;
+  }
+
+  currentUser = data.user;
+  notify("Signed in.");
+  return true;
+}
+
+async function signUpWithEmail(email, password) {
+  if (!supabase) {
+    notify("Cloud login is not configured.");
+    return false;
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    notify(error.message);
+    return false;
+  }
+
+  currentUser = data.user;
+  notify("Account created. Check your email if verification is required.");
+  return true;
+}
+
+async function signOut() {
+  if (supabase) {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      notify(error.message);
+      return;
+    }
+  }
+
+  currentUser = null;
+  notify("Signed out.");
+}
+
+async function saveCloudGame() {
+  if (!supabase || !currentUser) {
+    notify("Sign in to enable cloud saving.");
+    return false;
+  }
+
+  // This requires a table you own, with:
+  // user_id UUID PRIMARY KEY REFERENCES auth.users(id)
+  // save_data JSONB, updated_at TIMESTAMPTZ
+  //
+  // Configure the table's RLS policies before enabling cloud saves.
+  const { error } = await supabase
+    .from("game_saves")
+    .upsert({
+      user_id: currentUser.id,
+      save_data: state,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id" });
+
+  if (error) {
+    console.error("Cloud save failed:", error);
+    notify("Cloud save failed. Your local save is unchanged.");
+    return false;
+  }
+
+  notify("Cloud save complete.");
+  return true;
+}
+
+async function loadCloudGame() {
+  if (!supabase || !currentUser) {
+    notify("Sign in first.");
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("game_saves")
+    .select("save_data")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    notify("Cloud load failed.");
+    console.error(error);
+    return false;
+  }
+
+  if (!data?.save_data) {
+    notify("No cloud save found.");
+    return false;
+  }
+
+  state = normalizeState(data.save_data);
+  saveGame();
+  refreshGameUI();
+  syncPlayerPosition();
+  notify("Cloud save loaded.");
+  return true;
+}
+
+// ------------------------------------------------------------
+// 5. THREE.JS WORLD
+// ------------------------------------------------------------
+
+let scene;
+let camera;
+let renderer;
+let clock;
+let player;
+let playerBody;
+let playerHead;
+let playerHair;
+let worldReady = false;
+
+const buildingMeshes = [];
+const npcMeshes = [];
+const keys = new Set();
+
+const cameraTarget = new THREE.Vector3();
+const cameraOffset = new THREE.Vector3(14, 18, 14);
+
+let cameraZoom = CONFIG.cameraZoom;
+let sprinting = false;
+let joystick = { x: 0, y: 0, active: false };
+let gamePaused = false;
+let currentInteraction = null;
+let lastSave = 0;
+let lastHudUpdate = 0;
+
+function makeMaterial(color, roughness = 0.9) {
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness
+  });
+}
+
+function makeBox(width, height, depth, color) {
+  return new THREE.Mesh(
+    new THREE.BoxGeometry(width, height, depth),
+    makeMaterial(color)
+  );
+}
+
+function addGround() {
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(250, 250),
+    makeMaterial(0x59664b)
+  );
+
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.08;
+  scene.add(ground);
+
+  // Roads
+  const roadMaterial = makeMaterial(0x444448);
+
+  const road1 = new THREE.Mesh(
+    new THREE.BoxGeometry(90, 0.08, 9),
+    roadMaterial
+  );
+
+  road1.position.set(0, 0, 0);
+  scene.add(road1);
+
+  const road2 = new THREE.Mesh(
+    new THREE.BoxGeometry(9, 0.08, 90),
+    roadMaterial
+  );
+
+  road2.position.set(0, 0.01, 0);
+  scene.add(road2);
+
+  // Road markings
+  for (let i = -40; i <= 40; i += 8) {
+    const marking = new THREE.Mesh(
+      new THREE.BoxGeometry(3, 0.03, 0.18),
+      makeMaterial(0xe6d7a2)
+    );
+
+    marking.position.set(i, 0.07, 0);
+    scene.add(marking);
+  }
+}
+
+function createBuilding(data) {
+  const group = new THREE.Group();
+
+  const building = makeBox(10, 7, 9, data.color);
+  building.position.y = 3.5;
+  group.add(building);
+
+  const roof = makeBox(10.8, 0.45, 9.8, 0x4c3930);
+  roof.position.y = 7.2;
+  group.add(roof);
+
+  const door = makeBox(1.5, 2.7, 0.18, 0x4b3020);
+  door.position.set(0, 1.35, 4.58);
+  group.add(door);
+
+  for (const x of [-3, 3]) {
+    const windowMesh = makeBox(1.6, 1.4, 0.2, 0x9bd2df);
+    windowMesh.position.set(x, 4.3, 4.58);
+    group.add(windowMesh);
+  }
+
+  group.position.set(data.x, 0, data.z);
+  group.userData = {
+    kind: data.kind,
+    name: data.name,
+    x: data.x,
+    z: data.z
+  };
+
+  scene.add(group);
+  buildingMeshes.push(group);
+
+  return group;
+}
+
+function createTree(x, z) {
+  const tree = new THREE.Group();
+
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.25, 0.4, 2.2, 7),
+    makeMaterial(0x6a4329)
+  );
+
+  trunk.position.y = 1.1;
+  tree.add(trunk);
+
+  const leaves = new THREE.Mesh(
+    new THREE.SphereGeometry(1.6, 8, 7),
+    makeMaterial(0x326b3c)
+  );
+
+  leaves.position.y = 3;
+  tree.add(leaves);
+
+  tree.position.set(x, 0, z);
+  scene.add(tree);
+}
+
+function createNPC(x, z) {
+  const npc = new THREE.Group();
+
+  const body = makeBox(0.8, 1.5, 0.55, choice([
+    0x315c80, 0x7e4b33, 0x7d3974, 0x476d45, 0xc09a39
+  ]));
+
+  body.position.y = 1.0;
+  npc.add(body);
+
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.42, 12, 10),
+    makeMaterial(choice([0x5c3525, 0x8d5524, 0xb98058]))
+  );
+
+  head.position.y = 2.1;
+  npc.add(head);
+
+  npc.position.set(x, 0, z);
+  npc.userData = {
+    originX: x,
+    originZ: z,
+    phase: random(0, Math.PI * 2),
+    speed: random(0.2, 0.6)
+  };
+
+  scene.add(npc);
+  npcMeshes.push(npc);
+}
+
+function createPlayer() {
+  player = new THREE.Group();
+
+  playerBody = makeBox(
+    0.9, 1.4, 0.6,
+    state.avatar.outfitColor || "#315c80"
+  );
+
+  playerBody.position.y = 1.0;
+  player.add(playerBody);
+
+  playerHead = new THREE.Mesh(
+    new THREE.SphereGeometry(0.43, 16, 12),
+    makeMaterial(state.avatar.skinTone || "#8d5524")
+  );
+
+  playerHead.position.y = 2.1;
+  player.add(playerHead);
+
+  playerHair = new THREE.Mesh(
+    new THREE.SphereGeometry(0.45, 12, 8, 0, Math.PI * 2, 0, 0.9),
+    makeMaterial(state.avatar.hairColor || "#201710")
+  );
+
+  playerHair.position.y = 2.35;
+  player.add(playerHair);
+
+  player.position.set(state.player.x, 0, state.player.z);
+  scene.add(player);
+}
+
+function applyAvatar() {
+  if (!playerBody || !playerHead || !playerHair) return;
+
+  playerBody.material.color.set(state.avatar.outfitColor);
+  playerHead.material.color.set(state.avatar.skinTone);
+  playerHair.material.color.set(state.avatar.hairColor);
+
+  playerHair.visible = state.avatar.hairstyle !== "bald";
+}
+
+function initializeWorld() {
+  const host = $("#gameCanvas") || $("#game-world") || $("#gameWorld");
+
+  if (!host) {
+    console.error(
+      "No game canvas container found. Expected #gameCanvas, #game-world, or #gameWorld."
+    );
+    notify("Game canvas container not found. Check your index.html.");
+    return;
+  }
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x9ec6d7);
+  scene.fog = new THREE.Fog(0x9ec6d7, 65, 160);
+
+  const width = host.clientWidth || window.innerWidth;
+  const height = host.clientHeight || window.innerHeight;
+
+  // Orthographic camera creates the isometric-style view.
+  camera = new THREE.OrthographicCamera(
+    -cameraZoom * width / height / 2,
+    cameraZoom * width / height / 2,
+    cameraZoom / 2,
+    -cameraZoom / 2,
+    0.1,
+    500
+  );
+
+  camera.position.set(14, 18, 14);
+  camera.lookAt(0, 0, 0);
+
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: false
+  });
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(width, height);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  host.replaceChildren(renderer.domElement);
+  renderer.domElement.style.width = "100%";
+  renderer.domElement.style.height = "100%";
+  renderer.domElement.style.display = "block";
+  renderer.domElement.style.touchAction = "none";
+
+  const ambient = new THREE.HemisphereLight(0xffffff, 0x4e5943, 2.0);
+  scene.add(ambient);
+
+  const sunlight = new THREE.DirectionalLight(0xffe3b0, 2.0);
+  sunlight.position.set(-25, 45, 25);
+  sunlight.castShadow = true;
+  scene.add(sunlight);
+
+  addGround();
+
+  for (const building of BUILDINGS) {
+    createBuilding(building);
+  }
+
+  for (let i = 0; i < 28; i++) {
+    const x = random(-42, 42);
+    const z = random(-42, 42);
+
+    if (Math.abs(x) < 25 && Math.abs(z) < 23) continue;
+    createTree(x, z);
+  }
+
+  for (let i = 0; i < 12; i++) {
+    createNPC(random(-30, 30), random(-30, 30));
+  }
+
+  createPlayer();
+
+  clock = new THREE.Clock();
+  worldReady = true;
+
+  window.addEventListener("resize", resizeRenderer);
+
+  renderer.domElement.addEventListener("pointerdown", onWorldPointer);
+  animate();
+
+  notify("Welcome to Naija Hustle!");
+}
+
+function resizeRenderer() {
+  if (!renderer || !camera) return;
+
+  const host = renderer.domElement.parentElement;
+  const width = host.clientWidth || window.innerWidth;
+  const height = host.clientHeight || window.innerHeight;
+
+  renderer.setSize(width, height);
+
+  camera.left = -cameraZoom * width / height / 2;
+  camera.right = cameraZoom * width / height / 2;
+  camera.top = cameraZoom / 2;
+  camera.bottom = -cameraZoom / 2;
+  camera.updateProjectionMatrix();
+}
+
+function onWorldPointer(event) {
+  if (!renderer || !camera) return;
+
+  const rect = renderer.domElement.getBoundingClientRect();
+
+  const pointer = new THREE.Vector2(
+    ((event.clientX - rect.left) / rect.width) * 2 - 1,
+    -((event.clientY - rect.top) / rect.height) * 2 + 1
+  );
+
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(pointer, camera);
+
+  const hits = raycaster.intersectObjects(buildingMeshes, true);
+
+  if (!hits.length) return;
+
+  let object = hits[0].object;
+
+  while (object && !object.userData.kind) {
+    object = object.parent;
+  }
+
+  if (!object?.userData?.kind) return;
+
+  const data = object.userData;
+  const distance = Math.hypot(
+    player.position.x - data.x,
+    player.position.z - data.z
+  );
+
+  if (distance > 12) {
+    notify("Move closer to " + data.name + " first.");
+    return;
+  }
+
+  interactWithBuilding(data);
+}
+
+// ------------------------------------------------------------
+// 6. PLAYER MOVEMENT AND CAMERA
+// ------------------------------------------------------------
+
+function syncPlayerPosition() {
+  if (!player) return;
+
+  player.position.x = state.player.x;
+  player.position.z = state.player.z;
+}
+
+function updateMovement(dt) {
+  if (!player || gamePaused) return;
+
+  let x = 0;
+  let z = 0;
+
+  if (keys.has("w") || keys.has("arrowup")) z -= 1;
+  if (keys.has("s") || keys.has("arrowdown")) z += 1;
+  if (keys.has("a") || keys.has("arrowleft")) x -= 1;
+  if (keys.has("d") || keys.has("arrowright")) x += 1;
+
+  x += joystick.x;
+  z += joystick.y;
+
+  const length = Math.hypot(x, z);
+
+  if (length > 1) {
+    x /= length;
+    z /= length;
+  }
+
+  const multiplier = sprinting ? CONFIG.sprintMultiplier : 1;
+  const speed = CONFIG.moveSpeed * multiplier;
+
+  if (length > 0.05) {
+    // Isometric movement: controls remain aligned with the screen.
+    const worldX = x - z;
+    const worldZ = x + z;
+    const scale = 1 / Math.SQRT2;
+
+    player.position.x += worldX * scale * speed * dt;
+    player.position.z += worldZ * scale * speed * dt;
+
+    player.rotation.y = Math.atan2(worldX, worldZ);
+
+    state.needs.energy = clamp(
+      state.needs.energy - dt * (sprinting ? 0.75 : 0.25),
+      0, 100
     );
   }
+
+  // Keep the player inside the world boundary.
+  player.position.x = clamp(
+    player.position.x, -CONFIG.worldSize, CONFIG.worldSize
+  );
+
+  player.position.z = clamp(
+    player.position.z, -CONFIG.worldSize, CONFIG.worldSize
+  );
+
+  state.player.x = player.position.x;
+  state.player.z = player.position.z;
+
+  updateCamera(dt);
 }
 
-async function loadGame() {
-  loadLocalGame();
+function updateCamera(dt) {
+  if (!camera || !player) return;
 
-  await loadCloudCharacter();
+  cameraTarget.copy(player.position);
 
-  updateHUD();
+  const desired = cameraTarget.clone().add(cameraOffset);
+
+  camera.position.lerp(
+    desired,
+    1 - Math.exp(-5 * dt)
+  );
+
+  camera.lookAt(cameraTarget);
 }
 
-/* =========================================================
-   HUD AND MINIMAP
-   ========================================================= */
+function zoomCamera(amount) {
+  cameraZoom = clamp(cameraZoom + amount, 8, 28);
+  resizeRenderer();
+}
 
-function updateHUD() {
-  setText("name", state.name);
-  setText("levelBadge", `Lv ${state.level}`);
+function animate() {
+  if (!worldReady) return;
 
-  const career = state.career
-    ? CAREERS.find(item => item.id === state.career)?.name
-    : null;
+  requestAnimationFrame(animate);
 
-  setText(
-    "sub",
-    `${state.district} · ${career || "Starting Out"}`
-  );
+  const dt = Math.min(clock.getDelta(), 0.05);
 
-  setText("money", fmt(state.money));
+  updateMovement(dt);
+  updateWorld(dt);
+  updateGameTime(dt);
 
-  setText(
-    "housingPill",
-    HOUSING[state.housing]?.name || HOUSING[0].name
-  );
+  renderer.render(scene, camera);
 
-  setText("clock", currentClock());
-  setText("moodText", mood());
-  setText("objectiveText", state.activity);
+  lastHudUpdate += dt;
 
-  setText(
-    "xpText",
-    `${Math.round(state.xp)} / ${state.level * 100} XP`
-  );
-
-  const xpFill = $("xpFill");
-
-  if (xpFill) {
-    xpFill.style.width =
-      `${clamp(state.xp / (state.level * 100) * 100)}%`;
+  if (lastHudUpdate >= 0.25) {
+    refreshGameUI();
+    lastHudUpdate = 0;
   }
 
-  for (const key of Object.keys(state.needs)) {
-    const id = key[0].toUpperCase() + key.slice(1);
+  lastSave += dt * 1000;
 
-    const fill = $(`need${id}`);
-    const value = $(`need${id}V`);
+  if (lastSave >= CONFIG.saveInterval) {
+    saveGame();
+    lastSave = 0;
+  }
+}
 
-    if (fill) {
-      fill.style.width = `${state.needs[key]}%`;
-    }
+function updateWorld(dt) {
+  for (const npc of npcMeshes) {
+    npc.userData.phase += dt * npc.userData.speed;
 
-    if (value) {
-      value.textContent = Math.round(state.needs[key]);
-    }
+    npc.position.x =
+      npc.userData.originX + Math.sin(npc.userData.phase) * 1.5;
+
+    npc.position.z =
+      npc.userData.originZ + Math.cos(npc.userData.phase * 0.7) * 1.5;
   }
 
-  updatePrompt();
+  if (player) {
+    player.position.y = Math.abs(Math.sin(performance.now() * 0.006)) *
+      (keys.has(" ") ? 0.65 : 0);
+  }
 }
+
+// ------------------------------------------------------------
+// 7. NEEDS, TIME, XP AND QUESTS
+// ------------------------------------------------------------
+
+function updateGameTime(dt) {
+  state.time += dt * 24 / CONFIG.dayLength;
+
+  if (state.time >= 24) {
+    state.time -= 24;
+    state.day += 1;
+    payDailyExpenses();
+  }
+
+  state.needs.hunger = clamp(state.needs.hunger - dt * 0.12, 0, 100);
+  state.needs.hygiene = clamp(state.needs.hygiene - dt * 0.045, 0, 100);
+  state.needs.fun = clamp(state.needs.fun - dt * 0.025, 0, 100);
+  state.needs.social = clamp(state.needs.social - dt * 0.018, 0, 100);
+  state.needs.bladder = clamp(state.needs.bladder - dt * 0.07, 0, 100);
+}
+
+function payDailyExpenses() {
+  const home = HOMES[state.homeIndex] || HOMES[0];
+
+  if (home.rent > 0) {
+    state.money = Math.max(0, state.money - home.rent);
+    notify("Daily housing expense: " + money(home.rent));
+  }
+
+  const career = CAREERS.find((item) => item.name === state.career);
+
+  if (career?.salary > 0) {
+    state.money += career.salary;
+    notify("Work income received: " + money(career.salary));
+    addXP(20);
+  }
+
+  saveGame();
+}
+
+function addXP(amount) {
+  state.xp += Math.max(0, amount);
+
+  while (state.xp >= state.level * 100) {
+    state.xp -= state.level * 100;
+    state.level += 1;
+    state.money += 1500;
+    notify("Level " + state.level + " reached! Bonus: ₦1,500");
+  }
+
+  checkQuest();
+}
+
+function setNeed(name, value) {
+  if (!(name in state.needs)) return;
+
+  state.needs[name] = clamp(value, 0, 100);
+  refreshGameUI();
+}
+
+function restoreNeed(name, amount) {
+  if (!(name in state.needs)) return;
+
+  setNeed(name, state.needs[name] + amount);
+}
+
+function checkQuest() {
+  if (
+    state.activeQuest === "Earn your first ₦5,000" &&
+    state.money >= 30000
+  ) {
+    state.completedQuests.push(state.activeQuest);
+    state.activeQuest = "Complete your first gig";
+    state.money += 2000;
+    notify("Quest complete! Bonus: ₦2,000");
+  }
+
+  if (
+    state.activeQuest === "Complete your first gig" &&
+    state.stats.gigsCompleted > 0
+  ) {
+    state.completedQuests.push(state.activeQuest);
+    state.activeQuest = "Explore the city";
+    state.money += 3000;
+    notify("Quest complete! Bonus: ₦3,000");
+  }
+}
+
+// ------------------------------------------------------------
+// 8. ECONOMY: JOBS AND GIGS
+// ------------------------------------------------------------
+
+function getJob() {
+  const options = CAREERS.filter(
+    (career) => career.name !== "Unemployed"
+  );
+
+  const list = options.map((career, index) =>
+    (index + 1) + ". " + career.name + " — " +
+    money(career.salary) + " per game day"
+  ).join("\n");
+
+  const answer = prompt(
+    "Choose a career by number:\n" + list
+  );
+
+  if (answer === null) return;
+
+  const index = Number(answer) - 1;
+
+  if (!Number.isInteger(index) || index < 0 || index >= options.length) {
+    notify("Invalid career choice.");
+    return;
+  }
+
+  state.career = options[index].name;
+  state.stats.jobsCompleted += 1;
+
+  notify("Career selected: " + state.career);
+  addXP(25);
+  saveGame();
+}
+
+function doGig() {
+  const gig = choice(GIGS);
+
+  if (state.needs.energy < gig.energy) {
+    notify("Not enough energy. Rest first.");
+    return;
+  }
+
+  state.needs.energy -= gig.energy;
+  state.money += gig.reward;
+  state.stats.gigsCompleted += 1;
+
+  const skill = choice(Object.keys(state.skills));
+  state.skills[skill] += 1;
+
+  addXP(30);
+
+  notify(
+    "Gig completed: " + gig.name + ". Earned " + money(gig.reward)
+  );
+
+  saveGame();
+  refreshGameUI();
+}
+
+// ------------------------------------------------------------
+// 9. INVENTORY, SHOPS AND NEEDS
+// ------------------------------------------------------------
+
+function buyItem(item) {
+  if (state.money < item.price) {
+    notify("You don't have enough money.");
+    return false;
+  }
+
+  state.money -= item.price;
+  state.inventory.push(item.name);
+  state.stats.itemsPurchased += 1;
+
+  notify("Purchased " + item.name);
+  saveGame();
+  refreshGameUI();
+
+  return true;
+}
+
+function useItem(itemName) {
+  const index = state.inventory.indexOf(itemName);
+
+  if (index === -1) {
+    notify("That item isn't in your inventory.");
+    return;
+  }
+
+  const item = ITEMS.find((entry) => entry.name === itemName);
+
+  if (!item) {
+    notify("This item has no use configured.");
+    return;
+  }
+
+  state.inventory.splice(index, 1);
+
+  if (item.hunger) restoreNeed("hunger", item.hunger);
+  if (item.energy) restoreNeed("energy", item.energy);
+  if (item.hygiene) restoreNeed("hygiene", item.hygiene);
+
+  notify("Used " + item.name);
+  saveGame();
+  refreshGameUI();
+}
+
+function openShop() {
+  const options = ITEMS.map((item, index) =>
+    (index + 1) + ". " + item.name + " — " + money(item.price)
+  ).join("\n");
+
+  const answer = prompt("Shop\n" + options + "\n\nEnter item number:");
+
+  if (answer === null) return;
+
+  const index = Number(answer) - 1;
+
+  if (!Number.isInteger(index) || index < 0 || index >= ITEMS.length) {
+    notify("Invalid item choice.");
+    return;
+  }
+
+  buyItem(ITEMS[index]);
+}
+
+function rest() {
+  restoreNeed("energy", 40);
+  restoreNeed("fun", 10);
+  state.time = (state.time + 2) % 24;
+
+  notify("You rested and recovered energy.");
+  saveGame();
+}
+
+function shower() {
+  restoreNeed("hygiene", 55);
+  state.money = Math.max(0, state.money - 300);
+
+  notify("You freshened up. Cost: ₦300");
+  saveGame();
+}
+
+function eat() {
+  const food = ITEMS.filter((item) => item.hunger);
+
+  const options = food.map((item, index) =>
+    (index + 1) + ". " + item.name + " — " + money(item.price)
+  ).join("\n");
+
+  const answer = prompt("Food options:\n" + options);
+
+  if (answer === null) return;
+
+  const item = food[Number(answer) - 1];
+
+  if (!item) {
+    notify("Invalid choice.");
+    return;
+  }
+
+  if (buyItem(item)) {
+    useItem(item.name);
+  }
+}
+
+// ------------------------------------------------------------
+// 10. HOUSING AND VEHICLES
+// ------------------------------------------------------------
+
+function upgradeHome() {
+  const options = HOMES.map((home, index) =>
+    (index + 1) + ". " + home.name +
+    " — " + money(home.price) +
+    " (daily expense: " + money(home.rent) + ")"
+  ).join("\n");
+
+  const answer = prompt("Housing:\n" + options);
+
+  if (answer === null) return;
+
+  const index = Number(answer) - 1;
+
+  if (
+    !Number.isInteger(index) ||
+    index < 0 ||
+    index >= HOMES.length
+  ) {
+    notify("Invalid housing choice.");
+    return;
+  }
+
+  if (index <= state.homeIndex) {
+    notify("You already own this home or a better one.");
+    return;
+  }
+
+  const home = HOMES[index];
+
+  if (state.money < home.price) {
+    notify("Not enough money for this home.");
+    return;
+  }
+
+  state.money -= home.price;
+  state.homeIndex = index;
+
+  notify("You moved into " + home.name);
+  addXP(50);
+  saveGame();
+}
+
+function buyVehicle() {
+  const options = VEHICLES.map((vehicle, index) =>
+    (index + 1) + ". " + vehicle.name + " — " + money(vehicle.price)
+  ).join("\n");
+
+  const answer = prompt("Vehicle shop:\n" + options);
+
+  if (answer === null) return;
+
+  const index = Number(answer) - 1;
+
+  if (
+    !Number.isInteger(index) ||
+    index < 0 ||
+    index >= VEHICLES.length
+  ) {
+    notify("Invalid vehicle choice.");
+    return;
+  }
+
+  if (state.vehicleIndex === index) {
+    notify("You already have this vehicle.");
+    return;
+  }
+
+  const vehicle = VEHICLES[index];
+
+  if (state.money < vehicle.price) {
+    notify("Not enough money.");
+    return;
+  }
+
+  state.money -= vehicle.price;
+  state.vehicleIndex = index;
+
+  notify("Purchased: " + vehicle.name);
+  saveGame();
+}
+
+function useVehicle() {
+  if (state.vehicleIndex < 0) {
+    notify("You don't own a vehicle yet.");
+    return;
+  }
+
+  const vehicle = VEHICLES[state.vehicleIndex];
+
+  notify(vehicle.name + " selected. Vehicle driving physics are not yet implemented.");
+}
+
+// ------------------------------------------------------------
+// 11. BUILDING INTERACTIONS
+// ------------------------------------------------------------
+
+function interactWithBuilding(building) {
+  currentInteraction = building;
+
+  switch (building.kind) {
+    case "shop":
+      openShop();
+      break;
+
+    case "food":
+      eat();
+      break;
+
+    case "clinic":
+      restoreNeed("energy", 10);
+      restoreNeed("hygiene", 5);
+      notify("You took a short break at the clinic.");
+      break;
+
+    case "job":
+      getJob();
+      break;
+
+    case "home":
+      rest();
+      break;
+
+    case "garage":
+      buyVehicle();
+      break;
+
+    default:
+      notify("Nothing to do here yet.");
+  }
+
+  refreshGameUI();
+}
+
+// ------------------------------------------------------------
+// 12. AVATAR CUSTOMIZATION
+// ------------------------------------------------------------
+
+function customizeAvatar() {
+  const options = [
+    "1. Skin tone",
+    "2. Hair color",
+    "3. Outfit color",
+    "4. Hairstyle"
+  ].join("\n");
+
+  const answer = prompt("Avatar customization:\n" + options);
+
+  if (answer === null) return;
+
+  switch (answer) {
+    case "1": {
+      const value = prompt(
+        "Enter a hex skin color, e.g. #8d5524",
+        state.avatar.skinTone
+      );
+
+      if (value && /^#[0-9a-f]{6}$/i.test(value)) {
+        state.avatar.skinTone = value;
+      } else if (value !== null) {
+        notify("Use a valid hex color.");
+        return;
+      }
+
+      break;
+    }
+
+    case "2": {
+      const value = prompt(
+        "Enter a hex hair color, e.g. #201710",
+        state.avatar.hairColor
+      );
+
+      if (value && /^#[0-9a-f]{6}$/i.test(value)) {
+        state.avatar.hairColor = value;
+      } else if (value !== null) {
+        notify("Use a valid hex color.");
+        return;
+      }
+
+      break;
+    }
+
+    case "3": {
+      const value = prompt(
+        "Enter a hex outfit color, e.g. #315c80",
+        state.avatar.outfitColor
+      );
+
+      if (value && /^#[0-9a-f]{6}$/i.test(value)) {
+        state.avatar.outfitColor = value;
+      } else if (value !== null) {
+        notify("Use a valid hex color.");
+        return;
+      }
+
+      break;
+    }
+
+    case "4": {
+      const value = prompt(
+        "Choose: short, afro, bald",
+        state.avatar.hairstyle
+      );
+
+      if (["short", "afro", "bald"].includes(value)) {
+        state.avatar.hairstyle = value;
+      }
+
+      break;
+    }
+
+    default:
+      notify("Invalid choice.");
+      return;
+  }
+
+  applyAvatar();
+  saveGame();
+  notify("Avatar updated.");
+}
+
+// ------------------------------------------------------------
+// 13. MINIMAP
+// ------------------------------------------------------------
 
 function drawMinimap() {
-  const canvas = $("minimap");
+  const canvas = $("#minimap");
 
-  if (!canvas || !player) return;
+  if (!(canvas instanceof HTMLCanvasElement)) return;
 
-  const ctx = canvas.getContext("2d");
-
-  if (!ctx) return;
+  const context = canvas.getContext("2d");
+  if (!context) return;
 
   const width = canvas.width;
   const height = canvas.height;
 
-  const scale = width / 190;
+  context.clearRect(0, 0, width, height);
+  context.fillStyle = "#18221b";
+  context.fillRect(0, 0, width, height);
 
-  ctx.clearRect(0, 0, width, height);
+  const scale = Math.min(width, height) / 100;
 
-  ctx.fillStyle = "#10201d";
-  ctx.fillRect(0, 0, width, height);
+  context.strokeStyle = "#545454";
+  context.lineWidth = 7;
 
-  ctx.fillStyle = "#263a36";
+  context.beginPath();
+  context.moveTo(width / 2, 0);
+  context.lineTo(width / 2, height);
+  context.moveTo(0, height / 2);
+  context.lineTo(width, height / 2);
+  context.stroke();
 
-  for (let i = -3; i <= 3; i++) {
-    const value = (i * 28 + 95) * scale;
+  for (const building of BUILDINGS) {
+    const x = width / 2 + building.x * scale;
+    const y = height / 2 + building.z * scale;
 
-    ctx.fillRect(value, 0, 12 * scale, height);
-    ctx.fillRect(0, value, width, 12 * scale);
+    context.fillStyle = "#d0a94f";
+    context.fillRect(x - 3, y - 3, 6, 6);
   }
 
-  for (const place of PLACES) {
-    const x = (place.x + 95) * scale;
-    const y = (place.z + 95) * scale;
+  const playerX = width / 2 + state.player.x * scale;
+  const playerY = height / 2 + state.player.z * scale;
 
-    ctx.fillStyle = place.color;
-
-    ctx.fillRect(x - 3, y - 3, 6, 6);
-  }
-
-  const px = (player.root.position.x + 95) * scale;
-  const py = (player.root.position.z + 95) * scale;
-
-  ctx.fillStyle = "#ffffff";
-
-  ctx.beginPath();
-  ctx.arc(px, py, 5, 0, Math.PI * 2);
-  ctx.fill();
-
-  if (route) {
-    const rx = (route.x + 95) * scale;
-    const ry = (route.z + 95) * scale;
-
-    ctx.strokeStyle = "#FFC20E";
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-    ctx.moveTo(px, py);
-    ctx.lineTo(rx, ry);
-    ctx.stroke();
-
-    ctx.fillStyle = "#FFC20E";
-
-    ctx.beginPath();
-    ctx.arc(rx, ry, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  context.fillStyle = "#66d9ef";
+  context.beginPath();
+  context.arc(playerX, playerY, 4, 0, Math.PI * 2);
+  context.fill();
 }
 
-/* =========================================================
-   RENDER LOOP
-   ========================================================= */
+// ------------------------------------------------------------
+// 14. GAME UI
+// ------------------------------------------------------------
 
-function resize() {
-  if (!camera || !renderer) return;
+function setText(selector, value) {
+  const element = $(selector);
 
-  camera.aspect =
-    window.innerWidth / window.innerHeight;
-
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-  );
+  if (element) element.textContent = value;
 }
 
-function animate() {
-  if (!gameStarted || !renderer || !scene || !camera) {
-    return;
+function updateNeedBar(name, value) {
+  const selectors = [
+    "#" + name + "Bar",
+    `[data-need="${name}"]`,
+    `[data-stat="${name}"]`
+  ];
+
+  for (const selector of selectors) {
+    const element = $(selector);
+    if (!element) continue;
+
+    if ("value" in element) {
+      element.value = value;
+    } else {
+      element.style.width = value + "%";
+      element.setAttribute("aria-valuenow", String(value));
+    }
   }
 
-  requestAnimationFrame(animate);
-
-  const now = performance.now();
-
-  const dt = Math.min(
-    0.05,
-    Math.max(0, (now - last) / 1000)
-  );
-
-  last = now;
-
-  updatePlayer(dt);
-  updateNPCs(dt);
-  updateCars(dt);
-
-  updateCamera(dt);
-  updateWorldLight();
-
-  // Reduce repeated DOM updates instead of rewriting
-  // all HUD elements on every single animation frame.
-  hudClock += dt;
-
-  if (hudClock >= 0.16) {
-    hudClock = 0;
-    updateHUD();
-  }
-
-  mapClock++;
-
-  if ((mapClock & 3) === 0) {
-    drawMinimap();
-  }
-
-  saveClock += dt;
-
-  if (saveClock >= 8) {
-    saveClock = 0;
-    saveGame();
-  }
-
-  renderer.render(scene, camera);
+  setText("#" + name + "Value", Math.round(value) + "%");
 }
 
-/* =========================================================
-   AUTHENTICATION AND STARTUP
-   ========================================================= */
-
-function showLogin(message = "") {
-  $("loginScreen")?.classList.remove("hidden");
-  $("hud")?.classList.add("hidden");
-
-  const loading = $("loading");
-
-  if (loading) {
-    loading.style.display = "none";
-  }
-
-  if (message) {
-    setText("loginMessage", message);
-  }
-}
-
-function showGame() {
-  $("loginScreen")?.classList.add("hidden");
-  $("hud")?.classList.remove("hidden");
-
-  const loading = $("loading");
-
-  if (loading) {
-    loading.style.display = "none";
-  }
-}
-
-async function startGame() {
-  if (gameStarted) {
-    showGame();
-    return;
-  }
-
-  if (starting) return;
-
-  starting = true;
-
-  const loading = $("loading");
-
-  if (loading) {
-    loading.style.display = "flex";
-  }
-
-  setText("loginMessage", "");
-
-  try {
-    // Restore saved state before creating the character.
-    // This means the player spawns at the saved position.
-    await loadGame();
-
-    setup();
-
-    // Make sure the player position is the saved position.
-    if (player) {
-      player.root.position.set(
-        state.pos.x,
-        state.pos.y || 0,
-        state.pos.z
-      );
-    }
-
-    gameStarted = true;
-
-    showGame();
-
-    updateHUD();
-    drawMinimap();
-
-    toast("Welcome to Naija Hustle. Start with one useful move.");
-
-    last = performance.now();
-
-    animate();
-  } catch (error) {
-    console.error("GAME START ERROR:", error);
-
-    gameStarted = false;
-
-    showLogin(
-      `Game failed to start: ${error?.message || "Unknown error"}. Check the browser console.`
-    );
-  } finally {
-    starting = false;
-  }
-}
-
-function bindAuthButtons() {
-  on("loginBtn", "click", async event => {
-    event.preventDefault();
-
-    const email = $("loginEmail")?.value.trim() || "";
-    const password = $("loginPassword")?.value || "";
-
-    setText("loginMessage", "");
-
-    if (!email || !password) {
-      setText("loginMessage", "Enter email and password.");
-      return;
-    }
-
-    const button = $("loginBtn");
-
-    if (button) button.disabled = true;
-
-    try {
-      const { data, error } = await db.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      if (!data.session || !data.user) {
-        throw new Error("No authenticated session was returned.");
-      }
-
-      state.user = data.user;
-      state.guest = false;
-      state.accountEmail = data.user.email || "";
-
-      await startGame();
-    } catch (error) {
-      console.error("LOGIN ERROR:", error);
-
-      setText(
-        "loginMessage",
-        error?.message || "Login failed."
-      );
-    } finally {
-      if (button) button.disabled = false;
-    }
-  });
-
-  on("signupBtn", "click", async event => {
-    event.preventDefault();
-
-    const email = $("loginEmail")?.value.trim() || "";
-    const password = $("loginPassword")?.value || "";
-
-    setText("loginMessage", "");
-
-    if (!email || !password) {
-      setText("loginMessage", "Enter email and password.");
-      return;
-    }
-
-    if (password.length < 6) {
-      setText(
-        "loginMessage",
-        "Use a password containing at least 6 characters."
-      );
-
-      return;
-    }
-
-    const button = $("signupBtn");
-
-    if (button) button.disabled = true;
-
-    try {
-      const { data, error } = await db.auth.signUp({
-        email,
-        password
-      });
-
-      if (error) throw error;
-
-      if (data.session && data.user) {
-        state.user = data.user;
-        state.guest = false;
-        state.accountEmail = data.user.email || "";
-
-        setText("loginMessage", "Account created. Starting game...");
-
-        await startGame();
-      } else {
-        setText(
-          "loginMessage",
-          "Account created. Check your email for the confirmation link, then log in."
-        );
-      }
-    } catch (error) {
-      console.error("SIGNUP ERROR:", error);
-
-      setText(
-        "loginMessage",
-        error?.message || "Sign up failed."
-      );
-    } finally {
-      if (button) button.disabled = false;
-    }
-  });
-
-  on("guestBtn", "click", async event => {
-    event.preventDefault();
-
-    const button = $("guestBtn");
-
-    if (button) button.disabled = true;
-
-    try {
-      // Guest mode must not accidentally reuse an earlier
-      // authenticated session.
-      try {
-        await db.auth.signOut();
-      } catch (error) {
-        console.warn("Could not clear an old session:", error);
-      }
-
-      state.user = null;
-      state.guest = true;
-      state.accountEmail = "";
-
-      await startGame();
-    } finally {
-      if (button) button.disabled = false;
-    }
-  });
-}
-
-async function signOut() {
-  // Save first. Signing out should not erase local progress.
-  saveGame();
-
-  try {
-    if (state.user && !state.guest) {
-      const { error } = await db.auth.signOut();
-
-      if (error) {
-        console.warn("Supabase sign-out warning:", error);
-      }
-    }
-  } catch (error) {
-    console.warn("Sign-out error:", error);
-  }
-
-  // The page will return to the login screen after reload.
-  // Local progress is preserved in SAVE_KEY.
-  window.location.reload();
-}
-
-async function initializeApp() {
-  bindAuthButtons();
-
-  showLogin();
-
+function refreshGameUI() {
+  setText("#money", money(state.money));
+  setText("#moneyDisplay", money(state.money));
+  setText("#cashDisplay", money(state.money));
+  setText("#level", String(state.level));
+  setText("#levelBadge", "Lv " + state.level);
+  setText("#xp", String(state.xp));
+  setText("#day", String(state.day));
+  setText("#career", state.career);
+  setText("#activeQuest", state.activeQuest);
+  setText("#questText", state.activeQuest);
+  setText("#homeName", HOMES[state.homeIndex]?.name || "Unknown");
   setText(
-    "qualityBtn",
-    state.quality.toUpperCase()
+    "#vehicleName",
+    state.vehicleIndex >= 0
+      ? VEHICLES[state.vehicleIndex]?.name || "None"
+      : "None"
   );
 
-  try {
-    const {
-      data: { session },
-      error
-    } = await db.auth.getSession();
+  for (const [name, value] of Object.entries(state.needs)) {
+    updateNeedBar(name, value);
+  }
 
-    if (error) throw error;
+  const inventory = $("#inventoryList");
 
-    if (session?.user) {
-      // Automatically restore a valid login session,
-      // without creating another scene or render loop.
-      state.user = session.user;
-      state.guest = false;
-      state.accountEmail = session.user.email || "";
+  if (inventory) {
+    inventory.replaceChildren();
 
-      await startGame();
+    if (!state.inventory.length) {
+      inventory.textContent = "Your inventory is empty.";
+    } else {
+      for (const item of state.inventory) {
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.justifyContent = "space-between";
+        row.style.gap = "10px";
+
+        const label = document.createElement("span");
+        label.textContent = item;
+
+        row.append(
+          label,
+          makeButton("Use", () => useItem(item))
+        );
+
+        inventory.appendChild(row);
+      }
     }
-  } catch (error) {
-    console.warn("Could not restore login session:", error);
+  }
 
-    setText(
-      "loginMessage",
-      "Could not restore your session. Log in again or use guest mode."
+  const clockElement = $("#gameClock");
+
+  if (clockElement) {
+    const hours = Math.floor(state.time) % 24;
+    const minutes = Math.floor((state.time % 1) * 60);
+
+    clockElement.textContent =
+      String(hours).padStart(2, "0") + ":" +
+      String(minutes).padStart(2, "0");
+  }
+
+  drawMinimap();
+}
+
+function createBasicUI() {
+  if ($("#nhBasicMenu")) return;
+
+  const panel = document.createElement("div");
+  panel.id = "nhBasicMenu";
+
+  Object.assign(panel.style, {
+    position: "fixed",
+    top: "12px",
+    right: "12px",
+    width: "min(260px, 68vw)",
+    maxHeight: "75vh",
+    overflowY: "auto",
+    background: "rgba(18,18,18,0.92)",
+    color: "#fff",
+    border: "1px solid #8b6c29",
+    borderRadius: "14px",
+    padding: "12px",
+    zIndex: "1000",
+    font: "13px system-ui"
+  });
+
+  const heading = document.createElement("h3");
+  heading.textContent = "NAIJA HUSTLE";
+  heading.style.color = "#f4c95d";
+  panel.appendChild(heading);
+
+  const status = document.createElement("div");
+  status.id = "nhBasicStatus";
+  panel.appendChild(status);
+
+  const controls = document.createElement("div");
+
+  Object.assign(controls.style, {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "6px",
+    marginTop: "10px"
+  });
+
+  const actions = [
+    ["Do a Gig", doGig],
+    ["Find a Job", getJob],
+    ["Shop", openShop],
+    ["Rest", rest],
+    ["Shower", shower],
+    ["Housing", upgradeHome],
+    ["Vehicles", buyVehicle],
+    ["Avatar", customizeAvatar],
+    ["Inventory", () => showInventory()],
+    ["Save", () => {
+      saveGame();
+      notify("Game saved on this device.");
+    }],
+    ["Cloud Save", saveCloudGame],
+    ["New Game", resetGame]
+  ];
+
+  for (const [label, action] of actions) {
+    controls.appendChild(makeButton(label, action));
+  }
+
+  panel.appendChild(controls);
+
+  const help = document.createElement("p");
+  help.textContent =
+    "Move: WASD / arrows • Sprint: Shift • Interact: E • Zoom: +/-";
+  help.style.lineHeight = "1.5";
+  panel.appendChild(help);
+
+  document.body.appendChild(panel);
+}
+
+function showInventory() {
+  const list = state.inventory.length
+    ? state.inventory.join("\n")
+    : "Your inventory is empty.";
+
+  alert("Inventory\n\n" + list);
+}
+
+// ------------------------------------------------------------
+// 15. INPUTS AND MOBILE JOYSTICK
+// ------------------------------------------------------------
+
+function onKeyDown(event) {
+  const key = event.key.toLowerCase();
+
+  if (
+    ["arrowup", "arrowdown", "arrowleft", "arrowright", " "]
+      .includes(key)
+  ) {
+    event.preventDefault();
+  }
+
+  keys.add(key);
+
+  if (key === "shift") sprinting = true;
+  if (key === "+" || key === "=") zoomCamera(-1);
+  if (key === "-") zoomCamera(1);
+
+  if (key === "e") {
+    const nearest = getNearestBuilding();
+
+    if (nearest && nearest.distance <= 12) {
+      interactWithBuilding(nearest.building);
+    } else {
+      notify("Move closer to a building to interact.");
+    }
+  }
+
+  if (key === "i") showInventory();
+  if (key === "c") customizeAvatar();
+  if (key === "escape") gamePaused = !gamePaused;
+}
+
+function onKeyUp(event) {
+  const key = event.key.toLowerCase();
+  keys.delete(key);
+
+  if (key === "shift") sprinting = false;
+}
+
+function getNearestBuilding() {
+  if (!player) return null;
+
+  let nearest = null;
+
+  for (const building of BUILDINGS) {
+    const distance = Math.hypot(
+      player.position.x - building.x,
+      player.position.z - building.z
     );
+
+    if (!nearest || distance < nearest.distance) {
+      nearest = { building, distance };
+    }
+  }
+
+  return nearest;
+}
+
+function bindJoystick() {
+  const base = $("#joystickBase") || $("#joystick-base");
+  const knob = $("#joystickKnob") || $("#joystick-knob");
+
+  if (!base) return;
+
+  let pointerId = null;
+
+  function update(event) {
+    const rect = base.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const maxDistance = Math.max(1, rect.width * 0.32);
+    const dx = event.clientX - centerX;
+    const dy = event.clientY - centerY;
+    const distance = Math.hypot(dx, dy);
+    const factor = distance > maxDistance
+      ? maxDistance / distance
+      : 1;
+
+    joystick.x = (dx * factor) / maxDistance;
+    joystick.y = (dy * factor) / maxDistance;
+    joystick.active = true;
+
+    if (knob) {
+      knob.style.transform =
+        "translate(" +
+        (joystick.x * maxDistance) + "px, " +
+        (joystick.y * maxDistance) + "px)";
+    }
+  }
+
+  base.addEventListener("pointerdown", (event) => {
+    pointerId = event.pointerId;
+    base.setPointerCapture(pointerId);
+    update(event);
+  });
+
+  base.addEventListener("pointermove", (event) => {
+    if (event.pointerId === pointerId) update(event);
+  });
+
+  function stop(event) {
+    if (event.pointerId !== pointerId) return;
+
+    pointerId = null;
+    joystick.x = 0;
+    joystick.y = 0;
+    joystick.active = false;
+
+    if (knob) knob.style.transform = "translate(0, 0)";
+  }
+
+  base.addEventListener("pointerup", stop);
+  base.addEventListener("pointercancel", stop);
+  base.addEventListener("lostpointercapture", () => {
+    pointerId = null;
+    joystick.x = 0;
+    joystick.y = 0;
+    joystick.active = false;
+
+    if (knob) knob.style.transform = "translate(0, 0)";
+  });
+}
+
+function bindExistingButtons() {
+  const bindings = {
+    "#gigBtn": doGig,
+    "#jobBtn": getJob,
+    "#shopBtn": openShop,
+    "#restBtn": rest,
+    "#showerBtn": shower,
+    "#homeBtn": upgradeHome,
+    "#vehicleBtn": buyVehicle,
+    "#avatarBtn": customizeAvatar,
+    "#inventoryBtn": showInventory,
+    "#saveBtn": saveGame,
+    "#zoomIn": () => zoomCamera(-1),
+    "#zoomOut": () => zoomCamera(1)
+  };
+
+  for (const [selector, action] of Object.entries(bindings)) {
+    const element = $(selector);
+
+    if (element && !element.dataset.nhBound) {
+      element.addEventListener("click", action);
+      element.dataset.nhBound = "true";
+    }
   }
 }
 
-/* =========================================================
-   START APP
-   ========================================================= */
+// ------------------------------------------------------------
+// 16. STARTUP AND CLEANUP
+// ------------------------------------------------------------
 
-// Do not call startGame() unconditionally here.
-// The user must have an authenticated session or choose Guest.
-initializeApp();
+async function start() {
+  loadGame();
+
+  createBasicUI();
+  initializeWorld();
+
+  if (!worldReady) return;
+
+  bindJoystick();
+  bindExistingButtons();
+
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
+
+  window.addEventListener("beforeunload", saveGame);
+
+  await initializeSupabase();
+
+  refreshGameUI();
+
+  console.info("Naija Hustle " + CONFIG.version + " initialized.");
+}
+
+start().catch((error) => {
+  console.error("Naija Hustle startup failed:", error);
+  notify("The game could not start. Check the browser console.");
+});
