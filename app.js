@@ -1,32 +1,30 @@
 /* ============================================================
-   NAIJA HUSTLE — MODULAR APP.JS
-   Version: 2.1.0
-   ONLINE-ONLY BUILD
-   Three.js + Supabase Auth + Supabase Cloud Saves
+   NAIJA HUSTLE — REBUILT MODULAR APP
+   Version: 3.0.0
+   Three.js + Supabase Auth + Cloud Saves
+   ONLINE ONLY — NO GUEST OR LOCAL SAVE MODE
    ============================================================ */
 
 import * as THREE from
   "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
-/* ============================================================
-   0. CONFIGURATION
-   ============================================================ */
+/* ========================= 1. CONFIG ======================== */
 
 const SUPABASE_URL = "https://pbqtbwiymlwksdtfsfcb.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
-const CONFIG = {
-  version: "2.1.0",
+const SUPABASE_ANON_KEY =
+  "sb_publishable_-SK-LvMzEwv-oqn8A5hZOQ_rwyzGxUj";
+
+const CONFIG = Object.freeze({
+  version: "3.0.0",
   worldSize: 100,
   moveSpeed: 7,
   sprintMultiplier: 1.55,
   cameraZoom: 16,
   dayLength: 300,
-  saveInterval: 15000
-};
-
-/* ============================================================
-   1. UTILITIES
-   ============================================================ */
+  saveInterval: 15000,
+  interactionDistance: 12,
+  minimumPasswordLength: 6
+});
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -40,76 +38,92 @@ const choice = (items) =>
   items[Math.floor(Math.random() * items.length)];
 
 const money = (amount) =>
-  "₦" + Math.floor(amount).toLocaleString("en-NG");
+  "₦" + Math.floor(Number(amount) || 0).toLocaleString("en-NG");
 
-function notify(message) {
-  let element = $("#gameToast");
+const deepCopy = (value) => JSON.parse(JSON.stringify(value));
 
-  if (!element) {
-    element = document.createElement("div");
-    element.id = "gameToast";
-    document.body.appendChild(element);
-
-    Object.assign(element.style, {
-      position: "fixed",
-      bottom: "100px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      background: "#171717",
-      color: "#f4c95d",
-      border: "1px solid #9e7a2d",
-      padding: "12px 18px",
-      borderRadius: "12px",
-      zIndex: "10000",
-      font: "14px system-ui",
-      maxWidth: "85vw",
-      textAlign: "center",
-      pointerEvents: "none"
-    });
-  }
-
-  element.textContent = message;
-  element.style.display = "block";
-
-  clearTimeout(notify.timer);
-
-  notify.timer = setTimeout(() => {
-    element.style.display = "none";
-  }, 2800);
-}
-
-function makeButton(label, action) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = label;
-
-  Object.assign(button.style, {
-    background: "#191919",
-    color: "#f4c95d",
-    border: "1px solid #705821",
-    padding: "10px 14px",
-    borderRadius: "9px",
-    cursor: "pointer",
-    font: "inherit"
-  });
-
-  button.addEventListener("click", action);
-  return button;
-}
+const validColor = (value) =>
+  typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value);
 
 function setText(selector, value) {
   const element = $(selector);
   if (element) element.textContent = String(value ?? "");
 }
 
-function validColor(value) {
-  return typeof value === "string" &&
-    /^#[0-9a-f]{6}$/i.test(value);
+function showElement(selector, visible) {
+  const element = $(selector);
+  if (element) element.classList.toggle("hidden", !visible);
 }
 
-/* ============================================================
-   2. GAME DATA
-   ============================================================ */
+function reportError(label, error) {
+  console.error("[Naija Hustle] " + label, error);
+}
+
+/* ========================= 2. NOTIFICATIONS ================= */
+
+let toastTimer = null;
+
+function notify(message, duration = 2800) {
+  let toast = $("#gameToast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "gameToast";
+
+    Object.assign(toast.style, {
+      position: "fixed",
+      left: "50%",
+      bottom: "24px",
+      transform: "translateX(-50%)",
+      background: "#171717",
+      color: "#f4c95d",
+      border: "1px solid #9e7a2d",
+      padding: "12px 18px",
+      borderRadius: "12px",
+      zIndex: "20000",
+      font: "14px system-ui,sans-serif",
+      maxWidth: "88vw",
+      textAlign: "center",
+      boxShadow: "0 8px 28px #0008",
+      pointerEvents: "none"
+    });
+
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.style.display = "block";
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(() => {
+    toast.style.display = "none";
+  }, duration);
+}
+
+function makeButton(label, action, options = {}) {
+  const button = document.createElement("button");
+
+  button.type = "button";
+  button.textContent = label;
+
+  Object.assign(button.style, {
+    background: options.primary ? "#d7aa43" : "#191919",
+    color: options.primary ? "#171717" : "#f4c95d",
+    border: "1px solid #705821",
+    borderRadius: "9px",
+    padding: "10px 13px",
+    cursor: "pointer",
+    font: "inherit",
+    fontWeight: options.primary ? "700" : "500",
+    minHeight: "40px"
+  });
+
+  button.addEventListener("click", action);
+  return button;
+}
+
+/* ========================= 3. GAME DATA ===================== */
 
 const CAREERS = [
   { name: "Unemployed", salary: 0 },
@@ -121,15 +135,15 @@ const CAREERS = [
 ];
 
 const GIGS = [
-  { name: "Deliver a package", reward: 3500, energy: 8 },
-  { name: "Design a flyer", reward: 5000, energy: 10 },
-  { name: "Help at a shop", reward: 2500, energy: 6 },
-  { name: "Build a landing page", reward: 9000, energy: 15 }
+  { name: "Deliver a package", reward: 3500, energy: 8, skill: "social" },
+  { name: "Design a flyer", reward: 5000, energy: 10, skill: "creativity" },
+  { name: "Help at a shop", reward: 2500, energy: 6, skill: "business" },
+  { name: "Build a landing page", reward: 9000, energy: 15, skill: "technology" }
 ];
 
 const ITEMS = [
   { name: "Jollof Rice", price: 1500, hunger: 35 },
-  { name: "Bottle of Water", price: 300, energy: 5 },
+  { name: "Bottle of Water", price: 300, bladder: -5, energy: 5 },
   { name: "Shower Supplies", price: 800, hygiene: 35 },
   { name: "Energy Drink", price: 700, energy: 20 }
 ];
@@ -198,14 +212,12 @@ const DEFAULT_STATE = {
 };
 
 function createInitialState() {
-  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+  return deepCopy(DEFAULT_STATE);
 }
 
 let state = createInitialState();
 
-/* ============================================================
-   3. STATE VALIDATION
-   ============================================================ */
+/* ========================= 4. STATE VALIDATION ============== */
 
 function normalizeState(input) {
   const defaults = createInitialState();
@@ -225,59 +237,42 @@ function normalizeState(input) {
   };
 
   result.money = Math.max(0, Number(result.money) || 0);
-  result.level = Math.max(1, Number(result.level) || 1);
+  result.level = Math.max(1, Math.floor(Number(result.level) || 1));
   result.xp = Math.max(0, Number(result.xp) || 0);
-  result.day = Math.max(1, Number(result.day) || 1);
-  result.time = clamp(Number(result.time) || 0, 0, 24);
+  result.day = Math.max(1, Math.floor(Number(result.day) || 1));
+  result.time = clamp(Number(result.time) || 0, 0, 23.999);
 
   if (!CAREERS.some((item) => item.name === result.career)) {
     result.career = "Unemployed";
   }
 
   result.homeIndex = clamp(
-    Math.floor(Number(result.homeIndex) || 0),
-    0,
-    HOMES.length - 1
+    Math.floor(Number(result.homeIndex) || 0), 0, HOMES.length - 1
   );
 
-  result.vehicleIndex = Number.isInteger(Number(result.vehicleIndex))
-    ? clamp(Number(result.vehicleIndex), -1, VEHICLES.length - 1)
+  const vehicleIndex = Number(result.vehicleIndex);
+  result.vehicleIndex = Number.isInteger(vehicleIndex)
+    ? clamp(vehicleIndex, -1, VEHICLES.length - 1)
     : -1;
 
-  for (const key of Object.keys(result.needs)) {
+  for (const key of Object.keys(defaults.needs)) {
     result.needs[key] = clamp(Number(result.needs[key]) || 0, 0, 100);
   }
 
-  for (const key of Object.keys(result.skills)) {
+  for (const key of Object.keys(defaults.skills)) {
     result.skills[key] = Math.max(1, Number(result.skills[key]) || 1);
   }
 
-  result.player.x = clamp(
-    Number(result.player.x) || 0,
-    -CONFIG.worldSize,
-    CONFIG.worldSize
-  );
+  result.player.x = clamp(Number(result.player.x) || 0, -CONFIG.worldSize, CONFIG.worldSize);
+  result.player.z = clamp(Number(result.player.z) || 0, -CONFIG.worldSize, CONFIG.worldSize);
 
-  result.player.z = clamp(
-    Number(result.player.z) || 0,
-    -CONFIG.worldSize,
-    CONFIG.worldSize
-  );
+  result.inventory = Array.isArray(result.inventory)
+    ? result.inventory.filter((item) => typeof item === "string").slice(0, 100)
+    : [];
 
-  if (!Array.isArray(result.inventory)) result.inventory = [];
-  if (!Array.isArray(result.completedQuests)) result.completedQuests = [];
-
-  result.inventory = result.inventory.filter(
-    (item) => typeof item === "string"
-  );
-
-  result.completedQuests = result.completedQuests.filter(
-    (item) => typeof item === "string"
-  );
-
-  if (!result.avatar || typeof result.avatar !== "object") {
-    result.avatar = { ...defaults.avatar };
-  }
+  result.completedQuests = Array.isArray(result.completedQuests)
+    ? result.completedQuests.filter((item) => typeof item === "string")
+    : [];
 
   for (const key of ["skinTone", "hairColor", "outfitColor"]) {
     if (!validColor(result.avatar[key])) {
@@ -289,63 +284,68 @@ function normalizeState(input) {
     result.avatar.hairstyle = "short";
   }
 
+  if (typeof result.avatar.accessory !== "string") {
+    result.avatar.accessory = "none";
+  }
+
+  result.stats.jobsCompleted = Math.max(0, Number(result.stats.jobsCompleted) || 0);
+  result.stats.gigsCompleted = Math.max(0, Number(result.stats.gigsCompleted) || 0);
+  result.stats.itemsPurchased = Math.max(0, Number(result.stats.itemsPurchased) || 0);
+
   return result;
 }
 
-/* ============================================================
-   4. SUPABASE AUTHENTICATION AND CLOUD SAVES
-   ============================================================ */
+/* ========================= 5. AUTH + CLOUD SAVE ============= */
 
 let supabase = null;
 let currentUser = null;
 let authReady = false;
 let gameStarted = false;
 let gameStarting = false;
-let cloudSaveInProgress = false;
-let cloudSaveQueued = false;
+let authBusy = false;
 let loggingOut = false;
+
+let saveLoopPromise = null;
+let saveRequested = false;
+let lastSaveError = null;
 
 async function initializeSupabase() {
   if (
     !SUPABASE_URL.startsWith("https://") ||
-    SUPABASE_URL.includes("YOUR_PROJECT") ||
     !SUPABASE_ANON_KEY ||
-    SUPABASE_ANON_KEY.includes("YOUR_SUPABASE")
+    SUPABASE_ANON_KEY.includes("YOUR_")
   ) {
-    throw new Error(
-      "Supabase is not configured. Add your project URL and publishable/anon key to app.js."
-    );
+    throw new Error("Supabase configuration is missing from app.js.");
   }
 
   const module = await import(
     "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
   );
 
-  supabase = module.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY,
-    {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true
-      }
+  supabase = module.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
     }
-  );
+  });
 
   const { data, error } = await supabase.auth.getSession();
-
   if (error) throw error;
 
   currentUser = data.session?.user || null;
   authReady = true;
 
-  supabase.auth.onAuthStateChange((_event, session) => {
+  supabase.auth.onAuthStateChange((event, session) => {
     currentUser = session?.user || null;
 
-    if (!currentUser && gameStarted && !loggingOut) {
+    if (
+      event === "SIGNED_OUT" &&
+      gameStarted &&
+      !loggingOut
+    ) {
       stopGameplay();
-      showLogin("Your session has ended. Please sign in again.");
+      showLogin("Your session ended. Please sign in again.");
     }
   });
 
@@ -353,7 +353,7 @@ async function initializeSupabase() {
 }
 
 async function signInWithEmail(email, password) {
-  if (!supabase) throw new Error("The online service is not initialized.");
+  if (!supabase) throw new Error("The online service is not ready.");
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -365,14 +365,12 @@ async function signInWithEmail(email, password) {
   currentUser = data.user || data.session?.user || null;
 
   if (!currentUser) {
-    throw new Error("Login did not return a user. Please try again.");
+    throw new Error("Sign-in returned no user. Please try again.");
   }
-
-  return true;
 }
 
 async function signUpWithEmail(email, password) {
-  if (!supabase) throw new Error("The online service is not initialized.");
+  if (!supabase) throw new Error("The online service is not ready.");
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -381,7 +379,7 @@ async function signUpWithEmail(email, password) {
 
   if (error) throw error;
 
-  currentUser = data.user || data.session?.user || null;
+  currentUser = data.session?.user || null;
 
   return {
     user: data.user || null,
@@ -389,81 +387,71 @@ async function signUpWithEmail(email, password) {
   };
 }
 
-async function signOut() {
-  if (!supabase) return;
-
-  loggingOut = true;
-  stopGameplay();
-
-  const { error } = await supabase.auth.signOut();
-
-  loggingOut = false;
-
-  if (error) {
-    showLogin("Sign-out failed. Please try again.");
-    console.error("Sign-out failed:", error);
-    return;
-  }
-
-  currentUser = null;
-  showLogin("You have signed out.");
-}
-
+/*
+ * All writes pass through one queue.
+ * If the game changes during a write, another write is scheduled after it.
+ * This prevents concurrent upserts from finishing out of order.
+ */
 async function saveCloudGame(options = {}) {
   if (!supabase || !currentUser) {
+    if (options.notify) notify("Sign in before saving online.");
     return false;
   }
 
-  if (cloudSaveInProgress) {
-    cloudSaveQueued = true;
-    return false;
+  saveRequested = true;
+
+  if (saveLoopPromise) {
+    await saveLoopPromise;
+    return !lastSaveError;
   }
 
-  cloudSaveInProgress = true;
+  saveLoopPromise = (async () => {
+    lastSaveError = null;
 
-  try {
-    const userId = currentUser.id;
-    const snapshot = JSON.parse(JSON.stringify(state));
+    try {
+      while (saveRequested && currentUser) {
+        saveRequested = false;
 
-    const { error } = await supabase
-      .from("game_saves")
-      .upsert({
-        user_id: userId,
-        save_data: snapshot,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: "user_id"
-      });
+        const userId = currentUser.id;
+        const snapshot = deepCopy(state);
 
-    if (error) throw error;
+        const { error } = await supabase
+          .from("game_saves")
+          .upsert({
+            user_id: userId,
+            save_data: snapshot,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: "user_id"
+          });
 
-    if (options.notify) notify("Progress saved to your account.");
-
-    return true;
-  } catch (error) {
-    console.error("Cloud save failed:", error);
-
-    if (options.notify) {
-      notify("Cloud save failed. Check your connection and try again.");
-    }
-
-    return false;
-  } finally {
-    cloudSaveInProgress = false;
-
-    if (cloudSaveQueued) {
-      cloudSaveQueued = false;
-
-      if (currentUser && gameStarted) {
-        saveCloudGame();
+        if (error) throw error;
       }
+    } catch (error) {
+      lastSaveError = error;
+      reportError("Cloud save failed", error);
+      saveRequested = false;
+    } finally {
+      saveLoopPromise = null;
     }
+  })();
+
+  await saveLoopPromise;
+
+  if (lastSaveError) {
+    if (options.notify) {
+      notify("Save failed. Check your connection and game_saves permissions.");
+    }
+    return false;
   }
+
+  if (options.notify) notify("Progress saved to your account.");
+  return true;
 }
 
 async function loadCloudGame() {
   if (!supabase || !currentUser) {
-    throw new Error("Sign in before loading a game.");
+    throw new Error("Please sign in before loading your game.");
   }
 
   const { data, error } = await supabase
@@ -473,61 +461,78 @@ async function loadCloudGame() {
     .maybeSingle();
 
   if (error) {
-    console.error("Cloud load failed:", error);
+    reportError("Cloud load failed", error);
     throw new Error(
-      "Your cloud save could not be loaded. Check your game_saves table and RLS policies."
+      "Could not load your cloud save. Check the game_saves table and its row-level security policies."
     );
   }
 
-  if (data?.save_data) {
+  if (data && data.save_data && typeof data.save_data === "object") {
     state = normalizeState(data.save_data);
-    return true;
+    return;
   }
 
-  // A new account starts a new game, then immediately creates
-  // its own cloud save. No local save is created.
   state = createInitialState();
 
   const saved = await saveCloudGame();
 
   if (!saved) {
     throw new Error(
-      "Your new game could not be saved online. Please try again."
+      "Your new game could not be saved online. Check your game_saves table and permissions."
     );
   }
-
-  return true;
 }
 
-/* ============================================================
-   5. THREE.JS WORLD
-   ============================================================ */
+async function signOut() {
+  if (!supabase) return;
 
-let scene;
-let camera;
-let renderer;
-let clock;
-let player;
-let playerBody;
-let playerHead;
-let playerHair;
+  loggingOut = true;
+  stopGameplay();
+
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+
+    currentUser = null;
+    showLogin("You have signed out.");
+  } catch (error) {
+    reportError("Sign-out failed", error);
+    showLogin("Sign-out failed. Please try again.");
+  } finally {
+    loggingOut = false;
+  }
+}
+
+/* ========================= 6. THREE.JS WORLD =============== */
+
+let scene = null;
+let camera = null;
+let renderer = null;
+let clock = null;
+
+let player = null;
+let playerBody = null;
+let playerHead = null;
+let playerHair = null;
+
 let worldReady = false;
+let gamePaused = false;
+let sprinting = false;
+let jumpingUntil = 0;
 
+let cameraZoom = CONFIG.cameraZoom;
+let animationFrame = null;
+let lastSave = 0;
+let lastHudUpdate = 0;
+
+const keys = new Set();
 const buildingMeshes = [];
 const npcMeshes = [];
-const keys = new Set();
+
+const joystick = { x: 0, y: 0, active: false };
 
 const cameraTarget = new THREE.Vector3();
 const cameraOffset = new THREE.Vector3(14, 18, 14);
-
-let cameraZoom = CONFIG.cameraZoom;
-let sprinting = false;
-let joystick = { x: 0, y: 0, active: false };
-let gamePaused = false;
-let currentInteraction = null;
-let lastSave = 0;
-let lastHudUpdate = 0;
-let animationFrame = null;
 
 function makeMaterial(color, roughness = 0.9) {
   return new THREE.MeshStandardMaterial({ color, roughness });
@@ -552,25 +557,24 @@ function addGround() {
 
   const roadMaterial = makeMaterial(0x444448);
 
-  const road1 = new THREE.Mesh(
+  const horizontalRoad = new THREE.Mesh(
     new THREE.BoxGeometry(90, 0.08, 9),
     roadMaterial
   );
 
-  road1.position.set(0, 0, 0);
-  scene.add(road1);
+  scene.add(horizontalRoad);
 
-  const road2 = new THREE.Mesh(
+  const verticalRoad = new THREE.Mesh(
     new THREE.BoxGeometry(9, 0.08, 90),
     roadMaterial
   );
 
-  road2.position.set(0, 0.01, 0);
-  scene.add(road2);
+  verticalRoad.position.y = 0.01;
+  scene.add(verticalRoad);
 
   for (let i = -40; i <= 40; i += 8) {
     const marking = new THREE.Mesh(
-      new THREE.BoxGeometry(3, 0.03, 0.18),
+      new THREE.BoxGeometry(3, 0.035, 0.18),
       makeMaterial(0xe6d7a2)
     );
 
@@ -601,13 +605,7 @@ function createBuilding(data) {
   }
 
   group.position.set(data.x, 0, data.z);
-
-  group.userData = {
-    kind: data.kind,
-    name: data.name,
-    x: data.x,
-    z: data.z
-  };
+  group.userData = { ...data };
 
   scene.add(group);
   buildingMeshes.push(group);
@@ -713,6 +711,14 @@ function applyAvatar() {
   playerHair.material.color.set(state.avatar.hairColor);
 
   playerHair.visible = state.avatar.hairstyle !== "bald";
+
+  if (state.avatar.hairstyle === "afro") {
+    playerHair.scale.set(1.3, 1.25, 1.3);
+    playerHair.position.y = 2.4;
+  } else {
+    playerHair.scale.set(1, 1, 1);
+    playerHair.position.y = 2.35;
+  }
 }
 
 function initializeWorld() {
@@ -723,7 +729,7 @@ function initializeWorld() {
 
   if (!host) {
     throw new Error(
-      "No game canvas container found. Check for #gameCanvas in index.html."
+      "The game canvas container was not found. Check index.html for #gameCanvas."
     );
   }
 
@@ -755,16 +761,14 @@ function initializeWorld() {
 
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(width, height);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   host.replaceChildren(renderer.domElement);
 
   Object.assign(renderer.domElement.style, {
+    display: "block",
     width: "100%",
     height: "100%",
-    display: "block",
     touchAction: "none"
   });
 
@@ -772,7 +776,6 @@ function initializeWorld() {
 
   const sunlight = new THREE.DirectionalLight(0xffe3b0, 2);
   sunlight.position.set(-25, 45, 25);
-  sunlight.castShadow = true;
   scene.add(sunlight);
 
   addGround();
@@ -781,13 +784,19 @@ function initializeWorld() {
     createBuilding(building);
   }
 
-  for (let i = 0; i < 28; i++) {
+  let treesCreated = 0;
+  let attempts = 0;
+
+  while (treesCreated < 28 && attempts < 100) {
+    attempts++;
+
     const x = random(-42, 42);
     const z = random(-42, 42);
 
     if (Math.abs(x) < 25 && Math.abs(z) < 23) continue;
 
     createTree(x, z);
+    treesCreated++;
   }
 
   for (let i = 0; i < 12; i++) {
@@ -846,31 +855,21 @@ function onWorldPointer(event) {
 
   if (!object?.userData?.kind) return;
 
-  const data = object.userData;
-
+  const building = object.userData;
   const distance = Math.hypot(
-    player.position.x - data.x,
-    player.position.z - data.z
+    player.position.x - building.x,
+    player.position.z - building.z
   );
 
-  if (distance > 12) {
-    notify("Move closer to " + data.name + " first.");
+  if (distance > CONFIG.interactionDistance) {
+    notify("Move closer to " + building.name + " first.");
     return;
   }
 
-  interactWithBuilding(data);
+  interactWithBuilding(building);
 }
 
-/* ============================================================
-   6. PLAYER MOVEMENT AND CAMERA
-   ============================================================ */
-
-function syncPlayerPosition() {
-  if (!player) return;
-
-  player.position.x = state.player.x;
-  player.position.z = state.player.z;
-}
+/* ========================= 7. MOVEMENT ====================== */
 
 function updateMovement(dt) {
   if (!player || gamePaused) return;
@@ -893,8 +892,11 @@ function updateMovement(dt) {
     z /= length;
   }
 
+  const vehicle = VEHICLES[state.vehicleIndex];
+  const vehicleBonus = vehicle ? vehicle.speed : 1;
   const speed = CONFIG.moveSpeed *
-    (sprinting ? CONFIG.sprintMultiplier : 1);
+    (sprinting ? CONFIG.sprintMultiplier : 1) *
+    (vehicle ? Math.min(vehicleBonus, 1.5) : 1);
 
   if (length > 0.05) {
     const worldX = (x - z) / Math.SQRT2;
@@ -941,6 +943,24 @@ function zoomCamera(amount) {
   resizeRenderer();
 }
 
+function updateWorld(dt) {
+  for (const npc of npcMeshes) {
+    npc.userData.phase += dt * npc.userData.speed;
+
+    npc.position.x =
+      npc.userData.originX + Math.sin(npc.userData.phase) * 1.5;
+
+    npc.position.z =
+      npc.userData.originZ + Math.cos(npc.userData.phase * 0.7) * 1.5;
+  }
+
+  if (player) {
+    player.position.y = performance.now() < jumpingUntil
+      ? 0.65
+      : 0;
+  }
+}
+
 function animate() {
   if (!worldReady || !renderer || !scene || !camera) return;
 
@@ -970,32 +990,12 @@ function animate() {
   }
 }
 
-function updateWorld(dt) {
-  for (const npc of npcMeshes) {
-    npc.userData.phase += dt * npc.userData.speed;
-
-    npc.position.x =
-      npc.userData.originX + Math.sin(npc.userData.phase) * 1.5;
-
-    npc.position.z =
-      npc.userData.originZ + Math.cos(npc.userData.phase * 0.7) * 1.5;
-  }
-
-  if (player && keys.has(" ")) {
-    player.position.y = 0.65;
-  } else if (player) {
-    player.position.y = 0;
-  }
-}
-
-/* ============================================================
-   7. NEEDS, TIME, XP AND QUESTS
-   ============================================================ */
+/* ========================= 8. NEEDS AND GAME TIME =========== */
 
 function updateGameTime(dt) {
   state.time += dt * 24 / CONFIG.dayLength;
 
-  if (state.time >= 24) {
+  while (state.time >= 24) {
     state.time -= 24;
     state.day += 1;
     payDailyExpenses();
@@ -1010,17 +1010,16 @@ function updateGameTime(dt) {
 
 function payDailyExpenses() {
   const home = HOMES[state.homeIndex] || HOMES[0];
+  const career = CAREERS.find((item) => item.name === state.career);
 
   if (home.rent > 0) {
     state.money = Math.max(0, state.money - home.rent);
-    notify("Housing expense: " + money(home.rent));
+    notify("Daily housing expense: " + money(home.rent));
   }
-
-  const career = CAREERS.find((item) => item.name === state.career);
 
   if (career?.salary > 0) {
     state.money += career.salary;
-    notify("Work income: " + money(career.salary));
+    notify("Daily work income: " + money(career.salary));
     addXP(20);
   }
 
@@ -1028,7 +1027,7 @@ function payDailyExpenses() {
 }
 
 function addXP(amount) {
-  state.xp += Math.max(0, amount);
+  state.xp += Math.max(0, Number(amount) || 0);
 
   while (state.xp >= state.level * 100) {
     state.xp -= state.level * 100;
@@ -1041,17 +1040,9 @@ function addXP(amount) {
   checkQuest();
 }
 
-function setNeed(name, value) {
-  if (!(name in state.needs)) return;
-
-  state.needs[name] = clamp(value, 0, 100);
-  refreshGameUI();
-}
-
 function restoreNeed(name, amount) {
   if (!(name in state.needs)) return;
-
-  setNeed(name, state.needs[name] + amount);
+  state.needs[name] = clamp(state.needs[name] + amount, 0, 100);
 }
 
 function checkQuest() {
@@ -1062,7 +1053,6 @@ function checkQuest() {
     state.completedQuests.push(state.activeQuest);
     state.activeQuest = "Complete your first gig";
     state.money += 2000;
-
     notify("Quest complete! Bonus: ₦2,000");
   }
 
@@ -1073,58 +1063,49 @@ function checkQuest() {
     state.completedQuests.push(state.activeQuest);
     state.activeQuest = "Explore the city";
     state.money += 3000;
-
     notify("Quest complete! Bonus: ₦3,000");
   }
+
+  if (
+    state.activeQuest === "Explore the city" &&
+    Math.hypot(state.player.x, state.player.z) >= 25
+  ) {
+    state.completedQuests.push(state.activeQuest);
+    state.activeQuest = "Build your future";
+    state.money += 2500;
+    notify("Exploration quest completed! Bonus: ₦2,500");
+  }
 }
 
-/* ============================================================
-   8. JOBS AND GIGS
-   ============================================================ */
+/* ========================= 9. JOBS AND GIGS ================== */
 
-function getJob() {
-  const options = CAREERS.filter(
-    (career) => career.name !== "Unemployed"
-  );
-
-  const list = options.map((career, index) =>
-    (index + 1) + ". " + career.name + " — " +
-    money(career.salary) + " per game day"
-  ).join("\n");
-
-  const answer = prompt("Choose a career:\n" + list);
-
-  if (answer === null) return;
-
-  const index = Number(answer) - 1;
-
-  if (!Number.isInteger(index) || index < 0 || index >= options.length) {
-    notify("Invalid career choice.");
-    return;
-  }
-
-  state.career = options[index].name;
+function selectCareer(career) {
+  state.career = career.name;
   state.stats.jobsCompleted += 1;
 
-  notify("Career selected: " + state.career);
+  notify(
+    career.salary > 0
+      ? career.name + " selected. Daily pay: " + money(career.salary)
+      : "You are now unemployed."
+  );
+
   addXP(25);
   saveCloudGame();
+  refreshGameUI();
 }
 
-function doGig() {
-  const gig = choice(GIGS);
-
+function doGig(gig = choice(GIGS)) {
   if (state.needs.energy < gig.energy) {
-    notify("Not enough energy. Rest first.");
+    notify("Not enough energy. Rest before taking another gig.");
     return;
   }
 
-  state.needs.energy -= gig.energy;
+  state.needs.energy = clamp(state.needs.energy - gig.energy, 0, 100);
   state.money += gig.reward;
   state.stats.gigsCompleted += 1;
 
-  const skill = choice(Object.keys(state.skills));
-  state.skills[skill] += 1;
+  const skill = gig.skill || choice(Object.keys(state.skills));
+  state.skills[skill] = (state.skills[skill] || 1) + 1;
 
   addXP(30);
 
@@ -1132,13 +1113,12 @@ function doGig() {
     "Gig completed: " + gig.name + ". Earned " + money(gig.reward)
   );
 
+  checkQuest();
   saveCloudGame();
   refreshGameUI();
 }
 
-/* ============================================================
-   9. INVENTORY, SHOPS AND NEEDS
-   ============================================================ */
+/* ========================= 10. ITEMS AND ACTIVITIES ========== */
 
 function buyItem(item) {
   if (state.money < item.price) {
@@ -1169,148 +1149,110 @@ function useItem(itemName) {
   const item = ITEMS.find((entry) => entry.name === itemName);
 
   if (!item) {
-    notify("This item has no use configured.");
+    notify("This item has no configured effect.");
     return;
   }
 
   state.inventory.splice(index, 1);
 
-  if (item.hunger) restoreNeed("hunger", item.hunger);
-  if (item.energy) restoreNeed("energy", item.energy);
-  if (item.hygiene) restoreNeed("hygiene", item.hygiene);
-
-  notify("Used " + item.name);
-
-  saveCloudGame();
-  refreshGameUI();
-}
-
-function openShop() {
-  const options = ITEMS.map((item, index) =>
-    (index + 1) + ". " + item.name + " — " + money(item.price)
-  ).join("\n");
-
-  const answer = prompt("Shop\n" + options + "\n\nEnter item number:");
-
-  if (answer === null) return;
-
-  const index = Number(answer) - 1;
-
-  if (!Number.isInteger(index) || index < 0 || index >= ITEMS.length) {
-    notify("Invalid item choice.");
-    return;
+  for (const need of ["hunger", "energy", "hygiene", "fun", "social", "bladder"]) {
+    const effect = Number(item[need]) || 0;
+    if (effect > 0) restoreNeed(need, effect);
   }
 
-  buyItem(ITEMS[index]);
+  notify("Used " + item.name);
+  saveCloudGame();
+  refreshGameUI();
 }
 
 function rest() {
   restoreNeed("energy", 40);
   restoreNeed("fun", 10);
-  state.time = (state.time + 2) % 24;
+
+  advanceTime(2);
 
   notify("You rested and recovered energy.");
   saveCloudGame();
+  refreshGameUI();
 }
 
 function shower() {
+  if (state.money < 300) {
+    notify("You need ₦300 for shower supplies.");
+    return;
+  }
+
+  state.money -= 300;
   restoreNeed("hygiene", 55);
-  state.money = Math.max(0, state.money - 300);
 
   notify("You freshened up. Cost: ₦300");
   saveCloudGame();
+  refreshGameUI();
 }
 
-function eat() {
-  const food = ITEMS.filter((item) => item.hunger);
-
-  const options = food.map((item, index) =>
-    (index + 1) + ". " + item.name + " — " + money(item.price)
-  ).join("\n");
-
-  const answer = prompt("Food options:\n" + options);
-
-  if (answer === null) return;
-
-  const index = Number(answer) - 1;
-  const item = food[index];
-
-  if (!item) {
-    notify("Invalid choice.");
-    return;
-  }
-
-  if (buyItem(item)) useItem(item.name);
+function useToilet() {
+  restoreNeed("bladder", 80);
+  notify("You used the restroom.");
+  saveCloudGame();
+  refreshGameUI();
 }
 
-/* ============================================================
-   10. HOUSING AND VEHICLES
-   ============================================================ */
+function socialize() {
+  restoreNeed("social", 15);
+  restoreNeed("fun", 5);
+  notify("You spent time socializing.");
+  saveCloudGame();
+  refreshGameUI();
+}
 
-function upgradeHome() {
-  const options = HOMES.map((home, index) =>
-    (index + 1) + ". " + home.name +
-    " — " + money(home.price) +
-    " (daily expense: " + money(home.rent) + ")"
-  ).join("\n");
+function advanceTime(hours) {
+  state.time += hours;
 
-  const answer = prompt("Housing:\n" + options);
-
-  if (answer === null) return;
-
-  const index = Number(answer) - 1;
-
-  if (!Number.isInteger(index) || index < 0 || index >= HOMES.length) {
-    notify("Invalid housing choice.");
-    return;
+  while (state.time >= 24) {
+    state.time -= 24;
+    state.day += 1;
+    payDailyExpenses();
   }
+}
 
-  if (index <= state.homeIndex) {
-    notify("You already own this home or a better one.");
-    return;
-  }
+/* ========================= 11. HOUSING AND VEHICLES ========== */
 
+function purchaseHome(index) {
   const home = HOMES[index];
 
+  if (!home) return;
+
+  if (index <= state.homeIndex) {
+    notify("You already have this home or a better one.");
+    return;
+  }
+
   if (state.money < home.price) {
-    notify("Not enough money for this home.");
+    notify("You don't have enough money for this home.");
     return;
   }
 
   state.money -= home.price;
   state.homeIndex = index;
 
-  notify("You moved into " + home.name);
+  notify("You moved into " + home.name + ".");
   addXP(50);
   saveCloudGame();
   refreshGameUI();
 }
 
-function buyVehicle() {
-  const options = VEHICLES.map((vehicle, index) =>
-    (index + 1) + ". " + vehicle.name + " — " + money(vehicle.price)
-  ).join("\n");
-
-  const answer = prompt("Vehicle shop:\n" + options);
-
-  if (answer === null) return;
-
-  const index = Number(answer) - 1;
-
-  if (!Number.isInteger(index) || index < 0 || index >= VEHICLES.length) {
-    notify("Invalid vehicle choice.");
-    return;
-  }
-
-  if (state.vehicleIndex === index) {
-    notify("You already have this vehicle.");
-    return;
-  }
-
+function purchaseVehicle(index) {
   const vehicle = VEHICLES[index];
 
+  if (!vehicle) return;
+
+  if (state.vehicleIndex === index) {
+    notify("You already own this vehicle.");
+    return;
+  }
+
   if (state.money < vehicle.price) {
-    notify("Not enough money.");
+    notify("You don't have enough money.");
     return;
   }
 
@@ -1318,7 +1260,6 @@ function buyVehicle() {
   state.vehicleIndex = index;
 
   notify("Purchased: " + vehicle.name);
-
   saveCloudGame();
   refreshGameUI();
 }
@@ -1332,17 +1273,14 @@ function useVehicle() {
   const vehicle = VEHICLES[state.vehicleIndex];
 
   notify(
-    vehicle.name +
-    " selected. Vehicle driving controls have not been implemented yet."
+    vehicle.name + " selected. Movement speed is increased; full vehicle driving is not yet implemented."
   );
 }
 
-/* ============================================================
-   11. BUILDING INTERACTIONS
-   ============================================================ */
+/* ========================= 12. BUILDING INTERACTIONS ========= */
 
 function interactWithBuilding(building) {
-  currentInteraction = building;
+  if (!building) return;
 
   switch (building.kind) {
     case "shop":
@@ -1350,7 +1288,7 @@ function interactWithBuilding(building) {
       break;
 
     case "food":
-      eat();
+      openFoodMenu();
       break;
 
     case "clinic":
@@ -1358,129 +1296,494 @@ function interactWithBuilding(building) {
       restoreNeed("hygiene", 5);
       notify("You took a short break at the clinic.");
       saveCloudGame();
+      refreshGameUI();
       break;
 
     case "job":
-      getJob();
+      openCareerMenu();
       break;
 
     case "home":
-      rest();
+      openHousingMenu();
       break;
 
     case "garage":
-      buyVehicle();
+      openVehicleMenu();
       break;
 
     default:
       notify("Nothing to do here yet.");
   }
-
-  refreshGameUI();
 }
 
-/* ============================================================
-   12. AVATAR CUSTOMIZATION
-   ============================================================ */
+/* ========================= 13. IN-GAME SHEETS =============== */
 
-function customizeAvatar() {
-  const options = [
-    "1. Skin tone",
-    "2. Hair color",
-    "3. Outfit color",
-    "4. Hairstyle"
-  ].join("\n");
+let activeSheet = null;
 
-  const answer = prompt("Avatar customization:\n" + options);
-
-  if (answer === null) return;
-
-  switch (answer) {
-    case "1": {
-      const value = prompt(
-        "Enter a hex skin color, e.g. #8d5524",
-        state.avatar.skinTone
-      );
-
-      if (value === null) return;
-
-      if (!validColor(value)) {
-        notify("Use a valid hex color.");
-        return;
-      }
-
-      state.avatar.skinTone = value;
-      break;
-    }
-
-    case "2": {
-      const value = prompt(
-        "Enter a hex hair color, e.g. #201710",
-        state.avatar.hairColor
-      );
-
-      if (value === null) return;
-
-      if (!validColor(value)) {
-        notify("Use a valid hex color.");
-        return;
-      }
-
-      state.avatar.hairColor = value;
-      break;
-    }
-
-    case "3": {
-      const value = prompt(
-        "Enter a hex outfit color, e.g. #315c80",
-        state.avatar.outfitColor
-      );
-
-      if (value === null) return;
-
-      if (!validColor(value)) {
-        notify("Use a valid hex color.");
-        return;
-      }
-
-      state.avatar.outfitColor = value;
-      break;
-    }
-
-    case "4": {
-      const value = prompt(
-        "Choose: short, afro, bald",
-        state.avatar.hairstyle
-      );
-
-      if (value === null) return;
-
-      if (!["short", "afro", "bald"].includes(value)) {
-        notify("Choose short, afro, or bald.");
-        return;
-      }
-
-      state.avatar.hairstyle = value;
-      break;
-    }
-
-    default:
-      notify("Invalid choice.");
-      return;
+function closeGameSheet() {
+  if (activeSheet) {
+    activeSheet.remove();
+    activeSheet = null;
   }
 
-  applyAvatar();
-  saveCloudGame();
-  notify("Avatar updated.");
+  if (gameStarted) gamePaused = false;
 }
 
-/* ============================================================
-   13. MINIMAP
-   ============================================================ */
+function createGameSheet(title, subtitle = "") {
+  closeGameSheet();
+  gamePaused = true;
+
+  const overlay = document.createElement("div");
+  overlay.id = "nhGameSheet";
+
+  Object.assign(overlay.style, {
+    position: "fixed",
+    inset: "0",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "18px",
+    background: "rgba(0,0,0,0.72)",
+    zIndex: "15000",
+    font: "14px system-ui,sans-serif"
+  });
+
+  const panel = document.createElement("section");
+
+  Object.assign(panel.style, {
+    width: "min(440px, 100%)",
+    maxHeight: "min(82vh, 720px)",
+    overflowY: "auto",
+    background: "#171717",
+    color: "#f5f0e5",
+    border: "1px solid #9e7a2d",
+    borderRadius: "18px",
+    padding: "20px",
+    boxShadow: "0 20px 70px #0009"
+  });
+
+  const header = document.createElement("div");
+
+  Object.assign(header.style, {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: "12px",
+    marginBottom: "16px"
+  });
+
+  const headingGroup = document.createElement("div");
+
+  const heading = document.createElement("h2");
+  heading.textContent = title;
+
+  Object.assign(heading.style, {
+    margin: "0",
+    color: "#f4c95d",
+    fontSize: "21px"
+  });
+
+  headingGroup.appendChild(heading);
+
+  if (subtitle) {
+    const description = document.createElement("p");
+    description.textContent = subtitle;
+
+    Object.assign(description.style, {
+      margin: "6px 0 0",
+      color: "#bdb8ad",
+      lineHeight: "1.5"
+    });
+
+    headingGroup.appendChild(description);
+  }
+
+  const closeButton = makeButton("✕", closeGameSheet);
+  closeButton.setAttribute("aria-label", "Close menu");
+
+  header.append(headingGroup, closeButton);
+
+  const content = document.createElement("div");
+
+  Object.assign(content.style, {
+    display: "grid",
+    gap: "10px"
+  });
+
+  panel.append(header, content);
+  overlay.appendChild(panel);
+
+  overlay.addEventListener("pointerdown", (event) => {
+    if (event.target === overlay) closeGameSheet();
+  });
+
+  document.body.appendChild(overlay);
+  activeSheet = overlay;
+
+  return content;
+}
+
+function addSheetRow(content, title, description, actionLabel, action) {
+  const row = document.createElement("div");
+
+  Object.assign(row.style, {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "12px",
+    padding: "12px",
+    background: "#222",
+    border: "1px solid #39342a",
+    borderRadius: "12px"
+  });
+
+  const text = document.createElement("div");
+  text.style.flex = "1";
+
+  const name = document.createElement("strong");
+  name.textContent = title;
+  name.style.display = "block";
+
+  const detail = document.createElement("div");
+  detail.textContent = description;
+  detail.style.cssText = "color:#bdb8ad;font-size:12px;margin-top:5px;line-height:1.5";
+
+  text.append(name, detail);
+
+  const button = makeButton(actionLabel, action, { primary: true });
+  button.style.flexShrink = "0";
+
+  row.append(text, button);
+  content.appendChild(row);
+
+  return row;
+}
+
+function addSheetNotice(content, text) {
+  const notice = document.createElement("p");
+  notice.textContent = text;
+
+  Object.assign(notice.style, {
+    color: "#bdb8ad",
+    lineHeight: "1.6",
+    margin: "4px 0"
+  });
+
+  content.appendChild(notice);
+}
+
+function addSheetColorInput(content, labelText, value, onChange) {
+  const row = document.createElement("label");
+
+  Object.assign(row.style, {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "12px",
+    padding: "10px",
+    background: "#222",
+    borderRadius: "10px"
+  });
+
+  const label = document.createElement("span");
+  label.textContent = labelText;
+
+  const input = document.createElement("input");
+  input.type = "color";
+  input.value = validColor(value) ? value : "#ffffff";
+  input.setAttribute("aria-label", labelText);
+
+  input.addEventListener("input", () => onChange(input.value));
+
+  row.append(label, input);
+  content.appendChild(row);
+}
+
+/* ========================= 14. CAREER + GIG MENUS =========== */
+
+function openCareerMenu() {
+  const content = createGameSheet(
+    "Career Centre",
+    "Choose work that matches your ambitions. Salaries are paid per in-game day."
+  );
+
+  for (const career of CAREERS) {
+    const current = career.name === state.career;
+
+    addSheetRow(
+      content,
+      career.name,
+      career.salary
+        ? money(career.salary) + " per game day"
+        : "No salary",
+      current ? "Selected" : "Choose",
+      () => {
+        if (current) {
+          notify("This is already your career.");
+          return;
+        }
+
+        selectCareer(career);
+        closeGameSheet();
+      }
+    );
+  }
+}
+
+function openGigMenu() {
+  const content = createGameSheet(
+    "Available Gigs",
+    "Complete jobs to earn cash, experience, and skills."
+  );
+
+  for (const gig of GIGS) {
+    addSheetRow(
+      content,
+      gig.name,
+      "Reward: " + money(gig.reward) +
+        " • Energy needed: " + gig.energy,
+      "Work",
+      () => {
+        doGig(gig);
+        closeGameSheet();
+      }
+    );
+  }
+}
+
+/* ========================= 15. SHOP + FOOD ================== */
+
+function openShop() {
+  const content = createGameSheet(
+    "Naija Market",
+    "Buy supplies and keep your needs under control."
+  );
+
+  addSheetNotice(content, "Your cash: " + money(state.money));
+
+  for (const item of ITEMS) {
+    const effects = [];
+
+    for (const need of ["hunger", "energy", "hygiene", "fun", "social"]) {
+      if (Number(item[need]) > 0) {
+        effects.push("+" + item[need] + " " + need);
+      }
+    }
+
+    addSheetRow(
+      content,
+      item.name,
+      money(item.price) + (effects.length ? " • " + effects.join(", ") : ""),
+      "Buy",
+      () => {
+        if (buyItem(item)) openShop();
+      }
+    );
+  }
+}
+
+function openFoodMenu() {
+  const content = createGameSheet(
+    "Food Spot",
+    "Buy a meal and eat it immediately."
+  );
+
+  const food = ITEMS.filter((item) => Number(item.hunger) > 0);
+
+  for (const item of food) {
+    addSheetRow(
+      content,
+      item.name,
+      money(item.price) + " • Restores " + item.hunger + " hunger",
+      "Eat",
+      () => {
+        if (buyItem(item)) {
+          useItem(item.name);
+          closeGameSheet();
+        }
+      }
+    );
+  }
+}
+
+/* ========================= 16. HOUSING + VEHICLES =========== */
+
+function openHousingMenu() {
+  const content = createGameSheet(
+    "Housing",
+    "A better home costs more upfront and may have daily rent."
+  );
+
+  for (let i = 0; i < HOMES.length; i++) {
+    const home = HOMES[i];
+    const owned = i === state.homeIndex;
+    const unavailable = i < state.homeIndex;
+
+    addSheetRow(
+      content,
+      home.name,
+      "Price: " + money(home.price) +
+        " • Daily rent: " + money(home.rent),
+      owned ? "Current" : unavailable ? "Owned before" : "Move in",
+      () => {
+        if (owned || unavailable) {
+          notify(owned ? "This is your current home." : "You already have a better home.");
+          return;
+        }
+
+        purchaseHome(i);
+        openHousingMenu();
+      }
+    );
+  }
+}
+
+function openVehicleMenu() {
+  const content = createGameSheet(
+    "Garage",
+    "Vehicles increase your movement speed. Full driving mechanics are not implemented yet."
+  );
+
+  for (let i = 0; i < VEHICLES.length; i++) {
+    const vehicle = VEHICLES[i];
+    const owned = state.vehicleIndex === i;
+
+    addSheetRow(
+      content,
+      vehicle.name,
+      "Price: " + money(vehicle.price) +
+        " • Speed multiplier: " + vehicle.speed + "×",
+      owned ? "Owned" : "Buy",
+      () => {
+        if (owned) {
+          useVehicle();
+          return;
+        }
+
+        purchaseVehicle(i);
+        openVehicleMenu();
+      }
+    );
+  }
+}
+
+/* ========================= 17. AVATAR CUSTOMIZATION ========= */
+
+function customizeAvatar() {
+  const content = createGameSheet(
+    "Character Studio",
+    "Customize your character. Changes are saved to your cloud account."
+  );
+
+  addSheetColorInput(
+    content,
+    "Skin tone",
+    state.avatar.skinTone,
+    (value) => {
+      state.avatar.skinTone = value;
+      applyAvatar();
+      refreshGameUI();
+      saveCloudGame();
+    }
+  );
+
+  addSheetColorInput(
+    content,
+    "Hair colour",
+    state.avatar.hairColor,
+    (value) => {
+      state.avatar.hairColor = value;
+      applyAvatar();
+      saveCloudGame();
+    }
+  );
+
+  addSheetColorInput(
+    content,
+    "Outfit colour",
+    state.avatar.outfitColor,
+    (value) => {
+      state.avatar.outfitColor = value;
+      applyAvatar();
+      saveCloudGame();
+    }
+  );
+
+  const styleLabel = document.createElement("label");
+  styleLabel.textContent = "Hairstyle";
+  styleLabel.style.cssText = "display:grid;gap:8px";
+
+  const styleSelect = document.createElement("select");
+
+  for (const style of ["short", "afro", "bald"]) {
+    const option = document.createElement("option");
+    option.value = style;
+    option.textContent = style.charAt(0).toUpperCase() + style.slice(1);
+    styleSelect.appendChild(option);
+  }
+
+  styleSelect.value = state.avatar.hairstyle;
+
+  Object.assign(styleSelect.style, {
+    padding: "11px",
+    borderRadius: "9px",
+    background: "#222",
+    color: "#fff",
+    border: "1px solid #705821"
+  });
+
+  styleSelect.addEventListener("change", () => {
+    state.avatar.hairstyle = styleSelect.value;
+    applyAvatar();
+    saveCloudGame();
+  });
+
+  styleLabel.appendChild(styleSelect);
+  content.appendChild(styleLabel);
+
+  addSheetNotice(
+    content,
+    "Note: additional hairstyles and accessories can be added in a later graphics update."
+  );
+
+  content.appendChild(makeButton("Done", closeGameSheet, { primary: true }));
+}
+
+/* ========================= 18. INVENTORY ==================== */
+
+function showInventory() {
+  const content = createGameSheet(
+    "Inventory",
+    "Items you own. Select an item to use it."
+  );
+
+  if (!state.inventory.length) {
+    addSheetNotice(content, "Your inventory is empty. Visit the market to buy supplies.");
+    return;
+  }
+
+  for (const itemName of [...state.inventory]) {
+    const item = ITEMS.find((entry) => entry.name === itemName);
+
+    addSheetRow(
+      content,
+      itemName,
+      item
+        ? "Use this item to restore needs."
+        : "No effect is configured for this item.",
+      "Use",
+      () => {
+        useItem(itemName);
+        closeGameSheet();
+      }
+    );
+  }
+}
+
+/* ========================= 19. MINIMAP + HUD ================= */
 
 function drawMinimap() {
   const canvas = $("#minimap");
-
   if (!(canvas instanceof HTMLCanvasElement)) return;
 
   const context = canvas.getContext("2d");
@@ -1526,10 +1829,6 @@ function drawMinimap() {
   context.fill();
 }
 
-/* ============================================================
-   14. GAME UI
-   ============================================================ */
-
 function updateNeedBar(name, value) {
   const selectors = [
     "#" + name + "Bar",
@@ -1563,6 +1862,14 @@ function updateNeedBar(name, value) {
   }
 }
 
+function formatClock() {
+  const hours = Math.floor(state.time) % 24;
+  const minutes = Math.floor((state.time % 1) * 60);
+
+  return String(hours).padStart(2, "0") + ":" +
+    String(minutes).padStart(2, "0");
+}
+
 function refreshGameUI() {
   setText("#money", money(state.money));
   setText("#moneyDisplay", money(state.money));
@@ -1577,7 +1884,6 @@ function refreshGameUI() {
   setText("#questText", state.activeQuest);
   setText("#objectiveText", state.activeQuest);
   setText("#homeName", HOMES[state.homeIndex]?.name || "Unknown");
-
   setText(
     "#vehicleName",
     state.vehicleIndex >= 0
@@ -1611,15 +1917,11 @@ function refreshGameUI() {
     } else {
       for (const item of state.inventory) {
         const row = document.createElement("div");
-
-        Object.assign(row.style, {
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "10px"
-        });
-
         const label = document.createElement("span");
         label.textContent = item;
+
+        row.style.cssText =
+          "display:flex;justify-content:space-between;gap:10px;margin:6px 0";
 
         row.append(label, makeButton("Use", () => useItem(item)));
         inventory.appendChild(row);
@@ -1630,15 +1932,8 @@ function refreshGameUI() {
   drawMinimap();
 }
 
-function formatClock() {
-  const hours = Math.floor(state.time) % 24;
-  const minutes = Math.floor((state.time % 1) * 60);
+/* ========================= 20. ACTION MENU =================== */
 
-  return String(hours).padStart(2, "0") + ":" +
-    String(minutes).padStart(2, "0");
-}
-
-/* Adds a compact action menu for the existing gameplay functions. */
 function createBasicUI() {
   if ($("#nhBasicMenu")) return;
 
@@ -1652,19 +1947,22 @@ function createBasicUI() {
     width: "min(250px, 65vw)",
     maxHeight: "55vh",
     overflowY: "auto",
-    background: "rgba(18,18,18,0.92)",
+    background: "rgba(18,18,18,0.94)",
     color: "#fff",
     border: "1px solid #8b6c29",
     borderRadius: "14px",
     padding: "10px",
     zIndex: "1000",
-    font: "13px system-ui"
+    font: "13px system-ui,sans-serif"
   });
 
   const heading = document.createElement("h3");
   heading.textContent = "NAIJA HUSTLE";
-  heading.style.color = "#f4c95d";
-  panel.appendChild(heading);
+
+  Object.assign(heading.style, {
+    color: "#f4c95d",
+    margin: "4px 0 10px"
+  });
 
   const controls = document.createElement("div");
 
@@ -1675,14 +1973,16 @@ function createBasicUI() {
   });
 
   const actions = [
-    ["Gig", doGig],
-    ["Career", getJob],
+    ["Gig", openGigMenu],
+    ["Career", openCareerMenu],
     ["Shop", openShop],
-    ["Eat", eat],
+    ["Eat", openFoodMenu],
     ["Rest", rest],
     ["Shower", shower],
-    ["Housing", upgradeHome],
-    ["Vehicles", buyVehicle],
+    ["Toilet", useToilet],
+    ["Socialize", socialize],
+    ["Housing", openHousingMenu],
+    ["Vehicles", openVehicleMenu],
     ["Avatar", customizeAvatar],
     ["Inventory", showInventory],
     ["Save Online", () => saveCloudGame({ notify: true })],
@@ -1693,68 +1993,17 @@ function createBasicUI() {
     controls.appendChild(makeButton(label, action));
   }
 
-  panel.appendChild(controls);
-
   const help = document.createElement("p");
   help.textContent =
-    "Move: WASD / arrows • Sprint: Shift • Interact: E • Zoom: +/-";
-  help.style.lineHeight = "1.5";
-  panel.appendChild(help);
+    "Move: WASD / arrows • Sprint: Shift • Interact: E • Zoom: + / − • Inventory: I";
 
+  help.style.cssText = "line-height:1.5;color:#c9c5bb;margin-bottom:0";
+
+  panel.append(heading, controls, help);
   document.body.appendChild(panel);
 }
 
-function showInventory() {
-  const list = state.inventory.length
-    ? state.inventory.join("\n")
-    : "Your inventory is empty.";
-
-  alert("Inventory\n\n" + list);
-}
-
-/* ============================================================
-   15. INPUTS AND MOBILE JOYSTICK
-   ============================================================ */
-
-function onKeyDown(event) {
-  if (!gameStarted) return;
-
-  const key = event.key.toLowerCase();
-
-  if (
-    ["arrowup", "arrowdown", "arrowleft", "arrowright", " "]
-      .includes(key)
-  ) {
-    event.preventDefault();
-  }
-
-  keys.add(key);
-
-  if (key === "shift") sprinting = true;
-  if (key === "+" || key === "=") zoomCamera(-1);
-  if (key === "-") zoomCamera(1);
-
-  if (key === "e") {
-    const nearest = getNearestBuilding();
-
-    if (nearest && nearest.distance <= 12) {
-      interactWithBuilding(nearest.building);
-    } else {
-      notify("Move closer to a building to interact.");
-    }
-  }
-
-  if (key === "i") showInventory();
-  if (key === "c") customizeAvatar();
-  if (key === "escape") gamePaused = !gamePaused;
-}
-
-function onKeyUp(event) {
-  const key = event.key.toLowerCase();
-  keys.delete(key);
-
-  if (key === "shift") sprinting = false;
-}
+/* ========================= 21. INPUTS + JOYSTICK ============= */
 
 function getNearestBuilding() {
   if (!player) return null;
@@ -1775,8 +2024,61 @@ function getNearestBuilding() {
   return nearest;
 }
 
+function onKeyDown(event) {
+  if (!gameStarted) return;
+
+  const key = event.key.toLowerCase();
+
+  if (
+    ["arrowup", "arrowdown", "arrowleft", "arrowright", " "]
+      .includes(key)
+  ) {
+    event.preventDefault();
+  }
+
+  if (activeSheet && key !== "escape") return;
+
+  keys.add(key);
+
+  if (key === "shift") sprinting = true;
+  if (key === "+" || key === "=") zoomCamera(-1);
+  if (key === "-") zoomCamera(1);
+
+  if (key === "e") {
+    const nearest = getNearestBuilding();
+
+    if (nearest && nearest.distance <= CONFIG.interactionDistance) {
+      interactWithBuilding(nearest.building);
+    } else {
+      notify("Move closer to a building to interact.");
+    }
+  }
+
+  if (key === "i") showInventory();
+  if (key === "c") customizeAvatar();
+
+  if (key === " ") {
+    jumpingUntil = performance.now() + 250;
+  }
+
+  if (key === "escape") {
+    if (activeSheet) {
+      closeGameSheet();
+    } else {
+      gamePaused = !gamePaused;
+      notify(gamePaused ? "Game paused." : "Game resumed.");
+    }
+  }
+}
+
+function onKeyUp(event) {
+  const key = event.key.toLowerCase();
+  keys.delete(key);
+
+  if (key === "shift") sprinting = false;
+}
+
 function bindJoystick() {
-  // Supports both the old selectors and the current index.html IDs.
   const base =
     $("#joystickBase") ||
     $("#joystick-base") ||
@@ -1802,9 +2104,7 @@ function bindJoystick() {
     const dx = event.clientX - centerX;
     const dy = event.clientY - centerY;
     const distance = Math.hypot(dx, dy);
-    const factor = distance > maxDistance
-      ? maxDistance / distance
-      : 1;
+    const factor = distance > maxDistance ? maxDistance / distance : 1;
 
     joystick.x = dx * factor / maxDistance;
     joystick.y = dy * factor / maxDistance;
@@ -1812,8 +2112,7 @@ function bindJoystick() {
 
     if (knob) {
       knob.style.transform =
-        "translate(" +
-        joystick.x * maxDistance + "px, " +
+        "translate(" + joystick.x * maxDistance + "px," +
         joystick.y * maxDistance + "px)";
     }
   }
@@ -1840,7 +2139,7 @@ function bindJoystick() {
     joystick.y = 0;
     joystick.active = false;
 
-    if (knob) knob.style.transform = "translate(0, 0)";
+    if (knob) knob.style.transform = "translate(0,0)";
   }
 
   base.addEventListener("pointerup", stop);
@@ -1850,36 +2149,26 @@ function bindJoystick() {
 
 function bindExistingButtons() {
   const bindings = {
-    "#gigBtn": doGig,
-    "#jobBtn": getJob,
+    "#gigBtn": openGigMenu,
+    "#jobBtn": openCareerMenu,
     "#shopBtn": openShop,
     "#restBtn": rest,
     "#showerBtn": shower,
-    "#homeBtn": upgradeHome,
-    "#vehicleBtn": buyVehicle,
+    "#homeBtn": openHousingMenu,
+    "#vehicleBtn": openVehicleMenu,
     "#avatarBtn": customizeAvatar,
     "#inventoryBtn": showInventory,
     "#saveBtn": () => saveCloudGame({ notify: true }),
     "#zoomIn": () => zoomCamera(-1),
     "#zoomOut": () => zoomCamera(1),
-    "#socialBtn": () => {
-      state.needs.social = clamp(state.needs.social + 10, 0, 100);
-      notify("You spent time socializing.");
-      saveCloudGame();
-      refreshGameUI();
-    },
+    "#socialBtn": socialize,
     "#emoteBtn": () => notify("Your character waves!"),
     "#runBtn": () => {
       sprinting = !sprinting;
       notify(sprinting ? "Running enabled." : "Running disabled.");
     },
     "#jumpBtn": () => {
-      if (player) {
-        player.position.y = 0.65;
-        setTimeout(() => {
-          if (player) player.position.y = 0;
-        }, 250);
-      }
+      jumpingUntil = performance.now() + 250;
     }
   };
 
@@ -1893,18 +2182,12 @@ function bindExistingButtons() {
   }
 }
 
-/* ============================================================
-   16. ONLINE-ONLY STARTUP AND LOGIN
-   ============================================================ */
+/* ========================= 22. SCREEN MANAGEMENT ============ */
 
 function showLogin(message = "") {
-  const login = $("#loginScreen");
-  const hud = $("#hud");
-  const loading = $("#loadingScreen");
-
-  if (login) login.classList.remove("hidden");
-  if (hud) hud.classList.add("hidden");
-  if (loading) loading.classList.add("hidden");
+  showElement("#loginScreen", true);
+  showElement("#hud", false);
+  showElement("#loadingScreen", false);
 
   const messageElement = $("#loginMessage");
 
@@ -1914,13 +2197,29 @@ function showLogin(message = "") {
 }
 
 function showGame() {
-  const login = $("#loginScreen");
-  const hud = $("#hud");
-  const loading = $("#loadingScreen");
+  showElement("#loginScreen", false);
+  showElement("#hud", true);
+  showElement("#loadingScreen", false);
+}
 
-  if (login) login.classList.add("hidden");
-  if (hud) hud.classList.remove("hidden");
-  if (loading) loading.classList.add("hidden");
+/* ========================= 23. CLEANUP ====================== */
+
+function disposeObjectResources(root) {
+  if (!root) return;
+
+  root.traverse((object) => {
+    if (object.geometry) object.geometry.dispose();
+
+    if (object.material) {
+      const materials = Array.isArray(object.material)
+        ? object.material
+        : [object.material];
+
+      for (const material of materials) {
+        material.dispose();
+      }
+    }
+  });
 }
 
 function stopGameplay() {
@@ -1930,29 +2229,37 @@ function stopGameplay() {
 
   keys.clear();
   sprinting = false;
-  joystick = { x: 0, y: 0, active: false };
+  jumpingUntil = 0;
 
-  const menu = $("#nhBasicMenu");
-  if (menu) menu.remove();
+  joystick.x = 0;
+  joystick.y = 0;
+  joystick.active = false;
+
+  closeGameSheet();
+
+  $("#nhBasicMenu")?.remove();
 
   if (animationFrame !== null) {
     cancelAnimationFrame(animationFrame);
     animationFrame = null;
   }
 
+  window.removeEventListener("resize", resizeRenderer);
+  window.removeEventListener("keydown", onKeyDown);
+  window.removeEventListener("keyup", onKeyUp);
+
+  if (scene) disposeObjectResources(scene);
+
   if (renderer) {
     renderer.dispose();
     renderer.domElement.remove();
   }
 
-  window.removeEventListener("resize", resizeRenderer);
-  window.removeEventListener("keydown", onKeyDown);
-  window.removeEventListener("keyup", onKeyUp);
-
   scene = null;
   camera = null;
   renderer = null;
   clock = null;
+
   player = null;
   playerBody = null;
   playerHead = null;
@@ -1962,7 +2269,11 @@ function stopGameplay() {
   npcMeshes.length = 0;
 
   worldReady = false;
+  lastSave = 0;
+  lastHudUpdate = 0;
 }
+
+/* ========================= 24. AUTHENTICATED STARTUP ========== */
 
 async function startAuthenticatedGame() {
   if (!currentUser) {
@@ -1974,15 +2285,12 @@ async function startAuthenticatedGame() {
 
   gameStarting = true;
   gamePaused = false;
-
-  const loading = $("#loadingScreen");
-  if (loading) loading.classList.remove("hidden");
+  showElement("#loadingScreen", true);
 
   try {
     await loadCloudGame();
 
     showGame();
-
     initializeWorld();
 
     if (!worldReady) {
@@ -2001,36 +2309,41 @@ async function startAuthenticatedGame() {
     gamePaused = false;
     gameStarting = false;
 
-    syncPlayerPosition();
+    if (player) {
+      player.position.set(state.player.x, 0, state.player.z);
+    }
+
     applyAvatar();
     refreshGameUI();
 
-    setText("#name", currentUser.email || "Player");
-
     notify("Welcome to Naija Hustle!");
-    console.info("Naija Hustle " + CONFIG.version + " online.");
+    console.info("Naija Hustle " + CONFIG.version + " started.");
   } catch (error) {
-    console.error("Online game startup failed:", error);
+    reportError("Game startup failed", error);
 
     stopGameplay();
 
     showLogin(
-      error.message ||
-      "The game could not load. Check your connection and try again."
+      error instanceof Error
+        ? error.message
+        : "The game could not load. Check your connection and try again."
     );
   } finally {
     gameStarting = false;
 
     if (!gameStarted) {
-      const screen = $("#loadingScreen");
-      if (screen) screen.classList.add("hidden");
+      showElement("#loadingScreen", false);
     }
   }
 }
 
+/* ========================= 25. LOGIN + SIGNUP ================ */
+
 async function handleLogin() {
+  if (authBusy) return;
+
   if (!authReady) {
-    showLogin("Connecting to the online service. Please wait.");
+    showLogin("The online service is still connecting. Please wait.");
     return;
   }
 
@@ -2042,20 +2355,30 @@ async function handleLogin() {
     return;
   }
 
+  authBusy = true;
+
   try {
     showLogin("Signing in...");
-
     await signInWithEmail(email, password);
     await startAuthenticatedGame();
   } catch (error) {
-    console.error("Login failed:", error);
-    showLogin(error.message || "Login failed. Check your details.");
+    reportError("Login failed", error);
+
+    showLogin(
+      error instanceof Error
+        ? error.message
+        : "Login failed. Check your details and try again."
+    );
+  } finally {
+    authBusy = false;
   }
 }
 
 async function handleSignup() {
+  if (authBusy) return;
+
   if (!authReady) {
-    showLogin("Connecting to the online service. Please wait.");
+    showLogin("The online service is still connecting. Please wait.");
     return;
   }
 
@@ -2067,10 +2390,12 @@ async function handleSignup() {
     return;
   }
 
-  if (password.length < 6) {
+  if (password.length < CONFIG.minimumPasswordLength) {
     showLogin("Your password must contain at least 6 characters.");
     return;
   }
+
+  authBusy = true;
 
   try {
     showLogin("Creating your account...");
@@ -2079,20 +2404,29 @@ async function handleSignup() {
 
     if (!result.session) {
       showLogin(
-        "Account created. Check your email to verify the account, then sign in."
+        "Account created. Check your email to verify it, then sign in."
       );
       return;
     }
 
     await startAuthenticatedGame();
   } catch (error) {
-    console.error("Signup failed:", error);
-    showLogin(error.message || "Account creation failed.");
+    reportError("Signup failed", error);
+
+    showLogin(
+      error instanceof Error
+        ? error.message
+        : "Account creation failed. Please try again."
+    );
+  } finally {
+    authBusy = false;
   }
 }
 
 function bindAuthenticationEvents() {
-  // index.html dispatches these events on window.
+  if (window.datasetNaijaAuthBound === true) return;
+  window.datasetNaijaAuthBound = true;
+
   window.addEventListener("naijahustle:login", (event) => {
     event.preventDefault();
     handleLogin();
@@ -2103,8 +2437,7 @@ function bindAuthenticationEvents() {
     handleSignup();
   });
 
-  // Prevent form submission from reloading the page.
-  const form = document.querySelector("#loginForm");
+  const form = $("#loginForm");
 
   if (form && form.dataset.nhBound !== "true") {
     form.dataset.nhBound = "true";
@@ -2115,8 +2448,7 @@ function bindAuthenticationEvents() {
     });
   }
 
-  // Disable any leftover guest-play button.
-  const guestButton = document.querySelector("#guestBtn");
+  const guestButton = $("#guestBtn");
 
   if (guestButton) {
     guestButton.disabled = true;
@@ -2124,9 +2456,10 @@ function bindAuthenticationEvents() {
   }
 }
 
+/* ========================= 26. APP START ===================== */
+
 async function start() {
   showLogin("Connecting to Naija Hustle...");
-
   bindAuthenticationEvents();
 
   try {
@@ -2135,26 +2468,25 @@ async function start() {
     if (currentUser) {
       await startAuthenticatedGame();
     } else {
-      showLogin();
+      showLogin("Sign in or create an account to play online.");
     }
   } catch (error) {
-    console.error("Online startup failed:", error);
+    reportError("Online startup failed", error);
 
     showLogin(
-      "Online connection is not configured or unavailable. Check your Supabase settings."
+      "Could not connect to the online service. Check your internet connection and Supabase configuration, then refresh."
     );
   }
 }
 
 window.addEventListener("beforeunload", () => {
-  // Best-effort cloud save. Browsers may terminate asynchronous work
-  // during navigation, so this is not the only save mechanism.
-  if (currentUser && gameStarted && !cloudSaveInProgress) {
-    saveCloudGame();
+  if (currentUser && gameStarted && !saveLoopPromise) {
+    // Best effort only; browsers may stop asynchronous requests on exit.
+    void saveCloudGame();
   }
 });
 
 start().catch((error) => {
-  console.error("Naija Hustle startup failed:", error);
-  showLogin("The game could not start. Please refresh and try again.");
+  reportError("Fatal startup error", error);
+  showLogin("Naija Hustle could not start. Please refresh the page.");
 });
