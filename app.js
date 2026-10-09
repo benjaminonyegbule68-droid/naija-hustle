@@ -100,8 +100,7 @@ const TRAITS=[
  {id:"socialite",name:"Owambe Spirit",desc:"Social gains are 25% stronger."},
  {id:"clean",name:"Clean Pikin",desc:"Hygiene drains more slowly."},
  {id:"lazy",name:"Lazy Bone",desc:"Energy drains more slowly; work pays 15% less."}
-];
-const INVESTMENTS=[
+ const INVESTMENTS=[
  {id:"kiosk",name:"Street Kiosk",cost:85000,income:9000,req:1},
  {id:"foodcart",name:"Food Cart",cost:120000,income:14000,req:2},
  {id:"studio",name:"Creative Studio",cost:250000,income:25000,req:3},
@@ -133,6 +132,7 @@ const state={
 };
 
 let scene,camera,renderer,sun,hemi,player,npcGroup,carGroup,last=performance.now(),saveClock=0,mapClock=0,geoCache=new Map(),matCache=new Map(),npcs=[],cars=[],route=null,cameraState="third",routePulse=0,gameStarted=false;
+
 function clamp(v,a=0,b=100){return Math.max(a,Math.min(b,v))}
 function fmt(v){return Math.round(v).toLocaleString("en-NG")}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
@@ -142,8 +142,23 @@ function earn(n){state.money+=n;state.totalEarnings+=n;state.weeklyEarnings+=n;g
 function gainXP(n){state.xp+=n;while(state.xp>=state.level*100){state.xp-=state.level*100;state.level++;toast(`Level ${state.level} reached.`)}}
 function addNeed(k,v){if(k in state.needs)state.needs[k]=clamp(state.needs[k]+v)}
 function hasTrait(id){return Array.isArray(state.traits)&&state.traits.includes(id)}
-function applyStartType(type){state.startType=type==="nepo"?"nepo":"lapo";if(state.startType==="nepo"){state.money=150000;state.housing=1;state.rentDue=14;state.traits=["socialite"];state.inventory=["phone","laptop"];state.pos={x:-28,z:28,y:0};}else{state.money=12000;state.housing=0;state.rentDue=14;state.traits=["hustler"];state.inventory=["phone"];state.pos={x:-28,z:28,y:0};}state.career=null;state.careerLevel=0;state.xp=0;state.level=1;state.investments=[];state.ownedVehicles=["feet"];state.relationships={};state.achievements=[];state.quest=0;state.totalEarnings=0;state.weeklyEarnings=0;state.stats={meals:0,days:0,shifts:0,gigs:0};state.needs={hunger:85,energy:90,hygiene:80,fun:70,social:state.startType==="nepo"?70:55,bladder:85,focus:75};}
-function sanitize(raw){const o={...DEFAULT_CFG};if(!raw||typeof raw!=="object")return o;for(const k in DEFAULT_CFG)if(OPTIONS[k]?.values?.[raw[k]]!==undefined)o[k]=raw[k];return o}
+
+function applyStartType(type){
+ state.startType=type==="nepo"?"nepo":"lapo";
+ if(state.startType==="nepo"){
+  state.money=150000;state.housing=1;state.rentDue=14;state.traits=["socialite"];state.inventory=["phone","laptop"];state.pos={x:-28,z:28,y:0};
+ }else{
+  state.money=12000;state.housing=0;state.rentDue=14;state.traits=["hustler"];state.inventory=["phone"];state.pos={x:-28,z:28,y:0};
+ }
+ state.career=null;state.careerLevel=0;state.xp=0;state.level=1;state.investments=[];state.ownedVehicles=["feet"];state.relationships={};state.achievements=[];state.quest=0;state.totalEarnings=0;state.weeklyEarnings=0;state.stats={meals:0,days:0,shifts:0,gigs:0};
+ state.needs={hunger:85,energy:90,hygiene:80,fun:70,social:state.startType==="nepo"?70:55,bladder:85,focus:75};
+}
+function sanitize(raw){
+ const o={...DEFAULT_CFG};
+ if(!raw||typeof raw!=="object")return o;
+ for(const k in DEFAULT_CFG)if(OPTIONS[k]?.values?.[raw[k]]!==undefined)o[k]=raw[k];
+ return o;
+}
 function geo(key,make){if(!geoCache.has(key))geoCache.set(key,make());return geoCache.get(key)}
 function mat(color,rough=.72,metal=0,opts={}){const key=`${color}|${rough}|${metal}|${JSON.stringify(opts)}`;if(!matCache.has(key))matCache.set(key,new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,...opts}));return matCache.get(key)}
 function box(x,y,z){return geo(`b${x}|${y}|${z}`,()=>new THREE.BoxGeometry(x,y,z))}
@@ -156,210 +171,1818 @@ function createCharacter(raw,scale=.82){
  const cfg=sanitize(raw),root=new THREE.Group();root.scale.setScalar(scale);
  const skin=mat(OPTIONS.skinTone.values[cfg.skinTone]||"#855033"),hair=mat(({black:"#151313",darkBrown:"#2c1b14",brown:"#4b2c1e",burgundy:"#541d2c",blonde:"#d6ad65",grey:"#8d8d8d"}[cfg.hairColor]||"#151313"));
  const outfit=mat(OPTIONS.outfitColor.values[cfg.outfitColor]||"#315d50"),dark=mat("#171717"),white=mat("#f4f1ea");
- const W=cfg.bodyBuild==="compact"?.88:cfg.bodyBuild==="broad"?1.12:1;const S=cfg.bodyBuild==="compact"?.92:cfg.bodyBuild==="broad"?1.12:1;const H=cfg.height==="short"?.94:cfg.height==="tall"?1.07:1;
- const hips=new THREE.Group();hips.position.y=1.02*H;root.add(hips);const body=new THREE.Mesh(capGeo(.32*W,.75*H),outfit);body.scale.set(1.2*S,1,.83*W);body.position.y=.46*H;hips.add(body);
- const spine=new THREE.Group();spine.position.y=.35*H;hips.add(spine);const neck=new THREE.Mesh(cyl(.13,.14,.22,16),skin);neck.position.y=.84*H;spine.add(neck);const head=new THREE.Group();head.position.y=1.12*H;spine.add(head);
+ const W=cfg.bodyBuild==="compact"?.88:cfg.bodyBuild==="broad"?1.12:1;
+ const S=cfg.bodyBuild==="compact"?.92:cfg.bodyBuild==="broad"?1.12:1;
+ const H=cfg.height==="short"?.94:cfg.height==="tall"?1.07:1;
+ const hips=new THREE.Group();hips.position.y=1.02*H;root.add(hips);
+ const body=new THREE.Mesh(capGeo(.32*W,.75*H),outfit);body.scale.set(1.2*S,1,.83*W);body.position.y=.46*H;hips.add(body);
+ const spine=new THREE.Group();spine.position.y=.35*H;hips.add(spine);
+ const neck=new THREE.Mesh(cyl(.13,.14,.22,16),skin);neck.position.y=.84*H;spine.add(neck);
+ const head=new THREE.Group();head.position.y=1.12*H;spine.add(head);
  const face=new THREE.Mesh(sph(.36),skin);face.scale.set(1,.99,.93);head.add(face);
- for(const x of[-.125,.125]){const eye=new THREE.Mesh(sph(.082),white);eye.scale.set(1,.86,.45);eye.position.set(x,.045,.325);head.add(eye);const p=new THREE.Mesh(sph(.042),dark);p.scale.set(.9,.95,.45);p.position.set(x,.045,.36);head.add(p)}
- const nose=new THREE.Mesh(sph(.07),skin);nose.scale.set(.7,1,1.2);nose.position.set(0,-.04,.36);head.add(nose);const mouth=new THREE.Mesh(capGeo(.035,.13),mat("#5b2825"));mouth.rotation.z=Math.PI/2;mouth.scale.set(1,.6,.55);mouth.position.set(0,-.17,.345);head.add(mouth);
- if(cfg.hairstyle!=="bald"){const styles=cfg.hairstyle;if(styles==="afro"){const h=new THREE.Mesh(sph(.43),hair);h.scale.set(1.08,.9,1.08);h.position.y=.18;head.add(h)}else if(["twists","locs","braids"].includes(styles)){const h=new THREE.Mesh(sph(.37),hair);h.scale.set(1,.63,1);h.position.y=.17;head.add(h);const count=styles==="braids"?12:styles==="locs"?14:10;for(let i=0;i<count;i++){const a=i/count*Math.PI*2,s=new THREE.Mesh(capGeo(.052,styles==="locs"?.33:.27),hair);s.position.set(Math.cos(a)*.28,.14,Math.sin(a)*.28);head.add(s)}}else{const h=new THREE.Mesh(sph(.38),hair);h.scale.set(1,styles==="fade"?.52:.63,1);h.position.y=.2;head.add(h)}}
- if(cfg.beard!=="none"){const b=new THREE.Mesh(sph(cfg.beard==="full"?.22:.17),hair);b.scale.set(1,.7,.55);b.position.set(0,-.18,.34);head.add(b)}
- if(cfg.accessory==="cap"){const c=new THREE.Mesh(sph(.39),dark);c.scale.set(1,.44,1);c.position.y=.29;head.add(c);const brim=new THREE.Mesh(box(.66,.04,.25),dark);brim.position.set(0,.22,.43);head.add(brim)}
- if(cfg.accessory==="glasses"||cfg.accessory==="sunglasses"){const f=mat(cfg.accessory==="sunglasses"?"#101010":"#303030");for(const x of[-.16,.16]){const l=new THREE.Mesh(box(.18,.1,.03),f);l.position.set(x,.04,.43);head.add(l)}const br=new THREE.Mesh(box(.11,.03,.03),f);br.position.set(0,.04,.43);head.add(br)}
- if(cfg.accessory==="chain"){const ch=new THREE.Mesh(torus(.25,.022,8,24),mat("#d7aa28",.3,.8));ch.rotation.x=Math.PI/2;ch.position.set(0,-.48,.4);root.add(ch)}
- const legs=[],arms=[];for(const x of[-.2*W,.2*W]){const l=new THREE.Group();l.position.x=x;hips.add(l);const th=new THREE.Mesh(capGeo(.14,.42*H),outfit);th.position.y=-.3*H;l.add(th);const sh=new THREE.Mesh(capGeo(.12,.42*H),outfit);sh.position.y=-.75*H;l.add(sh);const shoe=new THREE.Mesh(box(.3,.16,.5),dark);shoe.position.set(0,-1.06*H,.1);l.add(shoe);legs.push(l)}
- for(const x of[-.5*S,.5*S]){const a=new THREE.Group();a.position.set(x,.62*H,0);spine.add(a);const up=new THREE.Mesh(capGeo(.125,.36*H),outfit);up.position.y=-.2*H;a.add(up);const fore=new THREE.Mesh(capGeo(.105,.32*H),skin);fore.position.y=-.57*H;a.add(fore);const hand=new THREE.Mesh(sph(.13),skin);hand.position.y=-.79*H;a.add(hand);arms.push(a)}
- return {root,hips,spine,head,legs,arms,cfg,time:Math.random()*6};
-}
-
-function setup(){
- scene=new THREE.Scene();scene.background=new THREE.Color("#8cc2c7");scene.fog=new THREE.Fog("#8cc2c7",48,190);camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,260);
- renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});renderer.setPixelRatio(state.quality==="low"?1:Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;$('game').appendChild(renderer.domElement);
- hemi=new THREE.HemisphereLight("#e8ffff","#3c4638",1.4);scene.add(hemi);sun=new THREE.DirectionalLight("#fff1d4",2);sun.position.set(40,80,30);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
- const world=new THREE.Group();scene.add(world);buildWorld(world);npcGroup=new THREE.Group();scene.add(npcGroup);carGroup=new THREE.Group();scene.add(carGroup);buildPlayer();buildNPCs();buildCars();attachInput();buildCustomizer();updateHUD();window.addEventListener("resize",resize)
-}
-function buildWorld(g){
- // Stylized GTA-like Lagos: broad grid roads, sidewalks, distinct districts and landmarks.
- const ground=new THREE.Mesh(box(210,.2,210),mat("#68745b",.95));ground.position.y=-.1;ground.receiveShadow=true;g.add(ground);
- const asphalt=mat("#293230",1),lane=mat("#e9c85a",.8),sidewalk=mat("#b6b2a5",1),curb=mat("#d8d1bd",.95);
- // District ground accents make the map readable without hiding existing destinations.
- const districtPads=[[-70,-70,66,66,"#65765d"],[70,-70,66,66,"#73766b"],[-70,70,66,66,"#77705f"],[70,70,66,66,"#668078"]];
- for(const [x,z,w,d,color] of districtPads){const pad=new THREE.Mesh(box(w,.025,d),mat(color,.98));pad.position.set(x,.015,z);g.add(pad)}
- for(let i=-3;i<=3;i++){
-  const x=i*28,z=i*28;
-  const vertical=new THREE.Mesh(box(13,.05,210),asphalt);vertical.position.set(x,.025,0);g.add(vertical);
-  const horizontal=new THREE.Mesh(box(210,.05,13),asphalt);horizontal.position.set(0,.026,z);g.add(horizontal);
-  // Centre lane markings, broken into dashes for a more natural city-road look.
-  for(let q=-9;q<=9;q++){if(q%2===0)continue;const dashV=new THREE.Mesh(box(.16,.06,3.2),lane);dashV.position.set(x,.06,q*10);g.add(dashV);const dashH=new THREE.Mesh(box(3.2,.06,.16),lane);dashH.position.set(q*10,.061,z);g.add(dashH)}
-  for(const edge of [-1,1]){
-   const sx=x+edge*7.25,sz=z+edge*7.25;
-   const walkV=new THREE.Mesh(box(1.35,.12,210),sidewalk);walkV.position.set(sx,.055,0);g.add(walkV);
-   const curbV=new THREE.Mesh(box(.16,.16,210),curb);curbV.position.set(x+edge*6.55,.08,0);g.add(curbV);
-   const walkH=new THREE.Mesh(box(210,.12,1.35),sidewalk);walkH.position.set(0,.056,sz);g.add(walkH);
-   const curbH=new THREE.Mesh(box(210,.16,.16),curb);curbH.position.set(0,.081,z+edge*6.55);g.add(curbH);
+ for(const x of[-.125,.125]){
+  const eye=new THREE.Mesh(sph(.082),white);eye.scale.set(1,.86,.45);eye.position.set(x,.045,.325);head.add(eye);
+  const p=new THREE.Mesh(sph(.042),dark);p.scale.set(.9,.95,.45);p.position.set(x,.045,.36);head.add(p);
+ }
+ const nose=new THREE.Mesh(sph(.07),skin);nose.scale.set(.7,1,1.2);nose.position.set(0,-.04,.36);head.add(nose);
+ const mouth=new THREE.Mesh(capGeo(.035,.13),mat("#5b2825"));mouth.rotation.z=Math.PI/2;mouth.scale.set(1,.6,.55);mouth.position.set(0,-.17,.345);head.add(mouth);
+ if(cfg.hairstyle!=="bald"){
+  const styles=cfg.hairstyle;
+  if(styles==="afro"){
+   const h=new THREE.Mesh(sph(.43),hair);h.scale.set(1.08,.9,1.08);h.position.y=.18;head.add(h);
+  }else if(["twists","locs","braids"].includes(styles)){
+   const h=new THREE.Mesh(sph(.37),hair);h.scale.set(1,.63,1);h.position.y=.17;head.add(h);
+   const count=styles==="braids"?12:styles==="locs"?14:10;
+   for(let i=0;i<count;i++){
+    const a=i/count*Math.PI*2,s=new THREE.Mesh(capGeo(.052,styles==="locs"?.33:.27),hair);
+    s.position.set(Math.cos(a)*.28,.14,Math.sin(a)*.28);head.add(s);
+   }
+  }else{
+   const h=new THREE.Mesh(sph(.38),hair);h.scale.set(1,styles==="fade"?.52:.63,1);h.position.y=.2;head.add(h);
   }
  }
- // District gateways and skyline landmarks give the world a stronger Lagos identity.
- buildDistrictSign(g,"MAINLAND",-70, -72,"YABA · SURULERE · IKEJA","#0F6B6F");
+ if(cfg.beard!=="none"){
+  const b=new THREE.Mesh(sph(cfg.beard==="full"?.22:.17),hair);b.scale.set(1,.7,.55);b.position.set(0,-.18,.34);head.add(b);
+ }
+ if(cfg.accessory==="cap"){
+  const c=new THREE.Mesh(sph(.39),dark);c.scale.set(1,.44,1);c.position.y=.29;head.add(c);
+  const brim=new THREE.Mesh(box(.66,.04,.25),dark);brim.position.set(0,.22,.43);head.add(brim);
+ }
+ if(cfg.accessory==="glasses"||cfg.accessory==="sunglasses"){
+  const f=mat(cfg.accessory==="sunglasses"?"#101010":"#303030");
+  for(const x of[-.16,.16]){const l=new THREE.Mesh(box(.18,.1,.03),f);l.position.set(x,.04,.43);head.add(l)}
+  const br=new THREE.Mesh(box(.11,.03,.03),f);br.position.set(0,.04,.43);head.add(br);
+ }
+ if(cfg.accessory==="chain"){
+  const ch=new THREE.Mesh(torus(.25,.022,8,24),mat("#d7aa28",.3,.8));ch.rotation.x=Math.PI/2;ch.position.set(0,-.48,.4);root.add(ch);
+ }
+ const legs=[],arms=[];
+ for(const x of[-.2*W,.2*W]){
+  const l=new THREE.Group();l.position.x=x;hips.add(l);
+  const th=new THREE.Mesh(capGeo(.14,.42*H),outfit);th.position.y=-.3*H;l.add(th);
+  const sh=new THREE.Mesh(capGeo(.12,.42*H),outfit);sh.position.y=-.75*H;l.add(sh);
+  const shoe=new THREE.Mesh(box(.3,.16,.5),dark);shoe.position.set(0,-1.06*H,.1);l.add(shoe);legs.push(l);
+ }
+ for(const x of[-.5*S,.5*S]){
+  const a=new THREE.Group();a.position.set(x,.62*H,0);spine.add(a);
+  const up=new THREE.Mesh(capGeo(.125,.36*H),outfit);up.position.y=-.2*H;a.add(up);
+  const fore=new THREE.Mesh(capGeo(.105,.32*H),skin);fore.position.y=-.57*H;a.add(fore);
+  const hand=new THREE.Mesh(sph(.13),skin);hand.position.y=-.79*H;a.add(hand);arms.push(a);
+ }
+ return {root,hips,spine,head,legs,arms,cfg,time:Math.random()*6};
+  }
+function setup(){
+ scene=new THREE.Scene();
+ scene.background=new THREE.Color("#8cc2c7");
+ scene.fog=new THREE.Fog("#8cc2c7",48,190);
+ camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,260);
+ renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+ renderer.setPixelRatio(state.quality==="low"?1:Math.min(devicePixelRatio,2));
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.shadowMap.enabled=true;
+ renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ $("game").appendChild(renderer.domElement);
+ hemi=new THREE.HemisphereLight("#e8ffff","#3c4638",1.4);
+ scene.add(hemi);
+ sun=new THREE.DirectionalLight("#fff1d4",2);
+ sun.position.set(40,80,30);
+ sun.castShadow=true;
+ sun.shadow.mapSize.set(1024,1024);
+ scene.add(sun);
+ const world=new THREE.Group();
+ scene.add(world);
+ buildWorld(world);
+ npcGroup=new THREE.Group();
+ scene.add(npcGroup);
+ carGroup=new THREE.Group();
+ scene.add(carGroup);
+ buildPlayer();
+ buildNPCs();
+ buildCars();
+ attachInput();
+ buildCustomizer();
+ updateHUD();
+ window.addEventListener("resize",resize);
+}
+
+function buildWorld(g){
+ // Stylized GTA-like Lagos: broad grid roads, sidewalks, distinct districts and landmarks.
+ const ground=new THREE.Mesh(box(210,.2,210),mat("#68745b",.95));
+ ground.position.y=-.1;
+ ground.receiveShadow=true;
+ g.add(ground);
+ const asphalt=mat("#293230",1),lane=mat("#e9c85a",.8),sidewalk=mat("#b6b2a5",1),curb=mat("#d8d1bd",.95);
+ const districtPads=[[-70,-70,66,66,"#65765d"],[70,-70,66,66,"#73766b"],[-70,70,66,66,"#77705f"],[70,70,66,66,"#668078"]];
+ for(const [x,z,w,d,color] of districtPads){
+  const pad=new THREE.Mesh(box(w,.025,d),mat(color,.98));
+  pad.position.set(x,.015,z);
+  g.add(pad);
+ }
+ for(let i=-3;i<=3;i++){
+  const x=i*28,z=i*28;
+  const vertical=new THREE.Mesh(box(13,.05,210),asphalt);
+  vertical.position.set(x,.025,0);
+  g.add(vertical);
+  const horizontal=new THREE.Mesh(box(210,.05,13),asphalt);
+  horizontal.position.set(0,.026,z);
+  g.add(horizontal);
+  for(let q=-9;q<=9;q++){
+   if(q%2===0)continue;
+   const dashV=new THREE.Mesh(box(.16,.06,3.2),lane);
+   dashV.position.set(x,.06,q*10);
+   g.add(dashV);
+   const dashH=new THREE.Mesh(box(3.2,.06,.16),lane);
+   dashH.position.set(q*10,.061,z);
+   g.add(dashH);
+  }
+  for(const edge of [-1,1]){
+   const sx=x+edge*7.25,sz=z+edge*7.25;
+   const walkV=new THREE.Mesh(box(1.35,.12,210),sidewalk);
+   walkV.position.set(sx,.055,0);
+   g.add(walkV);
+   const curbV=new THREE.Mesh(box(.16,.16,210),curb);
+   curbV.position.set(x+edge*6.55,.08,0);
+   g.add(curbV);
+   const walkH=new THREE.Mesh(box(210,.12,1.35),sidewalk);
+   walkH.position.set(0,.056,sz);
+   g.add(walkH);
+   const curbH=new THREE.Mesh(box(210,.16,.16),curb);
+   curbH.position.set(0,.081,z+edge*6.55);
+   g.add(curbH);
+  }
+ }
+ buildDistrictSign(g,"MAINLAND",-70,-72,"YABA · SURULERE · IKEJA","#0F6B6F");
  buildDistrictSign(g,"LAGOS ISLAND",70,-72,"VI · IKOYI · LEKKI","#a96d19");
  buildDistrictSign(g,"MARKET DISTRICT",-70,72,"TRADING · FOOD · STREET STYLE","#a54b36");
  buildDistrictSign(g,"COAST & LEISURE",70,72,"BEACH · HANGOUTS · NIGHTLIFE","#237f91");
  buildSkyline(g);
  PLACES.forEach((p,i)=>buildPlace(g,p,i));
- // Street furniture is kept away from the main roads and interactive destinations.
  for(let i=0;i<68;i++){
-  const x=(Math.random()*180-90),z=(Math.random()*180-90);
+  const x=Math.random()*180-90,z=Math.random()*180-90;
   if(PLACES.some(p=>Math.hypot(p.x-x,p.z-z)<11))continue;
-  if(Math.abs(Math.round(x/28)*28-x)<8 || Math.abs(Math.round(z/28)*28-z)<8)continue;
+  if(Math.abs(Math.round(x/28)*28-x)<8||Math.abs(Math.round(z/28)*28-z)<8)continue;
   const type=pick(["tree","stall","house","lamp","tree"]);
-  if(type==="tree")tree(g,x,z);if(type==="stall")stall(g,x,z);if(type==="house")house(g,x,z);if(type==="lamp")lamp(g,x,z);
+  if(type==="tree")tree(g,x,z);
+  if(type==="stall")stall(g,x,z);
+  if(type==="house")house(g,x,z);
+  if(type==="lamp")lamp(g,x,z);
  }
 }
+
 function buildDistrictSign(g,title,x,z,subtitle,color){
- const sign=new THREE.Group();sign.position.set(x,0,z);
+ const sign=new THREE.Group();
+ sign.position.set(x,0,z);
  const postMat=mat("#303532",.8),panelMat=mat(color,.65);
- for(const dx of [-4.6,4.6]){const post=new THREE.Mesh(box(.32,4.5,.32),postMat);post.position.set(dx,2.25,0);sign.add(post)}
- const board=new THREE.Mesh(box(10,2.25,.42),panelMat);board.position.set(0,4.05,0);sign.add(board);
- label(sign,title,0,4.2,.28);label(sign,subtitle,0,2.8,.28);g.add(sign);
+ for(const dx of[-4.6,4.6]){
+  const post=new THREE.Mesh(box(.32,4.5,.32),postMat);
+  post.position.set(dx,2.25,0);
+  sign.add(post);
+ }
+ const board=new THREE.Mesh(box(10,2.25,.42),panelMat);
+ board.position.set(0,4.05,0);
+ sign.add(board);
+ label(sign,title,0,4.2,.28);
+ label(sign,subtitle,0,2.8,.28);
+ g.add(sign);
 }
+
 function buildSkyline(g){
  const colors=["#647a79","#7c766b","#4c696b","#a48d70","#5d676e"];
  for(let i=0;i<15;i++){
   const h=10+Math.random()*22,w=5+Math.random()*6,d=5+Math.random()*6;
   const x=-86+i*12,z=-96-Math.random()*3;
-  const tower=new THREE.Group();tower.position.set(x,0,z);
-  const body=new THREE.Mesh(box(w,h,d),mat(colors[i%colors.length],.85));body.position.y=h/2;tower.add(body);
-  const windows=mat(i%3===0?"#e9c978":"#9cc6c6",.4,.1,{emissive:i%3===0?"#6b5420":"#28494b",emissiveIntensity:.18});
-  for(let y=2;y<h-1;y+=3)for(let wx=-w/2+1;wx<w/2;wx+=2){const win=new THREE.Mesh(box(.65,1,.08),windows);win.position.set(wx,y,d/2+.045);tower.add(win)}
+  const tower=new THREE.Group();
+  tower.position.set(x,0,z);
+  const body=new THREE.Mesh(box(w,h,d),mat(colors[i%colors.length],.85));
+  body.position.y=h/2;
+  tower.add(body);
+  const windows=mat(i%3===0?"#e9c978":"#9cc6c6",.4,.1,{
+   emissive:i%3===0?"#6b5420":"#28494b",
+   emissiveIntensity:.18
+  });
+  for(let y=2;y<h-1;y+=3){
+   for(let wx=-w/2+1;wx<w/2;wx+=2){
+    const win=new THREE.Mesh(box(.65,1,.08),windows);
+    win.position.set(wx,y,d/2+.045);
+    tower.add(win);
+   }
+  }
   g.add(tower);
  }
 }
-function label(root,text,x,y,z){const c=document.createElement("canvas");c.width=512;c.height=88;const ctx=c.getContext("2d");ctx.fillStyle="#14201F";ctx.fillRect(0,0,512,88);ctx.fillStyle="#FFC20E";ctx.font="bold 38px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(text,256,44);const t=new THREE.CanvasTexture(c);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t}));sp.scale.set(7.3,1.25,1);sp.position.set(x,y,z);root.add(sp)}
-function buildPlace(g,p,i){const b=new THREE.Group();b.position.set(p.x,0,p.z);const base=new THREE.Mesh(box(11,.5,9),mat(i%2?"#b78d68":"#b6a776"));base.position.y=.25;b.add(base);const walls=new THREE.Mesh(box(10,6.6,8),mat("#e0cfb0"));walls.position.y=3.55;b.add(walls);const roof=new THREE.Mesh(box(11,.55,9),mat(i%2?"#345d58":"#95453a"));roof.position.y=7;b.add(roof);const door=new THREE.Mesh(box(1.6,2.6,.22),mat("#503020"));door.position.set(0,1.4,-4.12);b.add(door);label(b,p.name,0,5.1,-4.35);g.add(b)}
-function tree(g,x,z){const t=new THREE.Group();t.position.set(x,0,z);const tr=new THREE.Mesh(cyl(.25,.34,2.8),mat("#6b4a2e"));tr.position.y=1.4;t.add(tr);const c=new THREE.Mesh(sph(1.9),mat("#2f7145"));c.position.y=3.6;t.add(c);g.add(t)}
-function stall(g,x,z){const s=new THREE.Group();s.position.set(x,0,z);const b=new THREE.Mesh(box(3,2,2.2),mat("#c48646"));b.position.y=1;s.add(b);const r=new THREE.Mesh(box(3.4,.2,2.6),mat("#0F6B6F"));r.position.y=2.15;s.add(r);g.add(s)}
-function house(g,x,z){const h=new THREE.Group();h.position.set(x,0,z);const b=new THREE.Mesh(box(7,4.4,6),mat("#9e8e77"));b.position.y=2.2;h.add(b);const r=new THREE.Mesh(box(7.6,.5,6.6),mat("#4e5752"));r.position.y=4.6;h.add(r);g.add(h)}
-function lamp(g,x,z){const l=new THREE.Group();l.position.set(x,0,z);const p=new THREE.Mesh(cyl(.06,.08,3.5),mat("#333"));p.position.y=1.75;l.add(p);const bulb=new THREE.Mesh(sph(.16),mat("#ffe28e",.2,0,{emissive:"#ffe28e",emissiveIntensity:2}));bulb.position.y=3.5;l.add(bulb);g.add(l)}
-function buildPlayer(){player=createCharacter(state.cfg);player.root.position.set(state.pos.x,state.pos.y,state.pos.z);scene.add(player.root)}
-function rebuildPlayer(){const old=player.root,pos=old.position.clone(),rot=old.rotation.clone();scene.remove(old);player=createCharacter(state.cfg);player.root.position.copy(pos);player.root.rotation.copy(rot);scene.add(player.root)}
 
-function buildNPCs(){npcs=[];for(let i=0;i<20;i++){const cfg={...DEFAULT_CFG,skinTone:pick(Object.keys(OPTIONS.skinTone.values)),hairstyle:pick(Object.keys(OPTIONS.hairstyle.values)),outfit:pick(["tee","hoodie","kaftan","ankara"]),outfitColor:pick(["red","blue","green","gold","teal","default"]),accessory:pick(["none","cap","glasses"])};const c=createCharacter(cfg,.68);const p=pick(PLACES);c.root.position.set(p.x+(Math.random()*10-5),0,p.z+(Math.random()*10-5));npcGroup.add(c.root);npcs.push({c,name:NAMES[i%NAMES.length],speed:.35+Math.random()*.8,target:null})}}
-function updateNPCs(dt){for(const n of npcs){n.c.time+=dt;if(!n.target||Math.random()<.008)n.target={x:clamp(n.c.root.position.x+(Math.random()*12-6),-90,90),z:clamp(n.c.root.position.z+(Math.random()*12-6),-90,90)};const dx=n.target.x-n.c.root.position.x,dz=n.target.z-n.c.root.position.z,d=Math.hypot(dx,dz);if(d>.5){n.c.root.position.x+=dx/d*n.speed*dt;n.c.root.position.z+=dz/d*n.speed*dt;n.c.legs.forEach((l,i)=>l.rotation.x=Math.sin(n.c.time*6+i*Math.PI)*.18)}}}
-function buildCars(){cars=[];for(let i=0;i<12;i++){const g=new THREE.Group();const body=new THREE.Mesh(box(2.1,1,4.1),mat(pick(["#253635","#eee9dc","#a9473c","#d4a62e","#6774ad"])));body.position.y=.62;g.add(body);const roof=new THREE.Mesh(box(1.55,.6,2.1),mat("#1d2524"));roof.position.y=1.2;g.add(roof);const axis=i%2,dir=i%4<2?1:-1;g.position.set(axis?Math.round(Math.random()*6-3)*28:Math.random()*170-85,0,axis?Math.random()*170-85:Math.round(Math.random()*6-3)*28);g.userData={axis,dir,speed:4+Math.random()*5};carGroup.add(g);cars.push(g)}}
-function updateCars(dt){cars.forEach(c=>{const u=c.userData;if(u.axis)c.position.z+=u.dir*u.speed*dt;else c.position.x+=u.dir*u.speed*dt;const v=u.axis?c.position.z:c.position.x;if(Math.abs(v)>96){if(u.axis)c.position.z=-u.dir*96;else c.position.x=-u.dir*96}})}
-
-function attachInput(){
- addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(k==="w"||k==="arrowup")state.keys.up=true;if(k==="s"||k==="arrowdown")state.keys.down=true;if(k==="a"||k==="arrowleft")state.keys.left=true;if(k==="d"||k==="arrowright")state.keys.right=true;if(k==="shift")state.keys.shift=true;if(k===" ")state.jump=true;if(k==="e")interact()});
- addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(k==="w"||k==="arrowup")state.keys.up=false;if(k==="s"||k==="arrowdown")state.keys.down=false;if(k==="a"||k==="arrowleft")state.keys.left=false;if(k==="d"||k==="arrowright")state.keys.right=false;if(k==="shift")state.keys.shift=false});
- $("runBtn").onpointerdown=()=>state.run=!state.run;$("jumpBtn").onpointerdown=()=>state.jump=true;
- const joy=$("joystick"),stick=$("stick");const setJoy=e=>{const r=joy.getBoundingClientRect();let x=(e.clientX-(r.left+r.width/2))/(r.width/2-20),y=(e.clientY-(r.top+r.height/2))/(r.height/2-20);const d=Math.hypot(x,y);if(d>1){x/=d;y/=d}state.joy.x=x;state.joy.y=y;stick.style.transform=`translate(${x*33}px,${y*33}px)`};joy.onpointerdown=e=>{state.joy.active=true;joy.setPointerCapture(e.pointerId);setJoy(e)};joy.onpointermove=e=>{if(state.joy.active)setJoy(e)};joy.onpointerup=()=>{state.joy.active=false;state.joy.x=state.joy.y=0;stick.style.transform="translate(0,0)"};
- $("cameraBtn").onclick=()=>{cameraState=cameraState==="third"?"close":cameraState==="close"?"front":"third";toast(`Camera: ${cameraState}`)};
- $("qualityBtn").onclick=()=>{state.quality=state.quality==="high"?"low":"high";localStorage.setItem("nh_quality",state.quality);renderer.setPixelRatio(state.quality==="high"?Math.min(devicePixelRatio,2):1);$("qualityBtn").textContent=state.quality.toUpperCase()};
- $("phoneBtn").onclick=()=>open("Phone","phone");$("bagBtn").onclick=()=>open("Inventory","inventory");$("mapBtn").onclick=()=>open("City Map","map");$("profileBtn").onclick=()=>open("My Life","profile");$("homeBtn").onclick=()=>open("Your Home","home");$("socialBtn").onclick=()=>open("People","social");$("avatarBtn").onclick=()=>{$("customizer").classList.add("open");renderCustomizer()};$("emoteBtn").onclick=()=>$("emoteMenu").classList.toggle("open");document.querySelectorAll("#emoteMenu button").forEach(b=>b.onclick=()=>{state.emote=b.dataset.emote;$("emoteMenu").classList.remove("open")});$("prompt").onclick=interact;
- $("sheetClose").onclick=()=>$("overlay").classList.remove("open");$("closeCustomizer").onclick=()=>$("customizer").classList.remove("open");$("randomBtn").onclick=()=>{for(const k of Object.keys(OPTIONS))state.cfg[k]=pick(Object.keys(OPTIONS[k].values));rebuildPlayer();renderCustomizer()};$("saveAvatar").onclick=saveAvatar;
+function label(root,text,x,y,z){
+ const c=document.createElement("canvas");
+ c.width=512;c.height=88;
+ const ctx=c.getContext("2d");
+ ctx.fillStyle="#14201F";
+ ctx.fillRect(0,0,512,88);
+ ctx.fillStyle="#FFC20E";
+ ctx.font="bold 38px system-ui";
+ ctx.textAlign="center";
+ ctx.textBaseline="middle";
+ ctx.fillText(text,256,44);
+ const t=new THREE.CanvasTexture(c);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t}));
+ sp.scale.set(7.3,1.25,1);
+ sp.position.set(x,y,z);
+ root.add(sp);
 }
-function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
+
+function buildPlace(g,p,i){
+ const b=new THREE.Group();
+ b.position.set(p.x,0,p.z);
+ const base=new THREE.Mesh(box(11,.5,9),mat(i%2?"#b78d68":"#b6a776"));
+ base.position.y=.25;
+ b.add(base);
+ const walls=new THREE.Mesh(box(10,6.6,8),mat("#e0cfb0"));
+ walls.position.y=3.55;
+ b.add(walls);
+ const roof=new THREE.Mesh(box(11,.55,9),mat(i%2?"#345d58":"#95453a"));
+ roof.position.y=7;
+ b.add(roof);
+ const door=new THREE.Mesh(box(1.6,2.6,.22),mat("#503020"));
+ door.position.set(0,1.4,-4.12);
+ b.add(door);
+ label(b,p.name,0,5.1,-4.35);
+ g.add(b);
+}
+
+function tree(g,x,z){
+ const t=new THREE.Group();
+ t.position.set(x,0,z);
+ const tr=new THREE.Mesh(cyl(.25,.34,2.8),mat("#6b4a2e"));
+ tr.position.y=1.4;t.add(tr);
+ const c=new THREE.Mesh(sph(1.9),mat("#2f7145"));
+ c.position.y=3.6;t.add(c);
+ g.add(t);
+}
+function stall(g,x,z){
+ const s=new THREE.Group();s.position.set(x,0,z);
+ const b=new THREE.Mesh(box(3,2,2.2),mat("#c48646"));
+ b.position.y=1;s.add(b);
+ const r=new THREE.Mesh(box(3.4,.2,2.6),mat("#0F6B6F"));
+ r.position.y=2.15;s.add(r);
+ g.add(s);
+}
+function house(g,x,z){
+ const h=new THREE.Group();h.position.set(x,0,z);
+ const b=new THREE.Mesh(box(7,4.4,6),mat("#9e8e77"));
+ b.position.y=2.2;h.add(b);
+ const r=new THREE.Mesh(box(7.6,.5,6.6),mat("#4e5752"));
+ r.position.y=4.6;h.add(r);
+ g.add(h);
+}
+function lamp(g,x,z){
+ const l=new THREE.Group();l.position.set(x,0,z);
+ const p=new THREE.Mesh(cyl(.06,.08,3.5),mat("#333"));
+ p.position.y=1.75;l.add(p);
+ const bulb=new THREE.Mesh(sph(.16),mat("#ffe28e",.2,0,{
+  emissive:"#ffe28e",emissiveIntensity:2
+ }));
+ bulb.position.y=3.5;l.add(bulb);
+ g.add(l);
+}
+
+function buildPlayer(){
+ player=createCharacter(state.cfg);
+ player.root.position.set(state.pos.x,state.pos.y,state.pos.z);
+ scene.add(player.root);
+}
+function rebuildPlayer(){
+ const old=player.root,pos=old.position.clone(),rot=old.rotation.clone();
+ scene.remove(old);
+ player=createCharacter(state.cfg);
+ player.root.position.copy(pos);
+ player.root.rotation.copy(rot);
+ scene.add(player.root);
+}
+
+function buildNPCs(){
+ npcs=[];
+ for(let i=0;i<20;i++){
+  const cfg={
+   ...DEFAULT_CFG,
+   skinTone:pick(Object.keys(OPTIONS.skinTone.values)),
+   hairstyle:pick(Object.keys(OPTIONS.hairstyle.values)),
+   outfit:pick(["tee","hoodie","kaftan","ankara"]),
+   outfitColor:pick(["red","blue","green","gold","teal","default"]),
+   accessory:pick(["none","cap","glasses"])
+  };
+  const c=createCharacter(cfg,.68);
+  const p=pick(PLACES);
+  c.root.position.set(p.x+Math.random()*10-5,0,p.z+Math.random()*10-5);
+  npcGroup.add(c.root);
+  npcs.push({c,name:NAMES[i%NAMES.length],speed:.35+Math.random()*.8,target:null});
+ }
+}
+function updateNPCs(dt){
+ for(const n of npcs){
+  n.c.time+=dt;
+  if(!n.target||Math.random()<.008){
+   n.target={
+    x:clamp(n.c.root.position.x+Math.random()*12-6,-90,90),
+    z:clamp(n.c.root.position.z+Math.random()*12-6,-90,90)
+   };
+  }
+  const dx=n.target.x-n.c.root.position.x,dz=n.target.z-n.c.root.position.z,d=Math.hypot(dx,dz);
+  if(d>.5){
+   n.c.root.position.x+=dx/d*n.speed*dt;
+   n.c.root.position.z+=dz/d*n.speed*dt;
+   n.c.legs.forEach((l,i)=>l.rotation.x=Math.sin(n.c.time*6+i*Math.PI)*.18);
+  }
+ }
+}
+
+function buildCars(){
+ cars=[];
+ for(let i=0;i<12;i++){
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(box(2.1,1,4.1),mat(pick(["#253635","#eee9dc","#a9473c","#d4a62e","#6774ad"])));
+  body.position.y=.62;g.add(body);
+  const roof=new THREE.Mesh(box(1.55,.6,2.1),mat("#1d2524"));
+  roof.position.y=1.2;g.add(roof);
+  const axis=i%2,dir=i%4<2?1:-1;
+  g.position.set(
+   axis?Math.round(Math.random()*6-3)*28:Math.random()*170-85,
+   0,
+   axis?Math.random()*170-85:Math.round(Math.random()*6-3)*28
+  );
+  g.userData={axis,dir,speed:4+Math.random()*5};
+  carGroup.add(g);cars.push(g);
+ }
+}
+function updateCars(dt){
+ cars.forEach(c=>{
+  const u=c.userData;
+  if(u.axis)c.position.z+=u.dir*u.speed*dt;
+  else c.position.x+=u.dir*u.speed*dt;
+  const v=u.axis?c.position.z:c.position.x;
+  if(Math.abs(v)>96){
+   if(u.axis)c.position.z=-u.dir*96;
+   else c.position.x=-u.dir*96;
+  }
+ });
+   }
+function attachInput(){
+ addEventListener("keydown",e=>{
+  const k=e.key.toLowerCase();
+  if(k==="w"||k==="arrowup")state.keys.up=true;
+  if(k==="s"||k==="arrowdown")state.keys.down=true;
+  if(k==="a"||k==="arrowleft")state.keys.left=true;
+  if(k==="d"||k==="arrowright")state.keys.right=true;
+  if(k==="shift")state.keys.shift=true;
+  if(k===" ")state.jump=true;
+  if(k==="e")interact();
+ });
+ addEventListener("keyup",e=>{
+  const k=e.key.toLowerCase();
+  if(k==="w"||k==="arrowup")state.keys.up=false;
+  if(k==="s"||k==="arrowdown")state.keys.down=false;
+  if(k==="a"||k==="arrowleft")state.keys.left=false;
+  if(k==="d"||k==="arrowright")state.keys.right=false;
+  if(k==="shift")state.keys.shift=false;
+ });
+
+ $("runBtn").onpointerdown=()=>state.run=!state.run;
+ $("jumpBtn").onpointerdown=()=>state.jump=true;
+
+ const joy=$("joystick"),stick=$("stick");
+ const setJoy=e=>{
+  const r=joy.getBoundingClientRect();
+  let x=(e.clientX-(r.left+r.width/2))/(r.width/2-20);
+  let y=(e.clientY-(r.top+r.height/2))/(r.height/2-20);
+  const d=Math.hypot(x,y);
+  if(d>1){x/=d;y/=d}
+  state.joy.x=x;
+  state.joy.y=y;
+  stick.style.transform=`translate(${x*33}px,${y*33}px)`;
+ };
+ joy.onpointerdown=e=>{
+  state.joy.active=true;
+  joy.setPointerCapture(e.pointerId);
+  setJoy(e);
+ };
+ joy.onpointermove=e=>{if(state.joy.active)setJoy(e)};
+ joy.onpointerup=()=>{
+  state.joy.active=false;
+  state.joy.x=state.joy.y=0;
+  stick.style.transform="translate(0,0)";
+ };
+
+ $("cameraBtn").onclick=()=>{
+  cameraState=cameraState==="third"?"close":
+   cameraState==="close"?"front":"third";
+  toast(`Camera: ${cameraState}`);
+ };
+ $("qualityBtn").onclick=()=>{
+  state.quality=state.quality==="high"?"low":"high";
+  localStorage.setItem("nh_quality",state.quality);
+  renderer.setPixelRatio(
+   state.quality==="high"?Math.min(devicePixelRatio,2):1
+  );
+  $("qualityBtn").textContent=state.quality.toUpperCase();
+ };
+
+ $("phoneBtn").onclick=()=>open("Phone","phone");
+ $("bagBtn").onclick=()=>open("Inventory","inventory");
+ $("mapBtn").onclick=()=>open("City Map","map");
+ $("profileBtn").onclick=()=>open("My Life","profile");
+ $("homeBtn").onclick=()=>open("Your Home","home");
+ $("socialBtn").onclick=()=>open("People","social");
+ $("avatarBtn").onclick=()=>{
+  $("customizer").classList.add("open");
+  renderCustomizer();
+ };
+ $("emoteBtn").onclick=()=>$("emoteMenu").classList.toggle("open");
+ document.querySelectorAll("#emoteMenu button").forEach(b=>{
+  b.onclick=()=>{
+   state.emote=b.dataset.emote;
+   $("emoteMenu").classList.remove("open");
+  };
+ });
+ $("prompt").onclick=interact;
+ $("sheetClose").onclick=()=>$("overlay").classList.remove("open");
+ $("closeCustomizer").onclick=()=>$("customizer").classList.remove("open");
+ $("randomBtn").onclick=()=>{
+  for(const k of Object.keys(OPTIONS))
+   state.cfg[k]=pick(Object.keys(OPTIONS[k].values));
+  rebuildPlayer();
+  renderCustomizer();
+ };
+ $("saveAvatar").onclick=saveAvatar;
+}
+
+function resize(){
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+}
 
 function updatePlayer(dt){
- let ix=(state.keys.right?1:0)-(state.keys.left?1:0),iz=(state.keys.down?1:0)-(state.keys.up?1:0);if(state.joy.active){ix=state.joy.x;iz=state.joy.y}const moving=Math.hypot(ix,iz)>.12;const speed=state.run||state.keys.shift?7.1:3.6;
- if(moving){const len=Math.hypot(ix,iz);ix/=len;iz/=len;player.root.position.x=clamp(player.root.position.x+ix*speed*dt,-96,96);player.root.position.z=clamp(player.root.position.z+iz*speed*dt,-96,96);player.root.rotation.y=Math.atan2(ix,iz);player.legs.forEach((l,i)=>l.rotation.x=Math.sin(performance.now()/80+i*Math.PI)*.3);state.status=state.run||state.keys.shift?"Running":"Walking";addNeed("energy",-(state.run||state.keys.shift?2.2:1.0)*(hasTrait("lazy")?.7:1)*dt);addNeed("hunger",-.18*(hasTrait("foodie")?.7:1)*dt);addNeed("hygiene",-.08*(hasTrait("clean")?.65:1)*dt);addNeed("bladder",-.06*dt)}else{state.status=state.emote!=="none"?state.emote:"Idle";player.legs.forEach(l=>l.rotation.x*=.8)}
- if(state.jump){state.jump=false;if(player.root.position.y<=.02)player.root.userData.vy=6}player.root.userData.vy=player.root.userData.vy||0;if(player.root.position.y>0||player.root.userData.vy>0){player.root.userData.vy-=17*dt;player.root.position.y+=player.root.userData.vy*dt;if(player.root.position.y<0){player.root.position.y=0;player.root.userData.vy=0}}
- state.time+=dt*1.1;if(state.time>=1440){state.time%=1440;state.day++;state.stats.days++;state.rentDue--;dailyTick()}if(state.time%10<dt)saveGame();
-}
-function dailyTick(){addNeed("hunger",-7*(hasTrait("foodie")?.7:1));addNeed("hygiene",-4*(hasTrait("clean")?.65:1));addNeed("fun",-3);addNeed("social",-3);addNeed("bladder",+16);addNeed("energy",22);addNeed("focus",-5);if(state.day%7===0)weeklyTick();if(state.rentDue<=0)payRent()}
-function weeklyTick(){state.weeklyEarnings=0;let passive=0;for(const id of state.investments){const inv=INVESTMENTS.find(x=>x.id===id);if(inv)passive+=inv.income}if(passive){earn(passive);toast(`Business week: +₦${fmt(passive)} income.`)}}
-function payRent(){const rent=HOUSING[state.housing].rent;if(spend(rent)){state.rentDue=14;addNeed("fun",4);toast(`Rent paid: ₦${fmt(rent)}.`)}else{state.rentDue=3;addNeed("fun",-15);addNeed("energy",-10);toast(`Rent problem: ₦${fmt(rent)} due. Earn fast.`)}}
-function currentClock(){const h=Math.floor(state.time/60),m=Math.floor(state.time%60),ap=h>=12?"PM":"AM",hh=h%12||12;return `${hh}:${String(m).padStart(2,"0")} ${ap}`}
-function mood(){const values=Object.values(state.needs);const v=values.reduce((a,b)=>a+b,0)/values.length;if(v>=80)return"Thriving";if(v>=60)return"Doing Fine";if(v>=40)return"Stressed";if(v>=20)return"Struggling";return"Emergency"}
-function updateWorldLight(){const h=state.time/60,sunY=Math.sin((h-6)/12*Math.PI),light=clamp((sunY+.1)*1.15,0,1);sun.position.set(40,20+sunY*65,30);sun.intensity=.55+1.8*light;hemi.intensity=.55+1.05*light;const sky=new THREE.Color(light>.45?"#8cc2c7":"#17282e");scene.background.lerp(sky,.05);scene.fog.color.copy(scene.background)}
-function updateCamera(dt){const p=player.root.position,dist=cameraState==="close"?5.4:8.5,off=new THREE.Vector3(Math.sin(performance.now()/100000+0)*dist,4.0,Math.cos(performance.now()/100000+0)*dist);if(cameraState==="front")off.multiplyScalar(-1);camera.position.lerp(new THREE.Vector3(p.x+off.x,p.y+off.y,p.z+off.z),Math.min(1,dt*5));camera.lookAt(p.x,p.y+1.02,p.z)}
-function nearestPlace(){let best=null,d=999;for(const p of PLACES){const n=Math.hypot(player.root.position.x-p.x,player.root.position.z-p.z);if(n<d){d=n;best=p}}return{p:best,d}}
-function updatePrompt(){const {p,d}=nearestPlace();if(d<11){$("prompt").style.display="block";$("prompt").textContent=`Enter ${p.name}`}else $("prompt").style.display="none"}
-function toast(msg){state.activity=msg}
+ let ix=(state.keys.right?1:0)-(state.keys.left?1:0);
+ let iz=(state.keys.down?1:0)-(state.keys.up?1:0);
 
-function open(title,mode){$("sheetEyebrow").textContent="NAIJA HUSTLE";$("sheetTitle").textContent=title;$("overlay").classList.add("open");render(mode)}
-function bindActions(){document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>handleAction(b.dataset.action,b.dataset.id))}
-function render(mode){const b=$("sheetBody");if(mode==="phone")b.innerHTML=renderPhone();else if(mode==="inventory")b.innerHTML=renderInventory();else if(mode==="map")b.innerHTML=renderMap();else if(mode==="profile")b.innerHTML=renderProfile();else if(mode==="home")b.innerHTML=renderHome();else if(mode==="social")b.innerHTML=renderSocial();else if(mode==="jobs")b.innerHTML=renderJobs();else if(mode==="gigs")b.innerHTML=renderGigs();else if(mode==="business")b.innerHTML=renderBusiness();else if(mode==="transport")b.innerHTML=renderTransport();else if(mode.startsWith("shop"))b.innerHTML=renderShop(mode);else if(mode.startsWith("place-"))b.innerHTML=renderPlaceActions(mode.slice(6));else if(mode==="skills")b.innerHTML=renderSkills();else b.innerHTML=renderPhone();bindActions()}
-function renderPhone(){return `<div class="stats"><div class="stat"><strong>₦${fmt(state.money)}</strong><span>WALLET</span></div><div class="stat"><strong>Day ${state.day}</strong><span>TIME</span></div><div class="stat"><strong>${mood()}</strong><span>MOOD</span></div><div class="stat"><strong>${state.rentDue}</strong><span>DAYS TO RENT</span></div></div><div class="card" style="margin-bottom:12px"><h3>${state.startType==="nepo"?"NEPO Start · Soft Life":"LAPO Start · Hustle Mode"}</h3><p>Traits: ${state.traits.map(t=>TRAITS.find(x=>x.id===t)?.name||cap(t)).join(", ")}</p><p>${state.traits.map(t=>TRAITS.find(x=>x.id===t)?.desc||"").filter(Boolean).join(" ")}</p></div><div class="grid"><article class="card"><h3>Work</h3><p>Pick a career, train skills and work shifts.</p><div class="actions"><button class="action primary" data-action="open" data-id="jobs">Careers</button><button class="action" data-action="open" data-id="gigs">Gigs</button></div></article><article class="card"><h3>Life</h3><p>Keep needs balanced and improve your home.</p><div class="actions"><button class="action primary" data-action="open" data-id="home">Home</button><button class="action" data-action="open" data-id="skills">Train</button></div></article><article class="card"><h3>Money</h3><p>Buy things, transport, and eventually a business.</p><div class="actions"><button class="action primary" data-action="open" data-id="business">Business</button><button class="action" data-action="open" data-id="transport">Transport</button></div></article><article class="card"><h3>People</h3><p>Meet locals and build useful relationships.</p><div class="actions"><button class="action primary" data-action="open" data-id="social">Social</button></div></article></div>`}
-function renderJobs(){return `<div class="grid">${CAREERS.map(c=>{const cur=state.career===c.id,skill=state.skills[c.skill];const lv=cur?state.careerLevel:0;const pay=c.pay+Math.max(0,skill-1)*c.levelPay+lv*1300;return `<article class="card"><h3>${c.name}</h3><p>${c.desc}</p><div class="meta">Skill: ${cap(c.skill)} Lv ${skill} · Pay about ₦${fmt(pay)}</div><div class="actions"><button class="action primary" data-action="career" data-id="${c.id}">${cur?"Work Shift":"Choose"}</button><button class="action" data-action="train" data-id="${c.skill}">Train</button></div></article>`}).join("")}</div>`}
-function renderGigs(){return `<div class="grid">${GIGS.map(g=>`<article class="card"><h3>${g.name}</h3><p>Cost ₦${fmt(g.cost)} · ${g.min} game min · ${cap(g.skill)} Lv ${state.skills[g.skill]||1}</p><div class="meta">Reward ₦${fmt(g.reward)}</div><div class="actions"><button class="action primary" data-action="gig" data-id="${g.id}">Take Gig</button></div></article>`).join("")}</div>`}
-function renderHome(){return `<div class="stats"><div class="stat"><strong>${HOUSING[state.housing].name}</strong><span>HOME</span></div><div class="stat"><strong>₦${fmt(HOUSING[state.housing].rent)}</strong><span>RENT / 14 DAYS</span></div><div class="stat"><strong>${HOUSING[state.housing].comfort}</strong><span>COMFORT</span></div><div class="stat"><strong>${state.rentDue}</strong><span>DAYS LEFT</span></div></div><div class="grid"><article class="card"><h3>Rest</h3><p>Sleep and recover energy.</p><div class="actions"><button class="action primary" data-action="rest">Sleep</button></div></article><article class="card"><h3>Bathroom</h3><p>Restore hygiene and bladder.</p><div class="actions"><button class="action primary" data-action="bath">Use Bathroom</button></div></article><article class="card"><h3>Cook</h3><p>Make a simple meal at home.</p><div class="actions"><button class="action primary" data-action="cook">Cook Meal · ₦600</button></div></article><article class="card"><h3>Upgrade</h3><p>Move to the next home when you can afford the cost.</p><div class="actions"><button class="action primary" data-action="upgrade">View Homes</button></div></article></div>`}
-function renderShop(mode){let shops=SHOPS;if(mode==="shop-food")shops=SHOPS.filter(s=>s.id==="food");if(mode==="shop-style")shops=SHOPS.filter(s=>s.id==="style");return shops.map(s=>`<div class="sectionBlock"><h3>${s.name}</h3><div class="grid">${s.items.map(i=>`<article class="card"><h3>${i.name}</h3><div class="meta">₦${fmt(i.price)}</div><p>${Object.entries(i.e).map(([k,v])=>`${v>0?"+":""}${v} ${cap(k)}`).join(" · ")}</p><div class="actions"><button class="action primary" data-action="item" data-id="${i.id}">Buy</button></div></article>`).join("")}</div></div>`).join("")}
-function renderInventory(){const counts={};state.inventory.forEach(x=>{counts[x]=(counts[x]||0)+1});return `<div class="list">${Object.entries(counts).map(([k,v])=>`<div class="listRow"><b>${cap(k)}</b><span>x${v}</span></div>`).join("")||`<div class="placeholder">Your bag is empty.</div>`}</div>`}
-function renderTransport(){return `<div class="grid">${VEHICLES.map(v=>`<article class="card"><h3>${v.name}</h3><p>${v.fare?`Fare around ₦${fmt(v.fare)}`:""}${v.purchase?` · Buy ₦${fmt(v.purchase)}`:""}</p><div class="actions"><button class="action primary" data-action="vehicle" data-id="${v.id}">${state.vehicle===v.id?"Active":v.purchase?"Buy & Use":"Use"}</button></div></article>`).join("")}</div>`}
-function renderBusiness(){return `<div class="grid">${INVESTMENTS.map(i=>`<article class="card"><h3>${i.name}</h3><p>Investment ₦${fmt(i.cost)} · Weekly income ₦${fmt(i.income)} · Requires level ${i.req}.</p><div class="actions"><button class="action primary" data-action="business" data-id="${i.id}">${state.investments.includes(i.id)?"Owned":"Invest"}</button></div></article>`).join("")}</div>`}
-function renderSkills(){return `<div class="grid">${SKILLS.map(k=>`<article class="card"><h3>${cap(k)}</h3><p>Level ${state.skills[k]} / 5</p><div class="actions"><button class="action primary" data-action="train" data-id="${k}">Train · ₦${fmt(450+state.skills[k]*400)}</button></div></article>`).join("")}</div>`}
-function renderSocial(){return `<div class="grid">${npcs.slice(0,12).map(n=>`<article class="card"><h3>${n.name}</h3><p>Friendship ${Math.round(state.relationships[n.name]||0)} / 100</p><div class="actions"><button class="action primary" data-action="talk" data-id="${n.name}">Talk</button></div></article>`).join("")}</div>`}
-function renderPlaceActions(id){const p=PLACES.find(x=>x.id===id);if(!p)return `<div class="placeholder">This place is unavailable.</div>`;const actions={beach:[["Relax at the beach","fun",1500],["Meet people","socialise",0],["Quick gig","placegig",0]],church:[["Community time","socialise",0],["Rest and reflect","placeRest",0]],club:[["Night out","fun",5000],["Meet people","socialise",0]],hotel:[["Meet people","socialise",0],["Quick gig","placegig",0]],restaurant:[["Eat a meal","eatout",2500],["Meet people","socialise",0]],gym:[["Work out","workout",0],["Meet people","socialise",0]],spa:[["Grooming session","groom",2500],["Meet people","socialise",0]]};const list=actions[id]||[["Meet people","socialise",0]];return `<p class="muted">${p.name} · Choose an activity. Time and needs will update.</p><div class="grid">${list.map(([label,action,cost])=>`<article class="card"><h3>${label}</h3><p>${cost?`Cost ₦${fmt(cost)}`:"No entry fee"}</p><div class="actions"><button class="action primary" data-action="${action}" data-id="${id}">Do Activity</button></div></article>`).join("")}</div>`}
-function renderMap(){return `<div class="grid">${PLACES.map(p=>`<article class="card"><h3>${p.name}</h3><p>${Math.round(Math.hypot(player.root.position.x-p.x,player.root.position.z-p.z))}m away.</p><div class="actions"><button class="action primary" data-action="route" data-id="${p.id}">Set Route</button></div></article>`).join("")}</div>`}
-function renderProfile(){const q=QUESTS[state.quest];return `<div class="stats"><div class="stat"><strong>Lv ${state.level}</strong><span>PLAYER</span></div><div class="stat"><strong>₦${fmt(state.totalEarnings)}</strong><span>LIFETIME EARNINGS</span></div><div class="stat"><strong>${state.career?CAREERS.find(c=>c.id===state.career)?.name:"No career"}</strong><span>CAREER</span></div><div class="stat"><strong>${state.investments.length}</strong><span>BUSINESSES</span></div></div><div class="sectionBlock"><h3>Current Quest</h3><div class="card"><h3>${q?.title||"All starter quests complete"}</h3><p>${q?.desc||"Keep building your life."}</p></div></div><div class="sectionBlock"><h3>Life Traits</h3><p class="muted">Choose one trait. You can change your approach to life here.</p><div class="grid">${TRAITS.map(t=>`<article class="card"><h3>${t.name}${hasTrait(t.id)?" · Active":""}</h3><p>${t.desc}</p><div class="actions"><button class="action ${hasTrait(t.id)?"good":"primary"}" data-action="trait" data-id="${t.id}">${hasTrait(t.id)?"Active":"Choose Trait"}</button></div></article>`).join("")}</div></div><div class="sectionBlock"><h3>Skills</h3><div class="list">${SKILLS.map(k=>`<div class="listRow"><b>${cap(k)}</b><span>Lv ${state.skills[k]}</span></div>`).join("")}</div></div><div class="actions"><button class="action" data-action="logout">SIGN OUT</button></div>`}
-function handleAction(a,id){if(a==="open"){const modes={jobs:"jobs",gigs:"gigs",home:"home",skills:"skills",business:"business",transport:"transport",social:"social"};render(modes[id]);$("sheetTitle").textContent=cap(id);return}if(a==="career")doCareer(id);if(a==="gig")doGig(id);if(a==="train")train(id);if(a==="upgrade")upgradeHomeMenu();if(a==="rest")rest();if(a==="bath")bath();if(a==="cook")cook();if(a==="item")buyItem(id);if(a==="vehicle")useVehicle(id);if(a==="business")buyBusiness(id);if(a==="talk")talk(id);if(a==="trait")chooseTrait(id);if(a==="socialise")socialise();if(a==="eatout")eatOut();if(a==="fun")haveFun(id);if(a==="workout")workout();if(a==="groom")groom();if(a==="placegig")doGig(pick(GIGS).id);if(a==="placeRest")rest();if(a==="route")setRoute(id);if(a==="logout")signOut()}
-function refreshOpen(mode){render(mode)}
-function doCareer(id){const c=CAREERS.find(x=>x.id===id);if(!c)return;if(state.career!==id){state.career=id;state.careerLevel=1;toast(`Career selected: ${c.name}.`);saveGame();refreshOpen("jobs");return}const skill=state.skills[c.skill];if(state.needs.energy<28||state.needs.focus<20){toast("You need more energy and focus before a full shift.");return}let pay=c.pay+(skill-1)*c.levelPay+Math.floor(state.careerLevel)*1300+(mood()==="Thriving"?1200:0);if(hasTrait("hustler"))pay*=1.2;if(hasTrait("lazy"))pay*=.85;pay=Math.floor(pay);earn(pay);state.stats.shifts++;state.time+=120;addNeed("energy",-19);addNeed("hunger",-12);addNeed("focus",-10);addNeed("fun",-6);state.careerLevel=Math.min(5,state.careerLevel+(skill>=state.careerLevel?.15:0));toast(`Shift complete: +₦${fmt(pay)}.`);checkQuest();saveGame();updateHUD();refreshOpen("jobs")}
-function doGig(id){const g=GIGS.find(x=>x.id===id);if(!g)return;if(state.skills[g.skill]<1){toast("Skill requirement not met.");return}if(!spend(g.cost)){toast("Not enough money for the gig costs.");return}let reward=g.reward+(state.skills[g.skill]-1)*700;if(hasTrait("hustler"))reward*=1.2;if(hasTrait("lazy"))reward*=.85;reward=Math.floor(reward);earn(reward);state.stats.gigs++;state.time+=g.min;addNeed("energy",-10);addNeed("hunger",-7);addNeed("focus",-8);toast(`Gig complete: +₦${fmt(reward)}.`);checkQuest();saveGame();updateHUD();refreshOpen("gigs")}
-function chooseTrait(id){if(!TRAITS.some(t=>t.id===id))return;state.traits=[id];toast(`Trait selected: ${TRAITS.find(t=>t.id===id).name}.`);saveGame();updateHUD();render("profile")}
-function socialise(){addNeed("social",hasTrait("socialite")?31.25:25);addNeed("fun",10);state.time+=30;gainXP(5);toast("You gist with people. Network strong.");saveGame();updateHUD()}
-function eatOut(){const cost=2500;if(!spend(cost)){toast("You need ₦2,500 to eat out.");return}addNeed("hunger",55);addNeed("bladder",-8);state.stats.meals++;state.time+=35;gainXP(4);toast("You chopped well. Soft life small.");checkQuest();saveGame();updateHUD()}
-function haveFun(placeId){const cost=placeId==="club"?5000:1500;if(!spend(cost)){toast(`You need ₦${fmt(cost)} for this outing.`);return}addNeed("fun",40);addNeed("social",15);addNeed("energy",-12);state.time+=60;gainXP(6);toast(placeId==="club"?"Quilox was lively. Wallet lighter.":"You relaxed and cleared your head.");saveGame();updateHUD()}
-function workout(){if(state.needs.energy<20){toast("You are too tired to work out.");return}addNeed("energy",-10);addNeed("fun",10);addNeed("focus",8);addNeed("hunger",-5);state.skills.fitness=Math.min(5,(state.skills.fitness||1)+1);state.time+=40;gainXP(10);toast("Workout complete. Fitness improved.");saveGame();updateHUD()}
-function groom(){if(!spend(2500)){toast("You need ₦2,500 for grooming.");return}addNeed("hygiene",25);addNeed("social",4);state.time+=25;gainXP(5);toast("Fresh like morning dew.");saveGame();updateHUD()}
-function train(k){if(!hasSkill(k)||state.skills[k]>=5)return;const cost=450+state.skills[k]*400;if(!spend(cost)){toast("Not enough money.");return}if(state.needs.energy<20||state.needs.focus<20){state.money+=cost;toast("Too tired to train.");return}state.skills[k]++;state.time+=60;addNeed("energy",-13);addNeed("focus",-8);gainXP(22);toast(`${cap(k)} is now level ${state.skills[k]}.`);checkQuest();saveGame();updateHUD();refreshOpen("skills")}
-function hasSkill(k){return k in state.skills}
-function upgradeHomeMenu(){refreshOpen("housing");$("sheetTitle").textContent="Housing";$("sheetBody").innerHTML=HOUSING.map((h,i)=>`<article class="card"><h3>${h.name} · ${h.area}</h3><p>${h.desc}</p><div class="meta">Move ₦${fmt(h.move)} · Rent ₦${fmt(h.rent)} / 14 days</div><div class="actions"><button class="action primary" data-action="move" data-id="${i}">${i===state.housing?"Current":"Move Here"}</button></div></article>`).join("");bindActionsWithMove()}
-function bindActionsWithMove(){$("sheetBody").querySelectorAll('[data-action="move"]').forEach(b=>b.onclick=()=>{const i=+b.dataset.id;if(i!==state.housing+1){toast("You can move one step at a time.");return}const h=HOUSING[i];if(!spend(h.move)){toast(`You need ₦${fmt(h.move)}.`);return}state.housing=i;state.rentDue=14;addNeed("energy",8);addNeed("hygiene",8);gainXP(45);toast(`Moved into ${h.name}.`);checkQuest();saveGame();updateHUD();upgradeHomeMenu()})}
-function rest(){const gain=HOUSING[state.housing].comfort*.32;state.time+=360;addNeed("energy",gain);addNeed("fun",8);addNeed("hunger",-5*(hasTrait("foodie")?.7:1));addNeed("focus",18);state.status="Resting";toast("You slept and recovered.");saveGame();updateHUD();refreshOpen("home")}
-function bath(){state.time+=35;addNeed("hygiene",38);addNeed("bladder",30);addNeed("energy",-2);toast("Freshened up.");saveGame();updateHUD();refreshOpen("home")}
-function cook(){if(!spend(600)){toast("You need ₦600 for ingredients.");return}state.inventory.push("home_meal");state.stats.meals++;state.time+=35;addNeed("hunger",30);addNeed("fun",3);toast("Meal ready.");checkQuest();saveGame();updateHUD();refreshOpen("home")}
-function buyItem(id){const item=SHOPS.flatMap(s=>s.items).find(i=>i.id===id);if(!item||!spend(item.price)){toast("Not enough money.");return}state.inventory.push(item.id);for(const [k,v] of Object.entries(item.e))if(k in state.needs)addNeed(k,v);if(item.id==="gym")state.skills.fitness=Math.min(5,state.skills.fitness+1);if(["jollof","shawarma","drink"].includes(item.id))state.stats.meals++;state.time+=20;gainXP(6);toast(`Bought ${item.name}.`);checkQuest();saveGame();updateHUD()}
-function useVehicle(id){const v=VEHICLES.find(x=>x.id===id);if(!v)return;if(v.purchase&&!state.ownedVehicles.includes(id)){if(!spend(v.purchase)){toast(`You need ₦${fmt(v.purchase)}.`);return}state.ownedVehicles.push(id)}else if(v.fare){if(!spend(v.fare)){toast(`You need ₦${fmt(v.fare)} for the ride.`);return}state.time+=20;addNeed("energy",4)}state.vehicle=id;toast(`${v.name} selected.`);checkQuest();saveGame();updateHUD();render("transport")}
-function buyBusiness(id){const inv=INVESTMENTS.find(x=>x.id===id);if(!inv||state.investments.includes(id))return;if(state.level<inv.req){toast(`Reach player level ${inv.req}.`);return}if(!spend(inv.cost)){toast(`You need ₦${fmt(inv.cost)}.`);return}state.investments.push(id);gainXP(60);toast(`${inv.name} is now part of your hustle.`);checkQuest();saveGame();updateHUD();render("business")}
-function talk(name){state.relationships[name]=clamp((state.relationships[name]||0)+8);state.time+=15;addNeed("social",hasTrait("socialite")?12.5:10);addNeed("fun",4);gainXP(8);toast(`You and ${name} connected.`);checkQuest();saveGame();render("social")}
-function setRoute(id){const p=PLACES.find(x=>x.id===id);if(!p)return;route=p;routePulse=0;toast(`Route set: ${p.name}.`);$("overlay").classList.remove("open")}
-function interact(){const {p,d}=nearestPlace();if(!p||d>11)return;if(p.kind==="job")open(p.name,"jobs");else if(p.kind==="home")open(p.name,"home");else if(p.kind==="market")open(p.name,"shop-market");else if(p.kind==="food")open(p.name,"place-restaurant");else if(p.kind==="style")open(p.name,"place-spa");else if(p.kind==="gym")open(p.name,"place-gym");else if(p.kind==="office")open(p.name,"business");else if(p.kind==="hall")open(p.name,"profile");else if(p.kind==="beach"||p.kind==="church")open(p.name,"place-"+p.id);else if(p.kind==="club"||p.kind==="hotel"||p.kind==="school")open(p.name,"place-"+p.id);else if(p.kind==="gym")open(p.name,"place-gym");else if(p.kind==="spa")open(p.name,"place-spa")}
-async function signOut(){try{if(state.user)await db.auth.signOut()}catch(e){console.warn(e)}localStorage.removeItem(SAVE_KEY);location.reload()}
-function checkQuest(){const q=QUESTS[state.quest];if(!q||!q.done(state))return;if(state.achievements.includes(q.id))return;state.achievements.push(q.id);state.money+=q.reward;gainXP(q.xp);state.quest++;toast(`Quest complete: ${q.title} · +₦${fmt(q.reward)}.`)}
+ if(state.joy.active){ix=state.joy.x;iz=state.joy.y}
 
-function renderCustomizer(){const root=$("sections");root.innerHTML="";for(const [k,o] of Object.entries(OPTIONS)){const sec=document.createElement("section");sec.className="optionSection";const h=document.createElement("h3");h.textContent=o.label;sec.appendChild(h);const opts=document.createElement("div");opts.className="options";for(const [id,val] of Object.entries(o.values)){const b=document.createElement("button");b.className=`option ${state.cfg[k]===id?"active":""} ${o.kind==="swatch"?"swatch":""}`;if(o.kind==="swatch")b.style.background=val;else b.textContent=val;b.onclick=()=>{state.cfg[k]=id;rebuildPlayer();renderCustomizer()};opts.appendChild(b)}sec.appendChild(opts);root.appendChild(sec)}}
-async function saveAvatar(){localStorage.setItem(AVATAR_KEY,JSON.stringify(state.cfg));toast("Avatar saved on this device.");try{if(state.user){const {error}=await db.rpc("save_avatar",{p_avatar:state.cfg});if(!error)toast("Avatar saved to your account.")}}catch(e){console.warn(e)}}
-function saveGame(){const copy={...state,user:null,pos:{x:player?.root.position.x??state.pos.x,y:player?.root.position.y??0,z:player?.root.position.z??state.pos.z}};localStorage.setItem(SAVE_KEY,JSON.stringify(copy))}
-async function loadGame(){try{const raw=localStorage.getItem(SAVE_KEY);if(raw){const s=JSON.parse(raw);Object.assign(state,s);state.user=null;state.cfg=sanitize(s.cfg);state.needs={hunger:82,energy:90,hygiene:86,fun:76,social:70,bladder:94,focus:75,...(s.needs||{})};state.skills={...Object.fromEntries(SKILLS.map(k=>[k,1])),...(s.skills||{})};state.traits=Array.isArray(s.traits)?s.traits:[(s.startType==="nepo"?"socialite":"hustler")];state.startType=s.startType==="nepo"?"nepo":"lapo";state.ownedVehicles=Array.isArray(s.ownedVehicles)?s.ownedVehicles:["feet",...(s.vehicle&&s.vehicle!=="feet"?[s.vehicle]:[])];state.relationships=s.relationships||{};state.inventory=s.inventory||["phone"];state.investments=s.investments||[];state.achievements=s.achievements||[];state.stats={meals:0,days:0,shifts:0,gigs:0,...(s.stats||{})};state.pos=s.pos||state.pos}}catch(e){console.warn("local save",e)}try{const a=localStorage.getItem(AVATAR_KEY);if(a)state.cfg=sanitize(JSON.parse(a))}catch{}
- try{const {data:{session}}=await db.auth.getSession();if(session){state.user=session.user;state.guest=false;state.accountEmail=session.user.email||"";const {data}=await db.rpc("get_my_character");if(data?.id){state.name=data.name||state.name;state.district=data.district||state.district;if(data.avatar)state.cfg=sanitize(data.avatar)}}}catch(e){console.warn("cloud",e)}rebuildPlayer();player.root.position.set(state.pos.x||0,state.pos.y||0,state.pos.z||0);updateHUD()}
-function updateHUD(){$("name").textContent=state.name;$("levelBadge").textContent=`Lv ${state.level}`;$("sub").textContent=`${state.district} · ${state.career?CAREERS.find(c=>c.id===state.career)?.name:"Starting Out"}`;$("money").textContent=fmt(state.money);$("housingPill").textContent=HOUSING[state.housing].name;$("clock").textContent=currentClock();$("moodText").textContent=mood();$("objectiveText").textContent=state.activity;$("xpText").textContent=`${Math.round(state.xp)} / ${state.level*100} XP`;$('xpFill').style.width=`${state.xp/(state.level*100)*100}%`;for(const k of Object.keys(state.needs)){const id=k[0].toUpperCase()+k.slice(1),f=$(`need${id}`),v=$(`need${id}V`);if(f){f.style.width=`${state.needs[k]}%`;v.textContent=Math.round(state.needs[k])}}updatePrompt()}
-function drawMinimap(){
- const c=$("minimap"),ctx=c.getContext("2d"),w=c.width,h=c.height,s=w/190;
- ctx.clearRect(0,0,w,h);ctx.fillStyle="#1b2a25";ctx.fillRect(0,0,w,h);
- // Four subtly tinted districts correspond to the main explorable map quadrants.
- ctx.fillStyle="#344b3a";ctx.fillRect(0,0,w/2,h/2);ctx.fillStyle="#454941";ctx.fillRect(w/2,0,w/2,h/2);
- ctx.fillStyle="#4c4336";ctx.fillRect(0,h/2,w/2,h/2);ctx.fillStyle="#294a4b";ctx.fillRect(w/2,h/2,w/2,h/2);
- ctx.fillStyle="#a7a99b";for(let i=-3;i<=3;i++){const q=(i*28+95)*s;ctx.fillRect(q-1,0,3*s,h);ctx.fillRect(0,q-1,w,3*s)}
- ctx.font=`${Math.max(7,w*.052)}px system-ui`;ctx.textAlign="center";ctx.fillStyle="rgba(255,255,255,.68)";ctx.fillText("MAINLAND",w*.25,10);ctx.fillText("ISLAND",w*.75,10);ctx.fillText("MARKETS",w*.25,h-4);ctx.fillText("COAST",w*.75,h-4);
- for(const p of PLACES){const x=(p.x+95)*s,y=(p.z+95)*s;ctx.fillStyle=p.color;ctx.strokeStyle="#101714";ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,3.2,0,Math.PI*2);ctx.fill();ctx.stroke()}
- const px=(player.root.position.x+95)*s,py=(player.root.position.z+95)*s;
- if(route){const rx=(route.x+95)*s,ry=(route.z+95)*s;ctx.strokeStyle="#FFC20E";ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(rx,ry);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#FFC20E";ctx.beginPath();ctx.arc(rx,ry,4.5,0,Math.PI*2);ctx.fill()}
- ctx.fillStyle="#fff";ctx.strokeStyle="#14201f";ctx.lineWidth=2;ctx.beginPath();ctx.arc(px,py,4.5,0,Math.PI*2);ctx.fill();ctx.stroke();
-}
+ const moving=Math.hypot(ix,iz)>.12;
+ const speed=state.run||state.keys.shift?7.1:3.6;
 
+ if(moving){
+  const len=Math.hypot(ix,iz);
+  ix/=len;iz/=len;
 
-function animate(){requestAnimationFrame(animate);const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;updatePlayer(dt);updateNPCs(dt);updateCars(dt);updateCamera(dt);updateWorldLight();updateHUD();if((mapClock++&3)===0)drawMinimap();saveClock+=dt;if(saveClock>8){saveClock=0;saveGame()}renderer.render(scene,camera)}
-async function start(){if(gameStarted)return;gameStarted=true;try{$("loading").style.display="flex";setup();await loadGame();$("loginScreen").classList.add("hidden");$("hud").classList.remove("hidden");$("loading").style.display="none";toast("Welcome to Naija Hustle. Start with one useful move.");animate()}catch(e){gameStarted=false;console.error("BOOT ERROR",e);$("loading").style.display="none";$("loginScreen").classList.remove("hidden");$("loginMessage").textContent="Game failed to start. Check the browser console."}}
+  player.root.position.x=clamp(
+   player.root.position.x+ix*speed*dt,-96,96
+  );
+  player.root.position.z=clamp(
+   player.root.position.z+iz*speed*dt,-96,96
+  );
+  player.root.rotation.y=Math.atan2(ix,iz);
+  player.legs.forEach((l,i)=>{
+   l.rotation.x=Math.sin(performance.now()/80+i*Math.PI)*.3;
+  });
 
-$("loginBtn").onclick=async()=>{const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginMessage").textContent="";if(!email||!password){$("loginMessage").textContent="Enter email and password.";return}$("loginBtn").disabled=true;try{const {data,error}=await db.auth.signInWithPassword({email,password});if(error)throw error;if(!data.session)throw new Error("No session created.");await start()}catch(e){console.error(e);$("loginMessage").textContent=e.message||"Login failed."}finally{$("loginBtn").disabled=false}};
-$("signupBtn").onclick=async()=>{const email=$("loginEmail").value.trim(),password=$("loginPassword").value;$("loginMessage").textContent="";if(!email||!password){$("loginMessage").textContent="Enter email and password.";return}$("signupBtn").disabled=true;try{const {data,error}=await db.auth.signUp({email,password});if(error)throw error;$("loginMessage").textContent=data.session?"Account created. Starting...":"Account created. Check your email, then log in.";if(data.session)await start()}catch(e){console.error(e);$("loginMessage").textContent=e.message||"Sign up failed."}finally{$("signupBtn").disabled=false}};
-async function beginGuestLife(type){
- const saved=localStorage.getItem(SAVE_KEY);
- if(saved){
-   const keep=confirm("A saved life already exists. Press OK to continue it, or Cancel to start a new life and replace that local save.");
-   if(!keep)localStorage.removeItem(SAVE_KEY);
-   else {state.guest=true;state.user=null;await start();return;}
+  state.status=state.run||state.keys.shift?"Running":"Walking";
+  addNeed("energy",-(state.run||state.keys.shift?2.2:1.0)*
+   (hasTrait("lazy")?.7:1)*dt);
+  addNeed("hunger",-.18*(hasTrait("foodie")?.7:1)*dt);
+  addNeed("hygiene",-.08*(hasTrait("clean")?.65:1)*dt);
+  addNeed("bladder",-.06*dt);
+ }else{
+  state.status=state.emote!=="none"?state.emote:"Idle";
+  player.legs.forEach(l=>l.rotation.x*=.8);
  }
- applyStartType(type);state.guest=true;state.user=null;saveGame();await start();
+
+ if(state.jump){
+  state.jump=false;
+  if(player.root.position.y<=.02)player.root.userData.vy=6;
+ }
+ player.root.userData.vy=player.root.userData.vy||0;
+
+ if(player.root.position.y>0||player.root.userData.vy>0){
+  player.root.userData.vy-=17*dt;
+  player.root.position.y+=player.root.userData.vy*dt;
+  if(player.root.position.y<0){
+   player.root.position.y=0;
+   player.root.userData.vy=0;
+  }
+ }
+
+ state.time+=dt*1.1;
+ if(state.time>=1440){
+  state.time%=1440;
+  state.day++;
+  state.stats.days++;
+  state.rentDue--;
+  dailyTick();
+ }
+ if(state.time%10<dt)saveGame();
 }
-$("lapoBtn").onclick=()=>beginGuestLife("lapo");
-$("nepoBtn").onclick=()=>beginGuestLife("nepo");
-$("guestBtn").onclick=()=>beginGuestLife("lapo");
-async function boot(){
- try{const {data:{session}}=await db.auth.getSession();if(session){state.user=session.user;await start();return;}}
- catch(e){console.warn("Session check",e)}
- $("loading").style.display="none";$("loginScreen").classList.remove("hidden");
+
+function dailyTick(){
+ addNeed("hunger",-7*(hasTrait("foodie")?.7:1));
+ addNeed("hygiene",-4*(hasTrait("clean")?.65:1));
+ addNeed("fun",-3);
+ addNeed("social",-3);
+ addNeed("bladder",16);
+ addNeed("energy",22);
+ addNeed("focus",-5);
+ if(state.day%7===0)weeklyTick();
+ if(state.rentDue<=0)payRent();
 }
-boot();
+
+function weeklyTick(){
+ state.weeklyEarnings=0;
+ let passive=0;
+ for(const id of state.investments){
+  const inv=INVESTMENTS.find(x=>x.id===id);
+  if(inv)passive+=inv.income;
+ }
+ if(passive){
+  earn(passive);
+  toast(`Business week: +₦${fmt(passive)} income.`);
+ }
+}
+
+function payRent(){
+ const rent=HOUSING[state.housing].rent;
+ if(spend(rent)){
+  state.rentDue=14;
+  addNeed("fun",4);
+  toast(`Rent paid: ₦${fmt(rent)}.`);
+ }else{
+  state.rentDue=3;
+  addNeed("fun",-15);
+  addNeed("energy",-10);
+  toast(`Rent problem: ₦${fmt(rent)} due. Earn fast.`);
+ }
+}
+
+function currentClock(){
+ const h=Math.floor(state.time/60);
+ const m=Math.floor(state.time%60);
+ const ap=h>=12?"PM":"AM";
+ const hh=h%12||12;
+ return `${hh}:${String(m).padStart(2,"0")} ${ap}`;
+}
+
+function mood(){
+ const values=Object.values(state.needs);
+ const v=values.reduce((a,b)=>a+b,0)/values.length;
+ if(v>=80)return"Thriving";
+ if(v>=60)return"Doing Fine";
+ if(v>=40)return"Stressed";
+ if(v>=20)return"Struggling";
+ return"Emergency";
+}
+
+function updateWorldLight(){
+ const h=state.time/60;
+ const sunY=Math.sin((h-6)/12*Math.PI);
+ const light=clamp((sunY+.1)*1.15,0,1);
+ sun.position.set(40,20+sunY*65,30);
+ sun.intensity=.55+1.8*light;
+ hemi.intensity=.55+1.05*light;
+ const sky=new THREE.Color(light>.45?"#8cc2c7":"#17282e");
+ scene.background.lerp(sky,.05);
+ scene.fog.color.copy(scene.background);
+}
+
+function updateCamera(dt){
+ const p=player.root.position;
+ const dist=cameraState==="close"?5.4:8.5;
+ const off=new THREE.Vector3(
+  Math.sin(performance.now()/100000)*dist,
+  4.0,
+  Math.cos(performance.now()/100000)*dist
+ );
+ if(cameraState==="front")off.multiplyScalar(-1);
+ camera.position.lerp(
+  new THREE.Vector3(p.x+off.x,p.y+off.y,p.z+off.z),
+  Math.min(1,dt*5)
+ );
+ camera.lookAt(p.x,p.y+1.02,p.z);
+}
+
+function nearestPlace(){
+ let best=null,d=999;
+ for(const p of PLACES){
+  const n=Math.hypot(
+   player.root.position.x-p.x,
+   player.root.position.z-p.z
+  );
+  if(n<d){d=n;best=p}
+ }
+ return{p:best,d};
+}
+
+function updatePrompt(){
+ const {p,d}=nearestPlace();
+ if(d<11){
+  $("prompt").style.display="block";
+  $("prompt").textContent=`Enter ${p.name}`;
+ }else{
+  $("prompt").style.display="none";
+ }
+}
+
+function toast(msg){state.activity=msg}
+function open(title,mode){
+ $("sheetEyebrow").textContent="NAIJA HUSTLE";
+ $("sheetTitle").textContent=title;
+ $("overlay").classList.add("open");
+ render(mode);
+}
+
+function bindActions(){
+ document.querySelectorAll("[data-action]").forEach(b=>{
+  b.onclick=()=>handleAction(b.dataset.action,b.dataset.id);
+ });
+}
+
+function render(mode){
+ const b=$("sheetBody");
+ if(mode==="phone")b.innerHTML=renderPhone();
+ else if(mode==="inventory")b.innerHTML=renderInventory();
+ else if(mode==="map")b.innerHTML=renderMap();
+ else if(mode==="profile")b.innerHTML=renderProfile();
+ else if(mode==="home")b.innerHTML=renderHome();
+ else if(mode==="social")b.innerHTML=renderSocial();
+ else if(mode==="jobs")b.innerHTML=renderJobs();
+ else if(mode==="gigs")b.innerHTML=renderGigs();
+ else if(mode==="business")b.innerHTML=renderBusiness();
+ else if(mode==="transport")b.innerHTML=renderTransport();
+ else if(mode.startsWith("shop"))b.innerHTML=renderShop(mode);
+ else if(mode.startsWith("place-"))b.innerHTML=renderPlaceActions(mode.slice(6));
+ else if(mode==="skills")b.innerHTML=renderSkills();
+ else b.innerHTML=renderPhone();
+ bindActions();
+}
+
+function renderPhone(){
+ return `
+ <div class="stats">
+  <div class="stat"><strong>₦${fmt(state.money)}</strong><span>WALLET</span></div>
+  <div class="stat"><strong>Day ${state.day}</strong><span>TIME</span></div>
+  <div class="stat"><strong>${mood()}</strong><span>MOOD</span></div>
+  <div class="stat"><strong>${state.rentDue}</strong><span>DAYS TO RENT</span></div>
+ </div>
+ <div class="card" style="margin-bottom:12px">
+  <h3>${state.startType==="nepo"?"NEPO Start · Soft Life":"LAPO Start · Hustle Mode"}</h3>
+  <p>Traits: ${state.traits.map(t=>TRAITS.find(x=>x.id===t)?.name||cap(t)).join(", ")}</p>
+  <p>${state.traits.map(t=>TRAITS.find(x=>x.id===t)?.desc||"").filter(Boolean).join(" ")}</p>
+ </div>
+ <div class="grid">
+  <article class="card">
+   <h3>Work</h3><p>Pick a career, train skills and work shifts.</p>
+   <div class="actions">
+    <button class="action primary" data-action="open" data-id="jobs">Careers</button>
+    <button class="action" data-action="open" data-id="gigs">Gigs</button>
+   </div>
+  </article>
+  <article class="card">
+   <h3>Life</h3><p>Keep needs balanced and improve your home.</p>
+   <div class="actions">
+    <button class="action primary" data-action="open" data-id="home">Home</button>
+    <button class="action" data-action="open" data-id="skills">Train</button>
+   </div>
+  </article>
+  <article class="card">
+   <h3>Money</h3><p>Buy things, transport, and eventually a business.</p>
+   <div class="actions">
+    <button class="action primary" data-action="open" data-id="business">Business</button>
+    <button class="action" data-action="open" data-id="transport">Transport</button>
+   </div>
+  </article>
+  <article class="card">
+   <h3>People</h3><p>Meet locals and build useful relationships.</p>
+   <div class="actions">
+    <button class="action primary" data-action="open" data-id="social">Social</button>
+   </div>
+  </article>
+ </div>`;
+}
+
+function renderJobs(){
+ return `<div class="grid">${
+  CAREERS.map(c=>{
+   const cur=state.career===c.id;
+   const skill=state.skills[c.skill];
+   const lv=cur?state.careerLevel:0;
+   const pay=c.pay+Math.max(0,skill-1)*c.levelPay+lv*1300;
+   return `<article class="card">
+    <h3>${c.name}</h3>
+    <p>${c.desc}</p>
+    <div class="meta">Skill: ${cap(c.skill)} Lv ${skill} · Pay about ₦${fmt(pay)}</div>
+    <div class="actions">
+     <button class="action primary" data-action="career" data-id="${c.id}">${cur?"Work Shift":"Choose"}</button>
+     <button class="action" data-action="train" data-id="${c.skill}">Train</button>
+    </div>
+   </article>`;
+  }).join("")
+ }</div>`;
+}
+
+function renderGigs(){
+ return `<div class="grid">${
+  GIGS.map(g=>`<article class="card">
+   <h3>${g.name}</h3>
+   <p>Cost ₦${fmt(g.cost)} · ${g.min} game min · ${cap(g.skill)} Lv ${state.skills[g.skill]||1}</p>
+   <div class="meta">Reward ₦${fmt(g.reward)}</div>
+   <div class="actions">
+    <button class="action primary" data-action="gig" data-id="${g.id}">Take Gig</button>
+   </div>
+  </article>`).join("")
+ }</div>`;
+}
+
+function renderHome(){
+ return `
+ <div class="stats">
+  <div class="stat"><strong>${HOUSING[state.housing].name}</strong><span>HOME</span></div>
+  <div class="stat"><strong>₦${fmt(HOUSING[state.housing].rent)}</strong><span>RENT / 14 DAYS</span></div>
+  <div class="stat"><strong>${HOUSING[state.housing].comfort}</strong><span>COMFORT</span></div>
+  <div class="stat"><strong>${state.rentDue}</strong><span>DAYS LEFT</span></div>
+ </div>
+ <div class="grid">
+  <article class="card"><h3>Rest</h3><p>Sleep and recover energy.</p>
+   <div class="actions"><button class="action primary" data-action="rest">Sleep</button></div>
+  </article>
+  <article class="card"><h3>Bathroom</h3><p>Restore hygiene and bladder.</p>
+   <div class="actions"><button class="action primary" data-action="bath">Use Bathroom</button></div>
+  </article>
+  <article class="card"><h3>Cook</h3><p>Make a simple meal at home.</p>
+   <div class="actions"><button class="action primary" data-action="cook">Cook Meal · ₦600</button></div>
+  </article>
+  <article class="card"><h3>Upgrade</h3><p>Move to the next home when you can afford the cost.</p>
+   <div class="actions"><button class="action primary" data-action="upgrade">View Homes</button></div>
+  </article>
+ </div>`;
+}
+
+function renderShop(mode){
+ let shops=SHOPS;
+ if(mode==="shop-food")shops=SHOPS.filter(s=>s.id==="food");
+ if(mode==="shop-style")shops=SHOPS.filter(s=>s.id==="style");
+
+ return shops.map(s=>`
+  <div class="sectionBlock">
+   <h3>${s.name}</h3>
+   <div class="grid">
+    ${s.items.map(i=>`
+     <article class="card">
+      <h3>${i.name}</h3>
+      <div class="meta">₦${fmt(i.price)}</div>
+      <p>${Object.entries(i.e).map(([k,v])=>`${v>0?"+":""}${v} ${cap(k)}`).join(" · ")}</p>
+      <div class="actions">
+       <button class="action primary" data-action="item" data-id="${i.id}">Buy</button>
+      </div>
+     </article>`).join("")}
+   </div>
+  </div>`).join("");
+}
+
+function renderInventory(){
+ const counts={};
+ state.inventory.forEach(x=>{counts[x]=(counts[x]||0)+1});
+
+ return `<div class="list">${
+  Object.entries(counts).map(([k,v])=>`
+   <div class="listRow"><b>${cap(k)}</b><span>x${v}</span></div>
+  `).join("")||`<div class="placeholder">Your bag is empty.</div>`
+ }</div>`;
+}
+
+function renderTransport(){
+ return `<div class="grid">${
+  VEHICLES.map(v=>`
+   <article class="card">
+    <h3>${v.name}</h3>
+    <p>${v.fare?`Fare around ₦${fmt(v.fare)}`:""}${v.purchase?` · Buy ₦${fmt(v.purchase)}`:""}</p>
+    <div class="actions">
+     <button class="action primary" data-action="vehicle" data-id="${v.id}">
+      ${state.vehicle===v.id?"Active":v.purchase?"Buy & Use":"Use"}
+     </button>
+    </div>
+   </article>`).join("")
+ }</div>`;
+}
+
+function renderBusiness(){
+ return `<div class="grid">${
+  INVESTMENTS.map(i=>`
+   <article class="card">
+    <h3>${i.name}</h3>
+    <p>Investment ₦${fmt(i.cost)} · Weekly income ₦${fmt(i.income)} · Requires level ${i.req}.</p>
+    <div class="actions">
+     <button class="action primary" data-action="business" data-id="${i.id}">
+      ${state.investments.includes(i.id)?"Owned":"Invest"}
+     </button>
+    </div>
+   </article>`).join("")
+ }</div>`;
+}
+
+function renderSkills(){
+ return `<div class="grid">${
+  SKILLS.map(k=>`
+   <article class="card">
+    <h3>${cap(k)}</h3>
+    <p>Level ${state.skills[k]} / 5</p>
+    <div class="actions">
+     <button class="action primary" data-action="train" data-id="${k}">
+      Train · ₦${fmt(450+state.skills[k]*400)}
+     </button>
+    </div>
+   </article>`).join("")
+ }</div>`;
+}
+
+function renderSocial(){
+ return `<div class="grid">${
+  npcs.slice(0,12).map(n=>`
+   <article class="card">
+    <h3>${n.name}</h3>
+    <p>Friendship ${Math.round(state.relationships[n.name]||0)} / 100</p>
+    <div class="actions">
+     <button class="action primary" data-action="talk" data-id="${n.name}">Talk</button>
+    </div>
+   </article>`).join("")
+ }</div>`;
+}
+
+function renderPlaceActions(id){
+ const p=PLACES.find(x=>x.id===id);
+ if(!p)return `<div class="placeholder">This place is unavailable.</div>`;
+
+ const actions={
+  beach:[["Relax at the beach","fun",1500],["Meet people","socialise",0],["Quick gig","placegig",0]],
+  church:[["Community time","socialise",0],["Rest and reflect","placeRest",0]],
+  club:[["Night out","fun",5000],["Meet people","socialise",0]],
+  hotel:[["Meet people","socialise",0],["Quick gig","placegig",0]],
+  restaurant:[["Eat a meal","eatout",2500],["Meet people","socialise",0]],
+  gym:[["Work out","workout",0],["Meet people","socialise",0]],
+  spa:[["Grooming session","groom",2500],["Meet people","socialise",0]]
+ };
+
+ const list=actions[id]||[["Meet people","socialise",0]];
+
+ return `<p class="muted">${p.name} · Choose an activity. Time and needs will update.</p>
+ <div class="grid">${
+  list.map(([label,action,cost])=>`
+   <article class="card">
+    <h3>${label}</h3>
+    <p>${cost?`Cost ₦${fmt(cost)}`:"No entry fee"}</p>
+    <div class="actions">
+     <button class="action primary" data-action="${action}" data-id="${id}">Do Activity</button>
+    </div>
+   </article>`).join("")
+ }</div>`;
+}
+
+function renderMap(){
+ return `<div class="grid">${
+  PLACES.map(p=>`
+   <article class="card">
+    <h3>${p.name}</h3>
+    <p>${Math.round(Math.hypot(player.root.position.x-p.x,player.root.position.z-p.z))}m away.</p>
+    <div class="actions">
+     <button class="action primary" data-action="route" data-id="${p.id}">Set Route</button>
+    </div>
+   </article>`).join("")
+ }</div>`;
+}
+
+function renderProfile(){
+ const q=QUESTS[state.quest];
+
+ return `
+ <div class="stats">
+  <div class="stat"><strong>Lv ${state.level}</strong><span>PLAYER</span></div>
+  <div class="stat"><strong>₦${fmt(state.totalEarnings)}</strong><span>LIFETIME EARNINGS</span></div>
+  <div class="stat"><strong>${state.career?CAREERS.find(c=>c.id===state.career)?.name:"No career"}</strong><span>CAREER</span></div>
+  <div class="stat"><strong>${state.investments.length}</strong><span>BUSINESSES</span></div>
+ </div>
+ <div class="sectionBlock">
+  <h3>Current Quest</h3>
+  <div class="card">
+   <h3>${q?.title||"All starter quests complete"}</h3>
+   <p>${q?.desc||"Keep building your life."}</p>
+  </div>
+ </div>
+ <div class="sectionBlock">
+  <h3>Life Traits</h3>
+  <p class="muted">Choose one trait. You can change your approach to life here.</p>
+  <div class="grid">${
+   TRAITS.map(t=>`
+    <article class="card">
+     <h3>${t.name}${hasTrait(t.id)?" · Active":""}</h3>
+     <p>${t.desc}</p>
+     <div class="actions">
+      <button class="action ${hasTrait(t.id)?"good":"primary"}" data-action="trait" data-id="${t.id}">
+       ${hasTrait(t.id)?"Active":"Choose Trait"}
+      </button>
+     </div>
+    </article>`).join("")
+  }</div>
+ </div>
+ <div class="sectionBlock">
+  <h3>Skills</h3>
+  <div class="list">${
+   SKILLS.map(k=>`
+    <div class="listRow"><b>${cap(k)}</b><span>Lv ${state.skills[k]}</span></div>
+   `).join("")
+  }</div>
+ </div>
+ <div class="actions"><button class="action" data-action="logout">SIGN OUT</button></div>`;
+}
+
+function handleAction(a, id) {
+  if (a === "open") {
+    const modes = {
+      jobs: "jobs",
+      gigs: "gigs",
+      home: "home",
+      skills: "skills",
+      business: "business",
+      transport: "transport",
+      social: "social"
+    };
+
+    render(modes[id] || "phone");
+    $("sheetTitle").textContent = cap(id);
+    return;
+  }
+
+  if (a === "career") doCareer(id);
+  if (a === "gig") doGig(id);
+  if (a === "train") train(id);
+  if (a === "upgrade") upgradeHomeMenu();
+  if (a === "rest") rest();
+  if (a === "bath") bath();
+  if (a === "cook") cook();
+  if (a === "item") buyItem(id);
+  if (a === "vehicle") useVehicle(id);
+  if (a === "business") buyBusiness(id);
+  if (a === "talk") talk(id);
+  if (a === "trait") chooseTrait(id);
+  if (a === "socialise") socialise();
+  if (a === "eatout") eatOut();
+  if (a === "fun") haveFun(id);
+  if (a === "workout") workout();
+  if (a === "groom") groom();
+  if (a === "placegig") doGig(pick(GIGS).id);
+  if (a === "placeRest") rest();
+  if (a === "route") setRoute(id);
+  if (a === "logout") signOut();
+}
+
+function refreshOpen(mode) {
+  render(mode);
+}
+
+function doCareer(id) {
+  const c = CAREERS.find(x => x.id === id);
+  if (!c) return;
+
+  if (state.career !== id) {
+    state.career = id;
+    state.careerLevel = 1;
+    toast(`Career selected: ${c.name}.`);
+    saveGame();
+    refreshOpen("jobs");
+    return;
+  }
+
+  const skill = state.skills[c.skill];
+
+  if (state.needs.energy < 28 || state.needs.focus < 20) {
+    toast("You need more energy and focus before a full shift.");
+    return;
+  }
+
+  let pay =
+    c.pay +
+    (skill - 1) * c.levelPay +
+    Math.floor(state.careerLevel) * 1300 +
+    (mood() === "Thriving" ? 1200 : 0);
+
+  if (hasTrait("hustler")) pay *= 1.2;
+  if (hasTrait("lazy")) pay *= 0.85;
+
+  pay = Math.floor(pay);
+
+  earn(pay);
+  state.stats.shifts++;
+  state.time += 120;
+
+  addNeed("energy", -19);
+  addNeed("hunger", -12);
+  addNeed("focus", -10);
+  addNeed("fun", -6);
+
+  state.careerLevel = Math.min(
+    5,
+    state.careerLevel + (skill >= state.careerLevel ? 0.15 : 0)
+  );
+
+  toast(`Shift complete: +₦${fmt(pay)}.`);
+  checkQuest();
+  saveGame();
+  updateHUD();
+  refreshOpen("jobs");
+}
+
+function doGig(id) {
+  const g = GIGS.find(x => x.id === id);
+  if (!g) return;
+
+  if (state.skills[g.skill] < 1) {
+    toast("Skill requirement not met.");
+    return;
+  }
+
+  if (!spend(g.cost)) {
+    toast("Not enough money for the gig costs.");
+    return;
+  }
+
+  let reward = g.reward + (state.skills[g.skill] - 1) * 700;
+
+  if (hasTrait("hustler")) reward *= 1.2;
+  if (hasTrait("lazy")) reward *= 0.85;
+
+  reward = Math.floor(reward);
+
+  earn(reward);
+  state.stats.gigs++;
+  state.time += g.min;
+
+  addNeed("energy", -10);
+  addNeed("hunger", -7);
+  addNeed("focus", -8);
+
+  toast(`Gig complete: +₦${fmt(reward)}.`);
+  checkQuest();
+  saveGame();
+  updateHUD();
+  refreshOpen("gigs");
+}
+
+function chooseTrait(id) {
+  if (!TRAITS.some(t => t.id === id)) return;
+
+  state.traits = [id];
+
+  toast(`Trait selected: ${TRAITS.find(t => t.id === id).name}.`);
+  saveGame();
+  updateHUD();
+  render("profile");
+}
+
+function socialise() {
+  addNeed("social", hasTrait("socialite") ? 31.25 : 25);
+  addNeed("fun", 10);
+
+  state.time += 30;
+
+  gainXP(5);
+  toast("You gist with people. Network strong.");
+
+  saveGame();
+  updateHUD();
+}
+
+function eatOut() {
+  const cost = 2500;
+
+  if (!spend(cost)) {
+    toast("You need ₦2,500 to eat out.");
+    return;
+  }
+
+  addNeed("hunger", 55);
+  addNeed("bladder", -8);
+
+  state.stats.meals++;
+  state.time += 35;
+
+  gainXP(4);
+  toast("You chopped well. Soft life small.");
+
+  checkQuest();
+  saveGame();
+  updateHUD();
+}
+
+function haveFun(placeId) {
+  const cost = placeId === "club" ? 5000 : 1500;
+
+  if (!spend(cost)) {
+    toast(`You need ₦${fmt(cost)} for this outing.`);
+    return;
+  }
+
+  addNeed("fun", 40);
+  addNeed("social", 15);
+  addNeed("energy", -12);
+
+  state.time += 60;
+
+  gainXP(6);
+
+  toast(
+    placeId === "club"
+      ? "Quilox was lively. Wallet lighter."
+      : "You relaxed and cleared your head."
+  );
+
+  saveGame();
+  updateHUD();
+}
+
+function workout() {
+  if (state.needs.energy < 20) {
+    toast("You are too tired to work out.");
+    return;
+  }
+
+  addNeed("energy", -10);
+  addNeed("fun", 10);
+  addNeed("focus", 8);
+  addNeed("hunger", -5);
+
+  state.skills.fitness = Math.min(
+    5,
+    (state.skills.fitness || 1) + 1
+  );
+
+  state.time += 40;
+
+  gainXP(10);
+  toast("Workout complete. Fitness improved.");
+
+  saveGame();
+  updateHUD();
+}
+
+function groom() {
+  if (!spend(2500)) {
+    toast("You need ₦2,500 for grooming.");
+    return;
+  }
+
+  addNeed("hygiene", 25);
+  addNeed("social", 4);
+
+  state.time += 25;
+
+  gainXP(5);
+  toast("Fresh like morning dew.");
+
+  saveGame();
+  updateHUD();
+}
+
+function train(k) {
+  if (!hasSkill(k) || state.skills[k] >= 5) return;
+
+  const cost = 450 + state.skills[k] * 400;
+
+  if (!spend(cost)) {
+    toast("Not enough money.");
+    return;
+  }
+
+  if (state.needs.energy < 20 || state.needs.focus < 20) {
+    state.money += cost;
+    toast("Too tired to train.");
+    return;
+  }
+
+  state.skills[k]++;
+  state.time += 60;
+
+  addNeed("energy", -13);
+  addNeed("focus", -8);
+
+  gainXP(22);
+
+  toast(`${cap(k)} is now level ${state.skills[k]}.`);
+
+  checkQuest();
+  saveGame();
+  updateHUD();
+  refreshOpen("skills");
+}
+
+function hasSkill(k) {
+  return k in state.skills;
+}
+
+function upgradeHomeMenu() {
+  refreshOpen("housing");
+  $("sheetTitle").textContent = "Housing";
+
+  $("sheetBody").innerHTML = HOUSING.map((h, i) => `
+    <article class="card">
+      <h3>${h.name} · ${h.area}</h3>
+      <p>${h.desc}</p>
+      <div class="meta">
+        Move ₦${fmt(h.move)} · Rent ₦${fmt(h.rent)} / 14 days
+      </div>
+      <div class="actions">
+        <button class="action primary" data-action="move" data-id="${i}">
+          ${i === state.housing ? "Current" : "Move Here"}
+        </button>
+      </div>
+    </article>
+  `).join("");
+
+  bindActionsWithMove();
+}
+
+function bindActionsWithMove() {
+  $("sheetBody")
+    .querySelectorAll('[data-action="move"]')
+    .forEach(b => {
+      b.onclick = () => {
+        const i = +b.dataset.id;
+
+        if (i !== state.housing + 1) {
+          toast("You can move one step at a time.");
+          return;
+        }
+
+        const h = HOUSING[i];
+
+        if (!spend(h.move)) {
+          toast(`You need ₦${fmt(h.move)}.`);
+          return;
+        }
+
+        state.housing = i;
+        state.rentDue = 14;
+
+        addNeed("energy", 8);
+        addNeed("hygiene", 8);
+
+        gainXP(45);
+        toast(`Moved into ${h.name}.`);
+
+        checkQuest();
+        saveGame();
+        updateHUD();
+        upgradeHomeMenu();
+      };
+    });
+}
+
+function rest() {
+  const gain = HOUSING[state.housing].comfort * 0.32;
+
+  state.time += 360;
+
+  addNeed("energy", gain);
+  addNeed("fun", 8);
+  addNeed("hunger", -5 * (hasTrait("foodie") ? 0.7 : 1));
+  addNeed("focus", 18);
+
+  state.status = "Resting";
+  toast("You slept and recovered.");
+
+  saveGame();
+  updateHUD();
+  refreshOpen("home");
+}
+
+function bath() {
+  state.time += 35;
+
+  addNeed("hygiene", 38);
+  addNeed("bladder", 30);
+  addNeed("energy", -2);
+
+  toast("Freshened up.");
+
+  saveGame();
+  updateHUD();
+  refreshOpen("home");
+}
+
+function cook() {
+  if (!spend(600)) {
+    toast("You need ₦600 for ingredients.");
+    return;
+  }
+
+  state.inventory.push("home_meal");
+  state.stats.meals++;
+  state.time += 35;
+
+  addNeed("hunger", 30);
+  addNeed("fun", 3);
+
+  toast("Meal ready.");
+
+  checkQuest();
+  saveGame();
+  updateHUD();
+  refreshOpen("home");
+}
+
+function buyItem(id) {
+  const item = SHOPS.flatMap(s => s.items).find(i => i.id === id);
+
+  if (!item || !spend(item.price)) {
+    toast("Not enough money.");
+    return;
+  }
+
+  state.inventory.push(item.id);
+
+  for (const [k, v] of Object.entries(item.e)) {
+    if (k in state.needs) addNeed(k, v);
+  }
+
+  if (item.id === "gym") {
+    state.skills.fitness = Math.min(5, state.skills.fitness + 1);
+  }
+
+  if (["jollof", "shawarma", "drink"].includes(item.id)) {
+    state.stats.meals++;
+  }
+
+  state.time += 20;
+  gainXP(6);
+
+  toast(`Bought ${item.name}.`);
+
+  checkQuest();
+  saveGame();
+  updateHUD();
+}
+
+function useVehicle(id) {
+  const v = VEHICLES.find(x => x.id === id);
+  if (!v) return;
+
+  if (v.purchase && !state.ownedVehicles.includes(id)) {
+    if (!spend(v.purchase)) {
+      toast(`You need ₦${fmt(v.purchase)}.`);
+      return;
+    }
+
+    state.ownedVehicles.push(id);
+  } else if (v.fare) {
+    if (!spend(v.fare)) {
+      toast(`You need ₦${fmt(v.fare)} for the ride.`);
+      return;
+    }
+
+    state.time += 20;
+    addNeed("energy", 4);
+  }
+
+  state.vehicle = id;
+
+  toast(`${v.name} selected.`);
+
+  checkQuest();
+  saveGame();
+  updateHUD();
+  render("transport");
+}
+
+function buyBusiness(id) {
+  const inv = INVESTMENTS.find(x => x.id === id);
+
+  if (!inv || state.investments.includes(id)) return;
+
+  if (state.level < inv.req) {
+    toast(`Reach player level ${inv.req}.`);
+    return;
+  }
+
+  if (!spend(inv.cost)) {
+    toast(`You need ₦${fmt(inv.cost)}.`);
+    return;
+  }
+
+  state.investments.push(id);
+
+  gainXP(60);
+  toast(`${inv.name} is now part of your hustle.`);
+
+  checkQuest();
+  saveGame();
+  updateHUD();
+  render("business");
+}
+
+function talk(name) {
+  state.relationships[name] = clamp(
+    (state.relationships[name] || 0) + 8
+  );
+
+  state.time += 15;
+
+  addNeed("social", hasTrait("socialite") ? 12.5 : 10);
+  addNeed("fun", 4);
+
+  gainXP(8);
+  toast(`You and ${name} connected.`);
+
+  checkQuest();
+  saveGame();
+  render("social");
+}
+
+function setRoute(id) {
+  const p = PLACES.find(x => x.id === id);
+  if (!p) return;
+
+  route = p;
+  routePulse = 0;
+
+  toast(`Route set: ${p.name}.`);
+  $("overlay").classList.remove("open");
+}
+
+function interact() {
+  const { p, d } = nearestPlace();
+
+  if (!p || d > 11) return;
+
+  if (p.kind === "job") {
+    open(p.name, "jobs");
+  } else if (p.kind === "home") {
+    open(p.name, "home");
+  } else if (p.kind === "market") {
+    open(p.name, "shop-market");
+  } else if (p.kind === "food") {
+    open(p.name, "place-restaurant");
+  } else if (p.kind === "style") {
+    open(p.name, "place-spa");
+  } else if (p.kind === "gym") {
+    open(p.name, "place-gym");
+  } else if (p.kind === "office") {
+    open(p.name, "business");
+  } else if (p.kind === "hall") {
+    open(p.name, "profile");
+  } else if (
+    p.kind === "beach" ||
+    p.kind === "church" ||
+    p.kind === "club" ||
+    p.kind === "hotel" ||
+    p.kind === "school"
+  ) {
+    open(p.name, "place-" + p.id);
+  } else if (p.kind === "spa") {
+    open(p.name, "place-spa");
+  }
+}
+
+async function signOut() {
+  try {
+    if (state.user) await db.auth.signOut();
+  } catch (e) {
+    console.warn(e);
+  }
+
+  localStorage.removeItem(SAVE_KEY);
+  location.reload();
+}
+
+function checkQuest() {
+  const q = QUESTS[state.quest];
+
+  if (!q || !q.done(state)) return;
+  if (state.achievements.includes(q.id)) return;
+
+  state.achievements.push(q.id);
+  state.money += q.reward;
+
+  gainXP(q.xp);
+
+  state.quest++;
+  toast(`Quest complete: ${q.title} · +₦${fmt(q.reward)}.`);
+}
+
+function renderCustomizer() {
+  const root = $("sections");
+  root.innerHTML = "";
+
+  for (const [k, o] of Object.entries(OPTIONS)) {
+    const sec = document.createElement("section");
+    sec.className = "optionSection";
+
+    const h = document.createElement("h3");
+    h.textContent = o.label;
+    sec.appendChild(h);
+
+    const opts = document.createElement("div");
+    opts.className = "options";
+
+    for (const [id, val] of Object.entries(o.values)) {
+      const b = document.createElement("button");
+
+      b.className =
+        `option ${state.cfg[k] === id ? "active" : ""} ` +
+        `${o.kind === "swatch" ? "swatch" : ""}`;
+
+      if (o.kind === "swatch") {
+        b.style.background = val;
+      } else {
+        b.textContent = val;
+      }
+
+      b.onclick = () => {
+        state.cfg[k] = id;
+        rebuildPlayer();
+        renderCustomizer();
+      };
+
+      opts.appendChild(b);
+    }
+
+    sec.appendChild(opts);
+    root.appendChild(sec);
+  }
+}
+
+async function saveAvatar() {
+  localStorage.setItem(AVATAR_KEY, JSON.stringify(state.cfg));
+  toast("Avatar saved on this device.");
+
+  try {
+    if (state.user) {
+      const { error } = await db.rpc("save_avatar", {
+        p_avatar: state.cfg
+      });
+
+      if (!error) {
+        toast("Avatar saved to your account.");
+      }
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+}
+
+function saveGame() {
+  const copy = {
+    ...state,
+    user: null,
+    pos: {
+      x: player?.root.position.x ?? state.pos.x,
+      y: player?.root.position.y ?? 0,
+      z: player?.root.position.z ?? state.pos.z
+    }
+  };
+
+  localStorage.setItem(SAVE_KEY, JSON.stringify(copy));
+}
+
+async function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+
+    if (raw) {
+      const s = JSON.parse(raw);
+
+      Object.assign(state, s);
+      state.user = null;
+      state.cfg = sanitize(s.cfg);
+
+      state.needs = {
+        hunger: 82,
+        energy: 90,
+        hygiene: 86,
+        fun: 76,
+        social: 70,
+        bladder: 94,
+        focus: 75,
+        ...(s.needs || {})
+      };
+
+      state.skills = {
+        ...Object.fromEntries(SKILLS.map(k => [k, 1])),
+        ...(s.skills || {})
+      };
+
+      state.traits = Array.isArray(s.traits)
+        ? s.traits
+        : [s.startType === "nepo" ? "socialite" : "hustler"];
+
+      state.startType = s.startType === "nepo" ? "nepo" : "lapo";
+
+      state.ownedVehicles = Array.isArray(s.ownedVehicles)
+        ? s.ownedVehicles
+        : [
+            "feet",
+            ...(s.vehicle && s.vehicle !== "feet" ? [s.vehicle] : [])
+          ];
+
+      state.relationships = s.relationships || {};
+      state.inventory = s.inventory || ["phone"];
+      state.investments = s.investments || [];
+      state.achievements = s.achievements || [];
+
+      state.stats = {
+        meals: 0,
+        days: 0,
+        shifts: 0,
+        gigs: 0,
+        ...(s.stats || {})
+      };
+
+      state.pos = s.pos || state.pos;
+    }
+  } catch (e) {
+    console.warn("local save", e);
+  }
+
+  try {
+    const a = localStorage.getItem(AVATAR_KEY);
+
+    if (a) {
+      state.cfg = sanitize(JSON.parse(a));
+    }
+  } catch (e) {
+    console.warn("Saved avatar", e);
+  }
+
+  try {
+    const {
+      data: { session }
+    } = await db.auth.getSession();
+
+    if (session) {
+      state.user = session.user;
+      state.guest = false;
+      state.accountEmail = session.user.email || "";
+
+      const { data } = await db.rpc("get_my_character");
+
+      if (data?.id) {
+        state.name = data.name || state.name;
+        state.district = data.district || state.district;
+
+        if (data.avatar) {
+          state.cfg = sanitize(data.avatar);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("cloud", e);
+  }
+
+  rebuildPlayer();
+
+  player.root.position.set(
+    state.pos.x || 0,
+    state.pos.y || 0,
+    state.pos.z || 0
+  );
+
+  updateHUD();
+}
+
+function updateHUD() {
+  $("name").textContent = state.name;
+  $("levelBadge").textContent = `Lv ${state.level}`;
+
+  $("sub").textContent =
+    `${state.district} · ${
+      state.career
+        ? CAREERS.find(c => c.id === state.career)?.name
+        : "Starting Out"
+    }`;
+
+  $("money").textContent = fmt(state.money);
+  $("housingPill").textContent = HOUSING[state.housing].name;
+  $("clock").textContent = currentClock();
+  $("moodText").textContent = mood();
+  $("objectiveText").textContent = state.activity;
+
+  $("xpText").textContent =
+    `${Math.round(state.xp)} / ${state.level * 100} XP`;
+
+  $("xpFill").style.width =
+    `${state.xp / (state.level * 100) * 100}%`;
+
+  for (const k of Object.keys(state.needs)) {
+    const id = k[0].toUpperCase() + k.slice(1);
+    const f = $(`need${id}`);
+    const v = $(`need${id}V`);
+
+    if (f) {
+      f.style.width = `${state.needs[k]}%`;
+
+      if (v) {
+        v.textContent = Math.round(state.needs[k]);
+      }
+    }
+  }
+
+  updatePrompt();
+}
+
+function drawMinimap() {
+  const c = $("minimap");
+  const ctx = c.getContext("2d");
+  const w = c.width;
+  const h = c.height;
+  const s = w / 190;
+
+  ctx.clearRect(0, 0, w, h);
+
+  ctx.fillStyle = "#1b2a25";
+  ctx.fillRect(0, 0, w, h);
+
+  // Four subtly tinted districts.
+  ctx.fillStyle = "#344b3a";
+  ctx.fillRect(0, 0, w / 2, h / 2);
+
+  ctx.fillStyle = "#454941";
+  ctx.fillRect(w / 2, 0, w / 2, h / 2);
+
+  ctx.fillStyle = "#4c4336";
+  ctx.fillRect(0, h / 2, w / 2, h / 2);
+
+  ctx.fillStyle = "#294a4b";
+  ctx.fillRect(w / 2, h / 2, w / 2, h / 2);
+
+  // Roads.
+  ctx.fillStyle = "#a7a99b";
+
+  for (let i = -3; i <= 3; i++) {
+    const q = (i * 28 + 95) * s;
+
+    ctx.fillRect(q - 1, 0, 3 * s, h);
+    ctx.fillRect(0, q - 1, w, 3 * s);
+  }
+
+  // District labels.
+  ctx.font = `${Math.max(7, w * 0.052)}px system-ui`;
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(255,255,255,.68)";
+
+  ctx.fillText("MAINLAND", w * 0.25, 10);
+  ctx.fillText("ISLAND", w * 0.75, 10);
+  ctx.fillText("MARKETS", w * 0.25, h - 4);
+  ctx.fillText("COAST", w * 0.75, h - 4);
+
+  // Locations.
+  for (const p of PLACES) {
+    const x = (p.x + 95) * s;
+    const y = (p.z + 95) * s;
+
+    ctx.fillStyle = p.color;
+    ctx.strokeStyle = "#101714";
+    ctx.lineWidth = 1.5;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // Player position.
+  const px = (player.root.position.x + 95) * s;
+  const py = (player.root.position.z + 95) * s;
+
+  // Route indicator.
+  if (route) {
+    const rx = (route.x + 95) * s;
+    const ry = (route.z + 95) * s;
+
+    ctx.strokeStyle = "#FFC20E";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 3]);
+
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(rx, ry);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#FFC20E";
+    ctx.beginPath();
+    ctx.arc(rx, ry, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Highlight the player.
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "#14201f";
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+}
